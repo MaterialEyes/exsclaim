@@ -4,13 +4,19 @@ from imutils.object_detection import non_max_suppression
 from PIL import Image
 import numpy as np
 import cv2
+import os
 
 def none(image_array):
     return [image_array]
 
 
-def east_text_detector(image_array, east_detector="frozen_east_text_detection.pb", min_confidence=0.5, 
-                      newW = 320, newH = 320):
+def east_text_detector_save(image_array, image_name, image_path):
+    """ Runs EAST saving images with boxes drawn on them """
+    return east_text_detector(image_array, image_name, image_path, save=True)
+
+
+def east_text_detector(image_array, im_name = "", image_path = "", east_detector="frozen_east_text_detection.pb", min_confidence=0.5, 
+                      newW = 320, newH = 320, save=False):
     """ Returns images cropped around bounding boxes of text in image represented by image_path 
     
     param image_path: path to input image
@@ -126,11 +132,38 @@ def east_text_detector(image_array, east_detector="frozen_east_text_detection.pb
         endY = int(endY * rH)
         
         new_image = orig.copy()
-        text_box = new_image[startY-1:endY+1, startX-1:endX+1]
+        
+        # ensure that the textbox doesn't go beyond the image
+        startY = max(0, startY-1)
+        startX = max(0, startX-1)
+        endY = min(orig_height, endY-1)
+        endX = min(orig_width, endX-1)
+        
+        text_box = new_image[startY:endY, startX:endX]
         text_boxes.append(text_box)
+        
+        # to save a copy of the image with text boxes drawn
+        if save:
+            cv2.rectangle(orig, (startX, startY), (endX, endY), (0, 255, 0), 2)
+    
+    if save:
+        original_image = Image.fromarray(orig)
+        display(original_image, im_name, image_path)
         
     if len(text_boxes) == 0:
         return [orig]
     else:
         return text_boxes
         
+        
+# show the output image
+def display(image, image_name, image_path):
+    """ saves images to output_east directory """
+    os.makedirs("output/" + image_path, exist_ok=True)
+    destination = "output/" + image_name
+    try:
+        image.save(destination, "JPEG", quality=80, optimize=True, progressive=True)
+    except IOError:
+        PIL.ImageFile.MAXBLOCK = img.size[0] * img.size[1]
+        image.save(destination, "JPEG", quality=80, optimize=True, progressive=True)
+
