@@ -29,9 +29,9 @@ save_images = True if args["save"] == 1 else False
 
 # intitialize which functions will be used
 fp_function = pre.none
-td_function = td.east_text_detector
-ppm_function = pre.ace
-ocr_function = ocr.pytesseract_ocr
+td_function = td.none
+ppm_function = pre.none
+ocr_function = ocr.tesserocr_ocr
 
 
 def save(image, image_name):

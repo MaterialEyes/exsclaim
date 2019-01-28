@@ -14,6 +14,14 @@ def pytesseract_ocr(image):
     """
     return pytesseract.image_to_string(image, config = "--psm 10")
 
+def pytesseract_verbose_ocr(image):
+    """ Uses pytesseract to find the text in an image with data
+
+    param image: image object
+    returns: a string of all text in the image
+    """
+    return pytesseract.image_to_data(image, config = "--psm 10")
+
 def tesserocr_ocr(image):
     """ Uses tesserocr to find the text in an image
 

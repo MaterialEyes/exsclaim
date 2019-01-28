@@ -24,8 +24,8 @@ directory_name = args["test_images"]
 # SELECT WHICH FUNCTIONS TO USE FROM RESPECTIVE FILES
 fp_function = pre.none
 td_function = td.east_text_detector_save
-ppm_function = pre.none
-ocr_function = ocr.pytesseract_ocr
+ppm_function = pre.ace
+ocr_function = ocr.pytesseract_verbose_ocr
               
 # Prepare for displaying results
 save_text = True if args["print_results"] == "1" else False
