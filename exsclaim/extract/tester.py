@@ -8,6 +8,15 @@ import cv2 as cv
 import argparse
 
 
+<<<<<<< HEAD
+=======
+# SELECT WHICH FUNCTIONS TO USE FROM RESPECTIVE FILES
+td_function = td.east_text_detector
+ppm_function = pre.ace
+ocr_function = ocr.pytesseract_ocr
+
+
+>>>>>>> 99f9687... Added README.md
 # for command line usage
 ap = argparse.ArgumentParser()
 ap.add_argument("-t", "--test_images", type=str, default="images/small_nonisolated",
