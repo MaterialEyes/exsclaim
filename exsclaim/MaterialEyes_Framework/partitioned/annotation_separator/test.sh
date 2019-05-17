@@ -1,0 +1,1 @@
+python test.py --dataroot /home/weixin/Documents/MyProjects/PhDResearch/ArgonneProjects/MaterialEyes_Framework/data/subfigures --name pix2pix_res9block_3layer --model pix2pix --netG resnet_9blocks --direction AtoB --num_test 100  --results_dir /home/weixin/Documents/MyProjects/PhDResearch/ArgonneProjects/MaterialEyes_Framework/data/annotation_maps --preprocess none  --epoch 300
