@@ -86,6 +86,9 @@ for root, dirs, files in os.walk(directory):
         filename = os.fsdecode(os.path.join(root, file))
         df = pd.read_csv(filename)
 
+        df['image count (predicted)'] = [""]*len(df)
+        df['image text (predicted)'] = [""]*len(df)
+
         for index, row in df.iterrows():
 
             # if row["num subfigs"] != 1000 and row["num subfigs"] != -99:
@@ -94,8 +97,12 @@ for root, dirs, files in os.walk(directory):
             print("Figure ",index)
             caption = ". "+row["caption"]
             image_count, d = interpret_caption(caption,[],nlp,matcher)
+            row['image count (predicted)'] = image_count
+            row['image text (predicted)'] = d
             
 
                 # if image_count != row["num subfigs"]:
                 #     print("Expected number of images: ",row["num subfigs"])
                 #     break
+
+        df.to_csv(filename,index=False)
