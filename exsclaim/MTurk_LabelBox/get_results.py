@@ -148,8 +148,8 @@ def convert_single_image_label(json_answer):
 def get_labelbox_json(HITLayoutId):
 	# Create your connection to MTurk
 	hit_list = []
-	mtc = boto3.client('mturk', aws_access_key_id='AKIAQ5NBZORHXCUYHFWO',
-					   aws_secret_access_key='PU5H4y8/ZHhsl5XxiTyDXTl8wzvMknHsgme5PxXN',
+	mtc = boto3.client('mturk', aws_access_key_id=access_key,
+					   aws_secret_access_key=secret_key,
 					   region_name='us-east-1', 
 					   endpoint_url = MTURK_SANDBOX)
 	hits = mtc.list_hits()
