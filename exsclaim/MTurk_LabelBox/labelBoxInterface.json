@@ -1,0 +1,170 @@
+{
+  "classifications": [],
+  "tools": [
+    {
+      "name": "Master Figure",
+      "color": "#FF0000",
+      "tool": "rectangle",
+      "classifications": [
+        {
+          "name": "classification",
+          "instructions": "Select what type of image the Master Figure is",
+          "type": "radio",
+          "options": [
+            {
+              "value": "parent",
+              "label": "Parent (i.e. contains Dependent Image(s))"
+            },
+            {
+              "value": "microscopy",
+              "label": "Microscopy"
+            },
+            {
+              "value": "diffraction",
+              "label": "Diffraction"
+            },
+            {
+              "value": "graph",
+              "label": "Graph"
+            },
+            {
+              "value": "illustration",
+              "label": "Illustration"
+            },
+            {
+              "value": "basic_photo",
+              "label": "Basic Photo"
+            },
+            {
+              "value": "unclear",
+              "label": "Unclear"
+            }
+          ],
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "Dependent Figure",
+      "color": "#0000FF",
+      "tool": "rectangle",
+      "classifications": [
+        {
+          "name": "classification",
+          "instructions": "Select what type of image the Dependent Figure is",
+          "type": "radio",
+          "options": [
+            {
+              "value": "microscopy",
+              "label": "Microscopy"
+            },
+            {
+              "value": "diffraction",
+              "label": "Diffraction"
+            },
+            {
+              "value": "graph",
+              "label": "Graph"
+            },
+            {
+              "value": "illustration",
+              "label": "Illustration"
+            },
+            {
+              "value": "basic_photo",
+              "label": "Basic Photo"
+            },
+            {
+              "value": "unclear",
+              "label": "Unclear"
+            }
+          ],
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "Inset Figure",
+      "color": "#9900FF",
+      "tool": "rectangle",
+      "classifications": [
+        {
+          "name": "classification",
+          "instructions": "Select what type of image the Inset Figure is",
+          "type": "radio",
+          "options": [
+            {
+              "value": "microscopy",
+              "label": "Microscopy"
+            },
+            {
+              "value": "diffraction",
+              "label": "Diffraction"
+            },
+            {
+              "value": "graph",
+              "label": "Graph"
+            },
+            {
+              "value": "illustration",
+              "label": "Illustration"
+            },
+            {
+              "value": "basic_photo",
+              "label": "Basic Photo"
+            },
+            {
+              "value": "unclear",
+              "label": "Unclear"
+            }
+          ],
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "Subfigure Label",
+      "color": "#00A700",
+      "tool": "rectangle",
+      "classifications": [
+        {
+          "name": "text",
+          "instructions": "Fill in the exact text of the subfigure label",
+          "type": "text",
+          "options": [
+            {
+              "value": "",
+              "label": ""
+            }
+          ],
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "Scale Bar Label",
+      "color": "#FFFF00",
+      "tool": "rectangle",
+      "classifications": [
+        {
+          "name": "text",
+          "instructions": "Fill in the exact text of the scale bar label",
+          "type": "text",
+          "options": [
+            {
+              "value": "",
+              "label": ""
+            }
+          ],
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "Scale Bar Line",
+      "color": "#FF9900",
+      "tool": "rectangle"
+    }
+  ],
+  "projectInstructions": "https://storage.googleapis.com/labelbox-193903.appspot.com/cjooh9smgbldt0738ducp9x0e%2F73c16066-cd09-1ecf-0dcf-0adc7f0a508e-Parse_Scientific_Figures_Instructions.pdf"
+}
