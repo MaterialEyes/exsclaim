@@ -1,5 +1,43 @@
 import boto3
 import json
+import argparse
+
+
+# for command line usage
+ap = argparse.ArgumentParser()
+ap.add_argument("-k", "--access_key", type=str,
+                help="AWS Access Key ID")
+ap.add_argument("-s", "--secret_key", type=str,
+                help="AWS Secret Access Key")
+ap.add_argument("-f", "--format", type=str, default="0",
+				help="enter how you would like to get the results:\n " +
+					 "0 - output to terminal\n1 - write to output.json\n" +
+					 "2 - upload to labelbox\n3 - output images with" +
+					 "bounding boxes drawn to output\nYou may enter multiple")
+ap.add_argument("-l", "--layout_id", type=str, 
+				help="enter the layout id available by clicking on the" +
+				     "project name in your requester account")
+ap.add_argument("-d", "--deploy", type=str, default="False",
+				help="enter true, y, or 1 if you are deploying. false, " + 
+				"n, or 0 to test")
+args = vars(ap.parse_args())
+
+
+# parse command line arguments
+access_key = args["access_key"]
+secret_key = args["secret_key"]
+layout_id = args["layout_id"]
+format = args["format"]
+testing = args["deploy"]
+
+# determines endpoint_url
+if testing.lower() in ["true", "y", "yes", "1", "yeah", "t"]:
+	endpoint_url = ""
+elif testing.lower() in ["false", "n", "no", "0", "nope", "f"]:
+	endpoint_url = 'https://mturk-requester-sandbox.us-east-1.amazonaws.com'
+else:
+	raise argparse.ArgumentTypeError("please provide a boolean " + 
+	                                 "value for '--testing'")
 
 ## Naming conventions
 # LabelBox
@@ -7,8 +45,8 @@ LabelBoxMaster = "Master Image"
 LabelBoxDependent = "Dependent Image"
 LabelBoxInset = "Inset Image"
 LabelBoxSubLabel = "Subfigure Label"
-LabelBoxScaleLabel = "Scale Bar Label (i.e. 10 nm)"
-LabelBoxScaleBar = "Scale Bar Line (actual bar or line)"
+LabelBoxScaleLabel = "Scale Bar Label"
+LabelBoxScaleBar = "Scale Bar Line"
 # Mechanical Turk
 MTurkMaster = "master"
 MTurkDependent = "dependent"
@@ -17,17 +55,13 @@ MTurkSubLabel = "subfigure_label"
 MTurkScaleLabel = "scale_bar_label"
 MTurkScaleBar = "scale_bar"
 
-## Delete in actual deployment
-MTURK_SANDBOX = 'https://mturk-requester-sandbox.us-east-1.amazonaws.com'
 
 # Create your connection to MTurk
 mtc = boto3.client('mturk', aws_access_key_id='',
 aws_secret_access_key='',
 region_name='us-east-1', 
-endpoint_url = MTURK_SANDBOX)
+endpoint_url = endpoint_url)
 
-## This is the HIT (Human Intelligence Task) ID whose results we are looking for
-hit_ids = ["3538U0YQ1FP9FLLG88Z8EGUMCEW3F5"]
 
 def labelbox_json_from_hitid(hit_id):
 	""" calls MTurk to results for HIT and converts them to labelbox format """
@@ -129,8 +163,19 @@ def get_labelbox_json(HITLayoutId):
 	
 	return output
 		
-	
-print(get_labelbox_json('3N1982R7HNS4XE89MKMATBZKS9PB5K'))
+# uses helper functions to retrieve labelbox_json for completed HITs	
+labelbox_json = get_labelbox_json('layout_id')
+
+# displays results in desired formats
+if "0" in format:
+	print(json.dumps(labelbox_json, sort_keys="True", indent=2)
+if "1" in format:
+	with open("output.json", "w") as g:
+		g.write(labelbox_json)
+if "2" in format:
+	print("format '2' not implemented")
+if "3" in format:
+	print("format '3' not implemented")
 	
 
 
