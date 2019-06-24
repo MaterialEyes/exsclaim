@@ -141,6 +141,9 @@ def main():
         if args.weights_path:
             print("loading yolo weights %s" % (args.weights_path))
             parse_yolo_weights(model, args.weights_path)
+        elif args.gpu < 0:
+            print("loading checkpoint %s" % (args.ckpt))
+            model.load_state_dict(torch.load(args.ckpt, map_location="cpu")["model_state_dict"])
         else:
             print("loading checkpoint %s" % (args.ckpt))
             model.load_state_dict(torch.load(args.ckpt)["model_state_dict"])
@@ -200,7 +203,7 @@ def main():
         from PIL import Image, ImageDraw, ImageFont
         test_img = Image.open(args.image).convert("RGB")
         draw = ImageDraw.Draw(test_img)
-        font_type = "arial.ttf"
+        font_type = "DejaVuSansMono.ttf"
         font = ImageFont.truetype(font_type, 10)
 
 #         print(classes)
