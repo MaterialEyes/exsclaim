@@ -39,7 +39,6 @@ def get_naming_dictionary():
 	json_string = f.read().replace("'","\"")
 	json_string = json_string.replace("(", "[")
 	json_string = json_string.replace(")", "]")
-	#print(json_string)
 	f.close()
 	return json.loads(json_string)
 naming_dictionary = get_naming_dictionary()
@@ -73,4 +72,5 @@ for image in image_urls:
 	  HITTypeId      = type_id,
 	  LifetimeInSeconds = 600
 	)
+	print(response["HIT"]["HITId"] + " " + image)
 

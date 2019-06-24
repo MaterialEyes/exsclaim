@@ -64,8 +64,23 @@ api_key = ("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjand1bzkweHJiMDR
 		  "uxgvwHnsFyHDb4kjw")		  
 project_id = 'cjx64zn93fdwl0890uxh0agvk'
 dataset_id = 'cjx65cbxsfgmb0800604zurzo'
+mtc = boto3.client('mturk', aws_access_key_id=access_key,
+					   aws_secret_access_key=secret_key,
+					   region_name='us-east-1', 
+					   endpoint_url = endpoint_url)
+					   
+def get_naming_dictionary():
+	f = open("image_urls_to_id_name.txt", "r")
+	json_string = f.read().replace("'","\"")
+	json_string = json_string.replace("(", "[")
+	json_string = json_string.replace(")", "]")
+	f.close()
+	return json.loads(json_string)
+	
+naming_dict = get_naming_dictionary()
 
 
+<<<<<<< HEAD
 
 # Create your connection to MTurk
 mtc = boto3.client('mturk', aws_access_key_id='',
@@ -75,16 +90,19 @@ endpoint_url = endpoint_url)
 
 
 def labelbox_json_from_hitid(hit_id):
+=======
+def labelbox_json_from_hitid(hit_id, url):
+>>>>>>> b951d98... Finished code to upload mturk labels to labelbox
 	""" calls MTurk to results for HIT and converts them to labelbox format """
 	output = []
 	result = mtc.list_assignments_for_hit(HITId = hit_id)
 	for assignment in result['Assignments']:
-		labelbox_json = convert_single_image(assignment)
+		labelbox_json = convert_single_image(assignment, url)
 		output.append(labelbox_json)
 	return output
 	
 
-def convert_single_image(assignment):
+def convert_single_image(assignment, url):
 	""" converts worker_answer from MTurk to LabelBox format
 	
 	param image_name: name of the image_name
@@ -112,8 +130,8 @@ def convert_single_image(assignment):
              "Created By": assignment["WorkerId"],
              "DataRow ID": None,
              "Dataset Name": "150419_atomic-resolution",
-             "External ID": "no name",
-             "ID": None,
+             "External ID": naming_dict[url][1],
+             "ID": naming_dict[url][0],
 			 "Label" : single_image_label }
 	return data
 
@@ -156,8 +174,9 @@ def convert_single_image_label(json_answer):
 			single_image_label[LabelBoxScaleBar].append(label_dictionary)
 	return single_image_label
 	
-def get_labelbox_json(HITLayoutId):
+def get_labelbox_json():
 	# Create your connection to MTurk
+<<<<<<< HEAD
 	hit_list = []
 	mtc = boto3.client('mturk', aws_access_key_id=access_key,
 					   aws_secret_access_key=secret_key,
@@ -168,68 +187,68 @@ def get_labelbox_json(HITLayoutId):
 		if hit['HITLayoutId'] == HITLayoutId:
 			hit_list.append(hit['HITId'])
 	
+=======
+	f = open("hitids.txt", "r")
+	hit_list = f.read().split("\n")
+>>>>>>> b951d98... Finished code to upload mturk labels to labelbox
 	output = []
-	for hit in hit_list:
-		output += labelbox_json_from_hitid(hit)
+	for line in hit_list:
+		if line != "":
+			hit, url = line.split()
+			output += labelbox_json_from_hitid(hit, url)
 	
 	return output
 	
-def get_naming_dictionary():
-	f = open("image_urls_to_id_name.txt", "r")
-	json_string = f.read().replace("'","\"")
-	json_string = json_string.replace("(", "[")
-	json_string = json_string.replace(")", "]")
-	f.close()
-	return json.loads(json_string)
 	
 def upload_labels(labelbox_json):
 	client = GraphQLClient('https://api.labelbox.com/graphql')
 	client.inject_token('Bearer ' + api_key)
-	naming_dict = get_naming_dictionary()
-	
-	res_str = client.execute("""
-    mutation CreateLabelFromApi($label: String!, $projectId: ID!, $dataRowId: ID!){
-      createLabel(data:{
-        label:$label,
-        secondsToLabel:0,
-        project:{
-          connect:{
-            id:$projectId
-          }
-        }
-        dataRow:{
-          connect:{
-            id:$dataRowId
-          }
-        }
-        type:{
-          connect:{
-            name:"Any"
-          }
-        }
-      }){
-      id
-      }
-    }
-    """, {
-        'label': '',
-        'projectId': project_id,
-        'dataRowId': ''
-    })
+	#naming_dict = get_naming_dictionary()
+	for label in labelbox_json:
+		
+		res_str = client.execute("""
+		mutation CreateLabelFromApi($label: String!, $projectId: ID!, $dataRowId: ID!){
+		  createLabel(data:{
+			label:$label,
+			secondsToLabel:0,
+			project:{
+			  connect:{
+				id:$projectId
+			  }
+			}
+			dataRow:{
+			  connect:{
+				id:$dataRowId
+			  }
+			}
+			type:{
+			  connect:{
+				name:"Any"
+			  }
+			}
+		  }){
+		  id
+		  }
+		}
+		""", {
+			'label': json.dumps(label["Label"]),
+			'projectId': project_id,
+			'dataRowId': label["ID"]
+		})
 		
 
 # uses helper functions to retrieve labelbox_json for completed HITs	
-labelbox_json = get_labelbox_json('layout_id')
+labelbox_json = get_labelbox_json()
 
 # displays results in desired formats
 if "0" in format:
-	print(json.dumps(labelbox_json, sort_keys="True", indent=2)
+	print(json.dumps(labelbox_json, sort_keys="True", indent=2))
 if "1" in format:
 	with open("output.json", "w") as g:
 		g.write(labelbox_json)
 if "2" in format:
-	print("format '2' not implemented")
-	api_key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjand1bzkweHJiMDRrMDgzNmFtdTdhMGVwIiwib3JnYW5pemF0aW9uSWQiOiJjang0dnJoejZjd21sMDg0NDhoODJiMzM3IiwiYXBpS2V5SWQiOiJjang2NDY5emtlMXNqMDgxMXdibWR3NHRwIiwiaWF0IjoxNTYxMTIyNzQzLCJleHAiOjIxOTIyNzQ3NDN9.Wgshf25Ls_eoPO21LaD810OtoHuxgvwHnsFyHDb4kjw"
+	print("sending to https://app.labelbox.com/projects/cjx64zn93fdwl0890uxh0agvk/labels/activity")
+	upload_labels(labelbox_json)
 if "3" in format:
 	print("format '3' not implemented")
 	
