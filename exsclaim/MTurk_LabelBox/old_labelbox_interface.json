@@ -7,12 +7,12 @@
       "tool": "rectangle",
       "classifications": [
         {
-          "name": "image_type",
+          "name": "classification",
           "instructions": "Image Type",
           "type": "radio",
           "options": [
             {
-              "value": "parent__(i.e._contains_dependent_image(s))",
+              "value": "parent",
               "label": "Parent  (i.e. contains Dependent Image(s))"
             },
             {
@@ -28,7 +28,7 @@
               "label": "Graph"
             },
             {
-              "value": "photo",
+              "value": "basic_photo",
               "label": "Photo"
             },
             {
@@ -50,7 +50,7 @@
       "tool": "rectangle",
       "classifications": [
         {
-          "name": "image_type",
+          "name": "classification",
           "instructions": "Image Type",
           "type": "radio",
           "options": [
@@ -67,7 +67,7 @@
               "label": "Graph"
             },
             {
-              "value": "photo",
+              "value": "basic_photo",
               "label": "Photo"
             },
             {
@@ -89,7 +89,7 @@
       "tool": "rectangle",
       "classifications": [
         {
-          "name": "image_type",
+          "name": "classification",
           "instructions": "Image Type",
           "type": "radio",
           "options": [
@@ -106,7 +106,7 @@
               "label": "Graph"
             },
             {
-              "value": "photo",
+              "value": "basic_photo",
               "label": "Photo"
             },
             {
@@ -128,7 +128,7 @@
       "tool": "rectangle",
       "classifications": [
         {
-          "name": "text_(match_case)",
+          "name": "text",
           "instructions": "Text (Match Case)",
           "type": "text",
           "options": [
@@ -142,12 +142,12 @@
       ]
     },
     {
-      "name": "Scale Bar Label (i.e. 10 nm)",
+      "name": "Scale Bar Label",
       "color": "#F6BF26",
       "tool": "rectangle",
       "classifications": [
         {
-          "name": "text_(match_case)",
+          "name": "text",
           "instructions": "Text (Match Case)",
           "type": "text",
           "options": [
@@ -161,7 +161,7 @@
       ]
     },
     {
-      "name": "Scale Bar Line (actual bar or line)",
+      "name": "Scale Bar Line",
       "color": "#F4511E",
       "tool": "rectangle"
     }

@@ -1,6 +1,7 @@
 import boto3
 import json
 import argparse
+from graphqlclient import GraphQLClient
 
 
 # for command line usage
@@ -54,6 +55,16 @@ MTurkInset = "inset"
 MTurkSubLabel = "subfigure_label"
 MTurkScaleLabel = "scale_bar_label"
 MTurkScaleBar = "scale_bar"
+
+# Constants
+api_key = ("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjand1bzkweHJiMDR" + 
+		  "rMDgzNmFtdTdhMGVwIiwib3JnYW5pemF0aW9uSWQiOiJjang0dnJoejZjd21sMDg0NDh" +
+		  "oODJiMzM3IiwiYXBpS2V5SWQiOiJjang2NDY5emtlMXNqMDgxMXdibWR3NHRwIiwiaWF" +
+		  "0IjoxNTYxMTIyNzQzLCJleHAiOjIxOTIyNzQ3NDN9.Wgshf25Ls_eoPO21LaD810OtoH" + 
+		  "uxgvwHnsFyHDb4kjw")		  
+project_id = 'cjx64zn93fdwl0890uxh0agvk'
+dataset_id = 'cjx65cbxsfgmb0800604zurzo'
+
 
 
 # Create your connection to MTurk
@@ -162,7 +173,51 @@ def get_labelbox_json(HITLayoutId):
 		output += labelbox_json_from_hitid(hit)
 	
 	return output
+	
+def get_naming_dictionary():
+	f = open("image_urls_to_id_name.txt", "r")
+	json_string = f.read().replace("'","\"")
+	json_string = json_string.replace("(", "[")
+	json_string = json_string.replace(")", "]")
+	f.close()
+	return json.loads(json_string)
+	
+def upload_labels(labelbox_json):
+	client = GraphQLClient('https://api.labelbox.com/graphql')
+	client.inject_token('Bearer ' + api_key)
+	naming_dict = get_naming_dictionary()
+	
+	res_str = client.execute("""
+    mutation CreateLabelFromApi($label: String!, $projectId: ID!, $dataRowId: ID!){
+      createLabel(data:{
+        label:$label,
+        secondsToLabel:0,
+        project:{
+          connect:{
+            id:$projectId
+          }
+        }
+        dataRow:{
+          connect:{
+            id:$dataRowId
+          }
+        }
+        type:{
+          connect:{
+            name:"Any"
+          }
+        }
+      }){
+      id
+      }
+    }
+    """, {
+        'label': '',
+        'projectId': project_id,
+        'dataRowId': ''
+    })
 		
+
 # uses helper functions to retrieve labelbox_json for completed HITs	
 labelbox_json = get_labelbox_json('layout_id')
 
@@ -174,6 +229,7 @@ if "1" in format:
 		g.write(labelbox_json)
 if "2" in format:
 	print("format '2' not implemented")
+	api_key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjand1bzkweHJiMDRrMDgzNmFtdTdhMGVwIiwib3JnYW5pemF0aW9uSWQiOiJjang0dnJoejZjd21sMDg0NDhoODJiMzM3IiwiYXBpS2V5SWQiOiJjang2NDY5emtlMXNqMDgxMXdibWR3NHRwIiwiaWF0IjoxNTYxMTIyNzQzLCJleHAiOjIxOTIyNzQ3NDN9.Wgshf25Ls_eoPO21LaD810OtoHuxgvwHnsFyHDb4kjw"
 if "3" in format:
 	print("format '3' not implemented")
 	

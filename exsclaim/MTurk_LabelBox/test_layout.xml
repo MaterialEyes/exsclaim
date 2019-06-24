@@ -552,7 +552,7 @@ BBoxAnnotator.prototype.change_selector = function(functionality) {
 			
 		
     var options = {
-		url: 'https://storage.googleapis.com/labelbox-193903.appspot.com/cjooh9smgbldt0738ducp9x0e%2Fa03372f9-c648-bf90-7d11-5b1451e59295-C5RA20461E_fig3.png', //PLACEHOLDER
+		url: "${image_url}", //PLACEHOLDER
 		input_method: new_input, 
 		labels: new_labels, 
 		functionality: functionality,
@@ -588,7 +588,7 @@ $(document).ready(function() {
   var assignment_id = turkGetParam('assignmentId', "");
   // Initialize the bounding-box annotator.
   var annotator = new BBoxAnnotator({
-    url: 'https://drive.google.com/uc?id=15_KDz9f93UDqubv-s8ngm2APBeHpfd4e', //PLACEHOLDER
+    url: "${image_url}", //PLACEHOLDER
 	input_method : 'select',
 	labels : ['Parent', 'Microscopy', 'Diffraction', 'Graph',
           	  'Illustration', 'Basic Photo', 'Unclear'],
