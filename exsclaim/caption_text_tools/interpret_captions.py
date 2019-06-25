@@ -15,20 +15,23 @@ def interpret_caption(caption,keywords,nlp,matcher):
     :return: spaCy matcher object (with explicit connections between implied subfigures and tokens), Predicted number of images (subfigures)
     """
 
+    # Initial caption text
+    print("\nInitial caption text:\n%s"%(caption))
+    
     # Initial preprocessing of caption text (enforce unicode and resolve known troublesome strings).
     caption = resolve_problem_sequences(caption)
-    print("\nCaption text:\n%s"%(caption[2::]))
+    print("\nResolved caption text:\n%s"%(caption))
 
     # Create doc and call rule-based matcher on doc
     doc     = nlp(caption)
     matches = matcher(doc)
 
-    query_kw = ["HAADF-STEM","HAADF–STEM","HRTEM","TEM","Z contrast","Z-contrast","annular","darkfield","crystalline","atomic structure","columns","atomic columns","atomic resolution","incoherent"]
+    # Keywords from webscraper/CDE query
+    # Format: {"Main class 1":[synonym1, synonym2, ...], "Main class 2":[synonym1, synonym2, ...], etc."}
+    query_kw = {"HAADF-STEM":["HAADF","HAADF-STEM","HAADF–STEM","High-angle annular dark-field","High angle annular dark-field","High-angle annular darkfield","High angle annular darkfield"],\
+                "Z-contrast":["Z-contrast","Z–contrast"]}
 
-    if len(matches) > 0:
-
-        print(matches)
-        print(len(matches))
+    if matches != []:
         # Find primary character type (TODO: implement resolve by mixed char type)
         char_type = select_char_delim(nlp,matches,alpha_thresh=0.20)
         
@@ -38,27 +41,28 @@ def interpret_caption(caption,keywords,nlp,matcher):
         print("\nPrimary Char Type: %s"%(char_type))
         print("\nTokens (All): ")
         view_matches(doc,resolved)
-
-        d = {}
-        d = associate_caption_text(nlp,doc,resolved,query_kw)
-
     else:
-
-        print("No Tokens Found!")
         resolved = []
         num_imgs_implied = 1
-        d = {}
-        d["None"] = caption
+
+    dt, de, dk = associate_caption_text(nlp,doc,resolved,query_kw)
 
     print("\nPredicted number of images : ",num_imgs_implied)
 
-
     print("\nAssociated caption text (by token) : ")
-    for k in list(d.keys()):
-        print(k,">"*(12-len(k)),d[k])
+    for k in list(dt.keys()):
+        print(k,">"*(9-len(k))," ".join(dt[k]))
+
+    print("\nAssociated caption text (explicit) : ")
+    for k in list(de.keys()):
+        print(k,">"*(9-len(k))," ".join(de[k]))
+
+    print("\nAssociated caption text (keywords) : ")
+    for k in list(dk.keys()):
+        print(k,">"*(9-len(k))," ".join(dk[k]))
 
     print("\n")
-    return num_imgs_implied,d
+    return num_imgs_implied, dt, de, dk 
 
 # Description of parameters used to create caption pattern collection:
 # - offsets: punctuation used to set off characters that are explanatory (i.e. a parenthesis)
@@ -86,23 +90,19 @@ for root, dirs, files in os.walk(directory):
         filename = os.fsdecode(os.path.join(root, file))
         df = pd.read_csv(filename)
 
-        df['image count (predicted)'] = [""]*len(df)
-        df['image text (predicted)'] = [""]*len(df)
+        df['predicted image count']   = [""]*len(df)
+        df['caption text (by token)'] = [""]*len(df)
+        df['caption text (explicit)'] = [""]*len(df)
+        df['caption text (keywords)'] = [""]*len(df)
 
         for index, row in df.iterrows():
-
-            # if row["num subfigs"] != 1000 and row["num subfigs"] != -99:
-         
             print("<*>"*35)
             print("Figure ",index)
-            caption = ". "+row["caption"]
-            image_count, d = interpret_caption(caption,[],nlp,matcher)
-            row['image count (predicted)'] = image_count
-            row['image text (predicted)'] = d
-            
-
-                # if image_count != row["num subfigs"]:
-                #     print("Expected number of images: ",row["num subfigs"])
-                #     break
+            caption = row["caption"]
+            image_count, dt, de, dk  = interpret_caption(caption,[],nlp,matcher)
+            row['predicted image count'] = image_count
+            row['caption text (by token)'] = dt
+            row['caption text (explicit)'] = de
+            row['caption text (keywords)'] = dk
 
         df.to_csv(filename,index=False)
