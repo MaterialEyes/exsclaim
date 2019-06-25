@@ -96,6 +96,7 @@ for root, dirs, files in os.walk(directory):
         df['caption text (keywords)'] = [""]*len(df)
 
         for index, row in df.iterrows():
+<<<<<<< HEAD
             print("<*>"*35)
             print("Figure ",index)
             caption = row["caption"]
@@ -104,5 +105,15 @@ for root, dirs, files in os.walk(directory):
             row['caption text (by token)'] = dt
             row['caption text (explicit)'] = de
             row['caption text (keywords)'] = dk
+=======
+                print("<*>"*35)
+                print("Figure ",index)
+                caption = row["caption"]
+                image_count, dt, de, dk  = interpret_caption(caption,[],nlp,matcher)
+                row['predicted image count'] = image_count
+                row['caption text (by token)'] = dt
+                row['caption text (explicit)'] = de
+                row['caption text (keywords)'] = dk
+>>>>>>> f78208f... Add htmls from key.csv
 
         df.to_csv(filename,index=False)
