@@ -1,6 +1,10 @@
 # MaterialEyes_Framework
 
+<<<<<<< HEAD
 !!!look at the .sh files in each folder, important!!!!
+=======
+### Description
+>>>>>>> 6983501... Merge branch 'master' of https://gitlab.com/MaterialEyes/exsclaim
 
 > change the input/output paths and put the weight files in the correct position
 
@@ -38,8 +42,34 @@ run
 
 ## Semi Automated
 
+<<<<<<< HEAD
 ** How to put weights file?
 >>>>>>> 441fdf7... Added code to automate streamlined and hopefully make it more portable
+=======
+## Automated Run
+
+Requires pip, best if you run after activating a virtualenv. 
+run
+```
+bash setup.sh
+```
+(this installs all required packages in requirements.txt and downloads and unzips the .ckpt file)
+
+Then to run the model on the default images, 
+```
+cd detection_compound_figure
+bash test.sh
+```
+or if you have no gpu
+```
+cd detection_compound_figure
+bash test_no_gpu.sh
+```
+
+## Semi Automated
+
+### How to put weights file?
+>>>>>>> 6983501... Merge branch 'master' of https://gitlab.com/MaterialEyes/exsclaim
 
 3. subfigure label/scaling bar detection
 > change --image_dir to --image if the input is a single image
@@ -52,11 +82,15 @@ python test.py --detect_thresh 0.5 --ckpt checkpoints/snapshot500.ckpt --image_d
 /path_to_MaterialEyesFramework/annotation_recognition/checkpoints
 ```
 
+<<<<<<< HEAD
 
 ** How to put weights file?
 
 Download the weights.zip file from "All Files/LDRD_MaterialEyes/Datasets/material_framework_weights/", unzip it.
 
+=======
+### test.sh
+>>>>>>> 6983501... Merge branch 'master' of https://gitlab.com/MaterialEyes/exsclaim
 ```bash
 <<<<<<< HEAD
 git clone git@github.com:WeixinGithubJiang/MaterialEyes_Framework.git
@@ -85,5 +119,8 @@ cp /path-to-weights_annotation_recognition/snapshot500.ckpt ./
 > --result_dir          folder for saving results
 > --image_extend        image extensions, default png
 > --gpu			enter -1 if running on machine with no GPU
+<<<<<<< HEAD
 >>>>>>> 441fdf7... Added code to automate streamlined and hopefully make it more portable
+=======
+>>>>>>> 6983501... Merge branch 'master' of https://gitlab.com/MaterialEyes/exsclaim
 ```

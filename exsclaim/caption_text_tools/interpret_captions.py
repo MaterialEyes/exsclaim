@@ -97,6 +97,7 @@ for root, dirs, files in os.walk(directory):
 
         for index, row in df.iterrows():
 <<<<<<< HEAD
+<<<<<<< HEAD
             print("<*>"*35)
             print("Figure ",index)
             caption = row["caption"]
@@ -106,6 +107,8 @@ for root, dirs, files in os.walk(directory):
             row['caption text (explicit)'] = de
             row['caption text (keywords)'] = dk
 =======
+=======
+>>>>>>> 6983501... Merge branch 'master' of https://gitlab.com/MaterialEyes/exsclaim
                 print("<*>"*35)
                 print("Figure ",index)
                 caption = row["caption"]
@@ -114,6 +117,9 @@ for root, dirs, files in os.walk(directory):
                 row['caption text (by token)'] = dt
                 row['caption text (explicit)'] = de
                 row['caption text (keywords)'] = dk
+<<<<<<< HEAD
 >>>>>>> f78208f... Add htmls from key.csv
+=======
+>>>>>>> 6983501... Merge branch 'master' of https://gitlab.com/MaterialEyes/exsclaim
 
         df.to_csv(filename,index=False)
