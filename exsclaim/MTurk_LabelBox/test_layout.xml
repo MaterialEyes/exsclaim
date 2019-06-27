@@ -7,9 +7,9 @@
 <p><b>Primary Task -- Draw bouding boxes:</b> Select which type of object you are labeling, then draw a box around each instance of that object. Finally complete the the object's classification, either by selecting a type or transcribing the text within your box. </p>
 <p>The objects of interest are: </p>
     <ul>
-        <li> <b>Master Image:</b> The global figure that the master subfigure label is referencing. Can be a <a href="https://drive.google.com/file/d/1CX14EfNzota_3mjWpTBbe7SpWPfqPZEf/view?usp=sharing">single image</a> or <a href="https://drive.google.com/file/d/1CX14EfNzota_3mjWpTBbe7SpWPfqPZEf/view?usp=sharing">multiple</a>. </li>
+        <li> <b>Master Image:</b> The global figure that the master subfigure label is referencing. Can be a <a href="https://drive.google.com/file/d/1v_t-cLlyHedL4vaSUJl8MKdDIEz0nZXC/view?usp=sharing" target="_blank">single image</a> or <a href="https://drive.google.com/file/d/1abF_PZPswWcmQ0D0R1rwtc8Nm8R46Hsg/view?usp=sharing" target="blank">multiple</a>. </li>
         <li> <b>Dependent Image:</b> A “sub” image contained within the bounds of its master image that is <em>not</em> integrated into the content of another image.</li>
-        <li> <b>Inset Image:</b> A “sub” image contained within the bounds of its master image that <em>is</em> integrated (inset) into the content another image. <a href="https://drive.google.com/file/d/1CX14EfNzota_3mjWpTBbe7SpWPfqPZEf/view?usp=sharing">Example</a></li>
+        <li> <b>Inset Image:</b> A “sub” image contained within the bounds of its master image that <em>is</em> integrated (inset) into the content another image. <a href="https://drive.google.com/open?id=1xlMSqxBRzr3LvhCOFl_eHqoFfLHe82Ma" target="_blank">Example</a></li>
         <li> <b>Subfigure Label:</b> A classifying name (most often a single letter or number) applying to a master image or dependent image within the figure.</li>
         <li> <b>Scale Bar Label:</b> The length associated with the scale bar line provided (i.e. 10 nm).</li>
         <li> <b>Scale Bar Line:</b> The bar or line providing a visual indication of size in the image. Be as precise as possible when drawing this bounding box being careful not to clip portions of the scale bar.</li>
@@ -26,7 +26,7 @@
     </ul>
 <p><b>Secondary Task #2 -- Transcribe Text:</b> If the object of interest is a Subfigure Label or Scale Bar Label, please enter in the text exactly as it appears. For scale bar labels, you may enter &#956m as um and &#8491 as A. </p>
  
-<p> Full instructions with sample labeling session <a href="https://drive.google.com/file/d/1423RJVS2zQw3arCQNRvMdyS5UboH4bDU/view?usp=sharing">here</a></p>
+<p> Full instructions with sample labeling session <a href="https://drive.google.com/file/d/1423RJVS2zQw3arCQNRvMdyS5UboH4bDU/view?usp=sharing" target="_blank">here</a></p>
 </div>
 
 <ul id="short_instructions" style="display:none">
