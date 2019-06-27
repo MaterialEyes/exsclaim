@@ -195,42 +195,61 @@ def get_labelbox_json():
 	
 	return output
 	
+def get_existing_labels(client, dataset_id, datarow_id):
+	""" returns dataRow externalId to id dict from index:index+100 """
+	res_str = client.execute("""
+	query getDatasetInformation($dataset_id: ID!, $datarow_id: ID!){
+		dataset(where: {id: $dataset_id}){
+			dataRows(where: {id: $datarow_id}) {
+				labels{
+					id
+				}
+			}
+		}
+	}
+    """, {'dataset_id': dataset_id, 'datarow_id': datarow_id} )
+
+	res = json.loads(res_str)
+	return res["data"]["dataset"]["dataRows"][0]["labels"]
+	
 	
 def upload_labels(labelbox_json):
 	client = GraphQLClient('https://api.labelbox.com/graphql')
 	client.inject_token('Bearer ' + api_key)
-	#naming_dict = get_naming_dictionary()
+	pre_existing_labels = []
 	for label in labelbox_json:
-		
-		res_str = client.execute("""
-		mutation CreateLabelFromApi($label: String!, $projectId: ID!, $dataRowId: ID!){
-		  createLabel(data:{
-			label:$label,
-			secondsToLabel:0,
-			project:{
-			  connect:{
-				id:$projectId
+		if get_existing_labels(client, dataset_id, label["ID"]) == []:
+			res_str = client.execute("""
+			mutation CreateLabelFromApi($label: String!, $projectId: ID!, $dataRowId: ID!){
+			  createLabel(data:{
+				label:$label,
+				secondsToLabel:0,
+				project:{
+				  connect:{
+					id:$projectId
+				  }
+				}
+				dataRow:{
+				  connect:{
+					id:$dataRowId
+				  }
+				}
+				type:{
+				  connect:{
+					name:"Any"
+				  }
+				}
+			  }){
+			  id
 			  }
 			}
-			dataRow:{
-			  connect:{
-				id:$dataRowId
-			  }
-			}
-			type:{
-			  connect:{
-				name:"Any"
-			  }
-			}
-		  }){
-		  id
-		  }
-		}
-		""", {
-			'label': json.dumps(label["Label"]),
-			'projectId': project_id,
-			'dataRowId': label["ID"]
-		})
+			""", {
+				'label': json.dumps(label["Label"]),
+				'projectId': project_id,
+				'dataRowId': label["ID"]
+			})
+		else: 
+			pre_existing_labels.append(label["ID"])
 		
 
 # uses helper functions to retrieve labelbox_json for completed HITs	
