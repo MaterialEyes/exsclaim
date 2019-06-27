@@ -15,9 +15,6 @@ ap.add_argument("-f", "--format", type=str, default="0",
 					 "0 - output to terminal\n1 - write to output.json\n" +
 					 "2 - upload to labelbox\n3 - output images with" +
 					 "bounding boxes drawn to output\nYou may enter multiple")
-ap.add_argument("-l", "--layout_id", type=str, 
-				help="enter the layout id available by clicking on the" +
-				     "project name in your requester account")
 ap.add_argument("-d", "--deploy", type=str, default="False",
 				help="enter true, y, or 1 if you are deploying. false, " + 
 				"n, or 0 to test")
@@ -27,13 +24,12 @@ args = vars(ap.parse_args())
 # parse command line arguments
 access_key = args["access_key"]
 secret_key = args["secret_key"]
-layout_id = args["layout_id"]
 format = args["format"]
 testing = args["deploy"]
 
 # determines endpoint_url
 if testing.lower() in ["true", "y", "yes", "1", "yeah", "t"]:
-	endpoint_url = ""
+	endpoint_url = 'https://mturk-requester.us-east-1.amazonaws.com'
 elif testing.lower() in ["false", "n", "no", "0", "nope", "f"]:
 	endpoint_url = 'https://mturk-requester-sandbox.us-east-1.amazonaws.com'
 else:
@@ -252,14 +248,3 @@ if "2" in format:
 if "3" in format:
 	print("format '3' not implemented")
 	
-
-
-
-
-
-
-
-
-
-
-

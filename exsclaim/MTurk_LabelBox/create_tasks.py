@@ -49,7 +49,7 @@ for key in naming_dictionary:
 	
 # determines endpoint_url
 if testing.lower() in ["true", "y", "yes", "1", "yeah", "t"]:
-	endpoint_url = ""
+	endpoint_url = 'https://mturk-requester.us-east-1.amazonaws.com'
 elif testing.lower() in ["false", "n", "no", "0", "nope", "f"]:
 	endpoint_url = 'https://mturk-requester-sandbox.us-east-1.amazonaws.com'
 else:
@@ -70,7 +70,7 @@ for image in image_urls:
 	  HITLayoutId    = layout_id,
 	  HITLayoutParameters = [ {'Name': 'image_url', 'Value': image } ],
 	  HITTypeId      = type_id,
-	  LifetimeInSeconds = 600
+	  LifetimeInSeconds = 2592000
 	)
 	print(response["HIT"]["HITId"] + " " + image)
 

@@ -555,6 +555,7 @@ BBoxAnnotator.prototype.change_selector = function(functionality) {
 		input_method: new_input, 
 		labels: new_labels, 
 		functionality: functionality,
+		color: color,
 		onchange: function(entries) {
 			$("#annotation_data").val(JSON.stringify(entries));
 			if (entries.length > 0 &&
