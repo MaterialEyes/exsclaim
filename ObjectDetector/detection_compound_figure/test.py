@@ -88,8 +88,8 @@ def load_model(args):
             total_loss += loss.data.cpu().numpy()
         print("loss is {}".format(total_loss/(i+1)))
         return
-	else:
-		pass  
+    else:
+        pass  
     
     
     
@@ -105,14 +105,14 @@ def load_model(args):
 #     nmsthre = 1
 
     if args.detect_thresh:
-		confthre = args.detect_thresh
+        confthre = args.detect_thresh
 	
-    return model, confthre, nmsthre
+    return model, confthre, nmsthre, imgsize
 	
 	
 def run_model(args, model, confthre, nmsthre):
     if args.image_dir:
-    img_names = glob.glob(os.path.join(args.image_dir,"*."+args.image_extend))
+        img_names = glob.glob(os.path.join(args.image_dir,"*."+args.image_extend))
         print("num of images:{}".format(len(img_names)))
     else:
         img_names = [args.image]
@@ -166,26 +166,26 @@ def main():
             print("No Objects Deteted!!")
             continue
 	
-	return outputs
+    return outputs
 	
 def generate_images(yolo_output):
-	coco_class_names, coco_class_ids, coco_class_colors = get_coco_label_names()
+    coco_class_names, coco_class_ids, coco_class_colors = get_coco_label_names()
 
     bboxes = list()
     classes = list()
     colors = list()
     confidences = []
-        for x1, y1, x2, y2, conf, cls_conf, cls_pred in outputs[0]:
+    for x1, y1, x2, y2, conf, cls_conf, cls_pred in outputs[0]:
 
-            cls_id = coco_class_ids[int(cls_pred)]
-            print(int(x1), int(y1), int(x2), int(y2), float(conf), int(cls_pred))
-            print('\t+ Label: %s, Conf: %.5f' %
-                  (coco_class_names[cls_id], cls_conf.item()))
-            box = yolobox2label([y1, x1, y2, x2], info_img)
-            bboxes.append(box)
-            classes.append(cls_id)
-            colors.append(coco_class_colors[int(cls_pred)])
-            confidences.append("%.3f"%(cls_conf.item()))
+        cls_id = coco_class_ids[int(cls_pred)]
+        print(int(x1), int(y1), int(x2), int(y2), float(conf), int(cls_pred))
+        print('\t+ Label: %s, Conf: %.5f' %
+             (coco_class_names[cls_id], cls_conf.item()))
+        box = yolobox2label([y1, x1, y2, x2], info_img)
+        bboxes.append(box)
+        classes.append(cls_id)
+        colors.append(coco_class_colors[int(cls_pred)])
+        confidences.append("%.3f"%(cls_conf.item()))
 
         
         from PIL import Image
@@ -215,7 +215,7 @@ def generate_images(yolo_output):
         font_type = "DejaVuSansMono.ttf"
         font = ImageFont.truetype(font_type, 10)
 
-#         print(classes)
+#        print(classes)
         for i in range(len(bboxes)):
             box = bboxes[i]
             h,w = test_img.size
@@ -273,8 +273,8 @@ def main():
     ## get arguments passed in through command line
     args = parse_arguments()
 	
-	## creates the model
-	model, confthre, nmsthre = load_model(args)
+    ## creates the model
+    model, confthre, nmsthre, imgsize = load_model(args)
     
     
 
@@ -370,8 +370,8 @@ def main():
         from PIL import Image
         test_img = Image.open(args.image).convert("RGB")
         sub_figures = []
-		labels = []
-		scalebars = []
+        labels = []
+        scalebars = []
 		
         for i in range(len(bboxes)):
             box = bboxes[i]
@@ -384,21 +384,25 @@ def main():
             sub_figure = test_img.crop((x0,y0,x1,y1))
             if classes[i] == 1:
                 sub_figures.append(sub_figure)
-			elif classes[i] == 3:
-			    labels.append(sub_figure)
-			elif classes[i] == 4:
-			    scalebars.append(sub_figure)
+            elif classes[i] == 3:
+                labels.append(sub_figure)
+            elif classes[i] == 4:
+                scalebars.append(sub_figure)
 			
         if not os.path.exists(os.path.join(args.result_dir,sample_img.split("/")[-1].split(".")[0])):
             os.makedirs(os.path.join(args.result_dir,sample_img.split("/")[-1].split(".")[0]))
         for i in range(len(sub_figures)):
-            sub_figures[i].save(os.path.join(args.result_dir,"image_{}_".format(i+1)+sample_img.split("/")[-1].split(".")[0]))
+            sub_figures[i].save(os.path.join(args.result_dir,"image_{}_".format(i+1)+sample_img.split("/")[-1].split(".")[0]+".png"))
             #sub_figures[i].save(os.path.join(os.path.join(args.result_dir,sample_img.split("/")[-1].split(".")[0]),"{}_output.png".format(i+1)))
         for i in range(len(labels)):
-            labels[i].save(os.path.join(args.result_dir,"sub_{}_".format(i+1)+sample_img.split("/")[-1].split(".")[0]))
+            labels[i].save(os.path.join(args.result_dir,"sub_{}_".format(i+1)+sample_img.split("/")[-1].split(".")[0]+".png"))
         for i in range(len(scalebars)):
+<<<<<<< HEAD
             scalebars[i].save(os.path.join(args.result_dir,"scale_{}_".format(i+1)+sample_img.split("/")[-1].split(".")[0]))			
 >>>>>>> 1b906c0... test.py now saves scale bars and labels too in desired format
+=======
+            scalebars[i].save(os.path.join(args.result_dir,"scale_{}_".format(i+1)+sample_img.split("/")[-1].split(".")[0]+".png"))			
+>>>>>>> cb96c78... fixed indentation, file extensions
         
         from PIL import Image, ImageDraw, ImageFont
         test_img = Image.open(args.image).convert("RGB")
