@@ -334,8 +334,8 @@ def main():
         colors = list()
         confidences = []
 		
-		subfigure_labels = {}
-		scalebar_labels = {}
+        subfigure_labels = {}
+        scalebar_labels = {}
 
         for x1, y1, x2, y2, conf, cls_conf, cls_pred in outputs[0]:
 
@@ -400,12 +400,13 @@ def main():
             sub_figures[i].save(os.path.join(args.result_dir,"image_{}_".format(i+1)+sample_img.split("/")[-1].split(".")[0]+".png"))
             #sub_figures[i].save(os.path.join(os.path.join(args.result_dir,sample_img.split("/")[-1].split(".")[0]),"{}_output.png".format(i+1)))
         for i in range(len(labels)):
-			new_image_name = "scale_{}_".format(i+1)+sample_img.split("/")[-1].split(".")[0]+".png"
+            new_image_name = "scale_{}_".format(i+1)+sample_img.split("/")[-1].split(".")[0]+".png"
             labels[i].save(os.path.join(args.result_dir,new_image_name))
-			text = pytesseract.image_to_string(labels[i], config = "--psm 10 --oem 3")
-			subfigure_labels[new_image_name] = text
+            text = pytesseract.image_to_string(labels[i], config = "--psm 10 --oem 3")
+            subfigure_labels[new_image_name] = text
 			
         for i in range(len(scalebars)):
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
             scalebars[i].save(os.path.join(args.result_dir,"scale_{}_".format(i+1)+sample_img.split("/")[-1].split(".")[0]))			
@@ -415,9 +416,12 @@ def main():
 >>>>>>> cb96c78... fixed indentation, file extensions
 =======
 			new_image_name = "scale_{}_".format(i+1)+sample_img.split("/")[-1].split(".")[0]+".png"
+=======
+            new_image_name = "scale_{}_".format(i+1)+sample_img.split("/")[-1].split(".")[0]+".png"
+>>>>>>> 76872d1... Added ability to run on directories
             scalebars[i].save(os.path.join(args.result_dir,new_image_name))			
-			text = pytesseract.image_to_string(labels[i], config = "--psm 10 --oem 3")
-			scalebar_labels[new_image_name] = text
+            text = pytesseract.image_to_string(labels[i], config = "--psm 10 --oem 3")
+            scalebar_labels[new_image_name] = text
 
 >>>>>>> 4210dd1... Added text output
         
@@ -457,10 +461,10 @@ def main():
     
 	
 	## save labels
-	with open("subfigure_labels.yaml", "w") as outfile:
-	    yaml.dump(subfigure_labels, outfile)
-	with open("scalebar_labels.yaml", "w") as outfile:
-	    yaml.dump(scalebar_labels, outfile)	
+    with open("subfigure_labels.yaml", "w") as outfile:
+        yaml.dump(subfigure_labels, outfile)
+    with open("scalebar_labels.yaml", "w") as outfile:
+        yaml.dump(scalebar_labels, outfile)	
     
 #     print("bbbox=",bboxes)
 #     print("classes=",classes)
