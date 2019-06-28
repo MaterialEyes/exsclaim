@@ -1,0 +1,76 @@
+TODO
+- Deploy labeling interface in MTurk (ensuring compatibility with Labelbox)
+
+- Decide on how to structure data from structured query --> labeled dataset. 
+	Each figure returned from CDE has json associated with it 
+	that contains the caption information, parsed caption information, [... other useful information to extract related to the figure as a whole], 
+	and image level label information (like the json we use from MTurk), etc. ??
+
+- Combine the fragmented processes to form single user-friendly tool:
+	[0] webscraper (Ed has one for RSC journals)
+		IN : structured-query
+		OUT: folder of htmls
+		STATUS: Ed is cleaning up the code?
+		PERFORMANCE: ?
+
+	[1] CDE_parser
+		IN : folder of htmls, structured-query 
+		OUT: folder of figures + .csv (figure path, caption text)
+		STATUS: Complete
+		PERFORMANCE: Works well for RSC journals (untested on others)
+
+	[2] interpret_captions.py
+		IN : .csv (figure path, caption text), structured-query 
+		OUT: appended .csv (...predicted # of images, dict of associated caption text)
+		STATUS: Operational
+		PERFORMANCE: Untested (predicted # images appears adequate)
+
+	[3] test.py (in MaterialEyes_Framework/streamlined)
+		IN : folder of figures
+		OUT: folder(s) of cropped images, scale bars, and subfigure labels + yaml files containing output of Aster 
+		STATUS: Operational (minus Aster?)
+		PERFORMANCE: Untested
+
+	[4] annotation_separator (in MaterialEyes_Framework/partitioned)
+		IN : folder of cropped images
+		OUT: folder of associated annotation masks
+		STATUS: Operational
+		PERFORMANCE: Untested
+	
+	[5] read_annotation_content 
+		IN : folder of cropped images/ annotation masks
+		OUT: csv (or another format) that contains annotation info extracted from caption 
+		STATUS: Incomplete
+		PERFORMANCE: N/A
+
+	[6] cluster_master_images (which cropped image belongs to which subfigure label?)
+		IN : folder(s) of cropped images, scale bars, and subfigure labels, .csv with dict of associated caption text
+		OUT: folder of separated images, .csv (or another format) that contains label info extracted from caption 
+		STATUS: Incomplete
+		PERFORMANCE: N/A
+
+
+    test v1.0 of tool: [1]-->[2]-->[3]-->[6]
+    test v2.0 of tool: [0]-->[1]-->[2]-->[3]------------->[6]
+                                          |                ^
+                                          |-->[4]-->[5]--> |
+                                          
+- Needed Improvements:
+	Process [0]:
+		- Push code to repo
+	Process [1]:
+		- Extend to other journal types
+	Process [2]:
+		- Quantify performance 
+		- "Learn" appropriate sentence search patterns
+	Process [3]:
+		- What to do about ASTER (figure it out, or replace it)?
+		- Quantify performance 
+		- Retrain YOLOv3 on MTurk labeled data
+		- Integrate predicted # of images into non-max supression step? 
+	Process [4]:
+		- Use to assist in reading all other text on image (Process [5])
+	Process [5]:
+		- Decide how to do this???
+	Process [6]:
+		- Decide how to do this???
