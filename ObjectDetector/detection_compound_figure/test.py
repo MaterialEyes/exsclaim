@@ -16,6 +16,8 @@ from dataset.figsepdataset import *
 
 import time
 
+import pytesseract
+
 def parse_arguments():
 	""" reads command line arguments and returns them in NameSpace object """
 	parser = argparse.ArgumentParser()
@@ -331,6 +333,9 @@ def main():
         classes = list()
         colors = list()
         confidences = []
+		
+		subfigure_labels = {}
+		scalebar_labels = {}
 
         for x1, y1, x2, y2, conf, cls_conf, cls_pred in outputs[0]:
 
@@ -395,14 +400,26 @@ def main():
             sub_figures[i].save(os.path.join(args.result_dir,"image_{}_".format(i+1)+sample_img.split("/")[-1].split(".")[0]+".png"))
             #sub_figures[i].save(os.path.join(os.path.join(args.result_dir,sample_img.split("/")[-1].split(".")[0]),"{}_output.png".format(i+1)))
         for i in range(len(labels)):
-            labels[i].save(os.path.join(args.result_dir,"sub_{}_".format(i+1)+sample_img.split("/")[-1].split(".")[0]+".png"))
+			new_image_name = "scale_{}_".format(i+1)+sample_img.split("/")[-1].split(".")[0]+".png"
+            labels[i].save(os.path.join(args.result_dir,new_image_name))
+			text = pytesseract.image_to_string(labels[i], config = "--psm 10 --oem 3")
+			subfigure_labels[new_image_name] = text
+			
         for i in range(len(scalebars)):
+<<<<<<< HEAD
 <<<<<<< HEAD
             scalebars[i].save(os.path.join(args.result_dir,"scale_{}_".format(i+1)+sample_img.split("/")[-1].split(".")[0]))			
 >>>>>>> 1b906c0... test.py now saves scale bars and labels too in desired format
 =======
             scalebars[i].save(os.path.join(args.result_dir,"scale_{}_".format(i+1)+sample_img.split("/")[-1].split(".")[0]+".png"))			
 >>>>>>> cb96c78... fixed indentation, file extensions
+=======
+			new_image_name = "scale_{}_".format(i+1)+sample_img.split("/")[-1].split(".")[0]+".png"
+            scalebars[i].save(os.path.join(args.result_dir,new_image_name))			
+			text = pytesseract.image_to_string(labels[i], config = "--psm 10 --oem 3")
+			scalebar_labels[new_image_name] = text
+
+>>>>>>> 4210dd1... Added text output
         
         from PIL import Image, ImageDraw, ImageFont
         test_img = Image.open(args.image).convert("RGB")
@@ -438,6 +455,12 @@ def main():
         test_img.save(os.path.join(args.result_dir,sample_img.split("/")[-1]))
         test_img.save(os.path.join(os.path.join(args.result_dir,sample_img.split("/")[-1].split(".")[0]),"output.png"))
     
+	
+	## save labels
+	with open("subfigure_labels.yaml", "w") as outfile:
+	    yaml.dump(subfigure_labels, outfile)
+	with open("scalebar_labels.yaml", "w") as outfile:
+	    yaml.dump(scalebar_labels, outfile)	
     
 #     print("bbbox=",bboxes)
 #     print("classes=",classes)
