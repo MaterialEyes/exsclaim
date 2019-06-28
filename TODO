@@ -25,13 +25,13 @@ TODO
 		STATUS: Operational
 		PERFORMANCE: Untested (predicted # images appears adequate)
 
-	[3] test.py (in MaterialEyes_Framework/streamlined)
+	[3] test.py (in ObjectDetector)
 		IN : folder of figures
 		OUT: folder(s) of cropped images, scale bars, and subfigure labels + yaml files containing output of Aster 
 		STATUS: Operational (minus Aster?)
 		PERFORMANCE: Untested
 
-	[4] annotation_separator (in MaterialEyes_Framework/partitioned)
+	[4] annotation_separator (in Annotations)
 		IN : folder of cropped images
 		OUT: folder of associated annotation masks
 		STATUS: Operational
