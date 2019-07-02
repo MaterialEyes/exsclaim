@@ -6,6 +6,7 @@ idna==2.8
 numpy==1.16.4
 opencv-contrib-python==4.1.0.25
 Pillow==6.0.0
+pytesseract==0.2.7
 PyYAML==5.1.1
 requests==2.22.0
 six==1.12.0
