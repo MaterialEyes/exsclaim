@@ -55,15 +55,14 @@ bash setup.sh
 ```
 (this installs all required packages in requirements.txt and downloads and unzips the .ckpt file)
 
-Then to run the model on the default images, 
+Then to run the model on the default images in input_images directory, 
 ```
-cd detection_compound_figure
-bash test.sh
+bash run.sh
 ```
 or if you have no gpu
 ```
 cd detection_compound_figure
-bash test_no_gpu.sh
+bash run_no_gpu.sh
 ```
 
 ## Semi Automated
@@ -79,7 +78,15 @@ python test.py --detect_thresh 0.5 --ckpt checkpoints/snapshot500.ckpt --image_d
 
 > weight position:
 ```bash
+<<<<<<< HEAD
 /path_to_MaterialEyesFramework/annotation_recognition/checkpoints
+=======
+git clone git@github.com:WeixinGithubJiang/MaterialEye_Framework_v2.git
+cd ObjectDetector
+mkdir checkpoints
+cp /path-to-weights_file/snapshot930.ckpt ./checkpoints
+bash test.sh
+>>>>>>> 51f7e5c... Reformatted ObjectDetector and updated REAME and shell files
 ```
 
 <<<<<<< HEAD
@@ -118,9 +125,13 @@ cp /path-to-weights_annotation_recognition/snapshot500.ckpt ./
 > --image_dir           folder path of input images
 > --result_dir          folder for saving results
 > --image_extend        image extensions, default png
+<<<<<<< HEAD
 > --gpu			enter -1 if running on machine with no GPU
 <<<<<<< HEAD
 >>>>>>> 441fdf7... Added code to automate streamlined and hopefully make it more portable
 =======
 >>>>>>> 6983501... Merge branch 'master' of https://gitlab.com/MaterialEyes/exsclaim
+=======
+> --gpu			enter 0 if running on machine with no GPU
+>>>>>>> 51f7e5c... Reformatted ObjectDetector and updated REAME and shell files
 ```
