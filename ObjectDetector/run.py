@@ -10,7 +10,7 @@ import glob
 import os
 from dataset.figsepdataset import *
 import time
-import pytesseract
+
 
 
 def parse_command_line_arguments():
@@ -63,7 +63,7 @@ def load_model(config_file = "config/yolov3_eval.cfg", detection_threshold = Non
 
 	
 def run_model(model, confidence_threshold, nms_threshold, image_size,
-        images_path = "./input_images", extension = "png",
+        images_path = "./input_images", extension = "jpg",
         checkpoint = "./checkpoints/snapshot930.ckpt", gpu = 0):
     """ Runs model on images in located in images_path
 
@@ -133,8 +133,8 @@ def generate_single_image_dictionary(image_data):
         y_1, x_1, y_2, x_2 = yolobox2label([y1, x1, y2, x2], info_image)
         y_1 = max(int(y_1), 0)
         x_1 = max(int(x_1), 0)
-        y_2 = min(int(y_2))
-        x_2 = min(int(x_2))
+        y_2 = min(int(y_2), info_image[0])
+        x_2 = min(int(x_2), info_image[1])
         location = [{"x" : x_1, "y" : y_1}, {"x" : x_1, "y" : y_2},
                     {"x" : x_2, "y" : y_2}, {"x" : x_2, "y" : y_1}] 
         object_entry = {"geometry" : location, "confidence" : float(cls_conf)}
