@@ -1,146 +1,15 @@
 # -*- coding: utf-8 -*-
-import sys
 import os
 import re
-import ast
 import yaml
 import string
-import pickle
 import difflib
 import itertools
-import numpy as np
 import collections
-from itertools import chain, zip_longest
-from difflib import SequenceMatcher
 
-import spacy
+import numpy as np
 from spacy.matcher import Matcher
 from spacy.pipeline import EntityRuler
-
-# Helper functions for customizing spaCy nlp processing pipeline and matchers
-def custom_nlp_pipeline(offsets,position_keys,separations,char_types,char_nums,custom_patterns):
-    """
-    Add custom components to spaCy nlp processing pipeline
-
-    # Description of parameters used to create caption pattern collection:
-    :param: offsets: punctuation used to set off characters that are explanatory (i.e. a parenthesis)
-    :param: position_keys : position of the offset character: 0-before, 1-after, 2-both
-    :param: separations: delimiter between characters within the offsets
-    :param: char_types: the character type (letter-> alpha or ALPHA (capitalized), digit-> number ... etc)
-    :param: char_nums: number of consecutive characters between delimeters
-    :param: custom_pattern: a list of tuples containing any custom patterns (from observation)
-
-    :return: spaCy nlp processing pipeline, spaCy rule-based Matcher
-    """
-    # Create caption specific patterns from inputs
-    caption_patterns = caption_pattern_collection(offsets,position_keys,separations,char_types,char_nums)
-    caption_patterns.extend(custom_patterns)
-
-    nlp = spacy.load("en_core_web_sm")
-    matcher = Matcher(nlp.vocab)
-    matcher = load_patterns_to_matcher(matcher,caption_patterns)
-    ruler = EntityRuler(nlp, patterns=caption_patterns)
-    nlp.add_pipe(ruler, before="ner")
-
-    return nlp, matcher
-
-def caption_parse_rules(offset,position_key,separate,char_type,char_num):
-    """
-    Create matching rules and based on custom characteristics of caption text described in input vars
-
-    :param offset: characters used to set off material that is amplifying or explanatory
-    :param position_key : position of the offset character: 0-before, 1-after, 2-both
-    :param separation: delimiter between characters within the offsets
-    :param char_type: the character type (letter-> alpha or ALPHA (capitalized), digit-> number ... etc)
-    :param char_num: number of consecutive characters between delimeters
-
-    :return: A spaCy Match pattern. A pattern consists of a list of dicts, where each dict describes a token.
-    """
-    roman_keywords = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii', 'ix', 'x', 'xi', 'xii', 'xiii', 'xiv', 'xv']
-    position_keywords =["above","after","around","before","beginning","behind","below","beside","between",\
-                        "bottom","center","down","end","far","finish","front","in","inside","lower","left","middle","near","next to",\
-                        "off","on","out","outside","over","right","start","through","top","under","up","upper","upside down"]
-
-    # Get subfigure label offset char (i.e parenthesis mark off test specific to an individual image)
-    offset_choices = {'parenthesis':'()','bracket':'[]','colon':'::','period':'..'}
-    offset_delimiter = offset_choices.get(offset)
-
-    # Get subfigure label separation char (i.e this punctuation separated consective chars)
-    separate_choices = {'comma':',','dash':'–','colon':':','period':'.','and':'and','none':'none'}
-    separate_delimiter = separate_choices.get(separate)
-
-    # Get character type (input to SHAPE), or list of characters from a predefined vocabulary
-    character_choices = {'alpha':'x','ALPHA':'X','digit':'d','roman':roman_keywords,'position':position_keywords}
-    character_delimiter = character_choices.get(char_type)
-
-    # Get keywords associcated with a given char_type
-    keywords_choices = {'roman':roman_keywords,'position':position_keywords}
-    keywords = keywords_choices.get(char_type)
-
-    if not keywords:
-        if separate_delimiter not in ['none','and']:
-            body = [{'SHAPE': character_delimiter},{'ORTH': separate_delimiter}]*(char_num-2) + [{'SHAPE': character_delimiter},{'ORTH': separate_delimiter, 'OP': '?'},{'ORTH': 'and', 'OP': '?'}]*2
-        else:
-            body = [{'SHAPE': character_delimiter},{'ORTH': separate_delimiter}]*(char_num)
-    else:
-        if separate_delimiter  not in ['none','and']:
-            body = [{"LOWER": {"IN": keywords}},{'ORTH': separate_delimiter}]*(char_num-2) + [{"LOWER": {"IN": keywords}},{'ORTH': separate_delimiter, 'OP': '?'},{'ORTH': 'and', 'OP': '?'}]*2
-        else:
-            body = [{"LOWER": {"IN": keywords}},{'ORTH': separate_delimiter}]*(char_num)
-
-    if position_key == 0:
-        return [{'ORTH': offset_delimiter[0]}]+body[:-1]
-    elif position_key == 1:
-        return body[:-1]+[{'ORTH': offset_delimiter[1]}]
-    elif position_key == 2:
-        return [{'ORTH': offset_delimiter[0]}]+body[:-1]+[{'ORTH': offset_delimiter[1]}]
-    else:
-        raise ValueError('The offset delimiter must appear to the left (0), right (1), or both sides (2) of the character!') 
-
-def caption_pattern_collection(offsets,position_keys,separations,char_types,char_nums):
-    """
-    A wrapper around caption_parse_rules to create a collection of rules and descriptions based on input lists
-
-    :return: List of tuples representing the name of each token (rule) with a list of dicts, where each dict describes a token.
-    """
-    full = []
-    descriptions, patterns = [], []
-    for off in offsets:
-        for pk in position_keys:
-            for sep in separations:
-                for ct in char_types:
-                    for cn in char_nums:
-                        if cn == 1:
-                            rules = caption_parse_rules(off,pk,sep,ct,cn)
-                            description=str(off)+"_"+str(pk).zfill(2)+"_"+"none"+"_"+str(ct)+"_"+str(cn).zfill(2)
-                        else:
-                            rules = caption_parse_rules(off,pk,sep,ct,cn)
-                            description=str(off)+"_"+str(pk).zfill(2)+"_"+str(sep)+"_"+str(ct)+"_"+str(cn).zfill(2)
-                        
-                        full.append({"label":description, "pattern":rules})
-                        descriptions.append(description)
-                        patterns.append(rules)
-    return full
-
-def load_patterns_to_matcher(matcher,patterns):
-    """
-    Load custom patterns (rules) to a spaCy matcher
-
-    :param matcher: The spaCy matcher object
-    :param patterns: The rules (readable by spaCy matcher)
-
-    :return: The matcher containing the a new set of rules
-    """
-    for pattern in patterns:
-        matcher.add(pattern['label'],None,pattern['pattern'])
-    return matcher
-
-#  ___                               ____                  _   _             
-# |_ _|_ __ ___   __ _  __ _  ___   / ___|___  _   _ _ __ | |_(_)_ __   __ _ 
-#  | || '_ ` _ \ / _` |/ _` |/ _ \ | |   / _ \| | | | '_ \| __| | '_ \ / _` |
-#  | || | | | | | (_| | (_| |  __/ | |__| (_) | |_| | | | | |_| | | | | (_| |
-# |___|_| |_| |_|\__,_|\__, |\___|  \____\___/ \__,_|_| |_|\__|_|_| |_|\__, |
-#                      |___/                                           |___/ 
 
 def make_unicode(str_text: str) -> str:
     """
@@ -383,7 +252,7 @@ def implied_chars(text: str, char_type: str) -> str:
     delims = [a for a in text if a in token_list]
 
     # Interleave chars with delims
-    text_list = [x for x in chain.from_iterable(zip_longest(chars,delims)) if x is not None]
+    text_list = [x for x in itertools.chain.from_iterable(itertools.zip_longest(chars,delims)) if x is not None]
     text_list = [remove_digits(a) for a in text_list]
 
     if char_type == 'position':
@@ -571,22 +440,6 @@ def resolve_by_char_delim(nlp,doc,matches,char_type):
 
     return in_caption, len(np.unique(implied_full))
 
-#  ___                                 _            _                                  _   
-# |_ _|_ __ ___   __ _  __ _  ___     / \   ___ ___(_) __ _ _ __  _ __ ___   ___ _ __ | |_ 
-#  | || '_ ` _ \ / _` |/ _` |/ _ \   / _ \ / __/ __| |/ _` | '_ \| '_ ` _ \ / _ \ '_ \| __|
-#  | || | | | | | (_| | (_| |  __/  / ___ \\__ \__ \ | (_| | | | | | | | | |  __/ | | | |_ 
-# |___|_| |_| |_|\__,_|\__, |\___| /_/   \_\___/___/_|\__, |_| |_|_| |_| |_|\___|_| |_|\__|
-#                      |___/                          |___/                                
-
-# Disable
-def blockPrint():
-    sys.stdout = open(os.devnull, 'w')
-
-# Restore
-def enablePrint():
-    sys.stdout = sys.__stdout__
-
-
 def split_list(l):
     """
     Groups neighboring list entries into single list.
@@ -750,8 +603,7 @@ def filter_by_tokenized_search_patterns(l1,l2,d):
     # Retain only unique values (entries)
     for k in list(d.keys()):
         d[k] = list(np.unique(d[k]))
-    enablePrint()
-    
+        
     return d
 
 def spans_from_list(doc,keywords):
@@ -793,7 +645,7 @@ def nounchunk_retoken(doc,remove_spans):
 
 def is_subset(a,b,tol=0):
     # See if b is subset of a
-    s = SequenceMatcher(None, a, b)
+    s = difflib.SequenceMatcher(None, a, b)
     match_elems = []
     for block in s.get_matching_blocks():
         _ , _ , match = block 
@@ -802,7 +654,7 @@ def is_subset(a,b,tol=0):
 
 def is_beginning_mismatch(a,b):
     # See if string mismatch occurs with first char
-    s = SequenceMatcher(None, a, b)
+    s = difflib.SequenceMatcher(None, a, b)
     match_elems = []
     for block in s.get_matching_blocks():
         start_match, _, _ = block
@@ -858,6 +710,7 @@ def filter_dual_membership(dt):
             for kg in dt:
                 if kg != key:
                     if bool(np.sum([is_subset(b,sent) for b in dt[kg]])):
+<<<<<<< HEAD:CaptionTools/caption_tools.py
                         dt[key].remove(sent)
     return dt
 
@@ -955,3 +808,10 @@ def associate_caption_text(nlp,doc,critical,query_kw=[]):
 
     return dt, de, dk
 
+=======
+                        # print("I'm removing: ",sent)
+                        remove_list.append(sent)
+        for re in np.unique(remove_list):
+            dt[key].remove(re)
+    return dt
+>>>>>>> 8f1c743... Restructure to mimic ObjectDetector:CaptionTools/tools/helper_nlp.py
