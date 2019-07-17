@@ -710,6 +710,7 @@ def filter_dual_membership(dt):
             for kg in dt:
                 if kg != key:
                     if bool(np.sum([is_subset(b,sent) for b in dt[kg]])):
+<<<<<<< HEAD:CaptionTools/tools/helper_nlp.py
 <<<<<<< HEAD:CaptionTools/caption_tools.py
                         dt[key].remove(sent)
     return dt
@@ -809,9 +810,15 @@ def associate_caption_text(nlp,doc,critical,query_kw=[]):
     return dt, de, dk
 
 =======
+=======
+>>>>>>> dd3f42c... Merge branch 'master' of gitlab.com:MaterialEyes/exsclaim:CaptionTools/tools/helper_nlp.py
                         # print("I'm removing: ",sent)
                         remove_list.append(sent)
         for re in np.unique(remove_list):
             dt[key].remove(re)
+<<<<<<< HEAD:CaptionTools/tools/helper_nlp.py
     return dt
 >>>>>>> 8f1c743... Restructure to mimic ObjectDetector:CaptionTools/tools/helper_nlp.py
+=======
+    return dt
+>>>>>>> dd3f42c... Merge branch 'master' of gitlab.com:MaterialEyes/exsclaim:CaptionTools/tools/helper_nlp.py
