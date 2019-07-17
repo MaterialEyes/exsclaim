@@ -1,3 +1,4 @@
+import time
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -69,28 +70,29 @@ def load_model(architecture, model_name):
 def run_model(image, transform, model):
     """ Runs the model on the image """
     # transform image to be 64x64
-    image_tensor = data_transform(image).float()
+    image_tensor = transform(image)#.float()
     image_tensor = image_tensor.unsqueeze_(0)
-    input_image = Variable(image_tensor)
-    input_image = input_image.to(device)
-    output = model(input_image)
+    #input_image = Variable(image_tensor)
+    #input_image = input_image.to(device)
+    output = model(image_tensor)
     index = output.data.cpu().numpy().argmax()
     return index
 
 
-if __name__ = '__main__':
+if __name__ == '__main__':
     start_time = time.time()
     
-    args = parse_command_line_args()
+    args = parse_command_line_arguments()
     model, transform = load_model(args["architecture"], args["model_name"])
     
     # loop through directory
     directory = os.fsencode(args["input_directory"])
     results = {}
-    for file in directory:
+    for file in os.listdir(directory):
         file_name = os.fsdecode(file)
         path = args["input_directory"] + "/" + file_name
         image = Image.open(path)
+        image = image.convert("RGB")
         results[file_name] = run_model(image, transform, model)
 
     print(results)
