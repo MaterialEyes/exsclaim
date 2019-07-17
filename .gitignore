@@ -1,0 +1,7 @@
+CDE/env_cde
+CDE/.env_cde
+TextDetector/models
+TextDetector/images
+ObjectDetector/checkpoints
+ObjectDetector/input_images
+images
