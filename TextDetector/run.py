@@ -12,6 +12,14 @@ import torch.optim as optim
 import architectures as a
 from PIL import Image
 import argparse
+import json
+
+## get class id's
+with open("classes.json", "r") as f:
+    index_to_text = json.load(f)
+
+ 
+
 
 def parse_command_line_arguments():
     """ reads arguments input at command line and outputs a dictionary """
@@ -76,7 +84,8 @@ def run_model(image, transform, model):
     #input_image = input_image.to(device)
     output = model(image_tensor)
     index = output.data.cpu().numpy().argmax()
-    return index
+    
+    return index_to_text[str(index)]
 
 
 if __name__ == '__main__':
