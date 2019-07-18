@@ -2,6 +2,7 @@ import boto3
 import json
 import argparse
 from graphqlclient import GraphQLClient
+import time
 
 
 # for command line usage
@@ -18,6 +19,8 @@ ap.add_argument("-f", "--format", type=str, default="0",
 ap.add_argument("-d", "--deploy", type=str, default="False",
 				help="enter true, y, or 1 if you are deploying. false, " + 
 				"n, or 0 to test")
+ap.add_argument("-H", "--hit_file", type=str, 
+                help="enter hit id dest file")
 args = vars(ap.parse_args())
 
 
@@ -26,6 +29,7 @@ access_key = args["access_key"]
 secret_key = args["secret_key"]
 format = args["format"]
 testing = args["deploy"]
+hit_file = args["hit_file"]
 
 # determines endpoint_url
 if testing.lower() in ["true", "y", "yes", "1", "yeah", "t"]:
@@ -91,11 +95,20 @@ def labelbox_json_from_hitid(hit_id, url):
 >>>>>>> b951d98... Finished code to upload mturk labels to labelbox
 	""" calls MTurk to results for HIT and converts them to labelbox format """
 	output = []
-	result = mtc.list_assignments_for_hit(HITId = hit_id)
+	errors = []
+	try: 
+		result = mtc.list_assignments_for_hit(HITId = hit_id)
+	except: 
+		time.sleep(65)
+		result = mtc.list_assignments_for_hit(HITId = hit_id)
+	
 	for assignment in result['Assignments']:
-		labelbox_json = convert_single_image(assignment, url)
-		output.append(labelbox_json)
-	return output
+		try:
+			labelbox_json = convert_single_image(assignment, url)
+			output.append(labelbox_json)
+		except:
+			errors.append((url, assignment))
+	return output, errors
 	
 
 def convert_single_image(assignment, url):
@@ -108,28 +121,31 @@ def convert_single_image(assignment, url):
 	"""
 	xml_answer = assignment['Answer']
 	## strips unused parts of XML response
-	pre, answer_post = xml_answer.split(">[{", 1)
-	answer, post = answer_post.split("}]<", 1)
-	json_answer_string = "[{" + answer + "}]"
+	try:
+		pre, answer_post = xml_answer.split(">[{", 1)
+		answer, post = answer_post.split("}]<", 1)
+		json_answer_string = "[{" + answer + "}]"
 
-	## manipulates response as a JSON and converts to LabelBox format
-	json_answer = json.loads(json_answer_string)
-	single_image_label = convert_single_image_label(json_answer)
-					  
-	
-	## pieces various metadata components with single_image_label
-	data = { "Agreement" : None, 
-			 "Benchmark Agreement": None,
-             "Benchmark ID": None,
-             "Benchmark Reference ID": None,
-             "Created At": None,
-             "Created By": assignment["WorkerId"],
-             "DataRow ID": None,
-             "Dataset Name": "150419_atomic-resolution",
-             "External ID": naming_dict[url][1],
-             "ID": naming_dict[url][0],
-			 "Label" : single_image_label }
-	return data
+		## manipulates response as a JSON and converts to LabelBox format
+		json_answer = json.loads(json_answer_string)
+		single_image_label = convert_single_image_label(json_answer)
+						  
+		
+		## pieces various metadata components with single_image_label
+		data = { "Agreement" : None, 
+				 "Benchmark Agreement": None,
+				 "Benchmark ID": None,
+				 "Benchmark Reference ID": None,
+				 "Created At": None,
+				 "Created By": assignment["WorkerId"],
+				 "DataRow ID": None,
+				 "Dataset Name": "150419_atomic-resolution",
+				 "External ID": naming_dict[url][1],
+				 "ID": naming_dict[url][0],
+				 "Label" : single_image_label }
+		return data
+	except:
+		raise TypeError
 
 
 def convert_single_image_label(json_answer):
@@ -173,6 +189,7 @@ def convert_single_image_label(json_answer):
 def get_labelbox_json():
 	# Create your connection to MTurk
 <<<<<<< HEAD
+<<<<<<< HEAD
 	hit_list = []
 	mtc = boto3.client('mturk', aws_access_key_id=access_key,
 					   aws_secret_access_key=secret_key,
@@ -185,15 +202,20 @@ def get_labelbox_json():
 	
 =======
 	f = open("hitids.txt", "r")
+=======
+	f = open(hit_file, "r")
+>>>>>>> 249e684... Updated mturk files
 	hit_list = f.read().split("\n")
 >>>>>>> b951d98... Finished code to upload mturk labels to labelbox
 	output = []
+	error = []
 	for line in hit_list:
 		if line != "":
 			hit, url = line.split()
-			output += labelbox_json_from_hitid(hit, url)
-	
-	return output
+			new_output, new_error = labelbox_json_from_hitid(hit, url)
+			output += new_output
+			error += new_error
+	return output, error
 	
 def get_existing_labels(client, dataset_id, datarow_id):
 	""" returns dataRow externalId to id dict from index:index+100 """
@@ -253,11 +275,12 @@ def upload_labels(labelbox_json):
 		
 
 # uses helper functions to retrieve labelbox_json for completed HITs	
-labelbox_json = get_labelbox_json()
+labelbox_json, errors = get_labelbox_json()
 
 # displays results in desired formats
 if "0" in format:
 	print(json.dumps(labelbox_json, sort_keys="True", indent=2))
+	print("There were errors...", errors)
 if "1" in format:
 	with open("output.json", "w") as g:
 		g.write(labelbox_json)

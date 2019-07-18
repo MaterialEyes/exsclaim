@@ -1,6 +1,8 @@
 import boto3
 import argparse
 import json
+import time
+from graphqlclient import GraphQLClient
 
 
 # for command line usage
@@ -24,6 +26,13 @@ ap.add_argument("-t", "--type_id", type=str,
 				     "project name in your requester account")
 args = vars(ap.parse_args())
 
+# constants
+api_key = ("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjand1bzkweHJiMDR" + 
+           "rMDgzNmFtdTdhMGVwIiwib3JnYW5pemF0aW9uSWQiOiJjang0dnJoejZjd21sMDg0NDh" +
+		   "oODJiMzM3IiwiYXBpS2V5SWQiOiJjang2NDY5emtlMXNqMDgxMXdibWR3NHRwIiwiaWF" +
+		   "0IjoxNTYxMTIyNzQzLCJleHAiOjIxOTIyNzQ3NDN9.Wgshf25Ls_eoPO21LaD810OtoH" + 
+		   "uxgvwHnsFyHDb4kjw")	
+dataset_id = 'cjx65cbxsfgmb0800604zurzo'
 
 # parse command line arguments
 access_key = args["access_key"]
@@ -32,6 +41,7 @@ file_name = args["image_names"]
 layout_id = args["layout_id"]
 type_id = args["type_id"]
 testing = args["deploy"]
+
 
 # generate list of image_urls (hosted on an AWS s3 bucket)
 def get_naming_dictionary():
@@ -46,6 +56,32 @@ image_urls = []
 for key in naming_dictionary:
 	image_urls.append(key)
 
+def get_existing_labels(client, dataset_id, datarow_id):
+	""" returns dataRow externalId to id dict from index:index+100 """
+	res_str = client.execute("""
+	query getDatasetInformation($dataset_id: ID!, $datarow_id: ID!){
+		dataset(where: {id: $dataset_id}){
+			dataRows(where: {id: $datarow_id}) {
+				labels{
+					id
+				}
+			}
+		}
+	}
+    """, {'dataset_id': dataset_id, 'datarow_id': datarow_id} )
+
+	res = json.loads(res_str)
+	return res["data"]["dataset"]["dataRows"][0]["labels"]
+	
+	
+# check a label hasn't been made already
+def check_existing(image):
+    client = GraphQLClient('https://api.labelbox.com/graphql')
+    client.inject_token('Bearer ' + api_key)
+    if get_existing_labels(client, dataset_id, naming_dictionary[image][0]) == []:
+        return True
+    else:
+        return False
 	
 # determines endpoint_url
 if testing.lower() in ["true", "y", "yes", "1", "yeah", "t"]:
@@ -65,12 +101,27 @@ endpoint_url = endpoint_url)
 
 
 # Create an HIT for each image url
+completed = 0
 for image in image_urls:
-	response = mtc.create_hit_with_hit_type(
-	  HITLayoutId    = layout_id,
-	  HITLayoutParameters = [ {'Name': 'image_url', 'Value': image } ],
-	  HITTypeId      = type_id,
-	  LifetimeInSeconds = 2592000
-	)
-	print(response["HIT"]["HITId"] + " " + image)
-
+    if completed > 500:
+        break
+    if check_existing(image):
+        try:
+            response = mtc.create_hit_with_hit_type(
+            HITLayoutId    = layout_id,
+            HITLayoutParameters = [ {'Name': 'image_url', 'Value': image } ],
+            HITTypeId      = type_id,
+            LifetimeInSeconds = 2592000
+            )
+            print(response["HIT"]["HITId"] + " " + image)
+            completed += 1
+        except:
+            time.sleep(65)
+            response = mtc.create_hit_with_hit_type(
+            HITLayoutId    = layout_id,
+            HITLayoutParameters = [ {'Name': 'image_url', 'Value': image } ],
+            HITTypeId      = type_id,
+            LifetimeInSeconds = 2592000
+            )
+            print(response["HIT"]["HITId"] + " " + image)
+            completed += 1
