@@ -706,6 +706,7 @@ def longest_unrelated_entries(str_list,ratio):
 
 def filter_dual_membership(dt):
     for key in dt:
+<<<<<<< HEAD:CaptionTools/tools/helper_nlp.py
         for sent in dt[key]:
             for kg in dt:
                 if kg != key:
@@ -812,13 +813,27 @@ def associate_caption_text(nlp,doc,critical,query_kw=[]):
 =======
 =======
 >>>>>>> dd3f42c... Merge branch 'master' of gitlab.com:MaterialEyes/exsclaim:CaptionTools/tools/helper_nlp.py
+=======
+        remove_list = []
+        # print("KEY", key)
+        for sent in dt[key]:
+            # print("sent:", sent)
+            for kg in dt:
+                # print("KG: ",kg)
+                if kg != key:
+                    if bool(np.sum([is_subset(b,sent) for b in dt[kg]])):
+>>>>>>> 6e8ef76... Merge branch 'master' of gitlab.com:MaterialEyes/exsclaim:CaptionTools/tools/helper_nlp.py
                         # print("I'm removing: ",sent)
                         remove_list.append(sent)
         for re in np.unique(remove_list):
             dt[key].remove(re)
+<<<<<<< HEAD:CaptionTools/tools/helper_nlp.py
 <<<<<<< HEAD:CaptionTools/tools/helper_nlp.py
     return dt
 >>>>>>> 8f1c743... Restructure to mimic ObjectDetector:CaptionTools/tools/helper_nlp.py
 =======
     return dt
 >>>>>>> dd3f42c... Merge branch 'master' of gitlab.com:MaterialEyes/exsclaim:CaptionTools/tools/helper_nlp.py
+=======
+    return dt
+>>>>>>> 6e8ef76... Merge branch 'master' of gitlab.com:MaterialEyes/exsclaim:CaptionTools/tools/helper_nlp.py
