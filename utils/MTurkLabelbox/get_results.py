@@ -78,6 +78,7 @@ def get_naming_dictionary():
 	return json.loads(json_string)
 	
 naming_dict = get_naming_dictionary()
+new_worker_data = {}
 
 
 <<<<<<< HEAD
@@ -103,6 +104,10 @@ def labelbox_json_from_hitid(hit_id, url):
 		result = mtc.list_assignments_for_hit(HITId = hit_id)
 	
 	for assignment in result['Assignments']:
+		## keep track of workers
+		worker_hits = new_worker_data.get(assignment["WorkerId"], [])
+		worker_hits.append(hit_id)
+		new_worker_data[assignment["WorkerId"]] = worker_hits
 		try:
 			labelbox_json = convert_single_image(assignment, url)
 			output.append(labelbox_json)
@@ -120,6 +125,7 @@ def convert_single_image(assignment, url):
 	returns python dictionary in LabelBox JSON format
 	"""
 	xml_answer = assignment['Answer']
+		
 	## strips unused parts of XML response
 	try:
 		pre, answer_post = xml_answer.split(">[{", 1)
@@ -282,11 +288,32 @@ if "0" in format:
 	print(json.dumps(labelbox_json, sort_keys="True", indent=2))
 	print("There were errors...", errors)
 if "1" in format:
-	with open("output.json", "w") as g:
-		g.write(labelbox_json)
+	# write results to output file
+	output_file = hit_file.split(".")[0] + "_output.json"
+	with open(output_file, "w") as g:
+		json.dump(labelbox_json, g)
+	
+	# write dictionary mapping workers to hit's to a json 
+	with open("worker_data.json", "r") as h:
+		old_data = json.load(h)
+	
+	for worker in new_worker_data:
+		if worker in old_data:
+			old_data[worker].add(new_worker_data[worker])
+		else:
+			old_data[worker] = new_worker_data[worker]
+	
+	with open("worker_data.json", "w") as h:
+		json.dump(old_data, h)
+	
 if "2" in format:
 	print("sending to https://app.labelbox.com/projects/cjx64zn93fdwl0890uxh0agvk/labels/activity")
+<<<<<<< HEAD
 	upload_labels(labelbox_json)
+=======
+	print("Some images already have labels in Labelbox and were not uploaded: ", upload_labels(labelbox_json))
+	print("These HITs had errors in the formatting of results: ", errors)
+>>>>>>> b092c71... Added tracking what hits each worker has done
 if "3" in format:
 	print("format '3' not implemented")
 	
