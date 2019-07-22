@@ -91,6 +91,11 @@ def run_model(image, transform, model):
 if __name__ == '__main__':
     start_time = time.time()
     
+    ## get class id's
+    with open("classes.json", "r") as f:
+        index_to_text = json.load(f)
+
+
     args = parse_command_line_arguments()
     model, transform = load_model(args["architecture"], args["model_name"])
     

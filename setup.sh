@@ -22,7 +22,7 @@ if [ ! -f "$object_model" ]; then
         mkdir ObjectDetector/checkpoints
     fi
     gdown -O ObjectDetector/checkpoints/snapshot930.ckpt.zip https://drive.google.com/uc?id=1xWxqQGDH_szfCe8eWDBwTcjzCmq7Bnf1
-    unzip ObjectDetector/checkpoints/snapshot930.ckpt.zip
+    unzip ObjectDetector/checkpoints/snapshot930.ckpt.zip -d ObjectDetector/checkpoints
     rm ObjectDetector/checkpoints/snapshot930.ckpt.zip
 else
     echo "Already downloaded ObjectDetector model"
