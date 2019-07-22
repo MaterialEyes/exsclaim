@@ -81,17 +81,16 @@ with open(ban, "r") as f:
 
 def reject_assignment_list(assignment_list):
 	for assignment_id in assignment_list:
-		mtc.reject_assignment(assignment_id, "The HIT requires all objects" +
+		mtc.reject_assignment(AssignmentId = assignment_id, RequesterFeedback= "The HIT requires all objects" +
 											 "of interest to be identified")
 		
 def accept_assignment_list(assignment_list):
 	for assignment_id in assignment_list:
-		mtc.reject_assignment(assignment_id, "The HIT requires all objects" +
-											 "of interest to be identified")		
+		mtc.accept_assignment(RequesterFeedback = assignment_id)		
 		
 def block_workers(worker_list):
 	for worker_id in worker_list:
-		mtc.create_worker_block(worker_id, "this worker is a bot")
+		mtc.create_worker_block(WorkerId = worker_id, Reason="this worker is a bot")
 	
 
 
