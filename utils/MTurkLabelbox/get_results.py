@@ -106,7 +106,7 @@ def labelbox_json_from_hitid(hit_id, url):
 	for assignment in result['Assignments']:
 		## keep track of workers
 		worker_hits = new_worker_data.get(assignment["WorkerId"], [])
-		worker_hits.append(hit_id)
+		worker_hits.append(assignment["AssignmentId"])
 		new_worker_data[assignment["WorkerId"]] = worker_hits
 		try:
 			labelbox_json = convert_single_image(assignment, url)
