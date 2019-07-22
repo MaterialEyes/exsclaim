@@ -300,18 +300,24 @@ BBoxAnnotator.prototype.initialize_events = function(selector, options) {
           switch (status) {
             case 'free':
 <<<<<<< HEAD
+<<<<<<< HEAD
             case 'input':
               if (status === 'input') {
                 selector.get_input_element().blur();
               }
 <!--               if (e.which === 1) {
 =======
+=======
+>>>>>>> bb963a4... Merge branch 'master' of gitlab.com:MaterialEyes/exsclaim
 
               if (status === 'input') {
                 selector.get_input_element().blur();
               }
               if (e.which === 1) {
+<<<<<<< HEAD
 >>>>>>> 1fc2e08... Updated xml label with margin
+=======
+>>>>>>> bb963a4... Merge branch 'master' of gitlab.com:MaterialEyes/exsclaim
                 selector.start(e.pageX, e.pageY);
                 status = 'hold';
               } -->

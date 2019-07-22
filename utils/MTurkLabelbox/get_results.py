@@ -313,7 +313,10 @@ if "2" in format:
 =======
 	print("Some images already have labels in Labelbox and were not uploaded: ", upload_labels(labelbox_json))
 	print("These HITs had errors in the formatting of results: ", errors)
+<<<<<<< HEAD
 >>>>>>> b092c71... Added tracking what hits each worker has done
+=======
+>>>>>>> bb963a4... Merge branch 'master' of gitlab.com:MaterialEyes/exsclaim
 if "3" in format:
 	print("format '3' not implemented")
 	
