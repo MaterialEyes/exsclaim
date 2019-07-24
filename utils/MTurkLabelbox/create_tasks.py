@@ -2,6 +2,7 @@ import boto3
 import argparse
 import json
 import time
+import os
 from graphqlclient import GraphQLClient
 
 
@@ -43,6 +44,14 @@ type_id = args["type_id"]
 testing = args["deploy"]
 
 
+# Names of desired images
+good_images = set()
+directory_name = "150419_3"
+directory = os.fsencode(directory_name)
+for file in os.listdir(directory):
+	good_images.add(os.fsdecode(file))
+
+
 # generate list of image_urls (hosted on an AWS s3 bucket)
 def get_naming_dictionary():
 	f = open(file_name, "r")
@@ -53,8 +62,10 @@ def get_naming_dictionary():
 	return json.loads(json_string)
 naming_dictionary = get_naming_dictionary()
 image_urls = []
+
 for key in naming_dictionary:
-	image_urls.append(key)
+	if naming_dictionary[key][1] in good_images:
+		image_urls.append(key)
 
 def get_existing_labels(client, dataset_id, datarow_id):
 	""" returns dataRow externalId to id dict from index:index+100 """
@@ -98,12 +109,13 @@ mtc = boto3.client('mturk', aws_access_key_id=access_key,
 aws_secret_access_key=secret_key,
 region_name='us-east-1', 
 endpoint_url = endpoint_url)
+created = []
 
 
 # Create an HIT for each image url
 completed = 0
 for image in image_urls:
-    if completed > 500:
+    if completed > 100:
         break
     if check_existing(image):
         try:
@@ -114,6 +126,7 @@ for image in image_urls:
             LifetimeInSeconds = 2592000
             )
             print(response["HIT"]["HITId"] + " " + image)
+            created.append(image)
             completed += 1
         except:
             time.sleep(65)
@@ -124,4 +137,8 @@ for image in image_urls:
             LifetimeInSeconds = 2592000
             )
             print(response["HIT"]["HITId"] + " " + image)
+            created.append(image)
             completed += 1
+			
+with open("created_hits_v2.txt", "w") as f:
+    f.write(str(created))

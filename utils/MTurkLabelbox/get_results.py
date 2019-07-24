@@ -299,7 +299,7 @@ if "1" in format:
 	
 	for worker in new_worker_data:
 		if worker in old_data:
-			old_data[worker].add(new_worker_data[worker])
+			old_data[worker].append(new_worker_data[worker])
 		else:
 			old_data[worker] = new_worker_data[worker]
 	
