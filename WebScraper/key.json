@@ -1,0 +1,27 @@
+{   
+    "post_login_url":"https://websso.it.northwestern.edu/amserver/UI/Login",
+    "inst_extension":".turing.library.northwestern.edu",
+
+    "payload":
+    {
+    	"token1":
+    	{
+    		"name":"IDToken1",
+    		"value":"¯\_(ツ)_/¯"
+    	},
+     	"token2":
+    	{
+    		"name":"IDToken2",
+    		"value":"¯\_(ツ)_/¯"
+    	}
+    },
+
+    "journal_family": "nature",
+
+    "output_scraped": "nature-test",
+    "maximum_scraped": 10,
+
+    "query":["HAADF STEM","Au nanoparticle"],
+
+    "human_traffic": false
+}
