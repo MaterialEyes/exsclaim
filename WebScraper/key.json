@@ -16,12 +16,29 @@
     	}
     },
 
+    "query":
+    {
+        "search_field_1":
+        {
+            "term":"HAADF STEM",
+            "synonyms":["HAADF","HAADF-STEM","HAADF–STEM","High-angle annular dark-field","High angle annular dark-field","High-angle annular darkfield","High angle annular darkfield"]
+        },
+        "search_field_2":
+        {
+            "term":"Ag nanoparticles",
+            "synonyms":["silver nanoparticles"]
+        },
+        "search_field_3":
+        {
+            "term":"",
+            "synonyms":[]
+        }
+    },
+
+    "sortby": "relevance",
     "journal_family": "nature",
-
-    "output_scraped": "nature-test",
-    "maximum_scraped": 10,
-
-    "query":["HAADF STEM","Au nanoparticle"],
+    "maximum_scraped": 15,
+    "saveas_custom_extension": "test",
 
     "human_traffic": false
 }

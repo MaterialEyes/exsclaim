@@ -31,11 +31,19 @@ def get_request_base_url(journal):
         raise NameError('journal {0} is not defined'.format(journal.lower()))
     return base
 
-def get_search_extension(journal,search_list):
+def get_search_extension(journal,search_list,sortby):
     if journal.lower() == "nature":
-        return '/search?'+"q="+",%20".join(["+".join(a.split(" ")) for a in search_list])+"&order=relevance&page=1"
+        if sortby == "recent":
+            sbext = "&order=date_desc"
+        else:
+            sbext = "&order=relevance"
+        return '/search?'+"q="+",%20".join(["+".join(a.split(" ")) for a in search_list])+sbext+"&page=1"
     elif journal.lower() == "acs":
-        return '/action/doSearch?AllField='+'%2C'.join(["+".join(a.split(" ")) for a in search_list])+'&startPage=0&pageSize=20'
+        if sortby == "recent":
+            sbext = "&sortBy=Earliest"
+        else:
+            sbext = "&sortBy=relevancy"
+        return '/action/doSearch?'+"".join(["&field"+str(i+1)+"=AllField&text"+str(i+1)+"="+"+".join(search_list[i].split(" ")) for i in range(len(search_list))])+"&publication=&accessType=allContent&Earliest=&pageSize=20&startPage=0"+sbext
     else:
         raise NameError('journal {0} is not defined'.format(journal.lower()))
 
@@ -57,7 +65,7 @@ def get_page_extension(journal,url,pg):
     if journal.lower() == "nature":
         return url.split('&page=')[0]+'&page='+str(pg)
     elif journal.lower() == "acs":
-        return url.split('&startPage=')[0]+'&startPage='+str(pg)+"&pageSize=20"
+        return url.split('&startPage=')[0]+'&startPage='+str(pg)+'&sortBy'+url.split('&sortBy')[-1]
 
 def create_payload(dict_json):
     return {dict_json['payload']['token1']['name']:dict_json['payload']['token1']['value'],\
@@ -66,10 +74,12 @@ def create_payload(dict_json):
 def create_request(dict_json):
     # Parses input json into formal request (for python requests package) 
     request_base_url = get_request_base_url(dict_json['journal_family'])
-    search_extension = get_search_extension(dict_json['journal_family'],dict_json['query'])
-    
+
+    search_list = [dict_json['query'][key]['term'] for key in dict_json['query'] if len(dict_json['query'][key]['term'])>0]
+    search_extension = get_search_extension(dict_json['journal_family'],search_list,dict_json['sortby'])
+
     try:
-        os.makedirs(dict_json["output_scraped"])
+        os.makedirs(dict_json['query']["search_field_1"]['term'].split(" ")[0]+"-"+dict_json['journal_family']+"-"+dict_json["saveas_custom_extension"])
     except OSError as e:
         if e.errno != errno.EEXIST:
             raise
@@ -124,13 +134,18 @@ def main():
         for article in article_extensions:
             print("["+str(counts+1).zfill(5)+"] Extracting html from "+str(article.split("/")[-1]))       
             r = session.get(request[1]+article) 
-            with open(dict_json['output_scraped']+"/"+article.split("/")[-1]+".html", 'wb') as f:
+            with open(dict_json['query']["search_field_1"]['term'].split(" ")[0]+"-"+dict_json['journal_family']+"-"+dict_json["saveas_custom_extension"]+"/"+article.split("/")[-1]+".html", 'wb') as f:
                 f.write(r.content)
             if dict_json['human_traffic']:
                 human_traffic()
             if counts+1 == dict_json['maximum_scraped']:
                 break
             counts+=1
+
+    f = open(dict_json['query']["search_field_1"]['term'].split(" ")[0]+"-"+dict_json['journal_family']+"-"+dict_json["saveas_custom_extension"]+"/"+"full_query.txt","w")
+    f.write("Sort by: "+str(dict_json['sortby']+"\n"))
+    f.write(str(dict_json['query']))
+    f.close()
 
 if __name__ == '__main__':
     start_time = time.time()
