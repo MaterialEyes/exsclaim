@@ -25,6 +25,7 @@ ap.add_argument("-l", "--layout_id", type=str,
 ap.add_argument("-t", "--type_id", type=str, 
 				help="enter the type id available by clicking on the" +
 				     "project name in your requester account")
+ap.add_argument("-n", "--number", type=int, defualt=100, help="number of hits to make")
 args = vars(ap.parse_args())
 
 # constants
@@ -42,6 +43,7 @@ file_name = args["image_names"]
 layout_id = args["layout_id"]
 type_id = args["type_id"]
 testing = args["deploy"]
+limit = args["number"]
 
 
 # Names of desired images
@@ -115,7 +117,7 @@ created = []
 # Create an HIT for each image url
 completed = 0
 for image in image_urls:
-    if completed > 100:
+    if completed > limit:
         break
     if check_existing(image):
         try:
@@ -140,5 +142,5 @@ for image in image_urls:
             created.append(image)
             completed += 1
 			
-with open("created_hits_v2.txt", "w") as f:
+with open("created_hits_v4.txt", "w") as f:
     f.write(str(created))

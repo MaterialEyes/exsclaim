@@ -72,7 +72,6 @@ def delete_labels(client, dataset_id, datarow_id):
     """, {'label_ids': [label_id]} )
 
 for image in workers_to_data_id[worker]:
-		print(delete_labels(client, dataset_id, image))
-	
-		
+		delete_labels(client, dataset_id, image))
 
+print("Deleted {} images from Labelbox".format(len(workers_to_data_id[worker])))
