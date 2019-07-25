@@ -7,7 +7,7 @@
 <p>The objects of interest are: </p>
     <ul>
         <li> <b>Master Image:</b> The global figure that the master subfigure label is referencing. Can be a <a href="https://drive.google.com/file/d/1v_t-cLlyHedL4vaSUJl8MKdDIEz0nZXC/view?usp=sharing" target="_blank">single image</a> or <a href="https://drive.google.com/file/d/1abF_PZPswWcmQ0D0R1rwtc8Nm8R46Hsg/view?usp=sharing" target="blank">multiple</a>. </li>
-        <li> <b>Dependent Image:</b> A “sub” image contained within the bounds of its master image that is <em>not</em> integrated into the content of another image.</li>
+        <li> <b>Dependent Image:</b> A “sub” image contained within the bounds of its master image that is <em>not</em> integrated into the content of another image. Usually when one label is referring to multiple subfigures, they are dependent images.</li>
         <li> <b>Inset Image:</b> A “sub” image contained within the bounds of its master image that <em>is</em> integrated (inset) into the content another image. <a href="https://drive.google.com/open?id=1xlMSqxBRzr3LvhCOFl_eHqoFfLHe82Ma" target="_blank">Example</a></li>
         <li> <b>Subfigure Label:</b> A classifying name (most often a single letter or number) applying to a master image or dependent image within the figure.</li>
         <li> <b>Scale Bar Label:</b> The length associated with the scale bar line provided (i.e. 10 nm).</li>
@@ -25,8 +25,10 @@
     </ul>
 <p><b>Secondary Task #2 -- Transcribe Text:</b> If the object of interest is a Subfigure Label or Scale Bar Label, please enter in the text exactly as it appears. <b>For scale bar labels, you may enter &#956m as um and &#8491 as A.</b> </p>
 <p><b> Interacting with the interface: </b> To begin drawing a box, double click. The location of your double click will be one corner of the box. When you have moved your cursor to the other corner of the box, single click. To move a previously drawn box, press down of its border and move it to where you would like it to go and then release the mouse. </p>
-<p><b>It is better to put too much in a bounding box than too little.</b></p> 
+<p><b>IMPORTANT: It is better to put too much in a bounding box than too little. If most of your boxes exclude parts of the object, we will reject you.</b></p> 
 <p> If the image is of terrible quality, draw one scalebar label box anywhere and enter text 'SKIP'</p>
+<p><b>Please enter text only for subfigure labels and scalebar labels EXACTLY as it appears</b> (include parenthesis if present, "10 nm" not "10nm", etc.).</p>
+<p><b>Most subfigures are master images.</b> A dependent image is typically when one subfigure label refers to multiple subfigures. The entire image will only be a master image if there is only one subfigure or if there are no labels. </p>
  
 <p> Full instructions with sample labeling session <a href="https://drive.google.com/file/d/1423RJVS2zQw3arCQNRvMdyS5UboH4bDU/view?usp=sharing" target="_blank">here</a></p>
 </div>
