@@ -74,7 +74,7 @@ def create_request(dict_json):
         if e.errno != errno.EEXIST:
             raise
 
-    return [dict_json['post_login_url'],request_base_url,search_extension]
+    return [request_base_url,search_extension]
     
 def get_figures(soup, article_url, journal_family):
     exsclaim_json = {}
@@ -136,15 +136,14 @@ def main():
     """
     dict_json = js_r("key_new.json")
 
-    request = create_request(dict_json) #[POST_URL,GET_URL_BASE,SEARCH_EXTENSION]
+    request = create_request(dict_json) #[GET_URL_BASE,SEARCH_EXTENSION]
 
     directory_parser = get_directory_parser(dict_json['journal_family'])
     
     # Session #1: Get article url extensions for articles related to query
     with requests.Session() as session:
         #post = session.post(request[0],data=payload)
-        print(request[1] + request[2])
-        get  = session.get(request[1]+request[2])
+        get  = session.get(request[0]+request[1])
         soup = BeautifulSoup(get.text, 'lxml')
         start,total = get_page_count(dict_json['journal_family'],soup.text)
         
@@ -161,7 +160,7 @@ def main():
         
         article_extensions = []
         for pg_num in range(start,total+1):
-            request_pg = get_page_extension(dict_json['journal_family'],request[1]+request[2],pg_num)
+            request_pg = get_page_extension(dict_json['journal_family'],request[0]+request[1],pg_num)
             r = session.get(request_pg)
             soup = BeautifulSoup(r.text, 'lxml')
             tags = soup.find_all('a',href=True)
@@ -176,7 +175,7 @@ def main():
         counts=0
         exsclaim_json = {}
         for article in article_extensions:
-            article_url = request[1] + article
+            article_url = request[0] + article
             print("["+str(counts+1).zfill(5)+"] Extracting html from "+str(article.split("/")[-1]))       
             r = session.get(article_url) 
             soup = BeautifulSoup(r.text, 'lxml')
