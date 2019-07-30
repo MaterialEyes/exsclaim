@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 
 from collections import defaultdict
-from models.yolo_layer import YOLOLayer
+from . import yolo_layer
 
 def add_conv(in_ch, out_ch, ksize, stride):
     """
@@ -85,7 +85,7 @@ def create_yolov3_modules(config_model, ignore_thre):
     # 1st yolo branch
     mlist.append(add_conv(in_ch=512, out_ch=1024, ksize=3, stride=1))
     mlist.append(
-         YOLOLayer(config_model, layer_no=0, in_ch=1024, ignore_thre=ignore_thre))
+         yolo_layer.YOLOLayer(config_model, layer_no=0, in_ch=1024, ignore_thre=ignore_thre))
 
     mlist.append(add_conv(in_ch=512, out_ch=256, ksize=1, stride=1))
     mlist.append(nn.Upsample(scale_factor=2, mode='nearest'))
@@ -96,7 +96,7 @@ def create_yolov3_modules(config_model, ignore_thre):
     # 2nd yolo branch
     mlist.append(add_conv(in_ch=256, out_ch=512, ksize=3, stride=1))
     mlist.append(
-        YOLOLayer(config_model, layer_no=1, in_ch=512, ignore_thre=ignore_thre))
+        yolo_layer.YOLOLayer(config_model, layer_no=1, in_ch=512, ignore_thre=ignore_thre))
 
     mlist.append(add_conv(in_ch=256, out_ch=128, ksize=1, stride=1))
     mlist.append(nn.Upsample(scale_factor=2, mode='nearest'))
@@ -104,7 +104,7 @@ def create_yolov3_modules(config_model, ignore_thre):
     mlist.append(add_conv(in_ch=128, out_ch=256, ksize=3, stride=1))
     mlist.append(resblock(ch=256, nblocks=2, shortcut=False))
     mlist.append(
-         YOLOLayer(config_model, layer_no=2, in_ch=256, ignore_thre=ignore_thre))
+         yolo_layer.YOLOLayer(config_model, layer_no=2, in_ch=256, ignore_thre=ignore_thre))
 
     return mlist
 

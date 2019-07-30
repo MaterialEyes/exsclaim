@@ -3,28 +3,28 @@ import yaml
 import cv2
 import torch
 from torch.autograd import Variable
-from models.yolov3 import *
-from utils.utils import *
-from utils.parse_yolo_weights import parse_yolo_weights
+from objects.models.yolov3 import *
+from objects.utils.utils import *
+from objects.utils.parse_yolo_weights import parse_yolo_weights
 import glob
 import os
-from dataset.figsepdataset import *
+from objects.dataset.figsepdataset import *
 import time
-
+import matplotlib.pyplot as plt
 
 
 def parse_command_line_arguments():
     """ reads command line arguments and returns them in dictionary """
     parser = argparse.ArgumentParser()
     parser.add_argument('--gpu', type=int, default=0, help='number of gpus on machine')
-    parser.add_argument('--cfg', type=str, default='config/yolov3_default.cfg', 
+    parser.add_argument('--cfg', type=str, default='objects/config/yolov3_default.cfg', 
                          help='path to yolov3 configuration file')
-    parser.add_argument('--ckpt', type=str, default='checkpoints/snapshot930.ckpt',
+    parser.add_argument('--ckpt', type=str, default='objects/checkpoints/snapshot930.ckpt',
                         help='path to the checkpoint file')
     parser.add_argument('--weights_path', type=str,
                         default=None, help='path to weights file')
     parser.add_argument('--image', type=str)
-    parser.add_argument('--image_dir', type=str)
+    parser.add_argument('--image_dir', type=str, default="images")
     parser.add_argument('--image_extend', type=str, default="jpg",
                          help='file extension for images (jpg, png, gif, etc.)')
     parser.add_argument('--groundtruth', action="store_true")
@@ -39,7 +39,7 @@ def parse_command_line_arguments():
     args = parser.parse_args()
     return vars(args)
 	
-def load_model(config_file = "config/yolov3_eval.cfg", detection_threshold = None):
+def load_model(config_file = "objects/config/yolov3_eval.cfg", detection_threshold = None):
     """ opens and extracts info from configuration file
     
     param config_file: path to configuration file
@@ -63,8 +63,8 @@ def load_model(config_file = "config/yolov3_eval.cfg", detection_threshold = Non
 
 	
 def run_model(model, confidence_threshold, nms_threshold, image_size,
-        images_path = "./input_images", extension = "jpg",
-        checkpoint = "./checkpoints/snapshot930.ckpt", gpu = 0):
+        images_path = "./images", extension = "jpg",
+        checkpoint = "./objects/checkpoints/snapshot930.ckpt", gpu = 0):
     """ Runs model on images in located in images_path
 
     param model: output of load_model
@@ -100,9 +100,11 @@ def run_model(model, confidence_threshold, nms_threshold, image_size,
     ## Runs model on each image and stores the result in a dictionary
     image_to_result = {}    
     for image_name in img_names:    
-        #print(image_name)
-        image = cv2.imread(image_name)
-        image_raw = image.copy()[:, :, ::-1].transpose((2, 0, 1))
+        image = plt.imread(image_name, "jpg")
+        if len(image.shape) == 2:
+            image = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
+        elif image.shape[2] == 4:
+            image = cv2.cvtColor(image, cv2.COLOR_RGBA2RGB)
         image, info_image = preprocess(image, image_size, jitter=0)  # info = (h, w, nh, nw, dx, dy)
         image = np.transpose(image / 255., (2, 0, 1))
         image = torch.from_numpy(image).float().unsqueeze(0)
@@ -124,10 +126,9 @@ def generate_single_image_dictionary(image_data):
     outputs, info_image = image_data
     coco_class_names, coco_class_ids, coco_class_colors = get_coco_label_names()
      
-    classes = {}
-    for name, ID, color in zip(coco_class_names, coco_class_ids, coco_class_colors):
-        classes[ID-1] = (name, color)
-    	
+    classes = {0: "image", 1: "nonimage", 2: "subfigure_label", 3: "scalebar"}
+    #for name, ID, color in zip(coco_class_names, coco_class_ids, coco_class_colors):
+    #    classes[ID] = (name, color)
     bboxes = {}
     for x1, y1, x2, y2, conf, cls_conf, cls_pred in outputs[0]:
         y_1, x_1, y_2, x_2 = yolobox2label([y1, x1, y2, x2], info_image)
@@ -138,7 +139,7 @@ def generate_single_image_dictionary(image_data):
         location = [{"x" : x_1, "y" : y_1}, {"x" : x_1, "y" : y_2},
                     {"x" : x_2, "y" : y_2}, {"x" : x_2, "y" : y_1}] 
         object_entry = {"geometry" : location, "confidence" : float(cls_conf)}
-        box_class = classes[int(cls_pred)][0]
+        box_class = classes[int(cls_pred)]
         bbox = bboxes.get(box_class, [])
         bbox.append(object_entry)
         bboxes[box_class] = bbox 
@@ -155,7 +156,7 @@ def generate_json(image_to_result):
 
 
 def load_and_run_model(input_images = "./input_images", gpu = 0, extension = "png",
-        checkpoint = "checkpoints/snapshot930.ckpt", config_file = "config/yolov3_eval.cfg",
+        checkpoint = "objects/checkpoints/snapshot930.ckpt", config_file = "objects/onfig/yolov3_eval.cfg",
         detection_threshold = None):
     """ runs model on input images and outputs data as MaterialEyes JSON
  
@@ -181,9 +182,12 @@ def main():
     ## get arguments passed in through command line
     args = parse_command_line_arguments()
 	
-    load_and_run_model(args['image_dir'], args['gpu'], args['image_extend'], args['ckpt'], 
+    exsclaim_json = load_and_run_model(args['image_dir'], args['gpu'], args['image_extend'], args['ckpt'], 
                        args['cfg'], args['detect_thresh'])
-        
+    
+    print(exsclaim_json)    
+
+    
 if __name__ == '__main__':
     start_time = time.time()
     main()

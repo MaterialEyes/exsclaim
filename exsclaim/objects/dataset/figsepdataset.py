@@ -6,7 +6,7 @@ from torch.utils.data import Dataset
 import cv2
 # from pycocotools.coco import COCO
 
-from utils.utils import *
+from ..utils.utils import *
 import glob
 import xml.etree.ElementTree as ET
 
