@@ -34,11 +34,19 @@ def get_request_base_url(journal):
         raise NameError('journal {0} is not defined'.format(journal.lower()))
     return base
 
-def get_search_extension(journal,search_list):
+def get_search_extension(journal,search_list,sortby):
     if journal.lower() == "nature":
-        return '/search?'+"q="+",%20".join(["+".join(a.split(" ")) for a in search_list])+"&order=relevance&page=1"
+        if sortby == "recent":
+            sbext = "&order=date_desc"
+        else:
+            sbext = "&order=relevance"
+        return '/search?'+"q="+",%20".join(["+".join(a.split(" ")) for a in search_list])+sbext+"&page=1"
     elif journal.lower() == "acs":
-        return '/action/doSearch?AllField='+'%2C'.join(["+".join(a.split(" ")) for a in search_list])+'&startPage=0&pageSize=20'
+        if sortby == "recent":
+            sbext = "&sortBy=Earliest"
+        else:
+            sbext = "&sortBy=relevancy"
+        return '/action/doSearch?'+"".join(["&field"+str(i+1)+"=AllField&text"+str(i+1)+"="+"+".join(search_list[i].split(" ")) for i in range(len(search_list))])+"&publication=&accessType=allContent&Earliest=&pageSize=20&startPage=0"+sbext
     else:
         raise NameError('journal {0} is not defined'.format(journal.lower()))
 
@@ -66,19 +74,14 @@ def get_page_extension(journal,url,pg):
 def create_request(dict_json):
     # Parses input json into formal request (for python requests package) 
     request_base_url = get_request_base_url(dict_json['journal_family'])
-    search_extension = get_search_extension(dict_json['journal_family'],dict_json['query'])
-    
-    try:
-        os.makedirs(dict_json["output_scraped"])
-    except OSError as e:
-        if e.errno != errno.EEXIST:
-            raise
-
+    search_list = [dict_json['query'][key]['term'] for key in dict_json['query'] if len(dict_json['query'][key]['term'])>0]
+    search_extension = get_search_extension(dict_json['journal_family'],search_list,dict_json['sortby'])
     return [request_base_url,search_extension]
     
 def get_figures(soup, article_url, journal_family):
     exsclaim_json = {}
     title = soup.find('title').get_text()
+    
     if journal_family == 'acs':
         prepend = "https://pubs.acs.org"
     elif journal_family == 'nature':
@@ -129,12 +132,11 @@ def get_figures(soup, article_url, journal_family):
     
     return exsclaim_json
 
-
 def main():
     """
     Scrape html files from specified journals by keyword
     """
-    dict_json = js_r("key_new.json")
+    dict_json = js_r("key.json")
 
     request = create_request(dict_json) #[GET_URL_BASE,SEARCH_EXTENSION]
 

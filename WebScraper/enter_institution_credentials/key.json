@@ -1,9 +1,20 @@
 {   
-    "journal_family": "nature",
+    "post_login_url":"https://websso.it.northwestern.edu/amserver/UI/Login",
+    "inst_extension":".turing.library.northwestern.edu",
 
-    "maximum_scraped": 2,
-
-    "sortby": "relevance",
+    "payload":
+    {
+    	"token1":
+    	{
+    		"name":"IDToken1",
+    		"value":"¯\_(ツ)_/¯"
+    	},
+     	"token2":
+    	{
+    		"name":"IDToken2",
+    		"value":"¯\_(ツ)_/¯"
+    	}
+    },
 
     "query":
     {
@@ -23,6 +34,11 @@
             "synonyms":[]
         }
     },
+
+    "sortby": "relevance",
+    "journal_family": "nature",
+    "maximum_scraped": 15,
+    "saveas_custom_extension": "test",
 
     "human_traffic": false
 }
