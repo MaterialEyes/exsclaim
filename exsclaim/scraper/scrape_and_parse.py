@@ -20,7 +20,7 @@ def exist_common_member(a, b):
     return(False)
 
 def human_traffic():
-    rp = random.randint(0,8)+random.randint(1,10)/10.0+random.randint(1,100)/100.0
+    rp = random.randint(0,12)+random.randint(1,10)/10.0+random.randint(1,100)/100.0
     daily_routines = ["Do the laundry","Hang the clothes","Iron the clothes","Make the bed","Go to bed","Wake up","Brush the teeth","Drive to work","Get home","Take a bath","Brush your hair","Surf the net","Play with friends","Go to school","Go shopping","Exercise","Wash the car","Get dressed","Go out with a friend","Take pictures","Play the guitar","Water the plant","Go for a walk","Work","Have breakfast","Have lunch","Have dinner","Make dinner","Fold the laundry","Surf the net","Feed the dog","Take a taxi","Wait for the bus","Paint the picture","Take a break","Walk the dog","Take out the rubbish","Sweep the floor","Rake the leaves","Read the news","Clean the window","Cut the grass","Do the dishes","Paint the house"]
     print("I will "+random.choice(daily_routines).lower()+" for "+str(np.round(rp,3))+" seconds.\n")
     time.sleep(rp)
