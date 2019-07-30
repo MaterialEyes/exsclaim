@@ -136,7 +136,7 @@ def main():
     """
     Scrape html files from specified journals by keyword
     """
-    dict_json = js_r("key.json")
+    dict_json = js_r("query.json")
 
     request = create_request(dict_json) #[GET_URL_BASE,SEARCH_EXTENSION]
 
