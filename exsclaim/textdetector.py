@@ -1,21 +1,22 @@
 import time
 import os
+import argparse
+import json
+
 import numpy as np
 import matplotlib.pyplot as plt
-
 import torch
 import torchvision
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-
-import architectures as a
 from PIL import Image
-import argparse
-import json
+
+import text.architecture as arch
+
 
 ## get class id's
-with open("classes.json", "r") as f:
+with open("text/classes.json", "r") as f:
     index_to_text = json.load(f)
 
  
@@ -40,7 +41,7 @@ def imshow(img):
     plt.show()
 
 
-def load_model(architecture, model_name):
+def load_model(architecture="CNN1", model_name="read_sflabel_5_CNN150_adam.pt"):
     """ Creates model with specified architecture and weights 
 
     param architecture: string. Name of NN architecture in architectures.py
@@ -55,14 +56,14 @@ def load_model(architecture, model_name):
 
     # assign architecture
     if architecture.upper() == "CNN1":
-        model = a.CNN1()
+        model = arch.CNN1()
     elif architecture.upper() == "CNN2":
-        model = a.CNN2()
+        model = arch.CNN2()
     else:
         print("invalid architecture given, using CNN1")
-        model = a.CNN1()
+        model = arch.CNN1()
     
-    model.load_state_dict(torch.load(os.getcwd() + "/models/" + model_name))
+    model.load_state_dict(torch.load(os.getcwd() + "/text/models/" + model_name))
     model.to(device)
     model.eval()
 
