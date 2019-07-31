@@ -111,7 +111,7 @@ def get_figures(soup, article_url, journal_family):
         image_url = prepend + image_url
         if ":" not in image_url:
             image_url = "https:" + image_url
-        figure_name = article_name + "_fig" + str(figures) + "." + image_url.split('.')[-1]
+        figure_name = article_name + "_fig" + str(figures) + ".jpg"  #" +  image_url.split('.')[-1]
         
         # save figure as image
         os.makedirs("images", exist_ok=True)
@@ -121,8 +121,9 @@ def get_figures(soup, article_url, journal_family):
         del response 
         
         # save image info
-        figure_json["figure_name"] : figure_name
+        figure_json["figure_name"] = figure_name
         figure_json["image_url"] = image_url
+        figure_json["figure_path"] = "images/" + figure_name       
 
         # add all results
         exsclaim_json[figure_name] = figure_json
@@ -132,19 +133,11 @@ def get_figures(soup, article_url, journal_family):
     
     return exsclaim_json
 
-def main():
-    """
-    Scrape html files from specified journals by keyword
-    """
-    dict_json = js_r("query.json")
 
-    request = create_request(dict_json) #[GET_URL_BASE,SEARCH_EXTENSION]
-
+def session_1(dict_json, request):
+    """ creates list of article locations from dict_json info """
     directory_parser = get_directory_parser(dict_json['journal_family'])
-    
-    # Session #1: Get article url extensions for articles related to query
     with requests.Session() as session:
-        #post = session.post(request[0],data=payload)
         get  = session.get(request[0]+request[1])
         soup = BeautifulSoup(get.text, 'lxml')
         start,total = get_page_count(dict_json['journal_family'],soup.text)
@@ -171,8 +164,10 @@ def main():
                     article_extensions.append(t.attrs['href'])
 
         article_extensions = [a for a in article_extensions if not exist_common_member(directory_parser[1],a.split("/"))]
+    return article_extensions
 
-    # Session #2: Request and save html files from article url extensions
+def session_2(dict_json, request, article_extensions):
+    """ parses html from articles in article_extensions as exsclaim_json """
     with requests.Session() as session:
         counts=0
         exsclaim_json = {}
@@ -191,7 +186,24 @@ def main():
             if counts+1 == dict_json['maximum_scraped']:
                 break
             counts+=1
+    return exsclaim_json
+
+
+def main():
+    """
+    Scrape html files from specified journals by keyword
+    """
+    dict_json = js_r("scraper/query.json")
+
+    request = create_request(dict_json) #[GET_URL_BASE,SEARCH_EXTENSION]
+
     
+    # Session #1: Get article url extensions for articles related to query
+    article_extensions = session_1(dict_json, request)
+
+    # Session #2: Request and save html files from article url extensions
+    exsclaim_json = session_2(dict_json, request, article_extensions)    
+   
     with open("exsclaim.json", "w") as f:
         json.dump(exsclaim_json, f)
 
