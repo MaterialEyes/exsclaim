@@ -53,6 +53,7 @@ if __name__ == '__main__':
 
     ## Run TextDetector on subfigure and scalebar labels
     model, transform = td.load_model()
+    i = 0
     for image_name in exsclaim_json:
         image_json = exsclaim_json[image_name]
         path = image_json["figure_path"]
@@ -61,11 +62,17 @@ if __name__ == '__main__':
         for label in image_json["unassigned"]["subfigure_label"]:
             x = [label["geometry"][i]["x"] for i in range(len(label["geometry"]))]
             y = [label["geometry"][i]["y"] for i in range(len(label["geometry"]))]
-            top, bottom = max(y), min(y)
+            top, bottom = min(y), max(y)
             left, right = min(x), max(x)
-            cropped = image.crop((left, top, bottom, right))
+            #print("top {}, bottom {}, left {}, right {}".format(top, bottom, left, right))
+            #print("image name {}, size {}".format(image_name, image.size))
+           
+            cropped = image.crop((left, top, right, bottom))
+            #print("cropped is {}".format(cropped.size))
+            #cropped.save(i + "_" + image_name)
             text = td.run_model(cropped, transform, model)
             label["text"] = text
+            i += 1
 
     print(exsclaim_json)
 
