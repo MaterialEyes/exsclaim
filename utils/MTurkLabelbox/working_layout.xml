@@ -2,7 +2,7 @@
 <link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/smoothness/jquery-ui.css" rel="stylesheet" /><script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.js"></script>
 <div style="display:inline-block;vertical-align:top;">
 <h3>Draw Bounding Boxes around all objects of interest in the image and then either label them or transcribe their text</h3>
-<div id="instructions">
+<div id="instructions" style="display:none">
 <p><b>Primary Task -- Draw bouding boxes:</b> Select which type of object you are labeling, then draw a box around each instance of that object. Finally complete the the object's classification, either by selecting a type or transcribing the text within your box. </p>
 <p>The objects of interest are: </p>
     <ul>
@@ -33,15 +33,21 @@
 <p> Full instructions with sample labeling session <a href="https://drive.google.com/file/d/1423RJVS2zQw3arCQNRvMdyS5UboH4bDU/view?usp=sharing" target="_blank">here</a></p>
 </div>
 
-<ul id="short_instructions" style="display:none">
-	<li>Objects of interest: Master Image, Dependent Image, Inset Image, Subfigure Label, Scale Bar Label, Scale Bar Line</li>
-	<li>Image Classes: Parent, Microscopy, Diffraction, Graph, Illustration, Basic Photo, Unclear</li>
-	<li>Text Transcirption: Enter in the text exactly as it appears except you may enter &#956m as um and &#8491 as A. </li>
+<ul id="short_instructions">
+	<li>Primary Task: Draw bounding boxes around objects of interest (Master Image, Dependent Image, Inset Image, Subfigure Label, Scale Bar Label, Scale Bar Line)</li>
+	<li>Secondary Task #1: Classify images as one of: Parent, Microscopy, Diffraction, Graph, Illustration, Basic Photo, Unclear</li>
+	<li>Secondary Task #2: Enter in the text for Scale Bar Labels and Subfigure Labels <b>EXACTLY</b> as it appears except you may enter &#956m as um and &#8491 as A. (this means include spaces and parenthesis!) </li>
+    <li><b> Interacting with the interface: </b> To begin drawing a box, double click. The location of your double click will be one corner of the box. When you have moved your cursor to the other corner of the box, single click. To move a previously drawn box, press down of its border and move it to where you would like it to go and then release the mouse. </p>
+    <li><b>IMPORTANT: It is better to put too much in a bounding box than too little. If most of your boxes exclude parts of the object, we will reject you.</b></li> 
+    <li> If the image is of terrible quality, draw one scalebar label box anywhere and enter text 'SKIP'</li>
+    <li><b>Most subfigures are master images.</b> A dependent image is typically when one subfigure label refers to multiple subfigures. The entire image will only be a master image if there is only one subfigure or if there are no labels. </li>
+    <li> Full instructions with sample labeling session <a href="https://drive.google.com/file/d/1423RJVS2zQw3arCQNRvMdyS5UboH4bDU/view?usp=sharing" target="_blank">here</a> Example labeled images available <a href="https://docs.google.com/document/d/1rZp7liuTEvq9J7OuX9ujOB1XuMBoWU4z1N628Pu7yRs/edit?usp=sharing" target="_blank">here</a></li>
 </ul>
+<input type="checkbox" name="agreement" value="agree" id="agreement"> I have read <a href="https://drive.google.com/file/d/0ByAEGqveH4rRcUNiUnZuYXFLOG5LN2poWGYzUzEzZG1ySWlJ/view" target="_blank">the user agreement</a> and I understand that if I do not follow the instructions, my assignment will be rejected. </input>
 
 <div>
-	<button type="button" onclick="document.getElementById('instructions').style.display='none'; document.getElementById('short_instructions').style.display='block'">Hide Instructions</button>
-	<button type="button" onclick="document.getElementById('instructions').style.display='block'; document.getElementById('short_instructions').style.display='none'">Show Instructions</button>
+	<button type="button" onclick="document.getElementById('instructions').style.display='none'; document.getElementById('short_instructions').style.display='block'">Hide Longer Instructions</button>
+	<button type="button" onclick="document.getElementById('instructions').style.display='block'; document.getElementById('short_instructions').style.display='none'">Show Longer Instructions</button>
 
 <div id="bbox_annotator" style="display:inline-block">&nbsp;</div><p/><p/>
 
@@ -574,7 +580,8 @@ BBoxAnnotator.prototype.change_selector = function(functionality) {
 			$("#annotation_data").val(JSON.stringify(entries));
 			if (entries.length > 0 &&
 			    assignment_id != "" &&
-		        assignment_id != "ASSIGNMENT_ID_NOT_AVAILABLE") {
+		        assignment_id != "ASSIGNMENT_ID_NOT_AVAILABLE" &&
+		        $('input[type="checkbox"]').is(":checked")) {
 				$("#submitButton").removeAttr("disabled");
 			} else {
 				$("#submitButton").attr("disabled", "disabled");
@@ -602,7 +609,8 @@ $(document).ready(function() {
   var assignment_id = turkGetParam('assignmentId', "");
   // Initialize the bounding-box annotator.
   var annotator = new BBoxAnnotator({
-    url: "${image_url}", //PLACEHOLDER
+    url: "https://drive.google.com/uc?id=11qv58ImehScb_s_TxxHutm5ut-vyfPSr", //PLACEHOLDER
+    //url: "${image_url}",
 	input_method : 'select',
 	labels : ['Parent', 'Microscopy', 'Diffraction', 'Graph', 'Illustration', 'Basic Photo', 'Unclear'],
 	color : "rgb(255,0,0)",
@@ -611,7 +619,8 @@ $(document).ready(function() {
       $("#annotation_data").val(JSON.stringify(entries));
       if (entries.length > 0 &&
           assignment_id != "" &&
-          assignment_id != "ASSIGNMENT_ID_NOT_AVAILABLE") {
+          assignment_id != "ASSIGNMENT_ID_NOT_AVAILABLE" &&
+          $('input[type="checkbox"]').is(":checked")) {
         $("#submitButton").removeAttr("disabled");
       }
       else {
@@ -621,14 +630,32 @@ $(document).ready(function() {
   });
 
 
+<<<<<<< HEAD
   
   
+=======
+  // functions to respond to click events on buttons
+>>>>>>> d746017... Added user agreement checkbox and shorter instructions to mturk layout
   document.getElementById("master").onclick = function() { annotator.change_selector('master') }
   document.getElementById("dependent").onclick = function() { annotator.change_selector('dependent') }
   document.getElementById("inset").onclick = function() { annotator.change_selector('inset') }
   document.getElementById("subfigure_label").onclick = function() { annotator.change_selector('subfigure_label') }
   document.getElementById("scale_bar_label").onclick = function() { annotator.change_selector('scale_bar_label') }
   document.getElementById("scale_bar").onclick = function() { annotator.change_selector('scale_bar') }
+  
+  // allowing submission
+  document.getElementById("agreement").onclick = function() {
+        if (annotator.entries.length > 0 &&
+          assignment_id != "" &&
+          assignment_id != "ASSIGNMENT_ID_NOT_AVAILABLE" &&
+          $( "input:checked" ).length > 0) {
+            
+            $("#submitButton").removeAttr("disabled");
+      }
+      else {
+            $("#submitButton").attr("disabled", "disabled");
+      }
+  }
   
   document.getElementById("hide_labels").onclick = function() { 
       var elts = document.getElementsByClassName("display_text")
@@ -665,6 +692,8 @@ $(document).ready(function() {
   if (assignment_id == "ASSIGNMENT_ID_NOT_AVAILABLE") {
     $("#submitButton").val("This is preview");
   }
-  console.log(assignment_id);
 });
+
+
+
 </script>
