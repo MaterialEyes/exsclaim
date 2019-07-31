@@ -609,8 +609,8 @@ $(document).ready(function() {
   var assignment_id = turkGetParam('assignmentId', "");
   // Initialize the bounding-box annotator.
   var annotator = new BBoxAnnotator({
-    url: "https://drive.google.com/uc?id=11qv58ImehScb_s_TxxHutm5ut-vyfPSr", //PLACEHOLDER
-    //url: "${image_url}",
+    //url: "https://drive.google.com/uc?id=11qv58ImehScb_s_TxxHutm5ut-vyfPSr", //PLACEHOLDER
+    url: "${image_url}",
 	input_method : 'select',
 	labels : ['Parent', 'Microscopy', 'Diffraction', 'Graph', 'Illustration', 'Basic Photo', 'Unclear'],
 	color : "rgb(255,0,0)",
