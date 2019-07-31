@@ -129,7 +129,7 @@ def generate_single_image_dictionary(image_data):
     classes = {0: "image", 1: "nonimage", 2: "subfigure_label", 3: "scalebar"}
     #for name, ID, color in zip(coco_class_names, coco_class_ids, coco_class_colors):
     #    classes[ID] = (name, color)
-    bboxes = {}
+    bboxes = {"image": [], "nonimage": [], "subfigure_label": [], "scalebar": []}
     for x1, y1, x2, y2, conf, cls_conf, cls_pred in outputs[0]:
         y_1, x_1, y_2, x_2 = yolobox2label([y1, x1, y2, x2], info_image)
         y_1 = max(int(y_1), 0)
@@ -151,12 +151,13 @@ def generate_json(image_to_result):
     results_json = {}
     for image_name in image_to_result:
         bboxes = generate_single_image_dictionary(image_to_result[image_name])
+        image_name = image_name.split("/")[-1]
         results_json[image_name] = {"unassigned" : bboxes}
     return results_json
 
 
-def load_and_run_model(input_images = "./input_images", gpu = 0, extension = "png",
-        checkpoint = "objects/checkpoints/snapshot930.ckpt", config_file = "objects/onfig/yolov3_eval.cfg",
+def load_and_run_model(input_images = "./input_images", gpu = 0, extension = "jpg",
+        checkpoint = "objects/checkpoints/snapshot930.ckpt", config_file = "objects/config/yolov3_eval.cfg",
         detection_threshold = None):
     """ runs model on input images and outputs data as MaterialEyes JSON
  
