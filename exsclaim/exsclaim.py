@@ -6,6 +6,7 @@ from PIL import Image
 import objectdetector as od
 import textdetector as td
 import webscraper as ws
+import captionparser as cp
 
 
 def parse_command_line_arguments():
@@ -17,7 +18,6 @@ def parse_command_line_arguments():
     args = vars(ap.parse_args())
     
     return args
-
 
 
 
@@ -40,6 +40,11 @@ if __name__ == '__main__':
     # Session #2: Request and save html files from article url extensions
     exsclaim_json = ws.session_2(dict_json, request, article_extensions)    
 
+    # <*>>?<*>>?<*>>?<*>>? Insert code for caption parser here... <*>>?<*>>?<*>>?<*>>? 
+    #
+    #
+    #
+    # <*>>?<*>>?<*>>?<*>>?<*>>?<*>>?<*>>?<*>>?<*>>?<*>>?<*>>?<*>>?<*>>?<*>>?<*>>?<*>>? 
 
     ## Run ObjectDetector on input images
     data = od.load_and_run_model(args['input_dir'])

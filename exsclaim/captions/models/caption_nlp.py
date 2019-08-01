@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import pandas as pd
-from tools.helper_nlp import *
+from captions.tools.helper_nlp import *
 
 import spacy
 from spacy.matcher import Matcher

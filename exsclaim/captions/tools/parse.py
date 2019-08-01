@@ -2,7 +2,7 @@ import sys
 import ast
 import yaml
 import numpy as np
-from tools.helper_nlp import *
+from captions.tools.helper_nlp import *
 
 # Disable
 def blockPrint():
