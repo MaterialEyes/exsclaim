@@ -1,4 +1,22 @@
 TODO
+
+- Add BeautifulSoup to environment.yml
+- In setup.sh, need to activate exsclaim_env from within file for proceeding code to download (gdown) the models (conda activate exsclaim within the bash script does not work)
+
+
+
+
+
+
+
+
+
+
+
+
+
+- ===================== Complete (for the most part) =====================
+
 - Deploy labeling interface in MTurk (ensuring compatibility with Labelbox)
 
 - Decide on how to structure data from structured query --> labeled dataset. 
