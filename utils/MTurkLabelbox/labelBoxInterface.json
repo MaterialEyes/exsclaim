@@ -2,168 +2,232 @@
   "classifications": [],
   "tools": [
     {
-      "name": "Master Figure",
-      "color": "#FF0000",
+      "name": "Master Image",
+      "color": "#D50000",
       "tool": "rectangle",
       "classifications": [
         {
           "name": "classification",
-          "instructions": "Select what type of image the Master Figure is",
+          "instructions": "Image Type",
           "type": "radio",
           "options": [
             {
-              "value": "parent",
-              "label": "Parent (i.e. contains Dependent Image(s))"
+              "value": "Parent",
+              "label": "Parent  (i.e. contains Dependent Image(s))",
+              "featureSchemaId": "fa2d09e2-089a-4a2f-928a-18c4fcc3ffcf",
+              "schemaNodeId": "e24370b3-d41e-4bd7-bb83-14f00b5c81c1"
             },
             {
-              "value": "microscopy",
-              "label": "Microscopy"
+              "value": "Microscopy",
+              "label": "Microscopy",
+              "featureSchemaId": "c37b57ab-eb3b-4f12-9d49-ea1bf3029606",
+              "schemaNodeId": "9e8babdd-8d7d-40c1-be5d-ad25f6592aa1"
             },
             {
-              "value": "diffraction",
-              "label": "Diffraction"
+              "value": "Diffraction",
+              "label": "Diffraction",
+              "featureSchemaId": "61f26338-b5f5-4d19-9e3f-30ac6d804301",
+              "schemaNodeId": "e2f074a3-bb2d-473e-ac31-7c1d76c8144d"
             },
             {
-              "value": "graph",
-              "label": "Graph"
+              "value": "Graph",
+              "label": "Graph",
+              "featureSchemaId": "461a248a-b243-489d-89f5-57811d91b0ad",
+              "schemaNodeId": "10c3ed88-3dc4-4527-8eb2-01e94167c724"
             },
             {
-              "value": "illustration",
-              "label": "Illustration"
+              "value": "Basic Photo",
+              "label": "Photo",
+              "featureSchemaId": "147e83aa-bcdf-4dc8-af68-de2b8656eaa4",
+              "schemaNodeId": "c2c26609-4dac-4301-bc76-a6768e0e357c"
             },
             {
-              "value": "basic_photo",
-              "label": "Basic Photo"
+              "value": "Illustration",
+              "label": "Illustration",
+              "featureSchemaId": "4cc892d6-ab83-4f24-8c9e-a2022a45ce2f",
+              "schemaNodeId": "eabe73c4-cc9e-4bc0-b5fd-931398bfe40b"
             },
             {
-              "value": "unclear",
-              "label": "Unclear"
+              "value": "Unclear",
+              "label": "Unclear",
+              "featureSchemaId": "e94d8e23-4b4d-4e28-b852-5729693ee503",
+              "schemaNodeId": "c8f8a07f-f238-40a9-bb2d-6b9ba9ba6fb2"
             }
           ],
-          "required": true
+          "required": true,
+          "featureSchemaId": "d1e183bc-71a3-4467-845b-1ecfa7c9ce0d",
+          "schemaNodeId": "0be328b4-0798-4f4c-9de0-fab8a8bdf4b3"
         }
-      ]
+      ],
+      "featureSchemaId": "c517ef57-973e-4f3d-b5d7-f85cd36c731e",
+      "schemaNodeId": "ee3378da-788f-4bb4-b7b1-a1494d4e87e0"
     },
     {
-      "name": "Dependent Figure",
-      "color": "#0000FF",
+      "name": "Dependent Image",
+      "color": "#039BE5",
       "tool": "rectangle",
       "classifications": [
         {
           "name": "classification",
-          "instructions": "Select what type of image the Dependent Figure is",
+          "instructions": "Image Type",
           "type": "radio",
           "options": [
             {
-              "value": "microscopy",
-              "label": "Microscopy"
+              "value": "Microscopy",
+              "label": "Microscopy",
+              "featureSchemaId": "0ec76fc7-e852-44ce-b770-b92ec8678fff",
+              "schemaNodeId": "f247157f-6daa-4813-9fee-18a938272b08"
             },
             {
-              "value": "diffraction",
-              "label": "Diffraction"
+              "value": "Diffraction",
+              "label": "Diffraction",
+              "featureSchemaId": "f223c8f0-9536-467c-8cc8-f352a6db4cd6",
+              "schemaNodeId": "e306f41d-fb25-4ba6-a138-c3135d2519cd"
             },
             {
-              "value": "graph",
-              "label": "Graph"
+              "value": "Graph",
+              "label": "Graph",
+              "featureSchemaId": "be1df6b9-dd49-4ccf-a116-a10cdaab8b98",
+              "schemaNodeId": "dd5b6d59-41d2-4251-853f-a56fca644f31"
             },
             {
-              "value": "illustration",
-              "label": "Illustration"
+              "value": "Basic Photo",
+              "label": "Photo",
+              "featureSchemaId": "fd5d43b1-e99d-4cfb-824a-352788a6abf3",
+              "schemaNodeId": "85f13ce1-f6eb-4b75-968e-5fe967256923"
             },
             {
-              "value": "basic_photo",
-              "label": "Basic Photo"
+              "value": "Illustration",
+              "label": "Illustration",
+              "featureSchemaId": "7185659b-7fb1-497a-a833-08829e90e959",
+              "schemaNodeId": "8dee26ef-20be-4e3f-b6a8-1b24b3255416"
             },
             {
-              "value": "unclear",
-              "label": "Unclear"
+              "value": "Unclear",
+              "label": "Unclear",
+              "featureSchemaId": "fe7e3684-3e29-4777-8535-7f4abfc63a61",
+              "schemaNodeId": "0c226428-90ea-4d4b-830e-0a8176a8bb16"
             }
           ],
-          "required": true
+          "required": true,
+          "featureSchemaId": "6829bf1f-5bef-4142-923c-eeec8a3ee31e",
+          "schemaNodeId": "f15725ba-8139-4f44-a2ab-a99a5ce9f0b3"
         }
-      ]
+      ],
+      "featureSchemaId": "20c62da3-4e4f-473b-ac26-0e67ea820edc",
+      "schemaNodeId": "1ab7a4e6-0f60-4064-9f26-543bc3c8486d"
     },
     {
-      "name": "Inset Figure",
-      "color": "#9900FF",
+      "name": "Inset Image",
+      "color": "#8E24AA",
       "tool": "rectangle",
       "classifications": [
         {
           "name": "classification",
-          "instructions": "Select what type of image the Inset Figure is",
+          "instructions": "Image Type",
           "type": "radio",
           "options": [
             {
-              "value": "microscopy",
-              "label": "Microscopy"
+              "value": "Microscopy",
+              "label": "Microscopy",
+              "featureSchemaId": "c76724e8-09c9-434e-b78b-8fb1bc3ae449",
+              "schemaNodeId": "b580cb05-4d3a-483f-af6d-9cf8bbee0c71"
             },
             {
-              "value": "diffraction",
-              "label": "Diffraction"
+              "value": "Diffraction",
+              "label": "Diffraction",
+              "featureSchemaId": "c8d89d48-184c-4b48-b820-286692973747",
+              "schemaNodeId": "30371a9d-9826-4abf-8780-35257c29fb8e"
             },
             {
-              "value": "graph",
-              "label": "Graph"
+              "value": "Graph",
+              "label": "Graph",
+              "featureSchemaId": "08eb55e2-4d66-44e3-9032-4f5c15dabd9e",
+              "schemaNodeId": "ca90be0e-6843-4d9d-88ac-987e957bdcb6"
             },
             {
-              "value": "illustration",
-              "label": "Illustration"
+              "value": "Basic Photo",
+              "label": "Photo",
+              "featureSchemaId": "8f4d3446-5dc0-41e6-ac4c-11534cd5920a",
+              "schemaNodeId": "710eb0c9-e57c-4901-934f-8f766e2bfd94"
             },
             {
-              "value": "basic_photo",
-              "label": "Basic Photo"
+              "value": "Illustration",
+              "label": "Illustration",
+              "featureSchemaId": "bd709571-a2af-4f78-8a99-988b1f767454",
+              "schemaNodeId": "73c46f18-cfe3-4f67-ac34-1a112da40f3c"
             },
             {
-              "value": "unclear",
-              "label": "Unclear"
+              "value": "Unclear",
+              "label": "Unclear",
+              "featureSchemaId": "5f1db356-0c8e-480c-91d8-83b7a0974634",
+              "schemaNodeId": "a861d77c-4c99-48ff-8550-c7bbf20718d9"
             }
           ],
-          "required": true
+          "required": true,
+          "featureSchemaId": "28f2620b-a31e-4720-996a-1c932b97204c",
+          "schemaNodeId": "793acb77-bedd-4b6c-a538-1d2600c3c876"
         }
-      ]
+      ],
+      "featureSchemaId": "a74962f7-f9a6-4bb3-ada2-70fc46427dd2",
+      "schemaNodeId": "1951a10e-4100-4e3c-bb9a-d471d1a1579d"
     },
     {
       "name": "Subfigure Label",
-      "color": "#00A700",
+      "color": "#0B8043",
       "tool": "rectangle",
       "classifications": [
         {
           "name": "text",
-          "instructions": "Fill in the exact text of the subfigure label",
+          "instructions": "Text (Match Case)",
           "type": "text",
           "options": [
             {
               "value": "",
-              "label": ""
+              "label": "",
+              "featureSchemaId": "c8811a02-b50f-42ef-813b-f7759715bc29",
+              "schemaNodeId": "2e5e5c2c-eebf-4953-a502-2bb3677bfb81"
             }
           ],
-          "required": true
+          "required": true,
+          "featureSchemaId": "971d61a4-47ef-4ca8-957f-43c448dce9df",
+          "schemaNodeId": "94bdba0f-d842-4d35-8a50-421ecba5abae"
         }
-      ]
+      ],
+      "featureSchemaId": "3bc3c4ac-e580-425e-b084-7fbf77c4862b",
+      "schemaNodeId": "82c97887-8f6a-43bc-8d7f-60ccb13066b3"
     },
     {
       "name": "Scale Bar Label",
-      "color": "#FFFF00",
+      "color": "#F6BF26",
       "tool": "rectangle",
       "classifications": [
         {
           "name": "text",
-          "instructions": "Fill in the exact text of the scale bar label",
+          "instructions": "Text (Match Case)",
           "type": "text",
           "options": [
             {
               "value": "",
-              "label": ""
+              "label": "",
+              "featureSchemaId": "1067c037-bc43-4a21-9125-9fae6b88e723",
+              "schemaNodeId": "d12b77ce-d95a-4d13-854d-e06a190ae81f"
             }
           ],
-          "required": true
+          "required": true,
+          "featureSchemaId": "8366eee6-6092-4e0b-91b5-96563be3d699",
+          "schemaNodeId": "3bb07d01-16a8-4daa-abd7-e9b2441df8fe"
         }
-      ]
+      ],
+      "featureSchemaId": "52751623-4b1f-47a1-8889-767bb9f8c0ff",
+      "schemaNodeId": "2eac1101-85d7-4047-aeac-36699501d539"
     },
     {
       "name": "Scale Bar Line",
-      "color": "#FF9900",
-      "tool": "rectangle"
+      "color": "#F4511E",
+      "tool": "rectangle",
+      "featureSchemaId": "7ae07300-0397-4338-9157-764f5aba1f53",
+      "schemaNodeId": "3f649564-f6f8-4889-bb20-891496e67ee7"
     }
   ],
   "projectInstructions": "https://storage.googleapis.com/labelbox-193903.appspot.com/cjooh9smgbldt0738ducp9x0e%2F73c16066-cd09-1ecf-0dcf-0adc7f0a508e-Parse_Scientific_Figures_Instructions.pdf"
