@@ -25,7 +25,7 @@ ap.add_argument("-l", "--layout_id", type=str,
 ap.add_argument("-t", "--type_id", type=str, 
 				help="enter the type id available by clicking on the" +
 				     "project name in your requester account")
-ap.add_argument("-n", "--number", type=int, defualt=100, help="number of hits to make")
+ap.add_argument("-n", "--number", type=int, default=100, help="number of hits to make")
 args = vars(ap.parse_args())
 
 # constants
@@ -35,6 +35,7 @@ api_key = ("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjand1bzkweHJiMDR
 		   "0IjoxNTYxMTIyNzQzLCJleHAiOjIxOTIyNzQ3NDN9.Wgshf25Ls_eoPO21LaD810OtoH" + 
 		   "uxgvwHnsFyHDb4kjw")	
 dataset_id = 'cjx65cbxsfgmb0800604zurzo'
+#dataset_id = 'cjyq8il7h8q850a464vfi44h2'
 
 # parse command line arguments
 access_key = args["access_key"]
@@ -47,27 +48,29 @@ limit = args["number"]
 
 
 # Names of desired images
-good_images = set()
-directory_name = "150419_3"
-directory = os.fsencode(directory_name)
-for file in os.listdir(directory):
-	good_images.add(os.fsdecode(file))
+#good_images = set()
+#directory_name = "../../dataset"
+#directory = os.fsencode(directory_name)
+#for file in os.listdir(directory):
+#	good_images.add(os.fsdecode(file))
 
 
 # generate list of image_urls (hosted on an AWS s3 bucket)
-def get_naming_dictionary():
-	f = open(file_name, "r")
-	json_string = f.read().replace("'","\"")
-	json_string = json_string.replace("(", "[")
-	json_string = json_string.replace(")", "]")
-	f.close()
-	return json.loads(json_string)
-naming_dictionary = get_naming_dictionary()
+#def get_naming_dictionary():
+#	f = open(file_name, "r")
+#	json_string = f.read().replace("'","\"")
+#	json_string = json_string.replace("(", "[")
+#	json_string = json_string.replace(")", "]")
+#	f.close()
+#	return json.loads(json_string)
+with open(file_name, "r") as f:
+    naming_dictionary = json.load(f)
+
 image_urls = []
 
 for key in naming_dictionary:
-	if naming_dictionary[key][1] in good_images:
-		image_urls.append(key)
+	#if naming_dictionary[key][1] in good_images:
+	image_urls.append(key)
 
 def get_existing_labels(client, dataset_id, datarow_id):
 	""" returns dataRow externalId to id dict from index:index+100 """
@@ -142,5 +145,5 @@ for image in image_urls:
             created.append(image)
             completed += 1
 			
-with open("created_hits_v4.txt", "w") as f:
+with open("created_hits_v6.txt", "w") as f:
     f.write(str(created))
