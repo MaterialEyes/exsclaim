@@ -120,7 +120,7 @@ created = []
 # Create an HIT for each image url
 completed = 0
 for image in image_urls:
-    if completed > limit:
+    if completed >= limit:
         break
     if check_existing(image):
         try:
