@@ -127,11 +127,6 @@ def parse_caption(caption,keywords,nlp,matcher,tokens_path,query_kw=""):
     doc     = nlp(caption)
     matches = matcher(doc)
 
-    # Keywords from webscraper/CDE query
-    # Format: {"Main class 1":[synonym1, synonym2, ...], "Main class 2":[synonym1, synonym2, ...], etc."}
-    # query_kw = {"HAADF-STEM":["HAADF","HAADF-STEM","HAADF–STEM","High-angle annular dark-field","High angle annular dark-field","High-angle annular darkfield","High angle annular darkfield"]}
-                # "Z-contrast":["Z-contrast","Z–contrast"]}
-
     if matches != []:
         # Find primary character type (TODO: implement resolve by mixed char type)
         char_type = select_char_delim(nlp,matches,alpha_thresh=0.20)

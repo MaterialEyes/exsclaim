@@ -133,8 +133,7 @@ def get_figures(soup, article_url, journal_family):
     
     return exsclaim_json
 
-
-def session_1(dict_json, request):
+def gather_searched_urls(dict_json, request):
     """ creates list of article locations from dict_json info """
     directory_parser = get_directory_parser(dict_json['journal_family'])
     with requests.Session() as session:
@@ -166,26 +165,29 @@ def session_1(dict_json, request):
         article_extensions = [a for a in article_extensions if not exist_common_member(directory_parser[1],a.split("/"))]
     return article_extensions
 
-def session_2(dict_json, request, article_extensions):
+def gather_article_figures(dict_json, request, article_extensions):
     """ parses html from articles in article_extensions as exsclaim_json """
     with requests.Session() as session:
         counts=0
         exsclaim_json = {}
         for article in article_extensions:
-            article_url = request[0] + article
-            print("["+str(counts+1).zfill(5)+"] Extracting html from "+str(article.split("/")[-1]))       
-            r = session.get(article_url) 
-            soup = BeautifulSoup(r.text, 'lxml')
-            article_figure_json = get_figures(soup, article_url, dict_json['journal_family'])
-            
-            exsclaim_json.update(article_figure_json)
-            
-            
-            if dict_json['human_traffic']:
-                human_traffic()
-            if counts+1 == dict_json['maximum_scraped']:
-                break
-            counts+=1
+            try:
+                article_url = request[0] + article
+                print("["+str(counts+1).zfill(5)+"] Extracting figure(s) from "+str(article.split("/")[-1]))       
+                r = session.get(article_url) 
+                soup = BeautifulSoup(r.text, 'lxml')
+                article_figure_json = get_figures(soup, article_url, dict_json['journal_family'])
+                exsclaim_json.update(article_figure_json)
+                
+                if dict_json['human_traffic']:
+                    human_traffic()
+                if counts+1 == dict_json['maximum_scraped']:
+                    break
+                counts+=1
+            except:
+                print("An exception occurred")
+
+    print("\n")
     return exsclaim_json
 
 
@@ -199,10 +201,10 @@ def main():
 
     
     # Session #1: Get article url extensions for articles related to query
-    article_extensions = session_1(dict_json, request)
+    article_extensions = gather_searched_urls(dict_json, request)
 
     # Session #2: Request and save html files from article url extensions
-    exsclaim_json = session_2(dict_json, request, article_extensions)    
+    exsclaim_json = gather_article_figures(dict_json, request, article_extensions)    
    
     with open("exsclaim.json", "w") as f:
         json.dump(exsclaim_json, f)

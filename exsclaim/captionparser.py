@@ -15,9 +15,10 @@ def js_add_subfigs(exsclaim_json,figure,de,dk):
     Add subfigure information to figure_level entry of an exsclaim_json
     """
     # Create place holder for any image_level information that has not been assigned
+    exsclaim_json[figure]["unassigned"] = {}
+
     if "subfigs" not in exsclaim_json[figure]:
         exsclaim_json[figure]["subfigs"]={}
-        exsclaim_json[figure]["subfigs"] = {"unassigned":{}}
 
     for subfig_label in de:
         exsclaim_json[figure]["subfigs"][str(subfig_label)] = \
@@ -51,7 +52,7 @@ def run_model(model, query_json, exsclaim_json, config_file):
 
     for figure in exsclaim_json:
         try:
-            print("Caption: ",exsclaim_json[figure]['caption'][0:25]+"...")
+            print("Reading caption: ",exsclaim_json[figure]['caption'][0:min(50,int(0.25*len(exsclaim_json[figure]['caption'])))]+"...")
             image_count, dt, de, dk  = parse_caption(exsclaim_json[figure]['caption'],[],nlp,matcher,config_file,keyword_query)
         except:
             print("Caption Parse Failure!")
@@ -59,6 +60,7 @@ def run_model(model, query_json, exsclaim_json, config_file):
 
         exsclaim_json = js_add_subfigs(exsclaim_json,figure,de,dk)
 
+    print("\n")
     return exsclaim_json
 
 def load_and_run_model(query_json, exsclaim_json, config_file):

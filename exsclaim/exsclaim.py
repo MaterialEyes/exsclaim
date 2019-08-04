@@ -13,38 +13,38 @@ def parse_command_line_arguments():
     """ parses arguments input throug command line as dictionary """
     ap = argparse.ArgumentParser()
     
-    ap.add_argument('-i', '--input-dir', type=str, default='images',
+    ap.add_argument('-i', '--input_dir', type=str, default='images',
                     help='Path to directory containing input images')
+
+    ap.add_argument('-q', '--query', type=str, default='query.json',
+                    help='Path to JSON containing an exsclaim-style query')
+
+    ap.add_argument('-s', '--sentence_patterns', type=str, default='captions/config/sentence_search_patterns.yml',
+                    help='Path to YAML containing a dictionary of sentence-level regexp patterns')
+
     args = vars(ap.parse_args())
     
     return args
 
 
-
-
-
-
-
-
-
 if __name__ == '__main__':
-    ## parse command line args
+    # parse command line args
     args = parse_command_line_arguments()
 
-   
-    ## Scrape web for keywords and initialize an exsclaim style json 
-    dict_json = ws.js_r("scraper/query.json")
-    request = ws.create_request(dict_json) #[GET_URL_BASE,SEARCH_EXTENSION]  
-    # Session #1: Get article url extensions for articles related to query
-    article_extensions = ws.session_1(dict_json, request)
-    # Session #2: Request and save html files from article url extensions
-    exsclaim_json = ws.session_2(dict_json, request, article_extensions)    
+    # collect query info from json
+    query_json = ws.js_r(args['query'])
 
-    # <*>>?<*>>?<*>>?<*>>? Insert code for caption parser here... <*>>?<*>>?<*>>?<*>>? 
-    #
-    #
-    #
-    # <*>>?<*>>?<*>>?<*>>?<*>>?<*>>?<*>>?<*>>?<*>>?<*>>?<*>>?<*>>?<*>>?<*>>?<*>>?<*>>? 
+    # create HTTP/1.1 request based on query 
+    request = ws.create_request(query_json) #[GET_URL_BASE,SEARCH_EXTENSION]  
+
+    # get url extensions for articles related to query
+    article_extensions = ws.gather_searched_urls(query_json, request)
+
+    # get figures from html files corresponding to article url extensions
+    exsclaim_json = ws.gather_article_figures(query_json, request, article_extensions)    
+
+    # parse full figure caption into chunks of subfigure text and populate exsclaim_json with subfigure info
+    exsclaim_json = cp.load_and_run_model(query_json,exsclaim_json,args['sentence_patterns'])
 
     ## Run ObjectDetector on input images
     data = od.load_and_run_model(args['input_dir'])
@@ -54,7 +54,6 @@ if __name__ == '__main__':
         image_json = exsclaim_json[image_name]
         image_json.update(data[image_name])
         exsclaim_json[image_name] = image_json
-
 
     ## Run TextDetector on subfigure and scalebar labels
     model, transform = td.load_model()
@@ -79,5 +78,6 @@ if __name__ == '__main__':
             label["text"] = text
             i += 1
 
-    print(exsclaim_json)
+    print(exsclaim_json['ncomms2124_fig4.jpg'])
+    print(exsclaim_json['s41467-019-10713-z_fig2.jpg'])
 
