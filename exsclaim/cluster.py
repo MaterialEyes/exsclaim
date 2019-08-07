@@ -188,24 +188,43 @@ def make_scale_bars(figure):
     # return Scale Bar JSONs with no label
     if unassigned.get("Scale Bar Label", []) == []:
         return scale_bars, unassigned
+    
+    # create mappings to jsons
+    not_assigned = set()
+    index = 0
+    index_to_json = {}
+    for label in unassigned["Scale Bar Label"]:
+        index_to_json[index] = label
+        not_assigned.add(index)
 
     # match Lines to Labels
     for line in scale_bar_lines:
         scores = []  # (score, label) tuples
         line_geo = line["geometry"] 
-        for label in unassigned["Scale Bar Label"]:
+        for label_index in index_to_json:
+            label = index_to_json[label_index]
             label_geo = label["geometry"]
             score = calculate_match_score(line_geo, label_geo)
-            scores.append((score, label))
+            scores.append((score, label_index))
+
         # use highest scoring label
-        best_match = max(scores, key=itemgetter(0))[1]
+        best_index = max(scores, key=itemgetter(0))[1]
+        not_assigned.discard(best_index)
+        best_match = index_to_json[best_index]
+        # create Scale Bar JSON
         label_json = {"text" : best_match["text"], 
                       "geometry" : best_match["geometry"]}
         scale_bar_json = {"label" : label_json, "geometry" : line_geo}
         scale_bars.append(scale_bar_json)
     
-
+    # update unassigned
+    unassigned_labels = []
+    for index in not_assigned:
+        unassigned_labels.append(index_to_json[index])
+    unassigned["Scale Bar Label"] = unassigned_labels
+    unassigned["Scale Bar Line"] = []        
     return scale_bars, unassigned
+
 
 def assign_dependent_images(figure):
     """ Assigns all Dependent Images in unassigned to a Master Image 
@@ -215,7 +234,34 @@ def assign_dependent_images(figure):
     returns (masters, unassigned): where masters is a list of Master Image
         JSONs and unassinged is the updated unassigned JSON
     """
-    pass
+    unassigned = figure["unassigned"]
+    dependent_images = unassigned.get("Dependent Image", [])
+    masters = figure.get("Master Image", [])
+    
+    # if there is nothing new here...
+    if len(masters) * len(dependent_images) == 0:
+        return masters, unassigned
+    
+    unassigned_dependents = []
+    for dependent in dependent_images:
+        matched = False
+        for master in masters:
+            score = calculate_match_score(dependent["geometry"],
+                                          master["geometry"])
+            # if a dependent is mostly in a Master Image, match them
+            if score > 50:
+                matched = True
+        # if the dependent is not mostly in any master, keep it unassigned
+        if not matched:
+            unassigned_dependents.append(dependent)
+            continue
+        master_dependents = master.get("Dependent Images", [])
+        assigned_dependent = {"geometry" : dependent["geometry"]}
+        master_dependents.append(assigned_dependent)
+        master["Dependent Images"] = master_dependents
+    
+    unassigned["Dependent Image"] = unassigned_dependents
+    return masters, unassigned
 
 
 def assign_inset_images(figure):
@@ -226,7 +272,34 @@ def assign_inset_images(figure):
     returns (masters, unassigned): where masters is a list of Master Image
         JSONs and unassinged is the updated unassigned JSON
     """
-    pass
+    unassigned = figure["unassigned"]
+    inset_images = unassigned.get("Inset Image", [])
+    masters = figure.get("Master Image", [])
+    
+    # if there is nothing new here...
+    if len(masters) * len(inset_images) == 0:
+        return masters, unassigned
+    
+    unassigned_insets = []
+    for inset in inset_images:
+        matched = False
+        for master in masters:
+            score = calculate_match_score(inset["geometry"],
+                                          master["geometry"])
+            # if a dependent is mostly in a Master Image, match them
+            if score > 50:
+                matched = True
+        # if the dependent is not mostly in any master, keep it unassigned
+        if not matched:
+            unassigned_insets.append(inset)
+            continue
+        master_insets = master.get("Inset Images", [])
+        assigned_inset = {"geometry" : inset["geometry"]}
+        master_insets.append(assigned_inset)
+        master["Inset Images"] = master_Insets
+    
+    unassigned["Inset Image"] = unassigned_insets
+    return masters, unassigned
 
 def assign_scale_bars(figure, scale_bars):
     """ Assigns all Scale Bar JSON  unassigned to a Subfigure 
