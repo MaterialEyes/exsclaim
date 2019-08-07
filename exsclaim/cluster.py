@@ -1,6 +1,5 @@
 import json
-
-
+from operator import itemgetter
 
 
 def cluster_subfigures(data):
@@ -11,10 +10,8 @@ def cluster_subfigures(data):
     for master in data["unassigned"]["Master Image"]:
         master_json = create_master_json(master)
     
-
 def find_dependent_images(master):
     return []
-
 
 def calculate_match_score(object_one, object_two):
     """ finds score where higher numbers indicate stronger relation """
@@ -23,7 +20,6 @@ def calculate_match_score(object_one, object_two):
         return 100 * overlap
     else:
         return -1 * calculate_distance(object_one, object_two)
-
 
 def calculate_overlap(object_one, object_two):
     """ Calculates the % of the smaller object contained in the larger """
@@ -46,7 +42,6 @@ def calculate_overlap(object_one, object_two):
     intersection = intersect_height * intersect_width
     
     return intersection / min(area_one, area_two)
-
 
 def calculate_distance(object_one, object_two):
     """ Calculates the shortest distance of object_one to object_two """
@@ -81,7 +76,6 @@ def dist(p1, p2):
     x2, y2 = p2
     return ((x2 - x1)**2 + (y2 - y1)**2)**(0.5)    
 
-
 def find_coords(object_geometry):
     """ Conversts geometry coords to (x1, x2, y1, y2) tuple """
     x_coords = [object_geometry[i]["x"] for i in range(len(object_geometry))]
@@ -90,13 +84,11 @@ def find_coords(object_geometry):
                      min(y_coords), max(y_coords))
     return object_coords
 
-
 def find_area(object_coords):
     """ Finds area of (x1, x2, y1, y2) tuple """
     height = object_coords[3] - object_coords[2]
     width = object_coords[1] - object_coords[0] 
     return height * width
-
 
 def find_intersection_length(a, b):
     """ finds length for which two lines intersect """
@@ -116,23 +108,151 @@ def find_intersection_length(a, b):
         else:
             return a2 - b1
 
+def assign_subfigure_labels(figure):
+    """ Matches Subfigure Labels with Master Image 
+    
+    param figure: a Figure JSON
+    returns: (masters, unassigned) where masters is a list of
+        Master Image JSONs and unassigned is the unassigned JSON 
+    """
+    masters = []
+    unassigned = figure["unassigned"]
+    num_masters = len(unassigned["Master Image"])
+    if num_masters == 0:
+        return masters, unassigned
+    # track which master images and labels have been paired
+    label_to_label = {}
+    master_index_to_master = {}
+    assigned = set()
+    not_assigned = set()
+    scores = [] # each elt is: (score, label, master_index)
+    # look through the unassigned, add them to tracking
+    for index, master in enumerate(unassigned["Master Image"]):
+        master_index_to_master[index] = master
+        not_assigned.add(index)
+    for label in unassigned["Subfigure Label"]:
+        label_geometry = label["geometry"]
+        label_to_label[label["text"]] = label
+        not_assigned.add(label["text"])
+        for master_index in master_index_to_master:
+            master_geometry = master_index_to_master[master_index]["geometry"]
+            score = calculate_match_score(master_geometry, label_geometry)
+            scores.append((score, label["text"], master_index))
+    # greedily assigne the highest scoring pair 
+    scores = sorted(scores, key=itemgetter(0))
+    iters = len(scores)
+    for i in range(iters):
+        best = scores.pop()
+        score, label, master_index = best
+        if label in assigned or master_index in assigned:
+            continue
+        # this Subfigure Label and Master Image will be assigned
+        assigned.add(label)
+        assigned.add(master_index) 
+        not_assigned.remove(label)
+        not_assigned.remove(master_index)       
+        # create a Master Image JSON
+        master_json = {}
+        label_json = {"text" : label,
+                      "geometry": label_to_label[label]["geometry"]}
+        master_json = {"label" : label_json, 
+                       "geometry" : master_index_to_master[master_index]["geometry"]}
+        ##TODO: also add classification from master object
+        masters.append(master_json)
+    
+    # update unassigned JSON
+    unassigned_masters = []
+    unassigned_labels = []
+    for i in not_assigned:
+        if i in master_index_to_master:
+            unassigned_masters.append(master_index_to_master[i])
+        else:
+            unassigned_labels.append(label_to_label[i])
+    unassigned["Master Image"] = unassigned_masters
+    unassigned["Subfigure Label"] = unassigned_labels
+    
+    return masters, unassigned
 
+def make_scale_bars(figure):
+    """ matches all scale bar lines to the nearest scale bar labels 
+
+    param figure: a Figure JSON
+
+    returns (scale bars, unassigned): where scale bars is a list of 
+        Scale Bar JSONs and unassigned is the updated unassigned JSON 
+    """
+    unassigned = figure["unassigned"]
+    scale_bar_lines = unassigned.get("Scale Bar Line", [])
+    scale_bars = []
+
+    # return Scale Bar JSONs with no label
+    if unassigned.get("Scale Bar Label", []) == []:
+        return scale_bars, unassigned
+
+    # match Lines to Labels
+    for line in scale_bar_lines:
+        scores = []  # (score, label) tuples
+        line_geo = line["geometry"] 
+        for label in unassigned["Scale Bar Label"]:
+            label_geo = label["geometry"]
+            score = calculate_match_score(line_geo, label_geo)
+            scores.append((score, label))
+        # use highest scoring label
+        best_match = max(scores, key=itemgetter(0))[1]
+        label_json = {"text" : best_match["text"], 
+                      "geometry" : best_match["geometry"]}
+        scale_bar_json = {"label" : label_json, "geometry" : line_geo}
+        scale_bars.append(scale_bar_json)
+    
+
+    return scale_bars, unassigned
+
+def assign_dependent_images(figure):
+    """ Assigns all Dependent Images in unassigned to a Master Image 
+    
+    param figure: a Figure JSON
+
+    returns (masters, unassigned): where masters is a list of Master Image
+        JSONs and unassinged is the updated unassigned JSON
+    """
+    pass
+
+
+def assign_inset_images(figure):
+    """ Assigns all Inset Images in unassigned to a Master Image 
+    
+    param figure: a Figure JSON
+
+    returns (masters, unassigned): where masters is a list of Master Image
+        JSONs and unassinged is the updated unassigned JSON
+    """
+    pass
+
+def assign_scale_bars(figure, scale_bars):
+    """ Assigns all Scale Bar JSON  unassigned to a Subfigure 
+    
+    param figure: a Figure JSON
+    param scale_bars: a list of Scale Bar JSONs
+
+    returns (masters, unassigned): where masters is a list of Master Image
+        JSONs and unassinged is the updated unassigned JSON
+    """
+    pass
+
+def assign_captions(figure):
+    """ Assigns all captions to Master Image JSONs
+
+    param figure: a Figure JSON
+
+    returns (masters, unassigned): where masters is a list of Master Image
+        JSONs and unassigned is the updated unassigned JSON
+    """
+    pass
 
 with open("exsclaim.json", "r") as f:
     exsclaim_json = json.load(f)
 
 for figure in exsclaim_json:
     figure = exsclaim_json[figure]
-    print(figure["article_url"])
-    print(figure["image_url"])
-    master_to_sub = {}
-    unassigned = figure["unassigned"]
-    for master in unassigned["Master Image"]:
-        master_geo = master["geometry"]
-        master_to_sub[master["confidence"]] = []
-        for label in unassigned["Subfigure Label"]:
-            label_geo = label["geometry"]
-            master_to_sub[master["confidence"]].append((label["text"], calculate_match_score(master_geo, label_geo)))
-    break
-
-print(master_to_sub)
+    print("\n\n", assign_subfigure_labels(figure))
+    
