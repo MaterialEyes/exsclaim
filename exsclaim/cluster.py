@@ -293,10 +293,10 @@ def assign_inset_images(figure):
         if not matched:
             unassigned_insets.append(inset)
             continue
-        master_insets = master.get("Inset Images", [])
+        master_insets = master.get("Inset Image", [])
         assigned_inset = {"geometry" : inset["geometry"]}
         master_insets.append(assigned_inset)
-        master["Inset Images"] = master_Insets
+        master["Inset Image"] = master_Insets
     
     unassigned["Inset Image"] = unassigned_insets
     return masters, unassigned
@@ -310,7 +310,76 @@ def assign_scale_bars(figure, scale_bars):
     returns (masters, unassigned): where masters is a list of Master Image
         JSONs and unassinged is the updated unassigned JSON
     """
-    pass
+    unassigned = figure["unassigned"]
+    new_masters = []
+    old_masters = figure.get("Master Image", [])
+    # track unassigned scale_bars
+    not_assigned = {i for i in range(len(scale_bars))}
+
+    # assign scale bars to master images
+    for master in old_masters:
+        master_scale_bars = []
+        for i, scale_bar in enumerate(scale_bars):
+            score = calculate_match_score(master["geometry"],
+                                          scale_bar["geometry"])
+            if score > 50:
+                master_scale_bars.append(scale_bar)
+                not_assigned.discard(i)
+        # assign scale bars to dependent/inset w/in master or to master
+        new_master = assign_master_scale_bars(master, master_scale_bars)
+        new_masters.append(new_master)
+    
+    # collect unassigned scalebars
+    unassigned_scale_bars = [scale_bars[i] for i in not_assigned]
+    unassigned["Scale Bar"] = unassigned_scale_bars
+    
+    return new_masters, unassigned
+
+
+def assign_master_scale_bars(master, scale_bars):
+    """ Assigns each scale bar to a portion of the Master Image
+
+    param master: a Master Image JSON
+    param scale_bars: a list of Scale Bar JSONs contained within master
+
+    returns new_master: a Master Image JSON incorporating scale_bars
+    """
+    insets = master.get("Inset Image", [])
+    dependents = master.get("Dependent Image", [])
+
+    assigned = set()
+    
+    for inset in insets:
+        for index, scale_bar in enumerate(scale_bars):
+            if index in assigned:
+                continue
+            score = calculate_match_score(inset["geometry"], 
+                                          scale_bar["geometry"])
+            if score > 50:
+                assigned.add(index)
+                inset["Scale Bar"] = scale_bar
+    for dependent in dependents:
+        for index, scale_bar in enumerate(scale_bars):
+            if index in assigned:
+                continue
+            score = calculate_match_score(dependent["geometry"],
+                                          scale_bar["geometry"])
+            if score > 50:
+                assigned.add(index)
+                dependent["Scale Bar"] = scale_bar
+
+    master_bars = master.get("Scale Bar", [])
+    for index, scale_bar in enumerate(scale_bars):
+        if index not in assigned:
+            master_bars.append(scale_bar)
+
+    master["Scale Bar"] = master_bars
+    master["Inset Image"] = insets
+    master["Dependent Image"] = dependents
+    return master
+
+
+
 
 def assign_captions(figure):
     """ Assigns all captions to Master Image JSONs
