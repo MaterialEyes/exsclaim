@@ -379,8 +379,6 @@ def assign_master_scale_bars(master, scale_bars):
     return master
 
 
-
-
 def assign_captions(figure):
     """ Assigns all captions to Master Image JSONs
 
@@ -391,10 +389,34 @@ def assign_captions(figure):
     """
     pass
 
+
+def cluster_figure(figure):
+    masters, unassigned = assign_subfigure_labels(figure)
+    figure["Master Image"] = masters
+    figure["unassigned"] = unassigned
+ 
+    masters, unassigned = assign_inset_images(figure)
+    figure["Master Image"] = masters
+    figure["unassigned"] = unassigned    
+
+    masters, unassigned = assign_dependent_images(figure)
+    figure["Master Image"] = masters
+    figure["unassigned"] = unassigned
+
+    scale_bars, unassigned = make_scale_bars(figure) 
+    figure["unassigned"] = unassigned
+
+    masters, unassigned = assign_scale_bars(figure, scale_bars)
+    figure["Master Image"] = masters
+    figure["unassigned"] = unassigned 
+    
+    return figure
+
+
 with open("exsclaim.json", "r") as f:
     exsclaim_json = json.load(f)
 
 for figure in exsclaim_json:
     figure = exsclaim_json[figure]
-    print("\n\n", assign_subfigure_labels(figure))
+    print("\n\n", cluster_figure(figure))
     
