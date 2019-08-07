@@ -63,7 +63,7 @@ if __name__ == '__main__':
         path = image_json["figure_path"]
         image = Image.open(path)
         image = image.convert("RGB")
-        for label in image_json["unassigned"]["subfigure_label"]:
+        for label in image_json["unassigned"]["Subfigure Label"]:
             x = [label["geometry"][i]["x"] for i in range(len(label["geometry"]))]
             y = [label["geometry"][i]["y"] for i in range(len(label["geometry"]))]
             top, bottom = min(y), max(y)
@@ -78,6 +78,8 @@ if __name__ == '__main__':
             label["text"] = text
             i += 1
 
+    with open("exsclaim.json", "w") as f:
+        json.dump(exsclaim_json, f)
     print(exsclaim_json['ncomms2124_fig4.jpg'])
     print(exsclaim_json['s41467-019-10713-z_fig2.jpg'])
 
