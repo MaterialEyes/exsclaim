@@ -1,34 +1,52 @@
-# MaterialEyes
+# EXSCLAIM!
 
 
 
-## Organization
+## Description
 
-Files are organized according to the major modules of the MaterialEyes framework. They are: a [web scraper](#webscraper), that takes in keywords and outputs html files, [Chem Data Extractor](#cde) which takes in html files and outputs a csv, [a caption processor](#captions), an [object detector](#object) that detects subfigures, scale bars, and transcribes labels, an [annotations sections](#annotations), and [a module that combines the results of each component](#cluster).
+EXSCLAIM! is a Python3 library for the **EX**traction, **S**eparation, **CL**eaning, and further **A**nnotation of **IM**ages from scientific figures. At the highest level, this library allows users to organize and utilize the large quantity of data from open, peer-reviewed scientific literature. Taking in keywords as a search query, EXSCLAIM! returns a JSON containng relevant images paired with their captions and scale bar data. 
 
-These modules are organized into two separate pipelines -- version 1.0 and version 2.0. [Version 1.0](#v1) includes all modules except the annotations. [Version 2.0](#v2) includes annotations. 
+## Table of Contents
 
-## Version 1.0 <a name="v1"></a>
+- [Installation](#installation)
+- [Usage](#usage)
+    * [All Together](#alltogether)
+    * [Individually](#individually)
+    * [Training](#training)
+- [How It Works](#howitworks)
+    * [Definitions](#definitions)
+    * [JSON Format](#jsonformat)
+    * [Overview](#overview)
+- [Credits](#credits)
+- [License](#license)
 
-
-## Version 2.0 <a name="v2"></a>
-
-## Data Format
-The format by which data will be stored throughout the pipeline will be a json. 
-
-## Web Scraper <a name="webscraper"></a>
-
-This has not been uploaded yet. 
-
-## Chem Data Extractor <a name="cde"></a>
-
-## Caption Tools <a name="captions"></a>
+## Installation <a name="installation"></a>
 
 
-## Object Detector <a name="object"></a>
+## Usage <a name="usage"></a> 
 
-## Annotations <a name="annotations"></a>
-
-## Cluster Master Images <a name="cluster"></a>
+### All Together <a name="alltogether"></a>
 
 
+### Individually <a name="individually"></a>
+
+
+### Training <a name="training"></a>
+
+
+## How It Works <a name="howitworks"></a>
+
+
+### Definitions <a name="definitions"></a>
+
+
+### JSON Format <a name="jsonformat"></a>
+
+
+### Overview <a name="overview"></a>
+
+
+## Credits <a name="credits"></a>
+
+
+## License <a name="license"></a>
