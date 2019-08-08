@@ -130,7 +130,7 @@ def assign_subfigure_labels(figure):
     for index, master in enumerate(unassigned["Master Image"]):
         master_index_to_master[index] = master
         not_assigned.add(index)
-    for label in unassigned["Subfigure Label"]:
+    for label in unassigned.get("Subfigure Label", []):
         label_geometry = label["geometry"]
         label_to_label[label["text"]] = label
         not_assigned.add(label["text"])
@@ -250,14 +250,15 @@ def assign_dependent_images(figure):
             # if a dependent is mostly in a Master Image, match them
             if score > 50:
                 matched = True
+                break
         # if the dependent is not mostly in any master, keep it unassigned
         if not matched:
             unassigned_dependents.append(dependent)
             continue
-        master_dependents = master.get("Dependent Images", [])
+        master_dependents = master.get("Dependent Image", [])
         assigned_dependent = {"geometry" : dependent["geometry"]}
         master_dependents.append(assigned_dependent)
-        master["Dependent Images"] = master_dependents
+        master["Dependent Image"] = master_dependents
     
     unassigned["Dependent Image"] = unassigned_dependents
     return masters, unassigned
@@ -288,6 +289,7 @@ def assign_inset_images(figure):
             # if a dependent is mostly in a Master Image, match them
             if score > 50:
                 matched = True
+                break
         # if the dependent is not mostly in any master, keep it unassigned
         if not matched:
             unassigned_insets.append(inset)
@@ -295,7 +297,7 @@ def assign_inset_images(figure):
         master_insets = master.get("Inset Image", [])
         assigned_inset = {"geometry" : inset["geometry"]}
         master_insets.append(assigned_inset)
-        master["Inset Image"] = master_Insets
+        master["Inset Image"] = master_insets
     
     unassigned["Inset Image"] = unassigned_insets
     return masters, unassigned
