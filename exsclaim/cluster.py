@@ -191,9 +191,8 @@ def make_scale_bars(figure):
     
     # create mappings to jsons
     not_assigned = set()
-    index = 0
     index_to_json = {}
-    for label in unassigned["Scale Bar Label"]:
+    for index, label in enumerate(unassigned["Scale Bar Label"]):
         index_to_json[index] = label
         not_assigned.add(index)
 
@@ -413,10 +412,11 @@ def cluster_figure(figure):
     return figure
 
 
-with open("exsclaim.json", "r") as f:
+with open("text/results.json", "r") as f:
     exsclaim_json = json.load(f)
 
 for figure in exsclaim_json:
-    figure = exsclaim_json[figure]
+    print(figure["Labeled Data"])
+    figure = {"unassigned" : figure["Label"]}
     print("\n\n", cluster_figure(figure))
     
