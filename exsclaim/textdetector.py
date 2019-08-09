@@ -59,6 +59,11 @@ def load_model(architecture="CNN1", model_name="read_sflabel_5_CNN150_adam.pt"):
         model = arch.CNN1()
     elif architecture.upper() == "CNN2":
         model = arch.CNN2()
+
+    ## ADD NEW ARCHITECTURES HERE ##
+    # elif architecture.upper() == "NAME_OF_ARCHITECTURE":
+    #    model = LOAD ARCHITECTURE
+
     else:
         print("invalid architecture given, using CNN1")
         model = arch.CNN1()

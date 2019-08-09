@@ -8,7 +8,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 
-import architectures as a
+import architecture as a
 
 import argparse
 
@@ -50,6 +50,15 @@ if architecture.upper() == "CNN1":
     model = a.CNN1()
 elif architecture.upper() == "CNN2":
     model = a.CNN2()
+elif architecture.upper() == "DENSENET":
+    model = torch.hub.load("pytorch/vision", "densenet121", pretrained=True)
+elif architecture.upper() == "RESNET":
+    model = torch.hub.load("pytorch/vision", "deeplabv3_resnet101", pretrained=True)
+
+## ADD NEW ARCHITECTURES HERE ##
+# elif architecture.upper() == "NAME_OF_ARCHITECTURE":
+#    model = LOAD ARCHITECTURE
+
 else:
     print("invalid architecture given, using CNN1")
     model = a.CNN1()
@@ -60,6 +69,11 @@ if optimization_alg == "adam":
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 elif optimization_alg == "sgd":
     optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
+
+## ADD NEW GRADIENT DESCENT OPTIMIZER HERE ##
+# elif optimizer_alg == "NAME_OF_OPTIMIZER":
+#    optimizer = LOAD OPTIMIZER
+
 else:
     optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
 
