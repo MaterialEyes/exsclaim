@@ -388,7 +388,23 @@ def assign_captions(figure):
     returns (masters, unassigned): where masters is a list of Master Image
         JSONs and unassigned is the updated unassigned JSON
     """
-    pass
+    unassigned = figure.get("unassigned", [])
+    captions = unassigned.get("captions", [])
+    for caption_label in captions:
+    for index, master_image in enumerate(figure["master images"]):
+        label_json = master_image.get("label", {})
+        subfigure_label = label_json.get("text", index)            
+        processed_label = subfigure_label.replace(")","")
+        processed_label = processed_label.replace("(","")
+        processed_label = processed_label.replace(".","")
+        for caption_label in captions:
+            processed_caption_label = caption_label.replace(")","")
+            processed_capiton_label = processed_caption_label.replace("(","")
+            processed_caption_label = processed_caption_label.replace(".","")
+            if processed_caption_label.lower() == processed_label.lower():
+                master_image["caption"] = captions[caption_label]
+                master_image["keywords"] = captions[caption_label]["keywords"]
+
 
 
 def cluster_figure(figure):
@@ -413,12 +429,12 @@ def cluster_figure(figure):
     
     return figure
 
+if __name__ == '__main__':
+    with open("text/results.json", "r") as f:
+        exsclaim_json = json.load(f)
 
-with open("text/results.json", "r") as f:
-    exsclaim_json = json.load(f)
-
-for figure in exsclaim_json:
-    print(figure["Labeled Data"])
-    figure = {"unassigned" : figure["Label"]}
-    print("\n\n", cluster_figure(figure))
+    for figure in exsclaim_json:
+        print(figure["Labeled Data"])
+        figure = {"unassigned" : figure["Label"]}
+        print("\n\n", cluster_figure(figure))
     

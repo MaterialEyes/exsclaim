@@ -21,21 +21,11 @@ def parse_command_line_arguments():
                          help='path to yolov3 configuration file')
     parser.add_argument('--ckpt', type=str, default='objects/checkpoints/snapshot930.ckpt',
                         help='path to the checkpoint file')
-    parser.add_argument('--weights_path', type=str,
-                        default=None, help='path to weights file')
-    parser.add_argument('--image', type=str)
     parser.add_argument('--image_dir', type=str, default="images")
     parser.add_argument('--image_extend', type=str, default="jpg",
                          help='file extension for images (jpg, png, gif, etc.)')
-    parser.add_argument('--groundtruth', action="store_true")
-    parser.add_argument('--gt_data_dir', type=str)
-    parser.add_argument('--gt_anno_dir', type=str)
-    parser.add_argument('--max_img', type=int,default=2000)
-    parser.add_argument('--background', action='store_true', default=False, 
-                        help='background(no-display mode. save "./output.png")')
     parser.add_argument('--detect_thresh', type=float,
                         default=None, help='confidence threshold')
-    parser.add_argument('--result_dir', type=str)
     args = parser.parse_args()
     return vars(args)
 	
@@ -126,10 +116,10 @@ def generate_single_image_dictionary(image_data):
     outputs, info_image = image_data
     coco_class_names, coco_class_ids, coco_class_colors = get_coco_label_names()
      
-    classes = {0: "image", 1: "nonimage", 2: "subfigure_label", 3: "scalebar"}
+    classes = {0: "Master Image", 1: "Master Image", 2: "Subfigure Label", 3: "Scale Bar"}
     #for name, ID, color in zip(coco_class_names, coco_class_ids, coco_class_colors):
     #    classes[ID] = (name, color)
-    bboxes = {"image": [], "nonimage": [], "subfigure_label": [], "scalebar": []}
+    bboxes = {"Master Image": [], "Subfigure Label": [], "Scale Bar": []}
     for x1, y1, x2, y2, conf, cls_conf, cls_pred in outputs[0]:
         y_1, x_1, y_2, x_2 = yolobox2label([y1, x1, y2, x2], info_image)
         y_1 = max(int(y_1), 0)
@@ -185,7 +175,6 @@ def main():
 	
     exsclaim_json = load_and_run_model(args['image_dir'], args['gpu'], args['image_extend'], args['ckpt'], 
                        args['cfg'], args['detect_thresh'])
-    
     print(exsclaim_json)    
 
     

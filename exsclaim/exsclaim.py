@@ -7,6 +7,7 @@ import objectdetector as od
 import textdetector as td
 import webscraper as ws
 import captionparser as cp
+import cluster
 
 
 def parse_command_line_arguments():
@@ -44,7 +45,7 @@ if __name__ == '__main__':
     exsclaim_json = ws.gather_article_figures(query_json, request, article_extensions)    
 
     # parse full figure caption into chunks of subfigure text and populate exsclaim_json with subfigure info
-    exsclaim_json = cp.load_and_run_model(query_json,exsclaim_json,args['sentence_patterns'])
+    exsclaim_json, expected_captions = cp.load_and_run_model(query_json,exsclaim_json,args['sentence_patterns'])
 
     ## Run ObjectDetector on input images
     data = od.load_and_run_model(args['input_dir'])
@@ -52,7 +53,10 @@ if __name__ == '__main__':
     # add data to the exsclaim_json
     for image_name in exsclaim_json:
         image_json = exsclaim_json[image_name]
-        image_json.update(data[image_name])
+        
+        unassigned = image_json["unassigned"]
+        unassigned.update(data[image_name]["unassigned"])
+        image_json["unassigned"] = unassigned
         exsclaim_json[image_name] = image_json
 
     ## Run TextDetector on subfigure and scalebar labels
@@ -68,12 +72,8 @@ if __name__ == '__main__':
             y = [label["geometry"][i]["y"] for i in range(len(label["geometry"]))]
             top, bottom = min(y), max(y)
             left, right = min(x), max(x)
-            #print("top {}, bottom {}, left {}, right {}".format(top, bottom, left, right))
-            #print("image name {}, size {}".format(image_name, image.size))
            
             cropped = image.crop((left, top, right, bottom))
-            #print("cropped is {}".format(cropped.size))
-            #cropped.save(i + "_" + image_name)
             text = td.run_model(cropped, transform, model)
             label["text"] = text
             i += 1

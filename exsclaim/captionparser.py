@@ -17,20 +17,16 @@ def js_add_subfigs(exsclaim_json,figure,de,dk):
     # Create place holder for any image_level information that has not been assigned
     exsclaim_json[figure]["unassigned"] = {}
 
-    if "subfigs" not in exsclaim_json[figure]:
-        exsclaim_json[figure]["subfigs"]={}
+    if "captions" not in exsclaim_json[figure]["unassigned"]:
+        exsclaim_json[figure]["unassigned"]["captions"]={}
 
+    predicted_labels = []
     for subfig_label in de:
-        exsclaim_json[figure]["subfigs"][str(subfig_label)] = \
-            {"type"     : "", 
-             "location" : "",\
-             "caption"  : de[subfig_label],\
-             "keywords" : dk[subfig_label],\
-             "label"    : {},
-             "scalebar" : {},
-             "children" : {}}
-
-    return exsclaim_json
+        exsclaim_json[figure]["unassigned"]["captions"][str(subfig_label)] = \
+            {"caption"  : de[subfig_label],\
+             "keywords" : dk[subfig_label]}
+        predicted_labels.append(str(subfig_label))
+    return exsclaim_json, predicted_labels
 
 def load_model():
     """ 
@@ -58,10 +54,10 @@ def run_model(model, query_json, exsclaim_json, config_file):
             print("Caption Parse Failure!")
             image_count, dt, de, dk  = -99,{},{},{}
 
-        exsclaim_json = js_add_subfigs(exsclaim_json,figure,de,dk)
+        exsclaim_json, predicted_labels = js_add_subfigs(exsclaim_json,figure,de,dk)
 
     print("\n")
-    return exsclaim_json
+    return exsclaim_json, predicted_labels
 
 def load_and_run_model(query_json, exsclaim_json, config_file):
     """ 
