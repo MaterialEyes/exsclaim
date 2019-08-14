@@ -1,8 +1,8 @@
 CDE/env_cde
 CDE/.env_cde
-TextDetector/models
-TextDetector/images
-ObjectDetector/checkpoints
-ObjectDetector/input_images
+exsclaim/objects/models
+exsclaim/text/images
+exsclaim/objects/checkpoints
+exsclaim/objects/input_images
 image
-utils/MTurkLabelbox/get_results.sh
+exsclaim/images
