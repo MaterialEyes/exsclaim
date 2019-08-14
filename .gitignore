@@ -4,5 +4,5 @@ exsclaim/objects/models
 exsclaim/text/images
 exsclaim/objects/checkpoints
 exsclaim/objects/input_images
-image
+images
 exsclaim/images
