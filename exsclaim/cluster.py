@@ -1,17 +1,21 @@
+import argparse
 import json
 from operator import itemgetter
 
 
-def cluster_subfigures(data):
-    figure_json = {}
-    masters = data["unassigned"]["Master Image"]
-    if len(masters) == 1:
-        pass
-    for master in data["unassigned"]["Master Image"]:
-        master_json = create_master_json(master)
+def parse_command_line():
+    ap = argparse.ArgumentParser()
     
-def find_dependent_images(master):
-    return []
+    ap.add_argument('-e', '--exsclaim_json', type=str,
+                    help='Path to exsclaim JSON (https://gitlab.com/MaterialEyes/exsclaim/wikis/JSON-Format)')
+
+    ap.add_argument('-t', '--testing', type=str, default='False',
+                    help='true if you want to feed a labelbox json instead')
+
+    args = vars(ap.parse_args())
+    
+    return args
+
 
 def calculate_match_score(object_one, object_two):
     """ finds score where higher numbers indicate stronger relation """
@@ -20,6 +24,7 @@ def calculate_match_score(object_one, object_two):
         return 100 * overlap
     else:
         return -1 * calculate_distance(object_one, object_two)
+
 
 def calculate_overlap(object_one, object_two):
     """ Calculates the % of the smaller object contained in the larger """
@@ -42,6 +47,7 @@ def calculate_overlap(object_one, object_two):
     intersection = intersect_height * intersect_width
     
     return intersection / min(area_one, area_two)
+
 
 def calculate_distance(object_one, object_two):
     """ Calculates the shortest distance of object_one to object_two """
@@ -70,11 +76,13 @@ def calculate_distance(object_one, object_two):
     else:             # rectangles intersect
         return 0.    
 
+
 def dist(p1, p2):
     """ calculates euclidean distance """
     x1, y1 = p1
     x2, y2 = p2
     return ((x2 - x1)**2 + (y2 - y1)**2)**(0.5)    
+
 
 def find_coords(object_geometry):
     """ Conversts geometry coords to (x1, x2, y1, y2) tuple """
@@ -84,11 +92,13 @@ def find_coords(object_geometry):
                      min(y_coords), max(y_coords))
     return object_coords
 
+
 def find_area(object_coords):
     """ Finds area of (x1, x2, y1, y2) tuple """
     height = object_coords[3] - object_coords[2]
     width = object_coords[1] - object_coords[0] 
     return height * width
+
 
 def find_intersection_length(a, b):
     """ finds length for which two lines intersect """
@@ -107,6 +117,7 @@ def find_intersection_length(a, b):
             return a2 - a1
         else:
             return a2 - b1
+
 
 def assign_subfigure_labels(figure):
     """ Matches Subfigure Labels with Master Image 
@@ -173,6 +184,7 @@ def assign_subfigure_labels(figure):
     
     return masters, unassigned
 
+
 def make_scale_bars(figure):
     """ matches all scale bar lines to the nearest scale bar labels 
 
@@ -235,7 +247,7 @@ def assign_dependent_images(figure):
     """
     unassigned = figure["unassigned"]
     dependent_images = unassigned.get("Dependent Image", [])
-    masters = figure.get("Master Image", [])
+    masters = figure.get("master images", [])
     
     # if there is nothing new here...
     if len(masters) * len(dependent_images) == 0:
@@ -274,7 +286,7 @@ def assign_inset_images(figure):
     """
     unassigned = figure["unassigned"]
     inset_images = unassigned.get("Inset Image", [])
-    masters = figure.get("Master Image", [])
+    masters = figure.get("master images", [])
     
     # if there is nothing new here...
     if len(masters) * len(inset_images) == 0:
@@ -302,6 +314,7 @@ def assign_inset_images(figure):
     unassigned["Inset Image"] = unassigned_insets
     return masters, unassigned
 
+
 def assign_scale_bars(figure, scale_bars):
     """ Assigns all Scale Bar JSON  unassigned to a Subfigure 
     
@@ -313,7 +326,7 @@ def assign_scale_bars(figure, scale_bars):
     """
     unassigned = figure["unassigned"]
     new_masters = []
-    old_masters = figure.get("Master Image", [])
+    old_masters = figure.get("master images", [])
     # track unassigned scale_bars
     not_assigned = {i for i in range(len(scale_bars))}
 
@@ -389,52 +402,86 @@ def assign_captions(figure):
         JSONs and unassigned is the updated unassigned JSON
     """
     unassigned = figure.get("unassigned", [])
-    captions = unassigned.get("captions", [])
-    for caption_label in captions:
-    for index, master_image in enumerate(figure["master images"]):
+    masters = []
+
+    captions = unassigned.get("captions", {})
+    not_assigned = set(captions.keys())
+    for index, master_image in enumerate(figure.get("master images", [])):
         label_json = master_image.get("label", {})
         subfigure_label = label_json.get("text", index)            
         processed_label = subfigure_label.replace(")","")
         processed_label = processed_label.replace("(","")
         processed_label = processed_label.replace(".","")
+        paired = False
         for caption_label in captions:
             processed_caption_label = caption_label.replace(")","")
             processed_capiton_label = processed_caption_label.replace("(","")
             processed_caption_label = processed_caption_label.replace(".","")
             if processed_caption_label.lower() == processed_label.lower():
-                master_image["caption"] = captions[caption_label]
+                master_image["caption"] = captions[caption_label]["caption"]
                 master_image["keywords"] = captions[caption_label]["keywords"]
+                masters.append(master_image)
+                not_assigned.remove(caption_label)
+                paired = True
+                break
+        if paired:
+            continue
+        masters.append(master_image)
+
+    new_unassigned_captions = {}
+    for caption_label in captions:
+        if caption_label in not_assigned:
+            new_unassigned_captions[caption_label] = captions[caption_label]
+
+    unassigned["captions"] = new_unassigned_captions
+    return masters, unassigned
 
 
 
 def cluster_figure(figure):
     masters, unassigned = assign_subfigure_labels(figure)
-    figure["Master Image"] = masters
+    figure["master images"] = masters
     figure["unassigned"] = unassigned
  
     masters, unassigned = assign_inset_images(figure)
-    figure["Master Image"] = masters
+    figure["master images"] = masters
     figure["unassigned"] = unassigned    
 
     masters, unassigned = assign_dependent_images(figure)
-    figure["Master Image"] = masters
+    figure["master images"] = masters
     figure["unassigned"] = unassigned
 
     scale_bars, unassigned = make_scale_bars(figure) 
     figure["unassigned"] = unassigned
 
     masters, unassigned = assign_scale_bars(figure, scale_bars)
-    figure["Master Image"] = masters
-    figure["unassigned"] = unassigned 
-    
+    figure["master image"] = masters
+    figure["unassigned"] = unassigned
+
+    masters, unassigned = assign_captions(figure)
+    figure["master image"] = masters
+    figure["unassigned"] = unassigned
+     
     return figure
 
 if __name__ == '__main__':
-    with open("text/results.json", "r") as f:
-        exsclaim_json = json.load(f)
-
-    for figure in exsclaim_json:
-        print(figure["Labeled Data"])
-        figure = {"unassigned" : figure["Label"]}
-        print("\n\n", cluster_figure(figure))
+    args = parse_command_line()
     
+    with open(args["exsclaim_json"], "r") as f:
+        exsclaim_json = json.load(f)
+    
+    if args["testing"].lower() in ["yes", "true", "t", "y"]:
+        modified_json = {}
+        for figure in exsclaim_json:
+            figure["unassigned"] = figure["Label"]
+            figure.remove["Label"]
+            figure = cluster_figure(figure)
+            modified_json["External ID"] = figure
+        print(modified_json)
+    else:
+        for figure in exsclaim_json:
+             figure_json = exsclaim_json[figure]
+             figure_json = cluster_figure(figure_json)
+             exsclaim_json[figure] = figure_json
+
+        print(exsclaim_json)    
