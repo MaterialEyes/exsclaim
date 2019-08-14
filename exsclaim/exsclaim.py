@@ -78,6 +78,15 @@ if __name__ == '__main__':
             label["text"] = text
             i += 1
 
+    ## Cluster objects in unassigned
+    for figure in exsclaim_json:
+        figure_json = exsclaim_json[figure]
+        figure_json = cluster.cluster_figure(figure_json)
+        exsclaim_json[figure] = figure_json
+
+
+
+
     with open("exsclaim.json", "w") as f:
         json.dump(exsclaim_json, f)
     print(exsclaim_json['ncomms2124_fig4.jpg'])
