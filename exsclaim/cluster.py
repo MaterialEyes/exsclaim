@@ -141,7 +141,11 @@ def assign_subfigure_labels(figure):
     for index, master in enumerate(unassigned["Master Image"]):
         master_index_to_master[index] = master
         not_assigned.add(index)
-    for label in unassigned.get("Subfigure Label", []):
+
+    # if there are no labels, there should be one master image
+    null_label = {"geometry" : [{"x" : 0, "y": 0}, {"x" : 1, "y" : 1}], 
+                  "text" : "null"}
+    for label in unassigned.get("Subfigure Label", [null_label]):
         label_geometry = label["geometry"]
         label_to_label[label["text"]] = label
         not_assigned.add(label["text"])
@@ -168,7 +172,8 @@ def assign_subfigure_labels(figure):
                       "geometry": label_to_label[label]["geometry"]}
         master_json = {"label" : label_json, 
                        "geometry" : master_index_to_master[master_index]["geometry"]}
-        ##TODO: also add classification from master object
+        if "classification" in master_index_to_master[master_index]:
+            master_json["classification"] = master_index_to_master[master_index]["classification"]
         masters.append(master_json)
     
     # update unassigned JSON
@@ -421,7 +426,7 @@ def assign_captions(figure):
                 master_image["caption"] = captions[caption_label]["caption"]
                 master_image["keywords"] = captions[caption_label]["keywords"]
                 masters.append(master_image)
-                not_assigned.remove(caption_label)
+                not_assigned.pop(caption_label)
                 paired = True
                 break
         if paired:
@@ -455,11 +460,11 @@ def cluster_figure(figure):
     figure["unassigned"] = unassigned
 
     masters, unassigned = assign_scale_bars(figure, scale_bars)
-    figure["master image"] = masters
+    figure["master images"] = masters
     figure["unassigned"] = unassigned
 
     masters, unassigned = assign_captions(figure)
-    figure["master image"] = masters
+    figure["master images"] = masters
     figure["unassigned"] = unassigned
      
     return figure
@@ -474,9 +479,9 @@ if __name__ == '__main__':
         modified_json = {}
         for figure in exsclaim_json:
             figure["unassigned"] = figure["Label"]
-            figure.remove["Label"]
+            figure.pop("Label")
             figure = cluster_figure(figure)
-            modified_json["External ID"] = figure
+            modified_json[figure["External ID"]] = figure
         print(modified_json)
     else:
         for figure in exsclaim_json:
