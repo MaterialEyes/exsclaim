@@ -426,7 +426,7 @@ def assign_captions(figure):
                 master_image["caption"] = captions[caption_label]["caption"]
                 master_image["keywords"] = captions[caption_label]["keywords"]
                 masters.append(master_image)
-                not_assigned.pop(caption_label)
+                not_assigned.remove(caption_label)
                 paired = True
                 break
         if paired:
