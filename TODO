@@ -1,5 +1,6 @@
 TODO
 
+<<<<<<< HEAD
 - Add BeautifulSoup to environment.yml
 - In setup.sh, need to activate exsclaim_env from within file for proceeding code to download (gdown) the models (conda activate exsclaim within the bash script does not work)
 
@@ -8,15 +9,41 @@ TODO
 
 
 
-
-
-
-
-
+=======
+(1) Add Eric as admin at project level
+(2) How to pay for/find "missing" HITs (had this happen in most recent release)
+(3) Understand difference between "crowdsourcing" and "MTurkLabelbox" directory
+(4) Follow instructions (Wiki) again to ensure no more bugs with Upload/Release/Review? (use attached dataset "nature-cryo-EM-5.1")
+(5) Check min.yml environment
+(6) Did full pipeline it work for me?
+(7) Issues training object detector?
+(8) Which license should we choose?
+(9) Script to write images to folder from bbox info in exsclaim.json
 
 
 - ===================== Complete (for the most part) =====================
+- Add:
+    channels:
+        - conda-forge
+    dependencies:
+        - beautifulsoup4==4.8.0
+        - lxml==4.4.0
+        - soupsieve==1.9.2
+        - spacy=2.1.4
+        - pandas=0.24.2
+        
+    python -m spacy download en_core_web_sm
 
+
+>   - cudatoolkit=10.0.130
+>   - freeglut=3.0.0
+>   - libgcc-ng=9.1.0
+>   - libgfortran-ng=7.3.0
+>   - libglu=9.0.0
+>   - libstdcxx-ng=9.1.0
+>>>>>>> ac67af5... Merge branch 'master' of https://gitlab.com/MaterialEyes/exsclaim
+
+- ========================================================================
 - Deploy labeling interface in MTurk (ensuring compatibility with Labelbox)
 
 - Decide on how to structure data from structured query --> labeled dataset. 
