@@ -1,8 +1,4 @@
 #!/bin/sh
-conda env create -f pipeline_osx_min.yml
-conda activate exsclaim
-
-
 
 text_model=exsclaim/text/models/read_sflabel_5_CNN150_adam.pt
 text_dir=exsclaim/text/models

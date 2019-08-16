@@ -1,0 +1,6 @@
+To setup the proper environment
+(1) conda env create -f pipeline_osx_min.yml
+(2) conda activate exsclaim
+(3) pip install -U spacy
+(4) python -m spacy download en
+(5) bash download_models.sh

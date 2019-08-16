@@ -86,7 +86,6 @@ dependencies:
   - pip:
     - blis==0.2.4
     - cymem==2.0.2
-    - en-core-web-sm==2.1.0
     - lxml==4.4.1
     - murmurhash==1.0.2
     - plac==0.9.6
