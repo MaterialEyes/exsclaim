@@ -84,11 +84,5 @@ if __name__ == '__main__':
         figure_json = cluster.cluster_figure(figure_json)
         exsclaim_json[figure] = figure_json
 
-
-
-
     with open("exsclaim.json", "w") as f:
         json.dump(exsclaim_json, f)
-    print(exsclaim_json['ncomms2124_fig4.jpg'])
-    print(exsclaim_json['s41467-019-10713-z_fig2.jpg'])
-

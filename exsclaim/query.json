@@ -1,7 +1,7 @@
 {   
     "journal_family": "nature",
 
-    "maximum_scraped": 3,
+    "maximum_scraped": 5,
 
     "sortby": "relevance",
 
