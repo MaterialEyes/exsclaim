@@ -1,4 +1,4 @@
-name: test
+name: exsclaim
 channels:
   - pytorch
   - vladsaveliev
