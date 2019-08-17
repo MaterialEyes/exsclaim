@@ -1,4 +1,4 @@
-name: exsclaim_env
+name: exsclaim_dev
 channels:
   - anaconda
   - pytorch

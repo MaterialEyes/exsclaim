@@ -1,4 +1,4 @@
-name: exsclaim
+name: exsclaim_min
 channels:
   - pytorch
   - vladsaveliev

@@ -23,7 +23,10 @@ EXSCLAIM! is a Python3 library for the **EX**traction, **S**eparation, **CL**ean
 ## Installation <a name="installation"></a>
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 7b1c8c4... merged setup.sh
 ### How do I get EXSCLAIM! working on macOS?
 [0] If conda is not installed, download an installer and follow the prompts on the installer screens:
 * [Anaconda installer for macOS](https://www.anaconda.com/distribution/)
@@ -60,7 +63,10 @@ $ gdown -O exsclaim/objects/checkpoints/snapshot930.ckpt.zip https://drive.googl
 $ unzip exsclaim/objects/checkpoints/snapshot930.ckpt.zip -d exsclaim/objects/checkpoints
 $ rm exsclaim/objects/checkpoints/snapshot930.ckpt.zip
 ```
+<<<<<<< HEAD
 >>>>>>> f4b0c75... Update README.md
+=======
+>>>>>>> 7b1c8c4... merged setup.sh
 
 ## Usage <a name="usage"></a> 
 

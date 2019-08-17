@@ -17,9 +17,14 @@ TODO
 (5) Check min.yml environment
 (6) Did full pipeline it work for me?
 (7) Issues training object detector?
-(8) Which license should we choose?
+(8) Which license should we choose (MIT vs. BSD vs. Apache vs. CC)?
 (9) Script to write images to folder from bbox info in exsclaim.json
 
+Before release:
+- Setup procedure needs to be ironed out... 
+- Retrain object detector.
+- Clean documentation
+- Improve 
 
 - ===================== Complete (for the most part) =====================
 - Add:
