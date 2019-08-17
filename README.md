@@ -22,6 +22,45 @@ EXSCLAIM! is a Python3 library for the **EX**traction, **S**eparation, **CL**ean
 
 ## Installation <a name="installation"></a>
 
+<<<<<<< HEAD
+=======
+### How do I get EXSCLAIM! working on macOS?
+[0] If conda is not installed, download an installer and follow the prompts on the installer screens:
+* [Anaconda installer for macOS](https://www.anaconda.com/distribution/)
+* [Miniconda installer for macOS](https://docs.conda.io/en/latest/miniconda.html)
+
+[1] Download or clone a copy of this repository from GitLab
+```sh
+$ git clone https://gitlab.com/MaterialEyes/exsclaim
+```
+[2] Create the environment from the `env_min_osx.yaml` file and activate
+```sh
+$ conda env create -f env_min_osx.yaml
+$ conda activate exsclaim_min
+```
+[3] Install select NLP and webscraping dependencies with pip
+```sh
+$ pip install lxml
+$ pip install -U spacy
+```
+[4] Install `gdown` for Google Drive direct download of big files.
+```sh
+$ pip install gdown
+```
+[5] Download a small English language model to use in spaCy (NLP)
+```sh
+$ python -m spacy download en
+```
+[6] Create directories for object detection and text detection models and download current models.
+```sh
+$ mkdir exsclaim/text/models
+$ gdown  -O exsclaim/text/models/read_sflabel_5_CNN150_adam.pt https://drive.google.com/uc?id=1pkBWn0Ss0c9TeAgsOBFqFFJZ-5ntxzpb
+$ mkdir exsclaim/objects/checkpoints
+$ gdown -O exsclaim/objects/checkpoints/snapshot930.ckpt.zip https://drive.google.com/uc?id=1xWxqQGDH_szfCe8eWDBwTcjzCmq7Bnf1
+$ unzip exsclaim/objects/checkpoints/snapshot930.ckpt.zip -d exsclaim/objects/checkpoints
+$ rm exsclaim/objects/checkpoints/snapshot930.ckpt.zip
+```
+>>>>>>> f4b0c75... Update README.md
 
 ## Usage <a name="usage"></a> 
 
