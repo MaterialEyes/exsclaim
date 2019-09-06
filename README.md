@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # EXSCLAIM!
 
 
@@ -33,6 +34,19 @@ EXSCLAIM! is a Python3 library for the **EX**traction, **S**eparation, **CL**ean
 * [Miniconda installer for macOS](https://docs.conda.io/en/latest/miniconda.html)
 
 [1] Download or clone a copy of this repository from GitLab
+=======
+![image](https://drive.google.com/uc?export=view&id=1RC81zqSoIirVwQcPfvi0X5V-nMyD32aJ)
+# __EXSCLAIM!__    [[wiki](https://gitlab.com/MaterialEyes/exsclaim/wikis/home)]  [[paper](#paper)]
+EXSCLAIM! is a Python3 library for the **EX**traction, **S**eparation, **CL**eaning, and further **A**nnotation of **IM**ages from scientific figures. This library allows users to organize and utilize the large quantity of imaging data from open, peer-reviewed scientific literature. Taking in keywords as a search query, EXSCLAIM! returns a JSON containing relevant images paired with their associated caption text and scale bar data. 
+
+## Getting started
+### Installation
+- If conda is not installed, download an installer and follow the prompts on the installer screens:
+    * [Anaconda installer for macOS](https://www.anaconda.com/distribution/)
+    * [Miniconda installer for macOS](https://docs.conda.io/en/latest/miniconda.html)
+<br/><br/>
+- Clone this repo:
+>>>>>>> 5798ef3... Update README.md
 ```sh
 $ git clone https://gitlab.com/MaterialEyes/exsclaim
 ```
