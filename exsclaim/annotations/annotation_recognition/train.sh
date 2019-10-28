@@ -1,1 +1,0 @@
-python train.py --weights_path weights/yolov3.weights --n_cpu 6

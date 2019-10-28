@@ -1,4 +1,0 @@
-# python test.py --detect_thresh 0.5 --ckpt checkpoints/snapshot500.ckpt --image_dir  /home/weixin/Documents/MyProjects/PhDResearch/ArgonneProjects/MaterialEyes_Framework/data/subfigures/ --result_dir /home/weixin/Documents/MyProjects/PhDResearch/ArgonneProjects/MaterialEyes_Framework/data/subfigurelabels/ --image_extend png
-
-
-python test.py --detect_thresh 0.5 --ckpt checkpoints/snapshot500.ckpt --image_dir  /home/weixin/Documents/MyProjects/PhDResearch/ArgonneProjects/MaterialEyes_Framework/data/subfigures/ --result_dir /home/weixin/Documents/MyProjects/PhDResearch/ArgonneProjects/MaterialEyes_Framework/data/subfigurelabels/ --image_extend png
