@@ -1,43 +1,3 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-# EXSCLAIM!
-
-
-
-## Description
-
-EXSCLAIM! is a Python3 library for the **EX**traction, **S**eparation, **CL**eaning, and further **A**nnotation of **IM**ages from scientific figures. At the highest level, this library allows users to organize and utilize the large quantity of data from open, peer-reviewed scientific literature. Taking in keywords as a search query, EXSCLAIM! returns a JSON containng relevant images paired with their captions and scale bar data. 
-
-## Table of Contents
-
-- [Installation](#installation)
-- [Usage](#usage)
-    * [All Together](#alltogether)
-    * [Individually](#individually)
-    * [Training](#training)
-- [How It Works](#howitworks)
-    * [Definitions](#definitions)
-    * [JSON Format](#jsonformat)
-    * [Overview](#overview)
-- [Credits](#credits)
-- [License](#license)
-
-## Installation <a name="installation"></a>
-
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 7b1c8c4... merged setup.sh
-### How do I get EXSCLAIM! working on macOS?
-[0] If conda is not installed, download an installer and follow the prompts on the installer screens:
-* [Anaconda installer for macOS](https://www.anaconda.com/distribution/)
-* [Miniconda installer for macOS](https://docs.conda.io/en/latest/miniconda.html)
-
-[1] Download or clone a copy of this repository from GitLab
-=======
-=======
->>>>>>> 6b1f229... Merge branch 'master' of https://gitlab.com/MaterialEyes/exsclaim
 ![image](https://drive.google.com/uc?export=view&id=1RC81zqSoIirVwQcPfvi0X5V-nMyD32aJ)
 # __EXSCLAIM!__    [[wiki](https://gitlab.com/MaterialEyes/exsclaim/wikis/home)]  [[paper](#paper)]
 EXSCLAIM! is a Python3 library for the **EX**traction, **S**eparation, **CL**eaning, and further **A**nnotation of **IM**ages from scientific figures. This library allows users to organize and utilize the large quantity of imaging data from open, peer-reviewed scientific literature. Taking in keywords as a search query, EXSCLAIM! returns a JSON containing relevant images paired with their associated caption text and scale bar data. 
@@ -49,66 +9,43 @@ EXSCLAIM! is a Python3 library for the **EX**traction, **S**eparation, **CL**ean
     * [Miniconda installer for macOS](https://docs.conda.io/en/latest/miniconda.html)
 <br/><br/>
 - Clone this repo:
->>>>>>> 5798ef3... Update README.md
 ```sh
-$ git clone https://gitlab.com/MaterialEyes/exsclaim
+git clone https://gitlab.com/MaterialEyes/exsclaim
 ```
-[2] Create the environment from the `env_min_osx.yaml` file and activate
+- Use the _source_ command to run [setup.sh](https://gitlab.com/MaterialEyes/exsclaim/blob/master/setup.sh)
 ```sh
-$ conda env create -f env_min_osx.yaml
-$ conda activate exsclaim_min
+# Current stable release
+source setup.sh
+
+# Developer mode (enables additional model training/testing tools)
+source setup.sh dev
 ```
-[3] Install select NLP and webscraping dependencies with pip
+- A successful execution of the [setup.sh](https://gitlab.com/MaterialEyes/exsclaim/blob/master/setup.sh) script will create and _activate_ a conda environment, as well as download all relevant models. For future sessions, it is only necessary to _activate_ the conda environment before using the __EXSCLAIM!__ tools.
 ```sh
-$ pip install lxml
-$ pip install -U spacy
+# To activate this environment, use
+conda activate exsclaim
+
+# To deactivate an active environment, use
+conda deactivate
 ```
-[4] Install `gdown` for Google Drive direct download of big files.
+
+Check out the project [wiki](https://gitlab.com/MaterialEyes/exsclaim/wikis/home) for more details!
+
+# Citation
+If you find this code useful, please consider citing our [paper](#paper)
 ```sh
-$ pip install gdown
+@article{,
+  title={},
+  author={},
+  journal={},
+  volume={},
+  number={},
+  pages={},
+  year={},
+  publisher={}
+}
 ```
-[5] Download a small English language model to use in spaCy (NLP)
-```sh
-$ python -m spacy download en
-```
-[6] Create directories for object detection and text detection models and download current models.
-```sh
-$ mkdir exsclaim/text/models
-$ gdown  -O exsclaim/text/models/read_sflabel_5_CNN150_adam.pt https://drive.google.com/uc?id=1pkBWn0Ss0c9TeAgsOBFqFFJZ-5ntxzpb
-$ mkdir exsclaim/objects/checkpoints
-$ gdown -O exsclaim/objects/checkpoints/snapshot930.ckpt.zip https://drive.google.com/uc?id=1xWxqQGDH_szfCe8eWDBwTcjzCmq7Bnf1
-$ unzip exsclaim/objects/checkpoints/snapshot930.ckpt.zip -d exsclaim/objects/checkpoints
-$ rm exsclaim/objects/checkpoints/snapshot930.ckpt.zip
-```
-<<<<<<< HEAD
->>>>>>> f4b0c75... Update README.md
-=======
->>>>>>> 7b1c8c4... merged setup.sh
 
-## Usage <a name="usage"></a> 
+# Acknowledgements <a name="credits"></a>
 
-### All Together <a name="alltogether"></a>
-
-
-### Individually <a name="individually"></a>
-
-
-### Training <a name="training"></a>
-
-
-## How It Works <a name="howitworks"></a>
-
-
-### Definitions <a name="definitions"></a>
-
-
-### JSON Format <a name="jsonformat"></a>
-
-
-### Overview <a name="overview"></a>
-
-
-## Credits <a name="credits"></a>
-
-
-## License <a name="license"></a>
+# License <a name="license"></a>
