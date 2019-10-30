@@ -1,5 +1,5 @@
-![image](https://drive.google.com/uc?export=view&id=1zQdkOULrjvYL2nxdn4DmrHoT2rtvLHgE)
-## __EXSCLAIM!__    [[wiki](https://gitlab.com/MaterialEyes/exsclaim/wikis/home)]  [[paper](#paper)]
+![image](https://drive.google.com/uc?export=view&id=142XkACsDxT9r9VgVg0RUsVvjJhaBqRIs)
+
 EXSCLAIM! is a Python3 library for the automatic **EX**traction, **S**eparation, and **C**aption-based natural **L**anguage **A**nnotation of **IM**ages from scientific figures.
 
 ## Getting started
