@@ -2,21 +2,21 @@
 # (see accompanying license files for details).
 
 """Definition of the ExsclaimTool classes.
-
 This module defines the central objects in the EXSCLAIM! 
 package. All the model classes are independent of each 
 other, but they expose the same interface, so they are 
 interchangeable.
 """
+import os
 import json
 import copy
 import time
-import utils
-import journal
-import caption
-import figure
-import imagetext
 
+from . import utils
+from . import journal
+from . import caption
+from . import figure
+from . import imagetext
 
 from abc import ABC, abstractmethod
 
@@ -41,12 +41,9 @@ class ExsclaimTool(ABC):
 class JournalScraper(ExsclaimTool):
     """ 
     JournalScraper object.
-
     Extract scientific figures from journal articles by passing  
     a json-style search query to the run method
-
     Parameters: 
-
     None
     """
     def __init__(self):
@@ -90,19 +87,18 @@ class JournalScraper(ExsclaimTool):
 class CaptionSeparator(ExsclaimTool):
     """ 
     CaptionSeparator object.
-
     Separate subfigure caption chunks from full figure captions 
     in an exsclaim_dict using custom caption nlp tools
-
     Parameters:
-
     model_path: str 
         Absolute path to caption nlp model 
     """
-    def __init__(self , model_path):
+    def __init__(self , model_path=""):
         super().__init__(model_path)
 
     def _load_model(self):
+        if "" in self.model_path:
+            self.model_path = os.path.dirname(__file__)+'/captions/models/'
         return caption.load_models(self.model_path)
 
     def _update_exsclaim(self,exsclaim_dict,figure_name,delimiter,caption_dict):
@@ -140,18 +136,17 @@ class CaptionSeparator(ExsclaimTool):
 class FigureSeparator(ExsclaimTool):
     """ 
     FigureSeparator object.
-
     Separate subfigure images from full figure image
     using CNN trained on crowdsourced labeled figures
-
     Parameters:
-
     None
     """
-    def __init__(self , model_path):
+    def __init__(self , model_path=""):
         super().__init__(model_path)
 
     def _load_model(self):
+        if "" in self.model_path:
+            self.model_path = os.path.dirname(__file__)+'/figures/models/'
         return figure.load_model(self.model_path)
 
     def _update_exsclaim(self,exsclaim_dict,figure_name,figure_dict):
@@ -186,17 +181,16 @@ class FigureSeparator(ExsclaimTool):
 class TextReader(ExsclaimTool):
     """ 
     TextReader object.
-
     Read cropped images containing subfigure label and scale bar text 
-
     Parameters:
-
     None
     """
-    def __init__(self , model_path):
+    def __init__(self , model_path=""):
         super().__init__(model_path)
 
     def _load_model(self):
+        if "" in self.model_path:
+            self.model_path = os.path.dirname(__file__)+'/imagetexts/models/'
         return imagetext.load_model(self.model_path)
 
     def _update_exsclaim(self,exsclaim_dict,figure_name,images_dict):

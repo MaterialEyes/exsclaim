@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import ast
-import utils
 import collections
 import numpy as np
 
@@ -8,20 +7,18 @@ from spacy import load
 from spacy.matcher import Matcher
 from spacy.pipeline import EntityRuler
 
-import captions.interpret as interpret
-import captions.regex as regex
-
+from . import utils
+from .captions import interpret as interpret
+from .captions import regex as regex
 
 def load_models(models_path=str) -> "caption_nlp_model":
     """
     Load a custom spaCy language object + matcher with regex model for full caption parsing 
-
     Args:
         models_path: A path to folder containing the necessary model files
     
     Returns:
         caption_nlp_model: A tuple (nlp, matcher)
-
     """
     # Load pre-trained statistical model (English) and input vocab to Matcher
     nlp     = load("en_core_web_sm") 
@@ -45,11 +42,9 @@ def find_subfigure_delimiter(caption_nlp_model=tuple, caption=str) -> str:
     """
     Determine which type of character is functioning as a delimiter 
     between segments of text describing the individual subfigures. 
-
     Args:
         caption_nlp_model: A tuple (nlp, matcher)
         caption: A string of caption text
-
     Returns:
         char_delim: The primary delimiter in the list of matches
     """
@@ -100,23 +95,19 @@ def get_subfigure_tokens(caption_nlp_model=tuple, caption=str) -> list:
     Split caption text into subfigure tokens based on subfigure delimiters. 
     The delimiting subfigure tokens are a given as list of subfigure tokens elements 
     A single subfigure token element is a tuple containing:
-
         - match_id: The hash value of the string ID 
         - string_id: The the caption rule label -> "rule['label']"
         - start/end: Describes a start/end slice of span in doc, i.e. doc[start:end]
         - doc_text: Text of the span, doc[start:end].text
         - implied_text: Text implied by the doc_text
-
         i.e (6167809695299526461, 'parenthesis_02_none_alpha_01', 134, 139, '(f–i)', ['f', 'g', 'h', 'i'])
     
     Note: 
         A list of subfigure tokens only refers to portions of the caption text 
         containing a subfigure label. Not all caption text is given a subfigure token!
-
     Args:
         caption_nlp_model: A tuple (nlp, matcher)
         caption: A string of caption text
-
     Returns:
         subfigure_tokens:  List of subfigure tokens elements (list of tuples)
     """
@@ -175,11 +166,9 @@ def get_subfigure_tokens(caption_nlp_model=tuple, caption=str) -> list:
 def get_subfigure_count(caption_nlp_model=tuple, caption=str) -> int:
     """
     Estimate the number of subfigures from 'implied_text' in subfigure tokens
-
     Args:
         caption_nlp_model: A tuple (nlp, matcher)
         caption: A string of caption text
-
     Returns:
         num_subfigs: An integer predicting number of subfigures in a figure
     """
@@ -194,11 +183,9 @@ def get_subfigure_count(caption_nlp_model=tuple, caption=str) -> int:
 def get_subfigure_labels(caption_nlp_model=tuple, caption=str) -> list:
     """
     Get the text for subfigure delimiters from 'doc_text' labels in subfigure tokens
-
     Args:
         caption_nlp_model: A tuple (nlp, matcher)
         caption: A string of caption text
-
     Returns:
         subfigure_labels: A list of 'doc_text' labels from subfigure tokens
     """
@@ -214,7 +201,6 @@ def associate_caption_text(caption_nlp_model=tuple, caption=str, keywords={}, ke
     """
     Find portions of caption text and assigns them to appropriate subfigure token key 
     in a caption_dict. 
-
     Args:
         caption_nlp_model: A tuple (nlp, matcher)
         caption: A string of caption text
@@ -222,7 +208,6 @@ def associate_caption_text(caption_nlp_model=tuple, caption=str, keywords={}, ke
         keys: A string indicating the style of the 'keys' in the caption_dict output
               "explicit" – caption label keys from the doc_text of the subfigure token: (a–c)
               "implied"  – caption labels keys from the implied_text of a subfigure token : a, b, c.
-
     Returns:
         caption_dict: A dictionary with subfigure token keys and associated text as entries. 
     """

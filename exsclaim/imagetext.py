@@ -6,13 +6,15 @@ import torch
 import torchvision
 import numpy as np
 from PIL import Image
-import imagetexts.architecture as arch
+# used to be called arch
+from .imagetexts.architecture import *
 
+file_loc = os.path.dirname(os.path.realpath(__file__))
 ## get class id's
-with open("imagetexts/classes.json", "r") as f:
+with open(file_loc+"/imagetexts/classes.json", "r") as f:
     index_to_text = json.load(f)
 
-with open('captions/models/reference.yml', 'r') as f:
+with open(file_loc+'/captions/models/reference.yml', 'r') as f:
     ref = yaml.safe_load(f)
 
 
@@ -35,9 +37,9 @@ def load_model(model_path=str) -> "figure_separator_model":
 
     # assign architecture
     if architecture.upper() == "CNN1":
-        model = arch.CNN1()
+        model = CNN1()
     elif architecture.upper() == "CNN2":
-        model = arch.CNN2()
+        model = CNN2()
 
     ## ADD NEW ARCHITECTURES HERE ##
     # elif architecture.upper() == "NAME_OF_ARCHITECTURE":
@@ -45,9 +47,9 @@ def load_model(model_path=str) -> "figure_separator_model":
 
     else:
         print("invalid architecture given, using CNN1")
-        model = arch.CNN1()
+        model = CNN1()
     
-    model.load_state_dict(torch.load(os.getcwd() + "/" + model_path + model_name))
+    model.load_state_dict(torch.load(model_path + model_name))
     model.to(device)
     model.eval()
 

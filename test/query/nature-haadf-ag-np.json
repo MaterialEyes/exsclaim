@@ -23,5 +23,5 @@
         }
     },
     
-    "results_dir": "data/extracted/nature-haadf-ag-np/"
+    "results_dir": "extracted/nature-haadf-ag-np/"
 }

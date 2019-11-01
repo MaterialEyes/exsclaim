@@ -2,8 +2,8 @@ import os
 import yaml
 import glob
 import matplotlib.pyplot as plt
-from figures.utils.utils import *
-from figures.models.yolov3 import *
+from .figures.utils.utils import *
+from .figures.models.yolov3 import *
 from torch.autograd import Variable
 
 

@@ -33,5 +33,5 @@
         }
     },
     
-    "results_dir": "data/extracted/nature-nmat3669-test/"
+    "results_dir": "extracted/nature-nmat3669-test/"
 }

@@ -1,15 +1,23 @@
-# In productivity.py
 import os
 import csv
-import utils
 import json
 import time
-import cluster
 import matplotlib.pyplot as plt
+
+from . import utils
+from . import cluster
 
 class Pipeline:
     def __init__(self , query_path, exsclaim_path):
         self.query_path = query_path
+        try:
+            with open(self.query_path) as f:
+                # Load query file to dict
+                self.query_dict = json.load(f)
+        except: 
+            self.query_dict = query_path
+            self.query_path = ""
+
         self.exsclaim_path = exsclaim_path
         try:
             with open(exsclaim_path, 'r') as f:
@@ -18,10 +26,6 @@ class Pipeline:
         except FileNotFoundError:
             # Keep preset values
             self.exsclaim_dict = {}
-
-    def _load_query(self):
-    	with open(self.query_path) as f:
-    		return(json.load(f))
 
     def run(self, tools):
         print("""
@@ -52,7 +56,7 @@ class Pipeline:
         @@@@@@@@@@@@@@@@@@@@   ,%@@&/   (@@@@@@@@@@@@@@@@@@@
         @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
         """)
-        search_query = self._load_query()
+        search_query = self.query_dict
         for tool in tools:
             self.exsclaim_dict = tool.run(search_query,self.exsclaim_dict)
         return self.exsclaim_dict
@@ -62,7 +66,7 @@ class Pipeline:
         Gather image objects that are part of the "unassigned" exsclaim_dict entry 
         and group together based on their association with a given subfigure label.
         """
-        search_query = self._load_query()
+        search_query = self.query_dict
         utils.Printer("Matching Image Objects to Caption Text\n")
         counter = 1
         for figure in self.exsclaim_dict:
@@ -108,7 +112,7 @@ class Pipeline:
 
 
         """
-        search_query = self._load_query()
+        search_query = self.query_dict
         utils.Printer("".join(["Printing Master Image Objects to: ",search_query['results_dir'].strip("/"),"/images","\n"]))
         rows = [['article_url', 'figure_path','figure_num', 'image_path', \
                  'master_label', 'dependent_id', 'inset_id', 'class', 'caption', 'keywords', 'scale_bar', 'pixel_size']]

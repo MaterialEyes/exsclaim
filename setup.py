@@ -10,6 +10,7 @@ import sys
 from shutil import rmtree
 
 from setuptools import find_packages, setup, Command
+from setuptools.command.install import install
 
 # Package meta-data.
 NAME = 'exsclaim'
@@ -32,7 +33,7 @@ REQUIRED = [
         'Pygments',
         'matplotlib',
         'scipy',
-        'spacy',
+        'spacy>=2.0.0,<3.0.0',
         'torch>=1.3.0',
         'torchvision>=0.4'
     ],
@@ -103,7 +104,6 @@ class UploadCommand(Command):
 
         sys.exit()
 
-
 # Where the magic happens:
 setup(
     name=NAME,
@@ -115,7 +115,7 @@ setup(
     author_email=EMAIL,
     python_requires=REQUIRES_PYTHON,
     url=URL,
-    packages=find_packages(exclude=["tests", "*.tests", "*.tests.*", "tests.*"]),
+    packages=find_packages(include=['exsclaim', 'exsclaim.*']),
     # If your package is a single module, use this instead of 'packages':
     # py_modules=['mypackage'],
 
@@ -136,6 +136,15 @@ setup(
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy'
     ],
+    data_files=[(sys.prefix+'/figures/models/checkpoints', ['exsclaim/figures/models/checkpoints/snapshot930.ckpt']),
+                (sys.prefix+'/figures/models/config/',['exsclaim/figures/models/config/yolov3_eval.cfg']),
+                (sys.prefix+'/imagetexts/models/read_sflabel_5_CNN150_adam.pt',['exsclaim/imagetexts/models/read_sflabel_5_CNN150_adam.pt']),
+                (sys.prefix+'/captions/models/reference.yml',['exsclaim/captions/models/reference.yml']),
+                (sys.prefix+'/captions/models/patterns.yml',['exsclaim/captions/models/patterns.yml']),
+                (sys.prefix+'/captions/models/rules.yml',['exsclaim/captions/models/rules.yml']),
+                (sys.prefix+'/imagetexts/classes.json',['exsclaim/imagetexts/classes.json'])
+    ],
+    dependency_links=['https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.2.0/en_core_web_sm-2.2.0.tar.gz#egg=package-1.0'],
     # $ setup.py publish support.
     cmdclass={
         'upload': UploadCommand,

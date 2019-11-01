@@ -26,5 +26,6 @@ else
     echo "Already downloaded ObjectDetector model"
 fi
 
+
 # Download the English spaCy model
-python -m spacy download en_core_web_sm
+# python -m spacy download en_core_web_sm
