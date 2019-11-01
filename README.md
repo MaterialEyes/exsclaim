@@ -31,11 +31,63 @@ cd exsclaim
 pip install .
 ```
 - Finally, download the best-matching model for the spaCy installation:
-```sh
+```python
 python -m spacy download en_core_web_sm
 ```
 
 Check out the project [wiki](https://gitlab.com/MaterialEyes/exsclaim/wikis/home) for more details!
+
+## Usage
+A simple example of EXSCLAIM! figure-extraction capabilities:
+
+(1) Import the <code>Pipeline</code> and <code>JournalScraper</code> objects and construct a query to 
+extract figures from the top 10 most-relevant *Nature* journal articles 
+returned in a search for **HRTEM** and **Au nanoparticles**.
+```python
+>>> from exsclaim.pipeline import Pipeline
+>>> from exsclaim.tool import JournalScraper
+>>> query = \
+... {   
+...     "name": "nature-hrtem-au-nanoparticles",
+...     "journal_family": "nature",
+...     "maximum_scraped": 10,
+...     "sortby": "relevant",
+...     "results_dir": "extracted/",
+...     "query":
+...     {
+...         "search_field_1":
+...         {
+...             "term":"HRTEM",
+...             "synonyms":["High-resolution transmission electron microscopy"]
+...         },
+...         "search_field_2":
+...         {
+...             "term":"Au nanoparticles",
+...             "synonyms":["Gold nanoparticles"]
+...         }
+...     }
+... }
+```
+(2)  Initialize a <code>Pipeline</code> and <code>JournalScraper</code> from scratch and put the tool(s) in a list that specifies run-time order.
+```python
+>>> js = JournalScraper()
+>>> exsclaim_pipeline = Pipeline(query,exsclaim_path="")
+>>> tools = [js] 
+```
+(3)  Run the tools through the <code>Pipeline</code> and save results to the directory specified in the query
+```python
+>>> exsclaim_pipeline.run(tools)
+```
+```sh       
+Running Journal Scraper
+(1 of 10) Extracting figures from: s41467-019-12853-8
+(2 of 10) Extracting figures from: srep11949
+⋮
+>>> SUCCESS
+```
+```python
+>>> exsclaim_pipeline.to_file()
+```
 
 ## Citation
 If you find this code useful, please consider citing our [paper](#paper)
