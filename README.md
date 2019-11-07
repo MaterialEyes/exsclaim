@@ -6,31 +6,25 @@ EXSCLAIM! is a library for the automatic **EX**traction, **S**eparation, and **C
 ## Getting started
 
 ### Requirements
-You need a working python 3.x installation to be able to use exsclaim, and gdown to directly download text detection and figure separation models. We highly recommend installing Anaconda, which takes care of installing Python and managing additional packages. In the following it will be assumed that you use Anaconda. Download and install it from here.
+You need a working python 3.x installation to be able to use exsclaim, and gdown to directly download text detection and figure separation models. We highly recommend installing Anaconda, which takes care of installing Python and managing additional packages.
 
 ### Installing exsclaim from GitHub
-- Clone this repo:
+- Clone this repo and create a new conda environment with Python 3.7 and gdown:
 ```sh
 git clone https://github.com/eschwenk/exsclaim
-```
-- Create a new conda environment with Python 3.7 and gdown:
-```sh
 conda create -n exsclaim -c conda-forge python=3.7 gdown
 ```
-- Activate this environment and navigate to the root directory:
+- Activate this environment, navigate to the root directory and download the models:
 ```sh
 conda activate exsclaim
 cd exsclaim
-```
-- Download text detection and figure separation models:
-```sh
 ./bin/download_models.sh
 ```
 - Install with pip:
 ```sh
 pip install .
 ```
-- Finally, download the best-matching model for the spaCy installation:
+- Finally, download required model for the spaCy installation:
 ```python
 python -m spacy download en_core_web_sm
 ```
