@@ -1,7 +1,7 @@
 ![image](https://drive.google.com/uc?export=view&id=142XkACsDxT9r9VgVg0RUsVvjJhaBqRIs)
 
 
-Automatic **EX**traction, **S**eparation, and **C**aption-based natural **L**anguage **A**nnotation of **IM**ages from scientific figures. [[wiki](https://gitlab.com/MaterialEyes/exsclaim/wikis/home)] [[paper](https://)]
+Automatic **EX**traction, **S**eparation, and **C**aption-based natural **L**anguage **A**nnotation of **IM**ages from scientific figures [wiki](https://gitlab.com/MaterialEyes/exsclaim/wikis/home)] [[paper](https://)]
 
 
 ## Getting started
@@ -10,32 +10,32 @@ Automatic **EX**traction, **S**eparation, and **C**aption-based natural **L**ang
 You need a working python 3.x installation to be able to use EXSCLAIM!, and [gdown](https://github.com/wkentaro/gdown) to directly download the current figure separation model. We highly recommend using [Anaconda](https://anaconda.org/) to manage the installation environment.
 
 ### Installation
-- Clone this repo and create a new conda environment with Python 3.7 and gdown:
+Clone this repo and create a new conda environment with Python 3.7 and gdown:
 ```sh
 git clone https://github.com/eschwenk/exsclaim
 conda create -n exsclaim -c conda-forge python=3.7 gdown
 ```
-- Activate this environment, navigate to the root directory and download the models:
+Activate this environment, navigate to the root directory and download the models:
 ```sh
 conda activate exsclaim
 cd exsclaim
 ./bin/download_models.sh
 ```
-- Install with pip:
+Install with pip:
 ```sh
 pip install .
 ```
-- Finally, download required model for the spaCy installation:
+Finally, download required model for the spaCy installation:
 ```python
 python -m spacy download en_core_web_sm
 ```
 
-For now, code development is easiest if you create a separate conda an environment from the
+__NOTE__: For now, code development is easiest if you create a separate conda an environment from the
 [environment.yml](https://github.com/eschwenk/exsclaim-prerelease/tree/master/bin/environment.yml) and do not install the package.
 
 ## Usage
 
-### Formulate a JSON search query
+### REQUIRED: Formulate a JSON search query
 A JSON search query is the singular point-of-entry for using the EXSCLAIM! search and retrieval tools.
 
 Here we query [Nature](https://www.nature.com) journals to find figures related to HAADF-STEM images of exfoliated MoS<sub>2</sub> flakes. Limiting the results to the top 5 most relevant hits, the query might look something like:
@@ -72,7 +72,7 @@ Here we query [Nature](https://www.nature.com) journals to find figures related 
 Saving the query avoids having to completely reformulate the structure with each new search entry and establishes provenance for the extraction results. Additional JSON search query examples can be found in the [test](https://github.com/eschwenk/exsclaim-prerelease/tree/master/test) folder in the root directory. 
 
 ### OPTION 1: Query a journal source to extract relevant figures
-With the [nature-exfoliated-MoS2-flakes.json]() search query from above, extract relevant figures by running a <code>JournalScraper</code> through an EXSCLAIM! <code>Pipeline</code>:
+With the [nature-exfoliated-MoS2-flakes.json](https://github.com/eschwenk/exsclaim-prerelease/tree/master/test/query/nature-exfoliated-MoS2-flakes.json) search query from above, extract relevant figures by running a <code>JournalScraper</code> through an EXSCLAIM! <code>Pipeline</code>:
 
 ```python
 from exsclaim.pipeline import Pipeline # will always use
@@ -98,8 +98,8 @@ exsclaim_pipeline.run(tools) # figures written to 'results_dir' specified in the
 
 Successful execution of the code will result in the creation of a directory populated with figures extracted from journals returned as search hits from the main [Nature](https://www.nature.com) homepage.
 
-### OPTION 2: Create an annotated materials imaging dataset from literature
-To extend the search to create an annotated imaging dataset from the extracted figures, import a <code>CaptionSeparator</code> and <code>FigureSeparator</code> tool (in addition to the <code>JournalScraper</code>) to run through the EXSCLAIM! <code>Pipeline</code>:
+### OPTION 2: Create an annotated materials imaging dataset from extracted figures
+To extend the search to create an annotated imaging dataset, import a <code>CaptionSeparator</code> and <code>FigureSeparator</code> tool (in addition to the <code>JournalScraper</code>) to run through the EXSCLAIM! <code>Pipeline</code>:
 
 > [nature-exfoliated-MoS2-flakes.py](https://github.com/eschwenk/exsclaim-prerelease/tree/master/test/nature-exfoliated-MoS2-flakes.py)
 ```python
