@@ -1,5 +1,5 @@
 from exsclaim.pipeline import Pipeline
-from exsclaim.tool import JournalScraper, CaptionSeparator, FigureSeparator, TextReader
+from exsclaim.tool import JournalScraper, CaptionSeparator, FigureSeparator
 
 # Set query paths
 query_path = "query/nature-exfoliated-MoS2-flakes.json"
