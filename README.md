@@ -1,15 +1,13 @@
 ![image](https://drive.google.com/uc?export=view&id=142XkACsDxT9r9VgVg0RUsVvjJhaBqRIs)
 
 
-Automatic **EX**traction, **S**eparation, and **C**aption-based natural **L**anguage **A**nnotation of **IM**ages from scientific figures.
-<p align="center">
-[[wiki](https://gitlab.com/MaterialEyes/exsclaim/wikis/home)] [[paper](https://)]
-</p>
+Automatic **EX**traction, **S**eparation, and **C**aption-based natural **L**anguage **A**nnotation of **IM**ages from scientific figures. [[wiki](https://gitlab.com/MaterialEyes/exsclaim/wikis/home)] [[paper](https://)]
+
 
 ## Getting started
 
 ### Requirements
-You need a working python 3.x installation to be able to use exsclaim, and [gdown](https://github.com/wkentaro/gdown) to directly download text detection and figure separation models. We highly recommend installing [Anaconda](https://anaconda.org/), to manage the installation environment.
+You need a working python 3.x installation to be able to use EXSCLAIM!, and [gdown](https://github.com/wkentaro/gdown) to directly download the current figure separation model. We highly recommend using [Anaconda](https://anaconda.org/) to manage the installation environment.
 
 ### Installation
 - Clone this repo and create a new conda environment with Python 3.7 and gdown:
@@ -32,12 +30,17 @@ pip install .
 python -m spacy download en_core_web_sm
 ```
 
+For now, code development is easiest if you create a separate conda an environment from the
+[environment.yml](https://github.com/eschwenk/exsclaim-prerelease/tree/master/bin/environment.yml) and do not install the package.
+
 ## Usage
+
+### Formulate a JSON search query
 A JSON search query is the singular point-of-entry for using the EXSCLAIM! search and retrieval tools.
 
 Here we query [Nature](https://www.nature.com) journals to find figures related to HAADF-STEM images of exfoliated MoS<sub>2</sub> flakes. Limiting the results to the top 5 most relevant hits, the query might look something like:
 
-> [nature-exfoliated-MoS2-flakes.json]() 
+> [nature-exfoliated-MoS2-flakes.json](https://github.com/eschwenk/exsclaim-prerelease/tree/master/test/query/nature-exfoliated-MoS2-flakes.json) 
 ```
 {   
     "name": "nature-exfoliated-MoS2-flakes",
@@ -66,9 +69,9 @@ Here we query [Nature](https://www.nature.com) journals to find figures related 
 }
 ```
 
-Saving the query avoids having to completely reformulate the structure with each new search entry and provides a means to track provenance of the extraction results. Additional JSON search query examples can be found in the [test]() folder in the root directory. 
+Saving the query avoids having to completely reformulate the structure with each new search entry and establishes provenance for the extraction results. Additional JSON search query examples can be found in the [test](https://github.com/eschwenk/exsclaim-prerelease/tree/master/test) folder in the root directory. 
 
-### Query a journal source to extract relevant figures
+### OPTION 1: Query a journal source to extract relevant figures
 With the [nature-exfoliated-MoS2-flakes.json]() search query from above, extract relevant figures by running a <code>JournalScraper</code> through an EXSCLAIM! <code>Pipeline</code>:
 
 ```python
@@ -92,12 +95,13 @@ exsclaim_pipeline = Pipeline(query_path=query_path , exsclaim_path=exsclaim_path
 exsclaim_pipeline.run(tools) # figures written to 'results_dir' specified in the query
 
 ```
-Successful execution of this code will result in the creation of a directory populated with figures extracted from journals returned as search hits from the main [Nature](https://www.nature.com) homepage.
 
-### Create an annotated materials imaging dataset from literature
+Successful execution of the code will result in the creation of a directory populated with figures extracted from journals returned as search hits from the main [Nature](https://www.nature.com) homepage.
+
+### OPTION 2: Create an annotated materials imaging dataset from literature
 To extend the search to create an annotated imaging dataset from the extracted figures, import a <code>CaptionSeparator</code> and <code>FigureSeparator</code> tool (in addition to the <code>JournalScraper</code>) to run through the EXSCLAIM! <code>Pipeline</code>:
 
-> [nature-exfoliated-MoS2-flakes.py]()
+> [nature-exfoliated-MoS2-flakes.py](https://github.com/eschwenk/exsclaim-prerelease/tree/master/test/nature-exfoliated-MoS2-flakes.py)
 ```python
 from exsclaim.pipeline import Pipeline # will always use
 from exsclaim.tool import JournalScraper, CaptionSeparator, FigureSeparator
@@ -123,7 +127,8 @@ exsclaim_pipeline.run(tools) # figures written to 'results_dir' specified in the
 # Save image and label (.csv) results to file
 exsclaim_pipeline.to_file()
 ```
-For this example, extracted images are written into separate subfigure folders within a folder for the figure itself. The root directory will also contain a 'labels.csv' with annotations, and for a more concise record of the search results, an "exsclaim.json", which records urls to each extracted figure, bounding box information for the detected images, and the associated caption text for each image.  
+
+For this example, extracted images are written into separate subfigure folders within a folder for the figure itself. The root directory will also contain a 'labels.csv' with annotations, and for a more concise record of the search results, an 'exsclaim.json', which records urls to each extracted figure, bounding box information for the detected images, and the associated caption text for each image.  
 
 ## Citation
 If you find this code useful, please consider citing our [paper](#paper)
