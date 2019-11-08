@@ -1,8 +1,10 @@
 import os
 import yaml
+import json
 import glob
 import matplotlib.pyplot as plt
 from .figures.utils.utils import *
+from .figures.utils.save_results import SavingResults
 from .figures.models.yolov3 import *
 from torch.autograd import Variable
 
@@ -20,7 +22,8 @@ def load_model(model_path=str) -> "figure_separator_model":
     # Fixed model paths/parameters 
     gpu = 0
     detection_threshold = None
-    checkpoint  = model_path + "checkpoints/snapshot930.ckpt"
+    # checkpoint  = model_path + "checkpoints/snapshot930.ckpt"
+    checkpoint  = model_path + "checkpoints/snapshot20000.ckpt"
     config_file = model_path + "config/yolov3_eval.cfg"
 
     # Begin model load procedure
@@ -118,28 +121,93 @@ def extract_image_objects(figure_separator_model=tuple, figure_path=str) -> "fig
     Returns:
         figure_dict: A dictionary with classified image_objects extracted from figure
     """
+    coco_class_names, coco_class_ids, coco_class_colors = get_coco_label_names()
+    json_dict = {}
+    json_dict["figure_separator_results"] = []
+
+    separations_path = figure_path.split("figures")[0]+"separations"
+    os.makedirs(separations_path, exist_ok=True)
+
     model, confidence_threshold, nms_threshold, image_size, gpu = figure_separator_model
+    # print("This is the model loaded:   ",model)
     model.eval()
 
     ## Runs model on each image 
-    image = plt.imread(figure_path, "jpg")
-    if len(image.shape) == 2:
-        image = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
-    elif image.shape[2] == 4:
-        image = cv2.cvtColor(image, cv2.COLOR_RGBA2RGB)
-    image, info_image = preprocess(image, image_size, jitter=0)  # info = (h, w, nh, nw, dx, dy)
-    image = np.transpose(image / 255., (2, 0, 1))
-    image = torch.from_numpy(image).float().unsqueeze(0)
-    if gpu > 0:
-        image = Variable(image.type(torch.cuda.FloatTensor))
+
+    # OLD
+    # image = plt.imread(figure_path, "jpg")
+    # if len(image.shape) == 2:
+    #     image = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
+    # elif image.shape[2] == 4:
+    #     image = cv2.cvtColor(image, cv2.COLOR_RGBA2RGB)
+    # image, info_image = preprocess(image, image_size, jitter=0)  # info = (h, w, nh, nw, dx, dy)
+    # image = np.transpose(image / 255., (2, 0, 1))
+    # image = torch.from_numpy(image).float().unsqueeze(0)
+    # if gpu > 0:
+    #     image = Variable(image.type(torch.cuda.FloatTensor))
+    # else:
+    #     image = Variable(image.type(torch.FloatTensor))
+
+    # print("\n\n\n\n")
+    # print("FIG PATH")
+    # print(figure_path)
+
+    img = cv2.imread(figure_path)
+    img_raw = img.copy()[:, :, ::-1].transpose((2, 0, 1))
+    img, info_image = preprocess(img, image_size, jitter=0)  # info = (h, w, nh, nw, dx, dy)
+    img = np.transpose(img / 255., (2, 0, 1))
+    img = torch.from_numpy(img).float().unsqueeze(0)
+
+    gpu = -1
+    if gpu >= 0:
+        model.cuda(gpu)
+        image = Variable(img.type(torch.cuda.FloatTensor))
     else:
-        image = Variable(image.type(torch.FloatTensor))
-    
+        image = Variable(img.type(torch.FloatTensor))
+
     with torch.no_grad():
         outputs = model(image)
         outputs = postprocess(outputs, 80, confidence_threshold, nms_threshold)
+   
     object_data = (outputs, info_image)
-    return write_object_dictionary(object_data)
+
+    if outputs[0] is None:
+        # print("\nNo Objects Detected!!")
+        outputs = [[]]
+        #continue
+
+    bboxes = list()
+    classes = list()
+    colors = list()
+    confidences = []
+        
+    for x1, y1, x2, y2, conf, cls_conf, cls_pred in outputs[0]:
+        cls_id = coco_class_ids[int(cls_pred)]
+#             print(int(x1), int(y1), int(x2), int(y2), float(conf), int(cls_pred))
+#             print('\t+ Label: %s, Conf: %.5f' %
+#                   (coco_class_names[cls_id], cls_conf.item()))
+        box = yolobox2label([y1, x1, y2, x2], info_image)
+        bboxes.append(box)
+        classes.append(cls_id)
+        colors.append(coco_class_colors[int(cls_pred)])
+        confidences.append("%.3f"%(cls_conf.item()))
+
+    
+    for i in range(len(bboxes)):
+        y1,x1,y2,x2 = bboxes[i]
+        bboxes[i] = [int(x1.data.cpu().numpy()),int(y1.data.cpu().numpy()),int(x2.data.cpu().numpy()),int(y2.data.cpu().numpy())]
+
+    bboxes,classes,confidences = NonMaximumSuppressionOnPosition (bboxes,classes,confidences,NMS_threshold=0.2,target=["subfigure_label","master_image"])
+    
+    result_record = SavingResults(bboxes, classes, confidences, figure_path, \
+                                  coco_class_names,separations_path,  \
+                                  False, None, json_dict)
+    
+    json_dict = result_record.json_dict
+    
+
+    return json_dict
+    # return write_object_dictionary(object_data)
 
 # -------------------------------- #  
 # -------- TEMPORARY HOME -------- #

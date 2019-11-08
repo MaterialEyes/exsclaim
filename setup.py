@@ -14,7 +14,7 @@ from setuptools.command.install import install
 
 # Package meta-data.
 NAME = 'exsclaim'
-DESCRIPTION = 'My short description for my project.'
+DESCRIPTION = 'EXSCLAIM! is a library for the automatic EXtraction, Separation, and Caption-based natural Language Annotation of IMages from scientific figures.'
 URL = 'https://github.com/eschwenk/exsclaim'
 EMAIL = 'eschwenk@u.northwestern.edu'
 AUTHOR = 'Eric Schwenker'
@@ -136,12 +136,13 @@ setup(
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy'
     ],
-    data_files=[(sys.prefix+'/figures/models/checkpoints', ['exsclaim/figures/models/checkpoints/snapshot930.ckpt']),
+    data_files=[(sys.prefix+'/figures/models/checkpoints', ['exsclaim/figures/models/checkpoints/snapshot20000.ckpt']),
                 (sys.prefix+'/figures/models/config/',['exsclaim/figures/models/config/yolov3_eval.cfg']),
                 (sys.prefix+'/imagetexts/models/read_sflabel_5_CNN150_adam.pt',['exsclaim/imagetexts/models/read_sflabel_5_CNN150_adam.pt']),
                 (sys.prefix+'/captions/models/reference.yml',['exsclaim/captions/models/reference.yml']),
                 (sys.prefix+'/captions/models/patterns.yml',['exsclaim/captions/models/patterns.yml']),
                 (sys.prefix+'/captions/models/rules.yml',['exsclaim/captions/models/rules.yml']),
+                (sys.prefix+'/captions/models/characterization.yml',['exsclaim/captions/models/characterization.yml']),
                 (sys.prefix+'/imagetexts/classes.json',['exsclaim/imagetexts/classes.json'])
     ],
     dependency_links=['https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.2.0/en_core_web_sm-2.2.0.tar.gz#egg=package-1.0'],

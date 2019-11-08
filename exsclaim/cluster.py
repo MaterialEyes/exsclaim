@@ -438,7 +438,7 @@ def assign_captions(figure):
     # not_assigned = set(captions.keys())
     not_assigned = set([a['label'] for a in captions])
     for index, master_image in enumerate(figure.get("master_images", [])):
-        label_json = master_image.get("label", {})
+        label_json = master_image.get("subfigure_label", {})
         subfigure_label = label_json.get("text", index)            
         processed_label = subfigure_label.replace(")","")
         processed_label = processed_label.replace("(","")
@@ -448,11 +448,13 @@ def assign_captions(figure):
             processed_caption_label = caption_label['label'].replace(")","")
             processed_capiton_label = processed_caption_label.replace("(","")
             processed_caption_label = processed_caption_label.replace(".","")
-            if processed_caption_label.lower() == processed_label.lower():
+            if (processed_caption_label.lower() == processed_label.lower()) and \
+               (processed_caption_label.lower() in [a.lower() for a in not_assigned]):
                 # master_image["caption"] = captions[caption_label]["caption"]
                 master_image["caption"] = caption_label['description']
                 # master_image["keywords"] = captions[caption_label]["keywords"]
                 master_image["keywords"] = caption_label['keywords']
+                master_image["general"] = caption_label['general']
                 masters.append(master_image)
                 not_assigned.remove(caption_label['label'])
                 paired = True
@@ -461,7 +463,8 @@ def assign_captions(figure):
             continue
 
         master_image["caption"] = []
-        master_image["keywords"] = []
+        master_image["keywords"]= []
+        master_image["general"] = []
         masters.append(master_image)
 
     # new_unassigned_captions = {}
@@ -499,26 +502,4 @@ def cluster_figure(figure):
     figure["master_images"] = masters
     figure["unassigned"] = unassigned
      
-    return figure
-
-# if __name__ == '__main__':
-#     args = parse_command_line()
-    
-#     with open(args["exsclaim_json"], "r") as f:
-#         exsclaim_json = json.load(f)
-    
-#     if args["testing"].lower() in ["yes", "true", "t", "y"]:
-#         modified_json = {}
-#         for figure in exsclaim_json:
-#             figure["unassigned"] = figure["Label"]
-#             figure.pop("Label")
-#             figure = cluster_figure(figure)
-#             modified_json[figure["External ID"]] = figure
-#         print(modified_json)
-#     else:
-#         for figure in exsclaim_json:
-#              figure_json = exsclaim_json[figure]
-#              figure_json = cluster_figure(figure_json)
-#              exsclaim_json[figure] = figure_json
-
-#         print(exsclaim_json)   
+    return figure 

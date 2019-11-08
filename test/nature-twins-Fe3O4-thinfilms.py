@@ -2,7 +2,7 @@ from exsclaim.pipeline import Pipeline
 from exsclaim.tool import JournalScraper, CaptionSeparator, FigureSeparator, TextReader
 
 # Set query paths
-query_path = "query/nature-haadf-ag-np.json"
+query_path = "query/nature-twins-Fe3O4-thinfilms.json"
 
 # Set path to initial exsclaim_dict JSON (if applicable)
 exsclaim_path = ""
@@ -11,9 +11,8 @@ exsclaim_path = ""
 js = JournalScraper()
 cs = CaptionSeparator()
 fs = FigureSeparator()
-tr = TextReader()
 
-tools = [js,cs,fs,tr] # define run order
+tools = [js,cs,fs] # define run order
 
 # Initialize EXSCLAIM! pipeline
 exsclaim_pipeline = Pipeline(query_path=query_path , exsclaim_path=exsclaim_path)

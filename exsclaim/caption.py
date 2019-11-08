@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import ast
+import difflib
+import itertools
 import collections
 import numpy as np
 
@@ -217,22 +219,55 @@ def associate_caption_text(caption_nlp_model=tuple, caption=str, keywords={}, ke
     # Unpack necessary elements of the model
     nlp, __ = caption_nlp_model 
     doc = nlp(caption)
-    
+
     subfigure_tokens = get_subfigure_tokens(caption_nlp_model,caption)
     
     de = regex.caption_sentence_findall(doc, subfigure_tokens, {})
 
     # Create search dictionary from search_query 'term' keys and 'term'+'synonyms' as entries 
     search_list = {keywords[key]['term']:\
-                  [keywords[key]['term']]+keywords[key]['synonyms'] \
+                  [a for a in [keywords[key]['term']]+keywords[key]['synonyms'] if ''!= a] \
                    for key in keywords if len(keywords[key]['term'])>0}
 
-    # Find keywords
+    experiment_list = interpret.experiment_synonyms()
+
+    # Find matching keywords
     for label in de:
         for keyword in search_list:
             description = " ".join(de[label]['description'])
-            if not utils.is_disjoint(search_list[keyword],description.split(" ")):
-                de[label]['keywords'].append(keyword)
+            for slk in search_list[keyword]:
+                if len(description.split(slk))>1:
+                    if keyword not in de[label]['keywords']:
+                        de[label]['keywords'].append(keyword)
+
+            # Old - did not capture phrases
+            # if not utils.is_disjoint(search_list[keyword],description.split(" ")):
+            #     de[label]['keywords'].append(keyword)
+
+    # Find matching general descriptions
+    for label in de:
+        for keyword in experiment_list:
+            description = " ".join(de[label]['description'])
+            for elk in experiment_list[keyword]:
+                if len(description.split(elk))>1:
+                    if keyword not in de[label]['general']:
+                        de[label]['general'].append(keyword)
+
+        # Remove any redundant descriptions when more specific "longer" description is present
+        # i.e. reduce ['HAADF-STEM', 'STEM', 'TEM', 'EELS'] to ['HAADF-STEM', 'EELS']
+        ratio = 0.5
+        remove_list = []
+        for pair in itertools.combinations(de[label]['general'], r=2):
+            v,w = pair
+            s = difflib.SequenceMatcher(None, v, w)
+            if s.ratio() >= ratio:
+                # If the two strings are similar, add shorter string to remove list
+                remove = pair[np.argmin([len(a) for a in pair])]
+                remove_list.append(remove)
+        remove_list = np.unique(remove_list)
+        for entry in remove_list:
+            de[label]['general'].remove(entry)
+
 
     if keys == 'explicit':
         return de
@@ -240,5 +275,6 @@ def associate_caption_text(caption_nlp_model=tuple, caption=str, keywords={}, ke
         # Create dictionary with all implied subfigure_label keys and associated text as entries. 
         di = {}
         for token in subfigure_tokens: 
-            di.update({k:{"description":de[token[4]]['description'],"keywords":de[token[4]]['keywords']} for k in token[5]})
+            di.update({k:{"description":de[token[4]]['description'],"keywords":de[token[4]]['keywords'],"general":de[token[4]]['general']} for k in token[5]})
         return di
+

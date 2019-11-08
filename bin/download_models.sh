@@ -12,16 +12,16 @@ else
 fi
 
 # Download the object detector model
-object_model=exsclaim/figures/models/checkpoints/snapshot930.ckpt
+object_model=exsclaim/figures/models/checkpoints/snapshot20000.ckpt
 object_dir=exsclaim/figures/models/checkpoints
 if [ ! -f "$object_model" ]; then
     if [ ! -d "$object_dir" ] ; then
         mkdir exsclaim/figures/models/checkpoints
     fi
     # Change link below if a new model is trained
-    gdown -O exsclaim/figures/models/checkpoints/snapshot930.ckpt.zip https://drive.google.com/uc?id=1xWxqQGDH_szfCe8eWDBwTcjzCmq7Bnf1
-    unzip exsclaim/figures/models/checkpoints/snapshot930.ckpt.zip -d exsclaim/figures/models/checkpoints
-    rm exsclaim/figures/models/checkpoints/snapshot930.ckpt.zip
+    gdown -O exsclaim/figures/models/checkpoints/snapshot20000.ckpt https://drive.google.com/uc?id=1DlYH9TVr0ucgbInHqLd8HFWRkKEWGQCj
+    # unzip exsclaim/figures/models/checkpoints/snapshot20000.ckpt -d exsclaim/figures/models/checkpoints
+    # rm exsclaim/figures/models/checkpoints/snapshot20000.ckpt.zip
 else
     echo "Already downloaded ObjectDetector model"
 fi

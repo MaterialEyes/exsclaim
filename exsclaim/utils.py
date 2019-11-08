@@ -8,6 +8,11 @@ def labelbox_to_patch(lb,img):
     x2,y2=lb[2]["x"],lb[2]["y"]
     return img[y1:y2,x1:x2]
 
+def labelbox_to_patch_v2(lb,img):
+    x1,y1=lb[0]["x"],lb[0]["y"]
+    x2,y2=lb[2]["x"],lb[1]["y"]
+    return img[y1:y2,x1:x2]
+
 def is_disjoint(l1,l2) -> bool:
     """
     Determines if two lists share any common elements
@@ -21,11 +26,12 @@ def is_disjoint(l1,l2) -> bool:
 
 def load_json(filename):
     with open(filename, 'r') as fp:
-        try:
-            return json.load(fp)
-        except:
-            print("JSON load error")
-            return
+        json.load(fp)
+        # try:
+        #     return json.load(fp)
+        # except:
+        #     print("JSON load error")
+        #     return
 
 def load_yaml(filename):
     with open(filename, 'r') as stream:

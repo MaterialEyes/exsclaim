@@ -104,7 +104,7 @@ class CaptionSeparator(ExsclaimTool):
     def _update_exsclaim(self,exsclaim_dict,figure_name,delimiter,caption_dict):
         exsclaim_dict[figure_name]["caption_delimiter"] = delimiter
         for label in caption_dict:
-            master_image = {"label": label, "description": caption_dict[label]['description'], "keywords": caption_dict[label]['keywords']}
+            master_image = {"label": label, "description": caption_dict[label]['description'], "keywords": caption_dict[label]['keywords'], "general": caption_dict[label]['general']}
             exsclaim_dict[figure_name]['unassigned']['captions'].append(master_image)
         return exsclaim_dict
 
@@ -151,7 +151,19 @@ class FigureSeparator(ExsclaimTool):
 
     def _update_exsclaim(self,exsclaim_dict,figure_name,figure_dict):
         figure_name = figure_name.split("/")[-1]
-        exsclaim_dict[figure_name]['unassigned'].update(figure_dict)
+
+        for master_image in figure_dict['figure_separator_results'][0]['master_images']:
+            exsclaim_dict[figure_name]['master_images'].append(master_image)
+
+        for unassigned in figure_dict['figure_separator_results'][0]['unassigned']:
+            exsclaim_dict[figure_name]['unassigned']['master_images'].append(unassigned)
+
+        # with open(os.path.join('./exsclaim',"addit.json"), 'w') as fp:
+        #     json.dump(figure_dict, fp, indent=2)
+
+        # with open(os.path.join('./exsclaim',"avoila.json"), 'w') as fp:
+        #     json.dump(exsclaim_dict, fp, indent=2)
+
         return exsclaim_dict
 
     def run(self,search_query,exsclaim_dict):

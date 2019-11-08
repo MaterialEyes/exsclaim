@@ -3,7 +3,90 @@ import torch
 import numpy as np
 import cv2
 
-
+def NonMaximumSuppressionOnPosition(bboxes,classes,confidences,NMS_threshold=0.2,target="subfigure_label"):
+    def CalIOU(bbox1,bbox2):
+        x1 = max(bbox1[0],bbox2[0])
+        y1 = max(bbox1[1],bbox2[1])
+        x2 = min(bbox1[2],bbox2[2])
+        y2 = min(bbox1[3],bbox2[3])
+        overlap_area = max(0,x2-x1)*max(0,y2-y1)
+        union_area = (bbox1[2]-bbox1[0])*(bbox1[3]-bbox1[1]) + (bbox2[2]-bbox2[0])*(bbox2[3]-bbox2[1]) - overlap_area
+        return overlap_area/union_area
+    master_image_bboxes = []
+    subfigure_label_bboxes = []
+    for i in range(len(classes)):
+        if classes[i] < 8:
+            master_image_bboxes.append([bboxes[i],classes[i],confidences[i]])
+        else:
+            subfigure_label_bboxes.append([bboxes[i],classes[i],confidences[i]])
+    if "subfigure_label" in target:
+        target_bboxes = subfigure_label_bboxes
+        filtered_bboxes = []
+        while target_bboxes:
+            anchor_bbox = target_bboxes[0]
+            ious = np.zeros(len(target_bboxes))
+            for i in range(1,len(target_bboxes)):
+                ious[i] = CalIOU(anchor_bbox[0],target_bboxes[i][0])
+            overlap = ious>NMS_threshold
+            if overlap.any():
+                remove_list = []
+                for i in range(len(ious)):
+                    if ious[i]>NMS_threshold:
+                        if anchor_bbox[2] < target_bboxes[i][2]:
+                            if anchor_bbox not in remove_list:
+                                remove_list.append(anchor_bbox)
+                        else:
+                            remove_list.append(target_bboxes[i])
+                if anchor_bbox not in remove_list:
+                    filtered_bboxes.append(anchor_bbox)
+                    target_bboxes.remove(anchor_bbox)
+                for tmp in remove_list:
+                    target_bboxes.remove(tmp)
+            else:
+                filtered_bboxes.append(anchor_bbox)
+                target_bboxes.remove(anchor_bbox)
+        subfigure_label_bboxes = filtered_bboxes
+        
+    if "master_image" in target:
+        target_bboxes = master_image_bboxes
+        filtered_bboxes = []
+        while target_bboxes:
+            anchor_bbox = target_bboxes[0]
+            ious = np.zeros(len(target_bboxes))
+            for i in range(1,len(target_bboxes)):
+                ious[i] = CalIOU(anchor_bbox[0],target_bboxes[i][0])
+            overlap = ious>NMS_threshold
+            if overlap.any():
+                remove_list = []
+                for i in range(len(ious)):
+                    if ious[i]>NMS_threshold:
+                        if anchor_bbox[2] < target_bboxes[i][2]:
+                            if anchor_bbox not in remove_list:
+                                remove_list.append(anchor_bbox)
+                        else:
+                            remove_list.append(target_bboxes[i])
+                if anchor_bbox not in remove_list:
+                    filtered_bboxes.append(anchor_bbox)
+                    target_bboxes.remove(anchor_bbox)
+                for tmp in remove_list:
+                    target_bboxes.remove(tmp)
+            else:
+                filtered_bboxes.append(anchor_bbox)
+                target_bboxes.remove(anchor_bbox)
+        master_image_bboxes = filtered_bboxes
+        
+    bboxes,classes,confidences = [], [], []
+    for box in master_image_bboxes:
+        bboxes.append(box[0])
+        classes.append(box[1])
+        confidences.append(box[2])
+    for box in subfigure_label_bboxes:
+        bboxes.append(box[0])
+        classes.append(box[1])
+        confidences.append(box[2])
+        
+    return bboxes,classes,confidences
+    
 def nms(bbox, thresh, score=None, limit=None):
     """Suppress bounding boxes according to their IoUs and confidence scores.
     Args:
@@ -360,11 +443,12 @@ def get_coco_label_names():
 #                       46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 67,
 #                       70, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 84, 85, 86, 87, 88, 89, 90]
     
-#     coco_label_names = ('background','subfigure',"scale")
-#     coco_class_ids = [1,2,3,4,5,6,7,8,9,10]
     
-    coco_label_names = ('background','image',"nonimage","subfigure","scalebar")
-    coco_class_ids = [1,2,3,4,5,6,7,8,9,10]
+    coco_label_names = ['background',"microscopy","parent","graph","illustration","diffraction","basic photo","unclear","invalid"]
+    for i in range(ord('a'),ord('z')+1):
+        coco_label_names.extend(chr(i))
+    coco_class_ids = list(np.asarray(np.linspace(1,26+8,26+8),dtype=np.int32))#[1,2,3,4,5,6,7,8,9,10]
+
 
     coco_cls_colors = np.random.randint(128, 255, size=(80, 3))
 

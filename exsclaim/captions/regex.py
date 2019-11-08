@@ -441,7 +441,7 @@ def caption_sentence_findall(doc="spacy.tokens.doc.Doc", subfigure_tokens=list, 
 
     # Create dictionary with explicit subfigure_label keys and associated text as entries. 
     if caption_dict == {}:
-        caption_dict = {k:{"description":[],"keywords":[]} for k in subfigure_labels}
+        caption_dict = {k:{"description":[],"keywords":[],"general":[]} for k in subfigure_labels}
     
     if "(0)" in caption_dict:
         caption_dict["(0)"]['description'] = " ".join([a[0] for a in caption_chunks])

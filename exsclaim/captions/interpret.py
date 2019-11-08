@@ -12,6 +12,14 @@ with open(dir_path + '/models/reference.yml', 'r') as stream:
     except yaml.YAMLError as exc:
         print(exc)
 
+with open(dir_path + '/models/characterization.yml', 'r') as stream:
+    try:
+        chrz = yaml.safe_load(stream)
+    except yaml.YAMLError as exc:
+        print(exc)
+
+def experiment_synonyms():
+    return chrz
 
 def implied_chars(str_text: str, char_type: str) -> str:
     """
@@ -97,9 +105,16 @@ def char_range(start: str, stop: str, char_type: str) -> str:
     if not (len(start)<3 or start.isnumeric()) or not (len(stop)<3 or stop.isnumeric()):
         return [""]
 
+    # Prevent roman from being mislabeled as "alpha" 
+    if len(start)+len(stop)>2:
+        char_type = 'roman'
+
     if char_type.lower() == 'alpha' or char_type == 'ALPHA':
-        st = ref['alphabet'].index(start.lower())
-        ed = ref['alphabet'].index(stop.lower())
+        try:       
+            st = ref['alphabet'].index(start.lower())
+            ed = ref['alphabet'].index(stop.lower())
+        except:
+            return 
 
         if start == start.upper():
             return [a.upper() for a in ref['alphabet'][st:ed+1]]
