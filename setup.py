@@ -15,9 +15,9 @@ from setuptools.command.install import install
 # Package meta-data.
 NAME = 'exsclaim'
 DESCRIPTION = 'EXSCLAIM! is a library for the automatic EXtraction, Separation, and Caption-based natural Language Annotation of IMages from scientific figures.'
-URL = 'https://github.com/eschwenk/exsclaim'
+URL = 'https://github.com/MaterialEyes/exsclaim'
 EMAIL = 'eschwenk@u.northwestern.edu'
-AUTHOR = 'Eric Schwenker'
+AUTHOR = 'Eric Schwenker','Trevor Spreadbury','Weixin Jiang','Maria Chan'
 REQUIRES_PYTHON = '>=3.6.0'
 VERSION = '0.1.0'
 
@@ -138,7 +138,6 @@ setup(
     ],
     data_files=[(sys.prefix+'/figures/models/checkpoints', ['exsclaim/figures/models/checkpoints/snapshot20000.ckpt']),
                 (sys.prefix+'/figures/models/config/',['exsclaim/figures/models/config/yolov3_eval.cfg']),
-                (sys.prefix+'/imagetexts/models/read_sflabel_5_CNN150_adam.pt',['exsclaim/imagetexts/models/read_sflabel_5_CNN150_adam.pt']),
                 (sys.prefix+'/captions/models/reference.yml',['exsclaim/captions/models/reference.yml']),
                 (sys.prefix+'/captions/models/patterns.yml',['exsclaim/captions/models/patterns.yml']),
                 (sys.prefix+'/captions/models/rules.yml',['exsclaim/captions/models/rules.yml']),
