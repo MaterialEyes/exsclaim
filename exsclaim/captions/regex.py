@@ -23,6 +23,20 @@ def get_caption_tokenization(doc="spacy.tokens.doc.Doc", subfigure_tokens=list) 
     Returns:
         doc: A retokenized doc (spacy.tokens.doc.Doc)
     """
+
+    def filter_spans(spans):
+        """
+        Filter a sequence of spans so they don't contain overlaps!
+        """
+        get_sort_key = lambda span: (span.end - span.start, span.start)
+        sorted_spans = sorted(spans, key=get_sort_key, reverse=True)
+        result = []
+        seen_tokens = set()
+        for span in spans:
+            if span.start not in seen_tokens and span.end-1 not in seen_tokens:
+                result.append(span)
+                seen_tokens.update(range(span.start, span.end))
+        return result
     
     def spans_from_list(doc="spacy.tokens.doc.Doc", keywords=list) -> "spacy.tokens.span.Spans":
         """
@@ -49,6 +63,7 @@ def get_caption_tokenization(doc="spacy.tokens.doc.Doc", subfigure_tokens=list) 
         Returns:
             doc: A spaCy processed document (spacy.tokens.doc.Doc)
         """
+        custom_spans = filter_spans(custom_spans)
         with doc.retokenize() as retokenizer:
             for span in custom_spans:
                 retokenizer.merge(span,attrs={"TAG":custom_tag})
