@@ -51,8 +51,8 @@ dependencies:
   - mkl_random=1.0.2
   - ncurses=6.1
   - ninja=1.9.0
-  - numpy=1.16.4
-  - numpy-base=1.16.4
+  - numpy=1.16.2
+  - numpy-base=1.16.2
   - olefile=0.46
   - opencv=3.4.2
   - openssl=1.1.1c
@@ -90,7 +90,6 @@ dependencies:
   - pip:
     - blis==0.2.4
     - cymem==2.0.2
-    - en-core-web-sm==2.1.0
     - filelock==3.0.12
     - gdown==3.8.1
     - graphqlclient==0.2.4

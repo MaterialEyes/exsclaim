@@ -1,15 +1,21 @@
 import os
-import yaml
+import cv2
 import json
+import yaml
 import glob
-import matplotlib.pyplot as plt
-from .figures.utils.utils import *
-from .figures.utils.save_results import SavingResults
-from .figures.models.yolov3 import *
+import torch
+import shutil
+
+import numpy as np
+import torch.nn.functional as F
+
+from PIL import Image, ImageDraw, ImageFont
 from torch.autograd import Variable
+from .figures.models.yolov3 import *
+from .figures.utils.utils import *
 
 
-def load_model(model_path=str) -> "figure_separator_model":
+def load_subfigure_model(model_path=str) -> "figure_separator_model":
     """
     Opens and extracts model snapshot from configuration file + checkpoints
 
@@ -19,35 +25,92 @@ def load_model(model_path=str) -> "figure_separator_model":
     Returns:
         figure_separator_model: A tuple (model, confidence_threshold, nms_threshold, img_size, gpu)
     """
-    # Fixed model paths/parameters 
-    gpu = 0
-    detection_threshold = None
-    # checkpoint  = model_path + "checkpoints/snapshot930.ckpt"
-    checkpoint  = model_path + "checkpoints/snapshot20000.ckpt"
-    config_file = model_path + "config/yolov3_eval.cfg"
 
-    # Begin model load procedure
-    with open(config_file, 'r') as f:
+    # Paths to config/checkpoint files
+    objd_ckpt = model_path + "checkpoints/snapshot6500.ckpt" # object detector
+    clsf_ckpt = model_path + "checkpoints/snapshot260.ckpt"  # classifier
+    cnfg_file = model_path + "config/yolov3_default_subfig.cfg"
+        
+    # Open the config file
+    with open(cnfg_file, 'r') as f:
         cfg = yaml.load(f, Loader=yaml.FullLoader)
+    # print("Successfully loaded config file: \n", cfg)
 
-    image_size = cfg['TEST']['IMGSIZE']
+    # Assign values to important varables
+    image_size            = cfg['TEST']['IMGSIZE']
+    nms_threshold         = cfg['TEST']['NMSTHRE']
+    confidence_threshold  = 0.0001
+    gpu_id                = 1
+
+    # load object_detect model
     model = YOLOv3(cfg['MODEL'])
 
-    confidence_threshold = cfg['TEST']['CONFTHRE']
-    nms_threshold = cfg['TEST']['NMSTHRE']
+    # load classifier model
+    classifier_model = None
+    for m in model.module_list:
+        if hasattr(m,"classifier_model"):
+            classifier_model = m.classifier_model
+            break
+    assert classifier_model != None
 
-    if detection_threshold:
-        confidence_threshold = detection_threshold
+    cuda = torch.cuda.is_available() and (gpu_id >= 0)
+    if objd_ckpt:
+        if cuda:
+            model.load_state_dict(torch.load(objd_ckpt)["model_state_dict"])
+            classifier_model.load_state_dict(torch.load(clsf_ckpt)["model_state_dict"])
+        else:
+            model.load_state_dict(torch.load(objd_ckpt,map_location='cpu')["model_state_dict"])
+            classifier_model.load_state_dict(torch.load(clsf_ckpt, map_location='cpu')["model_state_dict"])
+    dtype = torch.cuda.FloatTensor if cuda else torch.FloatTensor
+    if cuda:
+        print("using cuda: ", args.gpu_id) 
+        torch.cuda.set_device(device=args.gpu_id)
+        model = model.cuda()
+        classifier_model = classifier_model.cuda()
 
-    if gpu > 0:
-        model.cuda(args[gpu])
-        # print("loading checkpoint %s" % (checkpoint))
-        model.load_state_dict(torch.load(checkpoint)["model_state_dict"])
-    else:
-        # print("loading checkpoint %s" % (checkpoint))
-        model.load_state_dict(torch.load(checkpoint, map_location="cpu")["model_state_dict"])
+    return (model, classifier_model, dtype, confidence_threshold, nms_threshold, image_size, gpu_id)
 
-    return (model, confidence_threshold, nms_threshold, image_size, gpu)
+def load_masterimg_model(model_path=str) -> "figure_separator_model":
+    """
+    Opens and extracts model snapshot from configuration file + checkpoints
+
+    Args:
+        model_path: A path to the model files
+
+    Returns:
+        figure_separator_model: A tuple (model, confidence_threshold, nms_threshold, img_size, gpu)
+    """
+    # Paths to config/checkpoint files
+    objd_ckpt = model_path + "checkpoints/snapshot12000.ckpt" # object detector
+    cnfg_file = model_path + "config/yolov3_default_master.cfg"
+        
+    # Open the config file
+    with open(cnfg_file, 'r') as f:
+        cfg = yaml.load(f, Loader=yaml.FullLoader)
+    # print("Successfully loaded config file: \n", cfg)
+
+    # Assign values to important varables
+    image_size            = cfg['TEST']['IMGSIZE']
+    gpu_id                = 1
+
+    # load object_detect model
+    model = YOLOv3img(cfg['MODEL'])
+
+    cuda = torch.cuda.is_available() and (gpu_id >= 0)
+    if objd_ckpt:
+        if cuda:
+            model.load_state_dict(torch.load(objd_ckpt)["model_state_dict"])
+        else:
+            model.load_state_dict(torch.load(objd_ckpt,map_location='cpu')["model_state_dict"])
+
+    dtype = torch.cuda.FloatTensor if cuda else torch.FloatTensor
+    
+    if cuda:
+        print("using cuda: ", args.gpu_id) 
+        torch.cuda.set_device(device=args.gpu_id)
+        model = model.cuda()
+    
+    return (model, image_size)
 
 
 def get_figure_paths(search_query: dict) -> list:
@@ -66,51 +129,7 @@ def get_figure_paths(search_query: dict) -> list:
     return paths
 
 
-def write_object_dictionary(object_data) -> "figure_dict":
-    """
-    Find individual image objects within a figure and classify based on functionality
-
-    Args:
-        object_data: (outputs, info_image) from evaluation of PyTorch model
-
-    Returns:
-        figure_dict: A dictionary with classified image_objects extracted from figure
-    """
-    """ converts image_data to MaterialEyes JSON """
-    outputs, info_image = object_data
-    coco_class_names, coco_class_ids, coco_class_colors = get_coco_label_names()
-     
-    classes = {0: "master_images", 1: "master_images", 2: "subfigure_labels", 3: "scale_bar_labels"}
-    #for name, ID, color in zip(coco_class_names, coco_class_ids, coco_class_colors):
-    #    classes[ID] = (name, color)
-    bboxes = {"master_images": [], "subfigure_labels": [], "scale_bar_labels": []}
-    # Only proceed if objects have been detected!
-    if type(outputs[0]) == torch.Tensor: 
-        for x1, y1, x2, y2, conf, cls_conf, cls_pred in outputs[0]:
-            y_1, x_1, y_2, x_2 = yolobox2label([y1, x1, y2, x2], info_image)
-            y_1 = max(int(y_1), 0)
-            x_1 = max(int(x_1), 0)
-            y_2 = min(int(y_2), info_image[0])
-            x_2 = min(int(x_2), info_image[1])
-            location = [{"x" : x_1, "y" : y_1}, {"x" : x_1, "y" : y_2},
-                        {"x" : x_2, "y" : y_2}, {"x" : x_2, "y" : y_1}] 
-            # object_entry = {"geometry" : location, "confidence" : float(cls_conf), "text": ""}
-            object_entry_image = {"geometry" : location, "classification": None}
-            object_entry_label = {"geometry" : location, "text": ""}
-            box_class = classes[int(cls_pred)]
-
-            #  Create 'classification' key for image objects and 'text' key for label objects 
-            if box_class.split("_")[-1] == 'images':
-                bbox = bboxes.get(box_class, [])
-                bbox.append(object_entry_image)
-            if box_class.split("_")[-1] == 'labels':
-                bbox = bboxes.get(box_class, [])
-                bbox.append(object_entry_label)
-            bboxes[box_class] = bbox 
-    return bboxes
-
-
-def extract_image_objects(figure_separator_model=tuple, figure_path=str) -> "figure_dict":
+def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple, figure_path=str) -> "figure_dict":
     """
     Find individual image objects within a figure and classify based on functionality
 
@@ -121,122 +140,236 @@ def extract_image_objects(figure_separator_model=tuple, figure_path=str) -> "fig
     Returns:
         figure_dict: A dictionary with classified image_objects extracted from figure
     """
-    coco_class_names, coco_class_ids, coco_class_colors = get_coco_label_names()
-    json_dict = {}
-    json_dict["figure_separator_results"] = []
 
-    separations_path = figure_path.split("figures")[0]+"separations"
-    os.makedirs(separations_path, exist_ok=True)
-
-    model, confidence_threshold, nms_threshold, image_size, gpu = figure_separator_model
-    # print("This is the model loaded:   ",model)
+    # Unpack models and eval
+    model, classifier_model, dtype, confidence_threshold, nms_threshold, image_size, _ = subfigure_label_model
+    mi_model, _ = master_image_model
+    
     model.eval()
+    classifier_model.eval()
+    mi_model.eval()
 
-    ## Runs model on each image 
+    os.makedirs("result_dir", exist_ok=True)
 
-    # OLD
-    # image = plt.imread(figure_path, "jpg")
-    # if len(image.shape) == 2:
-    #     image = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
-    # elif image.shape[2] == 4:
-    #     image = cv2.cvtColor(image, cv2.COLOR_RGBA2RGB)
-    # image, info_image = preprocess(image, image_size, jitter=0)  # info = (h, w, nh, nw, dx, dy)
-    # image = np.transpose(image / 255., (2, 0, 1))
-    # image = torch.from_numpy(image).float().unsqueeze(0)
-    # if gpu > 0:
-    #     image = Variable(image.type(torch.cuda.FloatTensor))
-    # else:
-    #     image = Variable(image.type(torch.FloatTensor))
-
-    # print("\n\n\n\n")
-    # print("FIG PATH")
-    # print(figure_path)
+    label_names = ["background","microscopy","parent","graph","illustration","diffraction","None",
+                   "OtherMaster","OtherSubfigure","a","b","c","d","e","f"]
 
     img = cv2.imread(figure_path)
-    img_raw = img.copy()[:, :, ::-1].transpose((2, 0, 1))
-    img, info_image = preprocess(img, image_size, jitter=0)  # info = (h, w, nh, nw, dx, dy)
+    img, info_img = preprocess(img, image_size, jitter=0)
     img = np.transpose(img / 255., (2, 0, 1))
     img = torch.from_numpy(img).float().unsqueeze(0)
+    img = Variable(img.type(dtype))
 
-    gpu = -1
-    if gpu >= 0:
-        model.cuda(gpu)
-        image = Variable(img.type(torch.cuda.FloatTensor))
-    else:
-        image = Variable(img.type(torch.FloatTensor))
-
+    # prediction
+    img_raw = Image.open(figure_path).convert("RGB")
+    width, height = img_raw.size
     with torch.no_grad():
-        outputs = model(image)
-        outputs = postprocess(outputs, 80, confidence_threshold, nms_threshold)
-   
-    object_data = (outputs, info_image)
-
+        outputs = model(img)
+        outputs = postprocess(outputs, dtype=dtype, 
+                    conf_thre=confidence_threshold, nms_thre=nms_threshold)
     if outputs[0] is None:
-        # print("\nNo Objects Detected!!")
-        outputs = [[]]
-        #continue
+        print("No Objects Deteted!!")
 
     bboxes = list()
-    classes = list()
-    colors = list()
     confidences = []
-        
     for x1, y1, x2, y2, conf, cls_conf, cls_pred in outputs[0]:
-        cls_id = coco_class_ids[int(cls_pred)]
-#             print(int(x1), int(y1), int(x2), int(y2), float(conf), int(cls_pred))
-#             print('\t+ Label: %s, Conf: %.5f' %
-#                   (coco_class_names[cls_id], cls_conf.item()))
-        box = yolobox2label([y1, x1, y2, x2], info_image)
-        bboxes.append(box)
-        classes.append(cls_id)
-        colors.append(coco_class_colors[int(cls_pred)])
-        confidences.append("%.3f"%(cls_conf.item()))
+        box = yolobox2label([y1.data.cpu().numpy(), x1.data.cpu().numpy(), y2.data.cpu().numpy(), x2.data.cpu().numpy()], info_img)
+        box[0] = int(min(max(box[0],0),width-1))
+        box[1] = int(min(max(box[1],0),height-1))
+        box[2] = int(min(max(box[2],0),width))
+        box[3] = int(min(max(box[3],0),height))
+        if box[2]-box[0] > 5 and box[3]-box[1] > 5:
+            bboxes.append(box)
+            confidences.append("%.3f"%(cls_conf.item()))
 
-    
+    # save results
+    sample_image_name = figure_path.split("/")[-1].split(".")[0]
+    # img_raw.save(os.path.join(inpt_dir,sample_image_name+".png"))
+    width, height = img_raw.size
+    binary_img = np.zeros((height,width,1))
+    pair_dtype = [("x1",float),("y1",float),("x2",float),("y2",float),("cat",int)]
+    subfigure_pair_info_bboxes = []
+    # with open(os.path.join(outpt_dir,sample_image_name+".txt"),"a+") as results_file:
+        # results_file.write("z 1 0 0 1 1\n")
+    detected_labels = []
+    detected_bboxes = []
     for i in range(len(bboxes)):
-        y1,x1,y2,x2 = bboxes[i]
-        bboxes[i] = [int(x1.data.cpu().numpy()),int(y1.data.cpu().numpy()),int(x2.data.cpu().numpy()),int(y2.data.cpu().numpy())]
+        img_patch = img_raw.crop(tuple(bboxes[i]))
+        img_patch = np.array(img_patch)[:,:,::-1]
+        img_patch, _ = preprocess(img_patch, 28, jitter=0)
+        img_patch = np.transpose(img_patch / 255., (2, 0, 1))
+        img_patch = torch.from_numpy(img_patch).type(dtype).unsqueeze(0)
+        label_prediction = classifier_model(img_patch)
+        label_conf = np.amax(F.softmax(label_prediction, dim=1).data.cpu().numpy())
+        label_value = chr(label_prediction.argmax(dim=1).data.cpu().numpy()[0]+ord("a"))
+        if label_value == "z":
+            pass
+        else:
+            x1,y1,x2,y2 = int(bboxes[i][0]),int(bboxes[i][1]),int(bboxes[i][2]),int(bboxes[i][3])
+            conf = float(confidences[i])*label_conf
+            if label_value in detected_labels:
+                label_index = detected_labels.index(label_value)
+                if conf > detected_bboxes[label_index][0]:
+                    detected_bboxes[label_index] = [conf,x1,y1,x2,y2]
+            else:
+                detected_labels.append(label_value)
+                detected_bboxes.append([conf,x1,y1,x2,y2])
+                
+    # post processing
+    assert len(detected_labels) == len(detected_bboxes)
+    for i in range(len(detected_labels)):
+        label_value = detected_labels[i]
+        if (ord(label_value) - ord("a")) < (len(detected_labels)+2):
+            conf,x1,y1,x2,y2 = detected_bboxes[i]
+            if (x2-x1) < 50 and (y2-y1)< 50:
+                binary_img[y1:y2,x1:x2] = 255
+                text = "%s %f %d %d %d %d\n"%(label_value, conf, x1, y1, x2, y2)
+                subfigure_pair_info_bboxes.append(tuple([x1/width,y1/height,x2/width,y2/height, ord(label_value)-ord("a")]))
+                # with open(os.path.join(outpt_dir,sample_image_name+".txt"),"a+") as results_file:
+                #     results_file.write(text)
+        else:
+            pass
 
-    bboxes,classes,confidences = NonMaximumSuppressionOnPosition (bboxes,classes,confidences,NMS_threshold=0.2,target=["subfigure_label","master_image"])
+    # save concatenate image and pair info
+    subfigure_pair_info_bboxes = np.array(subfigure_pair_info_bboxes, dtype=pair_dtype)
+    concate_img = np.concatenate((np.array(img_raw),binary_img),axis=2)
+    # np.save(os.path.join(concat_dir,sample_image_name+".npy"),concate_img)
     
-    result_record = SavingResults(bboxes, classes, confidences, figure_path, \
-                                  coco_class_names,separations_path,  \
-                                  False, None, json_dict)
+    pair_info = []
+    pair_info.append([width, height])
+    for bbox in subfigure_pair_info_bboxes:
+        pair_info.append([bbox,bbox])
+    # np.save(os.path.join(pair_info_dir,sample_image_name+".npy"),pair_info)
     
-    json_dict = result_record.json_dict
+    # documentation
+    json_info = {}
+    json_info["figure_separator_results"] = []
+        
+    img = concate_img[...,:3].copy()
+    mask = concate_img[...,3:].copy()
+
+    img, info_img = preprocess(img, image_size, jitter=0)
+    img = np.transpose(img / 255., (2, 0, 1))
+    mask = preprocess_mask(mask, image_size, info_img)
+    mask = np.transpose(mask / 255., (2, 0, 1))
+    new_concate_img = np.concatenate((img,mask),axis=0)
     
+    img = torch.from_numpy(new_concate_img).float().unsqueeze(0)
+    img = Variable(img.type(dtype))
 
-    return json_dict
-    # return write_object_dictionary(object_data)
-
-# -------------------------------- #  
-# -------- TEMPORARY HOME -------- #
-# -------------------------------- #  
-def get_figure_images(figure_dict=dict, figure_path=str, search_query=dict) -> None:
-    """
-    Extract and save patches from figure based on bbox information in the figure_dict
-
-    Args:
-        figure_dict: A dictionary with classified image_objects extracted from figure
-        figure_path: A path to the figure to separate
-        search_query: A query json
-
-    Returns:
-        None
-    """
-    def labelbox_to_patch(lb,img):
-        x1,y1=lb[0]["x"],lb[0]["y"]
-        x2,y2=lb[2]["x"],lb[2]["y"]
-        return img[y1:y2,x1:x2]
-
-    figure_root = ".".join(figure_path.split('/')[-1].split('.')[0:-1])
-    figure_ext = ".png"
-
-    os.makedirs(search_query['results_dir'] + "/images/", exist_ok=True)
+    # documentation
+    current_info = {}
+    current_info["figure_name"] = figure_path.split("/")[-1]
+    current_info["master_images"] = []
+    current_info["unassigned"] = []
     
-    count = 1
-    image = plt.imread(figure_path)
-    for a in figure_dict['master_images']:
-        patch = labelbox_to_patch(a["geometry"],image)
-        plt.imsave(search_query['results_dir']+"/images/"+figure_root+"_"+str(count).zfill(2)+figure_ext,patch)
-        count +=1
+    width, height = pair_info[0]
+    subfigure_labels = []
+    for i in range(1, len(pair_info)):
+        subfigure, master = pair_info[i]
+        
+        x1,y1,x2,y2,c = subfigure
+        x1, x2 = float(x1*width), float(x2*width)
+        y1, y2 = float(y1*height), float(y2*height)
+        subfigure_labels.append([])
+        subfigure_labels[-1].append(c)
+        subfigure_labels[-1].extend([x1,y1,x2-x1,y2-y1])
+    
+    subfigure_labels_copy = subfigure_labels.copy()
+    
+    subfigure_padded_labels = np.zeros((80, 5))
+    if len(subfigure_labels) > 0:
+        subfigure_labels = np.stack(subfigure_labels)
+        subfigure_labels = label2yolobox(subfigure_labels, info_img, image_size, lrflip=False)
+        subfigure_padded_labels[range(len(subfigure_labels))[:80]
+                      ] = subfigure_labels[:80]
+    subfigure_padded_labels = (torch.from_numpy(subfigure_padded_labels)).float().unsqueeze(0)
+    subfigure_padded_labels = Variable(subfigure_padded_labels.type(dtype))
+    
+    padded_label_list = [None, subfigure_padded_labels]
+    assert subfigure_padded_labels.size()[0] == 1
+
+    # prediction
+    img_raw = Image.fromarray(np.uint8(concate_img[...,:3].copy()[...,::-1]))
+    width, height = img_raw.size
+    with torch.no_grad():
+        outputs = mi_model(img, padded_label_list)
+
+    # select the 13x13 grid as feature map
+    feature_size = [13,26,52]
+    feature_index = 0
+    preds = outputs[feature_index]
+    preds = preds[0].data.cpu().numpy()
+    
+    result_image = Image.new(mode="RGB",size=(200,len(pair_info)*100-50))
+    draw = ImageDraw.Draw(result_image)
+    font = ImageFont.load_default()
+    # headline text
+    text = "labels"
+    draw.text((10,10),text,fill="white",font=font)
+    text = "master image"
+    draw.text((110,10),text,fill="white",font=font)
+
+    for subfigure_id in range(0, len(pair_info)-1):
+        sub_cat,x,y,w,h = (subfigure_padded_labels[0,subfigure_id]* feature_size[feature_index] ).to(torch.int16).data.cpu().numpy()
+        best_anchor = np.argmax(preds[:,y,x,4])
+        tx,ty = np.array(preds[best_anchor,y,x,:2]/32,np.int32)
+        best_anchor = np.argmax(preds[:,ty,tx,4])
+        x,y,w,h = preds[best_anchor,ty,tx,:4]
+        cls = np.argmax(preds[best_anchor,int(ty),int(tx),5:])
+        x1 = (x-w/2)
+        x2 = (x+w/2)
+        y1 = (y-h/2)
+        y2 = (y+h/2)
+        x1,y1,x2,y2 = yolobox2label([y1,x1,y2,x2], info_img)
+        # visualization
+        patch = img_raw.crop((int(x1),int(y1),int(x2),int(y2)))
+        
+        master_label = label_names[cls]
+        subfigure_label = chr(int(sub_cat/feature_size[feature_index])+ord("a"))
+        
+        text = "%s\n%s"%(master_label,subfigure_label)
+        draw.text((10,60+100*subfigure_id),text,fill="white",font=font)
+        
+        pw,ph = patch.size
+        if pw>ph:
+            ph = ph/pw*80
+            pw = 80
+        else:
+            pw = pw/ph*80
+            ph = 80
+            
+        patch = patch.resize((int(pw),int(ph)))
+        result_image.paste(patch,box=(110,60+100*subfigure_id))
+        
+        # documentation
+        master_image_info = {}
+        master_image_info["classification"] = master_label
+        master_image_info["geometry"] = []
+        for x in [int(x1), int(x2)]:
+            for y in [int(y1), int(y2)]:
+                geometry = {}
+                geometry["x"] = x
+                geometry["y"] = y
+                master_image_info["geometry"].append(geometry)
+        subfigure_label_info = {}
+        subfigure_label_info["text"] = subfigure_label
+        subfigure_label_info["geometry"] = []
+        _,x1,y1,x2,y2 = subfigure_labels_copy[subfigure_id]
+        x2 += x1
+        y2 += y1
+        for x in [int(x1), int(x2)]:
+            for y in [int(y1), int(y2)]:
+                geometry = {}
+                geometry["x"] = x
+                geometry["y"] = y
+                subfigure_label_info["geometry"].append(geometry)
+        master_image_info["subfigure_label"] = subfigure_label_info
+        current_info["master_images"].append(master_image_info)
+        
+    json_info["figure_separator_results"]=[current_info]
+        
+    del draw
+    result_image.save(os.path.join("result_dir/",sample_image_name+".png"))
+
+    return json_info

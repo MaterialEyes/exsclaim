@@ -1,4 +1,3 @@
-
 from __future__ import division
 import torch
 import numpy as np
@@ -87,39 +86,3 @@ def parse_yolo_block(m, weights, offset, initflag):
     offset += param_length
 
     return offset, weights
-
-def parse_yolo_weights(model, weights_path):
-    """
-    Parse YOLO (darknet) pre-trained weights data onto the pytorch model
-    Args:
-        model : pytorch model object
-        weights_path (str): path to the YOLO (darknet) pre-trained weights file
-    """
-    fp = open(weights_path, "rb")
-
-    # skip the header
-    header = np.fromfile(fp, dtype=np.int32, count=5) # not used
-    # read weights 
-    weights = np.fromfile(fp, dtype=np.float32)
-    fp.close()
-
-    offset = 0 
-    initflag = False #whole yolo weights : False, darknet weights : True
-
-    for m in model.module_list:
-
-        if m._get_name() == 'Sequential':
-            # normal conv block
-            offset, weights = parse_conv_block(m, weights, offset, initflag)
-
-        elif m._get_name() == 'resblock':
-            # residual block
-            for modu in m._modules['module_list']:
-                for blk in modu:
-                    offset, weights = parse_conv_block(blk, weights, offset, initflag)
-
-        elif m._get_name() == 'YOLOLayer':
-            # YOLO Layer (one conv with bias) Initialization
-            offset, weights = parse_yolo_block(m, weights, offset, initflag)
-
-        initflag = (offset >= len(weights)) # the end of the weights file. turn the flag on

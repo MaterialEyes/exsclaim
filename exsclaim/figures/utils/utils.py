@@ -1,92 +1,156 @@
 from __future__ import division
-import torch
-import numpy as np
-import cv2
+from .utils_sup import *
 
-def NonMaximumSuppressionOnPosition(bboxes,classes,confidences,NMS_threshold=0.2,target="subfigure_label"):
-    def CalIOU(bbox1,bbox2):
-        x1 = max(bbox1[0],bbox2[0])
-        y1 = max(bbox1[1],bbox2[1])
-        x2 = min(bbox1[2],bbox2[2])
-        y2 = min(bbox1[3],bbox2[3])
-        overlap_area = max(0,x2-x1)*max(0,y2-y1)
-        union_area = (bbox1[2]-bbox1[0])*(bbox1[3]-bbox1[1]) + (bbox2[2]-bbox2[0])*(bbox2[3]-bbox2[1]) - overlap_area
-        return overlap_area/union_area
-    master_image_bboxes = []
-    subfigure_label_bboxes = []
-    for i in range(len(classes)):
-        if classes[i] < 8:
-            master_image_bboxes.append([bboxes[i],classes[i],confidences[i]])
-        else:
-            subfigure_label_bboxes.append([bboxes[i],classes[i],confidences[i]])
-    if "subfigure_label" in target:
-        target_bboxes = subfigure_label_bboxes
-        filtered_bboxes = []
-        while target_bboxes:
-            anchor_bbox = target_bboxes[0]
-            ious = np.zeros(len(target_bboxes))
-            for i in range(1,len(target_bboxes)):
-                ious[i] = CalIOU(anchor_bbox[0],target_bboxes[i][0])
-            overlap = ious>NMS_threshold
-            if overlap.any():
-                remove_list = []
-                for i in range(len(ious)):
-                    if ious[i]>NMS_threshold:
-                        if anchor_bbox[2] < target_bboxes[i][2]:
-                            if anchor_bbox not in remove_list:
-                                remove_list.append(anchor_bbox)
-                        else:
-                            remove_list.append(target_bboxes[i])
-                if anchor_bbox not in remove_list:
-                    filtered_bboxes.append(anchor_bbox)
-                    target_bboxes.remove(anchor_bbox)
-                for tmp in remove_list:
-                    target_bboxes.remove(tmp)
-            else:
-                filtered_bboxes.append(anchor_bbox)
-                target_bboxes.remove(anchor_bbox)
-        subfigure_label_bboxes = filtered_bboxes
-        
-    if "master_image" in target:
-        target_bboxes = master_image_bboxes
-        filtered_bboxes = []
-        while target_bboxes:
-            anchor_bbox = target_bboxes[0]
-            ious = np.zeros(len(target_bboxes))
-            for i in range(1,len(target_bboxes)):
-                ious[i] = CalIOU(anchor_bbox[0],target_bboxes[i][0])
-            overlap = ious>NMS_threshold
-            if overlap.any():
-                remove_list = []
-                for i in range(len(ious)):
-                    if ious[i]>NMS_threshold:
-                        if anchor_bbox[2] < target_bboxes[i][2]:
-                            if anchor_bbox not in remove_list:
-                                remove_list.append(anchor_bbox)
-                        else:
-                            remove_list.append(target_bboxes[i])
-                if anchor_bbox not in remove_list:
-                    filtered_bboxes.append(anchor_bbox)
-                    target_bboxes.remove(anchor_bbox)
-                for tmp in remove_list:
-                    target_bboxes.remove(tmp)
-            else:
-                filtered_bboxes.append(anchor_bbox)
-                target_bboxes.remove(anchor_bbox)
-        master_image_bboxes = filtered_bboxes
-        
-    bboxes,classes,confidences = [], [], []
-    for box in master_image_bboxes:
-        bboxes.append(box[0])
-        classes.append(box[1])
-        confidences.append(box[2])
-    for box in subfigure_label_bboxes:
-        bboxes.append(box[0])
-        classes.append(box[1])
-        confidences.append(box[2])
-        
-    return bboxes,classes,confidences
+import torch
+import cv2
+import numpy as np
+
+def parse_yolo_weights(model, weights_path):
+    """
+    Parse YOLO (darknet) pre-trained weights data onto the pytorch model
+    Args:
+        model : pytorch model object
+        weights_path (str): path to the YOLO (darknet) pre-trained weights file
+    """
+    fp = open(weights_path, "rb")
+
+    # skip the header
+    header = np.fromfile(fp, dtype=np.int32, count=5) # not used
+    # read weights 
+    weights = np.fromfile(fp, dtype=np.float32)
+    fp.close()
+
+    offset = 0 
+    initflag = False #whole yolo weights : False, darknet weights : True
+
+    yolo_id = 0
+    yolo_offset = [56629087, 60898910, 62001757]
     
+    for m in model.module_list:
+
+        if m._get_name() == 'Sequential':
+            # normal conv block
+            offset, weights = parse_conv_block(m, weights, offset, initflag)
+
+        elif m._get_name() == 'resblock':
+            # residual block
+            for modu in m._modules['module_list']:
+                for blk in modu:
+                    offset, weights = parse_conv_block(blk, weights, offset, initflag)
+
+        elif m._get_name() == 'YOLOLayer':
+            # YOLO Layer (one conv with bias) Initialization
+#             offset, weights = parse_yolo_block(m, weights, offset, initflag)
+            _, _ = parse_yolo_block(m, weights=[], offset=0, initflag=True)
+            offset = yolo_offset[yolo_id]
+            yolo_id += 1
+
+        initflag = (offset >= len(weights)) # the end of the weights file. turn the flag on
+
+def bboxes_iou(bboxes_a, bboxes_b, xyxy=True):
+    """Calculate the Intersection of Unions (IoUs) between bounding boxes.
+    IoU is calculated as a ratio of area of the intersection
+    and area of the union.
+
+    Args:
+        bbox_a (array): An array whose shape is :math:`(N, 4)`.
+            :math:`N` is the number of bounding boxes.
+            The dtype should be :obj:`numpy.float32`.
+        bbox_b (array): An array similar to :obj:`bbox_a`,
+            whose shape is :math:`(K, 4)`.
+            The dtype should be :obj:`numpy.float32`.
+    Returns:
+        array:
+        An array whose shape is :math:`(N, K)`. \
+        An element at index :math:`(n, k)` contains IoUs between \
+        :math:`n` th bounding box in :obj:`bbox_a` and :math:`k` th bounding \
+        box in :obj:`bbox_b`.
+
+    from: https://github.com/chainer/chainercv
+    """
+    if bboxes_a.shape[1] != 4 or bboxes_b.shape[1] != 4:
+        raise IndexError
+
+    # top left
+    if xyxy:
+        tl = torch.max(bboxes_a[:, None, :2], bboxes_b[:, :2])
+        # bottom right
+        br = torch.min(bboxes_a[:, None, 2:], bboxes_b[:, 2:])
+        area_a = torch.prod(bboxes_a[:, 2:] - bboxes_a[:, :2], 1)
+        area_b = torch.prod(bboxes_b[:, 2:] - bboxes_b[:, :2], 1)
+    else:
+        tl = torch.max((bboxes_a[:, None, :2] - bboxes_a[:, None, 2:] / 2),
+                        (bboxes_b[:, :2] - bboxes_b[:, 2:] / 2))
+        # bottom right
+        br = torch.min((bboxes_a[:, None, :2] + bboxes_a[:, None, 2:] / 2),
+                        (bboxes_b[:, :2] + bboxes_b[:, 2:] / 2))
+
+        area_a = torch.prod(bboxes_a[:, 2:], 1)
+        area_b = torch.prod(bboxes_b[:, 2:], 1)
+    en = (tl < br).type(tl.type()).prod(dim=2)
+    area_i = torch.prod(br - tl, 2) * en  # * ((tl < br).all())
+    return area_i / (area_a[:, None] + area_b - area_i)
+
+def label2yolobox(labels, info_img, maxsize, lrflip):
+    """
+    Transform coco labels to yolo box labels
+    Args:
+        labels (numpy.ndarray): label data whose shape is :math:`(N, 5)`.
+            Each label consists of [class, x1, y1, x2, y2] where \
+                class (float): class index.
+                x1, y1, x2, y2 (float) : coordinates of \
+                    left-top and right-bottom points of bounding boxes.
+                    Values range from 0 to width or height of the image.
+        info_img : tuple of h, w, nh, nw, dx, dy.
+            h, w (int): original shape of the image
+            nh, nw (int): shape of the resized image without padding
+            dx, dy (int): pad size
+        maxsize (int): target image size after pre-processing
+        lrflip (bool): horizontal flip flag
+
+    Returns:
+        labels:label data whose size is :math:`(N, 5)`.
+            Each label consists of [class, xc, yc, w, h] where
+                class (float): class index.
+                xc, yc (float) : center of bbox whose values range from 0 to 1.
+                w, h (float) : size of bbox whose values range from 0 to 1.
+    """
+    h, w, nh, nw, dx, dy = info_img
+    x1 = labels[:, 1] / w
+    y1 = labels[:, 2] / h
+    x2 = (labels[:, 1] + labels[:, 3]) / w
+    y2 = (labels[:, 2] + labels[:, 4]) / h
+    labels[:, 1] = (((x1 + x2) / 2) * nw + dx) / maxsize
+    labels[:, 2] = (((y1 + y2) / 2) * nh + dy) / maxsize
+    labels[:, 3] *= nw / w / maxsize
+    labels[:, 4] *= nh / h / maxsize
+    if lrflip:
+        labels[:, 1] = 1 - labels[:, 1]
+    return labels
+
+def yolobox2label(box, info_img):
+    """
+    Transform yolo box labels to yxyx box labels.
+    Args:
+        box (list): box data with the format of [yc, xc, w, h]
+            in the coordinate system after pre-processing.
+        info_img : tuple of h, w, nh, nw, dx, dy.
+            h, w (int): original shape of the image
+            nh, nw (int): shape of the resized image without padding
+            dx, dy (int): pad size
+    Returns:
+        label (list): box data with the format of [y1, x1, y2, x2]
+            in the coordinate system of the input image.
+    """
+    h, w, nh, nw, dx, dy = info_img
+    y1, x1, y2, x2 = box
+    box_h = ((y2 - y1) / nh) * h
+    box_w = ((x2 - x1) / nw) * w
+    y1 = ((y1 - dy) / nh) * h
+    x1 = ((x1 - dx) / nw) * w
+    label = [max(x1,0), max(y1,0), min(x1 + box_w,w), min(y1 + box_h,h)]
+    return label
+
 def nms(bbox, thresh, score=None, limit=None):
     """Suppress bounding boxes according to their IoUs and confidence scores.
     Args:
@@ -135,8 +199,7 @@ def nms(bbox, thresh, score=None, limit=None):
         selec = order[selec]
     return selec.astype(np.int32)
 
-
-def postprocess(prediction, num_classes, conf_thre=0.7, nms_thre=0.45):
+def postprocess(prediction, dtype, conf_thre=0.7, nms_thre=0.45):
     """
     Postprocess for the output of YOLO model
     perform box transformation, specify the class for each detection,
@@ -169,19 +232,28 @@ def postprocess(prediction, num_classes, conf_thre=0.7, nms_thre=0.45):
     output = [None for _ in range(len(prediction))]
     for i, image_pred in enumerate(prediction):
         # Filter out confidence scores below threshold
-        class_pred = torch.max(image_pred[:, 5:5 + num_classes], 1)
-        class_pred = class_pred[0]
-        conf_mask = (image_pred[:, 4] * class_pred >= conf_thre).squeeze()
+#         print(image_pred.size())
+#         class_pred = torch.max(image_pred[:, :4], 1)
+# #         class_pred = torch.zeros(image_pred.size()[0])
+# #         print(class_pred.size())
+#         class_pred = class_pred[0]
+#         print(class_pred.size())
+#         class_pred = torch.zeros(image_pred.size()[0]).type(dtype)
+        conf_mask = (image_pred[:, 4] >= conf_thre).squeeze()
+#         conf_mask = (image_pred[:, 4] * class_pred >= conf_thre).squeeze()
         image_pred = image_pred[conf_mask]
 
         # If none are remaining => process next image
         if not image_pred.size(0):
             continue
         # Get score and class with highest confidence
-        class_conf, class_pred = torch.max(
-            image_pred[:, 5:5 + num_classes], 1,  keepdim=True)
+        class_conf = torch.ones(image_pred[:, 4:5].size()).type(dtype)
+        class_pred = torch.zeros(image_pred[:, 4:5].size()).type(dtype)
+#         class_conf, class_pred = torch.max(
+#             image_pred[:, 5:5 + num_classes], 1,  keepdim=True)
 
         # Detections ordered as (x1, y1, x2, y2, obj_conf, class_conf, class_pred)
+#         print(image_pred[:, :5].size(),class_conf.size(),class_pred.size())
         detections = torch.cat(
             (image_pred[:, :5], class_conf.float(), class_pred.float()), 1)
         # Iterate through all predicted classes
@@ -201,115 +273,15 @@ def postprocess(prediction, num_classes, conf_thre=0.7, nms_thre=0.45):
                 output[i] = torch.cat((output[i], detections_class))
 
     return output
-
-
-def bboxes_iou(bboxes_a, bboxes_b, xyxy=True):
-    """Calculate the Intersection of Unions (IoUs) between bounding boxes.
-    IoU is calculated as a ratio of area of the intersection
-    and area of the union.
-
-    Args:
-        bbox_a (array): An array whose shape is :math:`(N, 4)`.
-            :math:`N` is the number of bounding boxes.
-            The dtype should be :obj:`numpy.float32`.
-        bbox_b (array): An array similar to :obj:`bbox_a`,
-            whose shape is :math:`(K, 4)`.
-            The dtype should be :obj:`numpy.float32`.
-    Returns:
-        array:
-        An array whose shape is :math:`(N, K)`. \
-        An element at index :math:`(n, k)` contains IoUs between \
-        :math:`n` th bounding box in :obj:`bbox_a` and :math:`k` th bounding \
-        box in :obj:`bbox_b`.
-
-    from: https://github.com/chainer/chainercv
-    """
-    if bboxes_a.shape[1] != 4 or bboxes_b.shape[1] != 4:
-        raise IndexError
-
-    # top left
-    if xyxy:
-        tl = torch.max(bboxes_a[:, None, :2], bboxes_b[:, :2])
-        # bottom right
-        br = torch.min(bboxes_a[:, None, 2:], bboxes_b[:, 2:])
-        area_a = torch.prod(bboxes_a[:, 2:] - bboxes_a[:, :2], 1)
-        area_b = torch.prod(bboxes_b[:, 2:] - bboxes_b[:, :2], 1)
-    else:
-        tl = torch.max((bboxes_a[:, None, :2] - bboxes_a[:, None, 2:] / 2),
-                        (bboxes_b[:, :2] - bboxes_b[:, 2:] / 2))
-        # bottom right
-        br = torch.min((bboxes_a[:, None, :2] + bboxes_a[:, None, 2:] / 2),
-                        (bboxes_b[:, :2] + bboxes_b[:, 2:] / 2))
-
-        area_a = torch.prod(bboxes_a[:, 2:], 1)
-        area_b = torch.prod(bboxes_b[:, 2:], 1)
-    en = (tl < br).type(tl.type()).prod(dim=2)
-    area_i = torch.prod(br - tl, 2) * en  # * ((tl < br).all())
-    return area_i / (area_a[:, None] + area_b - area_i)
-
-
-def label2yolobox(labels, info_img, maxsize, lrflip):
-    """
-    Transform coco labels to yolo box labels
-    Args:
-        labels (numpy.ndarray): label data whose shape is :math:`(N, 5)`.
-            Each label consists of [class, x1, y1, x2, y2] where \
-                class (float): class index.
-                x1, y1, x2, y2 (float) : coordinates of \
-                    left-top and right-bottom points of bounding boxes.
-                    Values range from 0 to width or height of the image.
-        info_img : tuple of h, w, nh, nw, dx, dy.
-            h, w (int): original shape of the image
-            nh, nw (int): shape of the resized image without padding
-            dx, dy (int): pad size
-        maxsize (int): target image size after pre-processing
-        lrflip (bool): horizontal flip flag
-
-    Returns:
-        labels:label data whose size is :math:`(N, 5)`.
-            Each label consists of [class, xc, yc, w, h] where
-                class (float): class index.
-                xc, yc (float) : center of bbox whose values range from 0 to 1.
-                w, h (float) : size of bbox whose values range from 0 to 1.
-    """
+    
+def preprocess_mask(mask, imgsize, info_img):
     h, w, nh, nw, dx, dy = info_img
-    x1 = labels[:, 1] / w
-    y1 = labels[:, 2] / h
-    x2 = (labels[:, 1] + labels[:, 3]) / w
-    y2 = (labels[:, 2] + labels[:, 4]) / h
-    labels[:, 1] = (((x1 + x2) / 2) * nw + dx) / maxsize
-    labels[:, 2] = (((y1 + y2) / 2) * nh + dy) / maxsize
-    labels[:, 3] *= nw / w / maxsize
-    labels[:, 4] *= nh / h / maxsize
-    if lrflip:
-        labels[:, 1] = 1 - labels[:, 1]
-    return labels
-
-
-def yolobox2label(box, info_img):
-    """
-    Transform yolo box labels to yxyx box labels.
-    Args:
-        box (list): box data with the format of [yc, xc, w, h]
-            in the coordinate system after pre-processing.
-        info_img : tuple of h, w, nh, nw, dx, dy.
-            h, w (int): original shape of the image
-            nh, nw (int): shape of the resized image without padding
-            dx, dy (int): pad size
-    Returns:
-        label (list): box data with the format of [y1, x1, y2, x2]
-            in the coordinate system of the input image.
-    """
-    h, w, nh, nw, dx, dy = info_img
-    y1, x1, y2, x2 = box
-    box_h = ((y2 - y1) / nh) * h
-    box_w = ((x2 - x1) / nw) * w
-    y1 = ((y1 - dy) / nh) * h
-    x1 = ((x1 - dx) / nw) * w
-    label = [y1, x1, y1 + box_h, x1 + box_w]
-    return label
-
-
+    sized = np.ones((imgsize, imgsize, 1), dtype=np.uint8) * 127
+    mask = cv2.resize(mask, (nw, nh))
+    sized[dy:dy+nh, dx:dx+nw, 0] = mask
+    
+    return sized    
+            
 def preprocess(img, imgsize, jitter, random_placing=False):
     """
     Image preprocess for yolo input
@@ -329,7 +301,9 @@ def preprocess(img, imgsize, jitter, random_placing=False):
             nh, nw (int): shape of the resized image without padding
             dx, dy (int): pad size
     """
+    
     h, w, _ = img.shape
+#     print("h=%d,w=%d"%(h,w))
     img = img[:, :, ::-1]
     assert img is not None
 
@@ -348,7 +322,7 @@ def preprocess(img, imgsize, jitter, random_placing=False):
     else:
         nw = imgsize
         nh = nw / new_ar
-    nw, nh = int(nw), int(nh)
+    nw, nh = int(max(nw,1)), int(max(nh,1))
 
     if random_placing:
         dx = int(np.random.uniform(imgsize - nw))
@@ -357,6 +331,7 @@ def preprocess(img, imgsize, jitter, random_placing=False):
         dx = (imgsize - nw) // 2
         dy = (imgsize - nh) // 2
 
+#     print("nw=%d,nh=%d"%(nw,nh))
     img = cv2.resize(img, (nw, nh))
     sized = np.ones((imgsize, imgsize, 3), dtype=np.uint8) * 127
     sized[dy:dy+nh, dx:dx+nw, :] = img
@@ -411,45 +386,3 @@ def random_distort(img, hue, saturation, exposure):
     img = np.asarray(img, dtype=np.float32)
 
     return img
-
-
-def get_coco_label_names():
-    """
-    COCO label names and correspondence between the model's class index and COCO class index.
-    Returns:
-        coco_label_names (tuple of str) : all the COCO label names including background class.
-        coco_class_ids (list of int) : index of 80 classes that are used in 'instance' annotations
-        coco_cls_colors (np.ndarray) : randomly generated color vectors used for box visualization
-
-    """
-#     coco_label_names = ('background',  # class zero
-#                         'person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck',
-#                         'boat', 'traffic light', 'fire hydrant', 'street sign', 'stop sign',
-#                         'parking meter', 'bench', 'bird', 'cat', 'dog', 'horse', 'sheep', 'cow',
-#                         'elephant', 'bear', 'zebra', 'giraffe', 'hat', 'backpack', 'umbrella',
-#                         'shoe', 'eye glasses', 'handbag', 'tie', 'suitcase', 'frisbee', 'skis',
-#                         'snowboard', 'sports ball', 'kite', 'baseball bat', 'baseball glove',
-#                         'skateboard', 'surfboard', 'tennis racket', 'bottle', 'plate', 'wine glass',
-#                         'cup', 'fork', 'knife', 'spoon', 'bowl', 'banana', 'apple', 'sandwich',
-#                         'orange', 'broccoli', 'carrot', 'hot dog', 'pizza', 'donut', 'cake', 'chair',
-#                         'couch', 'potted plant', 'bed', 'mirror', 'dining table', 'window', 'desk',
-#                         'toilet', 'door', 'tv', 'laptop', 'mouse', 'remote', 'keyboard', 'cell phone',
-#                         'microwave', 'oven', 'toaster', 'sink', 'refrigerator', 'blender', 'book',
-#                         'clock', 'vase', 'scissors', 'teddy bear', 'hair drier', 'toothbrush'
-#                         )
-    
-#     coco_class_ids = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20,
-#                       21, 22, 23, 24, 25, 27, 28, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44,
-#                       46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 67,
-#                       70, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 84, 85, 86, 87, 88, 89, 90]
-    
-    
-    coco_label_names = ['background',"microscopy","parent","graph","illustration","diffraction","basic photo","unclear","invalid"]
-    for i in range(ord('a'),ord('z')+1):
-        coco_label_names.extend(chr(i))
-    coco_class_ids = list(np.asarray(np.linspace(1,26+8,26+8),dtype=np.int32))#[1,2,3,4,5,6,7,8,9,10]
-
-
-    coco_cls_colors = np.random.randint(128, 255, size=(80, 3))
-
-    return coco_label_names, coco_class_ids, coco_cls_colors
