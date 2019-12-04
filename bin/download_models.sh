@@ -1,27 +1,31 @@
-# # Download the text detector model
-# text_model=exsclaim/imagetexts/models/read_sflabel_5_CNN150_adam.pt
-# text_dir=exsclaim/imagetexts/models
-# if [ ! -f "$text_model" ]; then
-#     if [ ! -d "$text_dir" ]; then
-#         mkdir exsclaim/imagetexts/models
-#     fi
-#     # Changle link below if a new model is trained
-#     gdown  -O exsclaim/imagetexts/models/read_sflabel_5_CNN150_adam.pt https://drive.google.com/uc?id=1pkBWn0Ss0c9TeAgsOBFqFFJZ-5ntxzpb
-# else
-#     echo "Already downloaded TextDetector model"
-# fi
-
-# Download the object detector model
-object_model=exsclaim/figures/models/checkpoints/snapshot20000.ckpt
-object_dir=exsclaim/figures/models/checkpoints
-if [ ! -f "$object_model" ]; then
-    if [ ! -d "$object_dir" ] ; then
-        mkdir exsclaim/figures/models/checkpoints
+model_01=exsclaim/figures/checkpoints/snapshot260.ckpt
+dir_01=exsclaim/figures/checkpoints
+if [ ! -f "$model_01" ]; then
+    if [ ! -d "$dir_01" ] ; then
+        mkdir exsclaim/figures/checkpoints
     fi
-    # Change link below if a new model is trained
-    gdown -O exsclaim/figures/models/checkpoints/snapshot20000.ckpt https://drive.google.com/uc?id=1DlYH9TVr0ucgbInHqLd8HFWRkKEWGQCj
-    # unzip exsclaim/figures/models/checkpoints/snapshot20000.ckpt -d exsclaim/figures/models/checkpoints
-    # rm exsclaim/figures/models/checkpoints/snapshot20000.ckpt.zip
+    gdown -O exsclaim/figures/checkpoints/snapshot260.ckpt https://drive.google.com/uc?id=16vH7FUZXm9hqedqMzne9ToxBajU_hp4i
 else
-    echo "Already downloaded ObjectDetector model"
+    echo "Already downloaded snapshot260.ckpt"
+fi
+
+model_02=exsclaim/figures/checkpoints/snapshot6500.ckpt
+dir_02=exsclaim/figures/checkpoints
+if [ ! -f "$model_02" ]; then
+    if [ ! -d "$dir_02" ] ; then
+        mkdir exsclaim/figures/checkpoints
+    fi
+    gdown -O exsclaim/figures/checkpoints/snapshot6500.ckpt https://drive.google.com/uc?id=1tMn29LPLzmNHOsHXB6jBDknSwQYXbn1L
+    echo "Already downloaded snapshot6500.ckpt"
+fi
+
+model_03=exsclaim/figures/checkpoints/snapshot12000.ckpt
+dir_03=exsclaim/figures/checkpoints
+if [ ! -f "$model_03" ]; then
+    if [ ! -d "$dir_03" ] ; then
+        mkdir exsclaim/figures/checkpoints
+    fi
+    gdown -O exsclaim/figures/checkpoints/snapshot12000.ckpt https://drive.google.com/uc?id=1O4a58sQsOSRrpKTkHNP2nqfwbjI4oCj_
+else
+    echo "Already downloaded snapshot12000.ckpt"
 fi
