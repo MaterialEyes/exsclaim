@@ -2,6 +2,7 @@ import os
 import csv
 import json
 import time
+import numpy as np
 import matplotlib.pyplot as plt
 
 from . import utils
@@ -154,7 +155,13 @@ class Pipeline:
 
         for figure_name in self.exsclaim_dict:
             fig_base, fig_ext = os.path.splitext(figure_name)
-            figure = plt.imread(search_query['results_dir'] + "figures/" + figure_name)
+            
+            try:
+                figure = plt.imread(search_query['results_dir'] + "figures/" + figure_name)
+            except:
+                print("Error printing {0} to file. It may be damaged!".format(figure_name))
+                figure = np.zeros((256,256))
+
             figure_dict = self.exsclaim_dict[figure_name]
             # Write masters to file
             for midx, mimage in enumerate(figure_dict.get("master_images", [])):

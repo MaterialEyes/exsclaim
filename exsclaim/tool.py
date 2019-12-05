@@ -76,8 +76,8 @@ class JournalScraper(ExsclaimTool):
         # -------------------------------- #  
         # -- Save current exsclaim_dict -- #
         # -------------------------------- # 
-        # with open(search_query['results_dir']+'0_js.json', 'w') as f:
-        #     json.dump(exsclaim_dict, f, indent=3)
+        with open(search_query['results_dir']+'_js.json', 'w') as f:
+            json.dump(exsclaim_dict, f, indent=3)
         # -------------------------------- #  
         # -------------------------------- # 
         # -------------------------------- # 
@@ -127,8 +127,8 @@ class CaptionSeparator(ExsclaimTool):
         # -------------------------------- #  
         # -- Save current exsclaim_dict -- #
         # -------------------------------- # 
-        # with open(search_query['results_dir']+'1_cs.json', 'w') as f:
-        #     json.dump(exsclaim_dict, f, indent=3)
+        with open(search_query['results_dir']+'_cs.json', 'w') as f:
+            json.dump(exsclaim_dict, f, indent=3)
         # -------------------------------- #  
         # -------------------------------- # 
         # -------------------------------- # 
@@ -170,22 +170,23 @@ class FigureSeparator(ExsclaimTool):
         sf_model, mi_model = self._load_model()
         counter = 1
         figures = figure.get_figure_paths(search_query)
-        # figures = glob.glob("/Users/eschwenk/Desktop/ME_UPDATE/figures/*.jpg")
         for figure_name in figures:
             utils.Printer(">>> ({0} of {1}) ".format(counter,+\
                 len(figures))+\
                 "Extracting images from: "+figure_name.split("/")[-1])
-            # figure_dict = figure.detect_subfigure_labels(model,figure_name)
-            figure_dict = figure.extract_image_objects(sf_model, mi_model, figure_name, search_query['results_dir'])
-            exsclaim_dict = self._update_exsclaim(exsclaim_dict,figure_name,figure_dict)
+            try:
+                figure_dict = figure.extract_image_objects(sf_model, mi_model, figure_name, search_query['results_dir'])
+                exsclaim_dict = self._update_exsclaim(exsclaim_dict,figure_name,figure_dict)
+            except:
+                print("\n!!! EXCEPTION !!!\n")
             counter += 1
         t1 = time.time()
         utils.Printer(">>> Time Elapsed: {0:.2f} sec ({1} figures)\n".format(t1-t0,int(counter-1)))
         # -------------------------------- #  
         # -- Save current exsclaim_dict -- #
         # -------------------------------- # 
-        # with open(search_query['results_dir']+'2_fs.json', 'w') as f:
-        #     json.dump(exsclaim_dict, f, indent=3)
+        with open(search_query['results_dir']+'_fs.json', 'w') as f:
+            json.dump(exsclaim_dict, f, indent=3)
         # -------------------------------- #  
         # -------------------------------- # 
         # -------------------------------- # 
