@@ -16,7 +16,6 @@ from . import utils
 from . import journal
 from . import caption
 from . import figure
-from . import imagetext
 
 from abc import ABC, abstractmethod
 
@@ -57,6 +56,7 @@ class JournalScraper(ExsclaimTool):
 
     def run(self,search_query,exsclaim_dict={}):
         utils.Printer("Running Journal Scraper\n") 
+        t0 = time.time()
         counter = 1
         articles = journal.get_article_extensions(search_query)
         for article in articles:
@@ -71,7 +71,8 @@ class JournalScraper(ExsclaimTool):
                 utils.Printer("<!> ERROR: An exception occurred\n")
                 return
             counter += 1
-        utils.Printer(">>> SUCCESS!\n")
+        t1 = time.time()
+        utils.Printer(">>> Time Elapsed: {0:.2f} sec ({1} articles)\n".format(t1-t0,int(counter-1)))
         # -------------------------------- #  
         # -- Save current exsclaim_dict -- #
         # -------------------------------- # 
@@ -109,6 +110,7 @@ class CaptionSeparator(ExsclaimTool):
 
     def run(self,search_query,exsclaim_dict):
         utils.Printer("Running Caption Separator\n")
+        t0 = time.time()
         model = self._load_model()
         counter = 1
         for figure_name in exsclaim_dict:
@@ -120,7 +122,8 @@ class CaptionSeparator(ExsclaimTool):
             caption_dict  = caption.associate_caption_text(model,caption_text,search_query['query'])
             exsclaim_dict = self._update_exsclaim(exsclaim_dict,figure_name,delimiter,caption_dict)
             counter += 1
-        utils.Printer(">>> SUCCESS!\n")
+        t1 = time.time()
+        utils.Printer(">>> Time Elapsed: {0:.2f} sec ({1} captions)\n".format(t1-t0,int(counter-1)))
         # -------------------------------- #  
         # -- Save current exsclaim_dict -- #
         # -------------------------------- # 
@@ -163,6 +166,7 @@ class FigureSeparator(ExsclaimTool):
 
     def run(self,search_query,exsclaim_dict):
         utils.Printer("Running Figure Separator\n")
+        t0 = time.time()
         sf_model, mi_model = self._load_model()
         counter = 1
         figures = figure.get_figure_paths(search_query)
@@ -172,63 +176,16 @@ class FigureSeparator(ExsclaimTool):
                 len(figures))+\
                 "Extracting images from: "+figure_name.split("/")[-1])
             # figure_dict = figure.detect_subfigure_labels(model,figure_name)
-            figure_dict = figure.extract_image_objects(sf_model, mi_model, figure_name)
+            figure_dict = figure.extract_image_objects(sf_model, mi_model, figure_name, search_query['results_dir'])
             exsclaim_dict = self._update_exsclaim(exsclaim_dict,figure_name,figure_dict)
             counter += 1
-        utils.Printer(">>> SUCCESS!\n")
+        t1 = time.time()
+        utils.Printer(">>> Time Elapsed: {0:.2f} sec ({1} figures)\n".format(t1-t0,int(counter-1)))
         # -------------------------------- #  
         # -- Save current exsclaim_dict -- #
         # -------------------------------- # 
         # with open(search_query['results_dir']+'2_fs.json', 'w') as f:
         #     json.dump(exsclaim_dict, f, indent=3)
-        # -------------------------------- #  
-        # -------------------------------- # 
-        # -------------------------------- # 
-        return exsclaim_dict
-        
-
-class TextReader(ExsclaimTool):
-    """ 
-    TextReader object.
-    Read cropped images containing subfigure label and scale bar text 
-    Parameters:
-    None
-    """
-    def __init__(self , model_path=""):
-        super().__init__(model_path)
-
-    def _load_model(self):
-        if "" in self.model_path:
-            self.model_path = os.path.dirname(__file__)+'/imagetexts/models/'
-        return imagetext.load_model(self.model_path)
-
-    def _update_exsclaim(self,exsclaim_dict,figure_name,images_dict):
-        for label in exsclaim_dict[figure_name]['unassigned']['subfigure_labels']:
-            updated_label = [b['text'] for b in images_dict if b['geometry'] == label['geometry']][0]
-            if updated_label != 'low_confidence':
-                label['text'] = updated_label
-        return exsclaim_dict
-
-    def run(self,search_query,exsclaim_dict):
-        utils.Printer("Running Image Text Reader\n")
-        model = self._load_model()
-        counter = 1
-        for figure_name in exsclaim_dict:
-            utils.Printer(">>> ({0} of {1}) ".format(counter,+\
-                len(exsclaim_dict))+\
-                "Reading image text from: "+figure_name)
-            path = exsclaim_dict[figure_name]["figure_path"]
-            # These are images of unassigned subfigure labels
-            images_dict = copy.deepcopy(exsclaim_dict[figure_name]['unassigned']['subfigure_labels'])
-            images_dict = imagetext.read_image_text(model,path,images_dict,exsclaim_dict[figure_name]['caption_delimiter'])
-            exsclaim_dict = self._update_exsclaim(exsclaim_dict,figure_name,images_dict)
-            counter+=1
-        utils.Printer(">>> SUCCESS!\n")
-        # -------------------------------- #  
-        # -- Save current exsclaim_dict -- #
-        # # -------------------------------- # 
-        # with open(search_query['results_dir']+'3_tr.json', 'w') as fd:
-        #     json.dump(exsclaim_dict, fd, indent=3)
         # -------------------------------- #  
         # -------------------------------- # 
         # -------------------------------- # 

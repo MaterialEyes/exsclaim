@@ -129,7 +129,7 @@ def get_figure_paths(search_query: dict) -> list:
     return paths
 
 
-def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple, figure_path=str) -> "figure_dict":
+def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple, figure_path=str, save_path="") -> "figure_dict":
     """
     Find individual image objects within a figure and classify based on functionality
 
@@ -149,7 +149,7 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
     classifier_model.eval()
     mi_model.eval()
 
-    os.makedirs("result_dir", exist_ok=True)
+    os.makedirs(save_path+"/extractions", exist_ok=True)
 
     label_names = ["background","microscopy","parent","graph","illustration","diffraction","None",
                    "OtherMaster","OtherSubfigure","a","b","c","d","e","f"]
@@ -370,6 +370,6 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
     json_info["figure_separator_results"]=[current_info]
         
     del draw
-    result_image.save(os.path.join("result_dir/",sample_image_name+".png"))
+    result_image.save(os.path.join(save_path+"/extractions/"+sample_image_name+".png"))
 
     return json_info

@@ -5,7 +5,61 @@ import time
 import matplotlib.pyplot as plt
 
 from . import utils
-from . import cluster
+
+def assign_captions(figure):
+    """ Assigns all captions to master_images JSONs
+
+    param figure: a Figure JSON
+
+    returns (masters, unassigned): where masters is a list of master_images
+        JSONs and unassigned is the updated unassigned JSON
+    """
+    unassigned = figure.get("unassigned", [])
+    masters = []
+
+    captions = unassigned.get("captions", {})
+
+    # not_assigned = set(captions.keys())
+    not_assigned = set([a['label'] for a in captions])
+    for index, master_image in enumerate(figure.get("master_images", [])):
+        label_json = master_image.get("subfigure_label", {})
+        subfigure_label = label_json.get("text", index)            
+        processed_label = subfigure_label.replace(")","")
+        processed_label = processed_label.replace("(","")
+        processed_label = processed_label.replace(".","")
+        paired = False
+        for caption_label in captions:
+            processed_caption_label = caption_label['label'].replace(")","")
+            processed_capiton_label = processed_caption_label.replace("(","")
+            processed_caption_label = processed_caption_label.replace(".","")
+            if (processed_caption_label.lower() == processed_label.lower()) and \
+               (processed_caption_label.lower() in [a.lower() for a in not_assigned]):
+                # master_image["caption"] = captions[caption_label]["caption"]
+                master_image["caption"] = caption_label['description']
+                # master_image["keywords"] = captions[caption_label]["keywords"]
+                master_image["keywords"] = caption_label['keywords']
+                master_image["general"] = caption_label['general']
+                masters.append(master_image)
+                not_assigned.remove(caption_label['label'])
+                paired = True
+                break
+        if paired:
+            continue
+
+        master_image["caption"] = []
+        master_image["keywords"]= []
+        master_image["general"] = []
+        masters.append(master_image)
+
+    # new_unassigned_captions = {}
+    new_unassigned_captions = []
+    for caption_label in captions:
+        if caption_label['label'] in not_assigned:
+            # new_unassigned_captions[caption_label] = captions[caption_label]
+            new_unassigned_captions.append(caption_label)
+
+    unassigned["captions"] = new_unassigned_captions
+    return masters, unassigned
 
 class Pipeline:
     def __init__(self , query_path, exsclaim_path):
@@ -75,26 +129,8 @@ class Pipeline:
                 "Matching objects from figure: "+figure)
     
             figure_json = self.exsclaim_dict[figure]
-            # masters, unassigned = cluster.assign_subfigure_labels(figure_json)
-            # figure_json["master_images"] = masters
-            # figure_json["unassigned"] = unassigned
 
-            # masters, unassigned = cluster.assign_inset_images(figure_json)
-            # figure_json["master_images"] = masters
-            # figure_json["unassigned"] = unassigned
-
-            # masters, unassigned = cluster.assign_dependent_images(figure_json)
-            # figure_json["master_images"] = masters
-            # figure_json["unassigned"] = unassigned
-
-            # scale_bars, unassigned = cluster.make_scale_bars(figure_json) 
-            # figure_json["unassigned"] = unassigned
-
-            # masters, unassigned = cluster.assign_scale_bars(figure_json, scale_bars)
-            # figure_json["master_images"] = masters
-            # figure_json["unassigned"] = unassigned
-
-            masters, unassigned = cluster.assign_captions(figure_json)
+            masters, unassigned = assign_captions(figure_json)
             figure_json["master_images"] = masters
             figure_json["unassigned"] = unassigned
 

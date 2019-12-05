@@ -136,13 +136,15 @@ setup(
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy'
     ],
-    data_files=[(sys.prefix+'/figures/models/checkpoints', ['exsclaim/figures/models/checkpoints/snapshot20000.ckpt']),
-                (sys.prefix+'/figures/models/config/',['exsclaim/figures/models/config/yolov3_eval.cfg']),
+    data_files=[(sys.prefix+'/figures/checkpoints', ['exsclaim/figures/checkpoints/snapshot12000.ckpt']),
+                (sys.prefix+'/figures/checkpoints', ['exsclaim/figures/checkpoints/snapshot6500.ckpt']),
+                (sys.prefix+'/figures/checkpoints', ['exsclaim/figures/checkpoints/snapshot260.ckpt']),
                 (sys.prefix+'/captions/models/reference.yml',['exsclaim/captions/models/reference.yml']),
                 (sys.prefix+'/captions/models/patterns.yml',['exsclaim/captions/models/patterns.yml']),
                 (sys.prefix+'/captions/models/rules.yml',['exsclaim/captions/models/rules.yml']),
                 (sys.prefix+'/captions/models/characterization.yml',['exsclaim/captions/models/characterization.yml']),
-                (sys.prefix+'/imagetexts/classes.json',['exsclaim/imagetexts/classes.json'])
+                (sys.prefix+'/figures/config/yolov3_default_master.cfg',['exsclaim/figures/config/yolov3_default_master.cfg']),
+                (sys.prefix+'/figures/config/yolov3_default_subfig.cfg',['exsclaim/figures/config/yolov3_default_subfig.cfg'])
     ],
     dependency_links=['https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.2.0/en_core_web_sm-2.2.0.tar.gz#egg=package-1.0'],
     # $ setup.py publish support.
