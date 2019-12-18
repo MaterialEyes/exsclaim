@@ -58,7 +58,7 @@ class JournalScraper(ExsclaimTool):
         utils.Printer("Running Journal Scraper\n") 
         t0 = time.time()
         counter = 1
-        articles = journal.get_article_extensions(search_query)
+        articles = journal.get_article_extensions_advanced(search_query)
         for article in articles:
             utils.Printer(">>> ({0} of {1}) ".format(counter,+\
                 min(len(articles),search_query["maximum_scraped"]))+\
@@ -69,7 +69,6 @@ class JournalScraper(ExsclaimTool):
                 exsclaim_dict = self._update_exsclaim(exsclaim_dict,article_dict)
             except:
                 utils.Printer("<!> ERROR: An exception occurred\n")
-                return
             counter += 1
         t1 = time.time()
         utils.Printer(">>> Time Elapsed: {0:.2f} sec ({1} articles)\n".format(t1-t0,int(counter-1)))
@@ -174,11 +173,11 @@ class FigureSeparator(ExsclaimTool):
             utils.Printer(">>> ({0} of {1}) ".format(counter,+\
                 len(figures))+\
                 "Extracting images from: "+figure_name.split("/")[-1])
-            try:
-                figure_dict = figure.extract_image_objects(sf_model, mi_model, figure_name, search_query['results_dir'])
-                exsclaim_dict = self._update_exsclaim(exsclaim_dict,figure_name,figure_dict)
-            except:
-                print("\n!!! EXCEPTION !!!\n")
+            # try:
+            figure_dict = figure.extract_image_objects(sf_model, mi_model, figure_name, search_query['results_dir'])
+            exsclaim_dict = self._update_exsclaim(exsclaim_dict,figure_name,figure_dict)
+            # except:
+            # utils.Printer("<!> ERROR: An exception occurred\n")
             counter += 1
         t1 = time.time()
         utils.Printer(">>> Time Elapsed: {0:.2f} sec ({1} figures)\n".format(t1-t0,int(counter-1)))

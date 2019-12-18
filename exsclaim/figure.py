@@ -9,11 +9,13 @@ import shutil
 import numpy as np
 import torch.nn.functional as F
 
-from PIL import Image, ImageDraw, ImageFont
+from skimage import io
+from scipy.special import softmax
 from torch.autograd import Variable
+from PIL import Image, ImageDraw, ImageFont
+
 from .figures.models.yolov3 import *
 from .figures.utils.utils import *
-
 
 def load_subfigure_model(model_path=str) -> "figure_separator_model":
     """
@@ -27,7 +29,8 @@ def load_subfigure_model(model_path=str) -> "figure_separator_model":
     """
 
     # Paths to config/checkpoint files
-    objd_ckpt = model_path + "checkpoints/snapshot6500.ckpt" # object detector
+    # objd_ckpt = model_path + "checkpoints/snapshot6500.ckpt" # object detector
+    objd_ckpt = model_path + "checkpoints/snapshot13400.ckpt"
     clsf_ckpt = model_path + "checkpoints/snapshot260.ckpt"  # classifier
     cnfg_file = model_path + "config/yolov3_default_subfig.cfg"
         
@@ -90,8 +93,8 @@ def load_masterimg_model(model_path=str) -> "figure_separator_model":
     # print("Successfully loaded config file: \n", cfg)
 
     # Assign values to important varables
-    image_size            = cfg['TEST']['IMGSIZE']
-    gpu_id                = 1
+    image_size = cfg['TEST']['IMGSIZE']
+    gpu_id     = 1
 
     # load object_detect model
     model = YOLOv3img(cfg['MODEL'])
@@ -140,22 +143,30 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
     Returns:
         figure_dict: A dictionary with classified image_objects extracted from figure
     """
-
     # Unpack models and eval
     model, classifier_model, dtype, confidence_threshold, nms_threshold, image_size, _ = subfigure_label_model
     mi_model, _ = master_image_model
-    
+
     model.eval()
     classifier_model.eval()
     mi_model.eval()
 
     os.makedirs(save_path+"/extractions", exist_ok=True)
 
-    label_names = ["background","microscopy","parent","graph","illustration","diffraction","None",
-                   "OtherMaster","OtherSubfigure","a","b","c","d","e","f"]
+    # label_names = ["background","microscopy","parent","graph","illustration","diffraction","None",
+    #                "OtherMaster","OtherSubfigure","a","b","c","d","e","f"]
 
-    img = cv2.imread(figure_path)
+    label_names = ["background","microscopy","parent","graph","illustration","diffraction","basic_photo",
+                   "unclear","OtherSubfigure","a","b","c","d","e","f"]
+
+    img = io.imread(figure_path)
+    if len(np.shape(img)) == 2:
+        img = cv2.cvtColor(img,cv2.COLOR_GRAY2RGB)
+    else:
+        img = cv2.cvtColor(img,cv2.COLOR_RGBA2RGB)
+    
     img, info_img = preprocess(img, image_size, jitter=0)
+    
     img = np.transpose(img / 255., (2, 0, 1))
     img = torch.from_numpy(img).float().unsqueeze(0)
     img = Variable(img.type(dtype))
@@ -163,6 +174,7 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
     # prediction
     img_raw = Image.open(figure_path).convert("RGB")
     width, height = img_raw.size
+
     with torch.no_grad():
         outputs = model(img)
         outputs = postprocess(outputs, dtype=dtype, 
@@ -214,7 +226,7 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
             else:
                 detected_labels.append(label_value)
                 detected_bboxes.append([conf,x1,y1,x2,y2])
-                
+    
     # post processing
     assert len(detected_labels) == len(detected_bboxes)
     for i in range(len(detected_labels)):
@@ -304,11 +316,16 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
     result_image = Image.new(mode="RGB",size=(200,len(pair_info)*100-50))
     draw = ImageDraw.Draw(result_image)
     font = ImageFont.load_default()
+
     # headline text
     text = "labels"
     draw.text((10,10),text,fill="white",font=font)
     text = "master image"
     draw.text((110,10),text,fill="white",font=font)
+    
+    label_img = img_raw.copy()
+    img_draw = ImageDraw.Draw(label_img)
+    # font_draw = ImageFont.truetype("FreeSerifBoldItalic.ttf", 15)
 
     for subfigure_id in range(0, len(pair_info)-1):
         sub_cat,x,y,w,h = (subfigure_padded_labels[0,subfigure_id]* feature_size[feature_index] ).to(torch.int16).data.cpu().numpy()
@@ -317,16 +334,29 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
         best_anchor = np.argmax(preds[:,ty,tx,4])
         x,y,w,h = preds[best_anchor,ty,tx,:4]
         cls = np.argmax(preds[best_anchor,int(ty),int(tx),5:])
+        master_cls_conf = max(softmax(preds[best_anchor,int(ty),int(tx),5:]))
+        master_obj_conf = preds[best_anchor,ty,tx,4]
+        # print("CLASS: {0} ({1})".format(label_names[cls],master_cls_conf))
+
         x1 = (x-w/2)
         x2 = (x+w/2)
         y1 = (y-h/2)
         y2 = (y+h/2)
+ 
         x1,y1,x2,y2 = yolobox2label([y1,x1,y2,x2], info_img)
         # visualization
         patch = img_raw.crop((int(x1),int(y1),int(x2),int(y2)))
         
         master_label = label_names[cls]
         subfigure_label = chr(int(sub_cat/feature_size[feature_index])+ord("a"))
+        
+        text = "%s %f %d %d %d %d\n"%(master_label, master_cls_conf*master_obj_conf, int(x1), int(y1), int(x2), int(y2))
+        with open(os.path.join(save_path+"/extractions/",sample_image_name+".txt"),"a+") as results_file:
+            results_file.write(text)
+        
+        img_draw.line([(x1,y1),(x1,y2),(x2,y2),(x2,y1),(x1,y1)], fill=(255,0,0), width=3)
+        img_draw.rectangle((x2-100,y2-30,x2,y2),fill=(0,255,0))
+        img_draw.text((x2-100+2,y2-30+2),"{}, {}".format(master_label,subfigure_label),fill=(255,0,0))
         
         text = "%s\n%s"%(master_label,subfigure_label)
         draw.text((10,60+100*subfigure_id),text,fill="white",font=font)
@@ -341,10 +371,11 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
             
         patch = patch.resize((int(pw),int(ph)))
         result_image.paste(patch,box=(110,60+100*subfigure_id))
-        
+
         # documentation
         master_image_info = {}
         master_image_info["classification"] = master_label
+        master_image_info["confidence"] = float("{0:.4f}".format(master_cls_conf))
         master_image_info["geometry"] = []
         for x in [int(x1), int(x2)]:
             for y in [int(y1), int(y2)]:
