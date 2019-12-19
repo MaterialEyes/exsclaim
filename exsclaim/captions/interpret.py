@@ -3,6 +3,7 @@ import re
 import yaml
 import itertools
 import numpy as np
+from itertools import chain
 
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -20,6 +21,11 @@ with open(dir_path + '/models/characterization.yml', 'r') as stream:
 
 def experiment_synonyms():
     return chrz
+
+def greek_letters():
+    greek_codes = chain(range(0x370,0x3e2),range(0x3f0,0x400))
+    greek_symbols = (chr(c) for c in greek_codes)
+    return [c for c in greek_symbols if c.isalpha()]
 
 def implied_chars(str_text: str, char_type: str) -> str:
     """
@@ -43,6 +49,7 @@ def implied_chars(str_text: str, char_type: str) -> str:
 
     discrete_tokens = [","]
     continuous_tokens = ["–"]
+    gl = greek_letters()
 
     token_list = discrete_tokens + continuous_tokens
     token_key = ("|").join(token_list)
@@ -66,7 +73,13 @@ def implied_chars(str_text: str, char_type: str) -> str:
             DT = ",".join([str_text_list[i],str_text_list[i+2]])
         else:
             DT = ""
-        if str_text_list[i+1] in continuous_tokens:
+        if (str_text_list[i+1] in continuous_tokens) and (str_text_list[i] not in gl) and (str_text_list[i+2] not in gl):
+            # print("\n[0] ",str_text_list[i])
+            # print(str_text_list[i] in gl)
+            # print("[1] ",str_text_list[i+1])
+            # print("[2] ",str_text_list[i+2])
+            # print(str_text_list[i+2] in gl)
+            # print("\n")
             CT = ",".join(char_range(str_text_list[i],str_text_list[i+2],char_type))
         else:
             CT = ""
