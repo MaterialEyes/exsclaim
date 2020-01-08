@@ -29,7 +29,6 @@ def load_subfigure_model(model_path=str) -> "figure_separator_model":
     """
 
     # Paths to config/checkpoint files
-    # objd_ckpt = model_path + "checkpoints/snapshot6500.ckpt" # object detector
     objd_ckpt = model_path + "checkpoints/snapshot13400.ckpt"
     clsf_ckpt = model_path + "checkpoints/snapshot260.ckpt"  # classifier
     cnfg_file = model_path + "config/yolov3_default_subfig.cfg"
@@ -152,10 +151,7 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
     mi_model.eval()
 
     os.makedirs(save_path+"/extractions", exist_ok=True)
-
-    # label_names = ["background","microscopy","parent","graph","illustration","diffraction","None",
-    #                "OtherMaster","OtherSubfigure","a","b","c","d","e","f"]
-
+    
     label_names = ["background","microscopy","parent","graph","illustration","diffraction","basic_photo",
                    "unclear","OtherSubfigure","a","b","c","d","e","f"]
 

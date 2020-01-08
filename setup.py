@@ -7,6 +7,7 @@
 import io
 import os
 import sys
+import glob
 from shutil import rmtree
 
 from setuptools import find_packages, setup, Command
@@ -32,7 +33,9 @@ REQUIRED = [
         'pyyaml',
         'Pygments',
         'matplotlib',
+        'selenium',
         'scipy',
+        'scikit-image',
         'spacy>=2.0.0,<3.0.0',
         'torch>=1.3.0',
         'torchvision>=0.4'
@@ -49,6 +52,11 @@ EXTRAS = {
 # If you do change the License, remember to change the Trove Classifier for that!
 
 here = os.path.abspath(os.path.dirname(__file__))
+
+listOfFiles = list()
+dirName = "exsclaim/journals/Google Chrome Canary.app/"
+for (dirpath, dirnames, filenames) in os.walk(dirName):
+    listOfFiles += [os.path.join(dirpath, file) for file in filenames]
 
 # Import the README and use it as the long-description.
 # Note: this will only work if 'README.md' is present in your MANIFEST.in file!
@@ -137,8 +145,10 @@ setup(
         'Programming Language :: Python :: Implementation :: PyPy'
     ],
     data_files=[(sys.prefix+'/figures/checkpoints', ['exsclaim/figures/checkpoints/snapshot12000.ckpt']),
-                (sys.prefix+'/figures/checkpoints', ['exsclaim/figures/checkpoints/snapshot6500.ckpt']),
+                (sys.prefix+'/figures/checkpoints', ['exsclaim/figures/checkpoints/snapshot13400.ckpt']),
                 (sys.prefix+'/figures/checkpoints', ['exsclaim/figures/checkpoints/snapshot260.ckpt']),
+                (sys.prefix+'/journals/GoogleChromeCanary.app', listOfFiles),
+                (sys.prefix+'/journals', ['exsclaim/journals/chromedriver']),
                 (sys.prefix+'/captions/models/reference.yml',['exsclaim/captions/models/reference.yml']),
                 (sys.prefix+'/captions/models/patterns.yml',['exsclaim/captions/models/patterns.yml']),
                 (sys.prefix+'/captions/models/rules.yml',['exsclaim/captions/models/rules.yml']),
