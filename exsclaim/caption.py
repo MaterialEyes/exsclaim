@@ -139,11 +139,17 @@ def get_subfigure_tokens(caption_nlp_model=tuple, caption=str) -> list:
     critical_tokens = [a for a in [matches[i] for i in critical_idxs]\
                          if utils.is_disjoint(doc[a[1]:a[2]].text.split(" "),\
                             interpret.false_negative_subfigure_labels(delimiter))]
+    
+    # Filter out any remaining tokens that resemble molecules
+    critical_tokens = [a for a in critical_tokens if not any(substring in doc[a[1]:a[2]].text for substring in interpret.common_molecules())]
 
+    # print("Critical tokens: ",[doc[entry[1]:entry[2]].text for entry in critical_tokens])
+    
     # Find all labels suggested by syntax (i.e. the label a–d suggests that in actuality, images a, b, c, d exist).
     suggested_labels = sorted(np.unique(list(utils.flatten([list(a) \
                    for a in [interpret.implied_chars(doc[entry[1]:entry[2]].text,delimiter)
                    for entry in critical_tokens]]))))
+
     # At this point, stray "non-chemistry" labels (i.e. "a", "b", "c", "d", "j") 
     # may still be included. Get rid of stray labels if not connected to the group. 
     subfigure_tokens = [] 
@@ -277,4 +283,3 @@ def associate_caption_text(caption_nlp_model=tuple, caption=str, keywords={}, ke
         for token in subfigure_tokens: 
             di.update({k:{"description":de[token[4]]['description'],"keywords":de[token[4]]['keywords'],"general":de[token[4]]['general']} for k in token[5]})
         return di
-

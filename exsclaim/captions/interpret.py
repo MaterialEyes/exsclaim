@@ -74,16 +74,9 @@ def implied_chars(str_text: str, char_type: str) -> str:
         else:
             DT = ""
         if (str_text_list[i+1] in continuous_tokens) and (str_text_list[i] not in gl) and (str_text_list[i+2] not in gl):
-            # print("\n[0] ",str_text_list[i])
-            # print(str_text_list[i] in gl)
-            # print("[1] ",str_text_list[i+1])
-            # print("[2] ",str_text_list[i+2])
-            # print(str_text_list[i+2] in gl)
-            # print("\n")
             CT = ",".join(char_range(str_text_list[i],str_text_list[i+2],char_type))
         else:
             CT = ""
-
         IC += DT+CT+","
     joined = ",".join([a for a in np.unique(IC[:-1].split(",")) if len(a)>0])
     return joined.replace(":","").replace("(","").replace(")","").split(",")
@@ -106,11 +99,6 @@ def char_range(start: str, stop: str, char_type: str) -> str:
     Returns:
         char_list: A list containing evenly spaced values within a given interval.
     """
-    # Check to make sure start/stop strings are valid:
-    # print(stop)
-    # print("Just printed stop")
-    # print(type(stop))
-
     if "" == start or "" == stop:
         return [""]
 
@@ -122,26 +110,35 @@ def char_range(start: str, stop: str, char_type: str) -> str:
     if len(start)+len(stop)>2:
         char_type = 'roman'
 
+    if (len(start) > 1 or len(stop) > 1):
+        if start not in ref['roman numerals'] and stop not in ref['roman numerals']:
+            return [""]
+        else:
+            pass
+
     if char_type.lower() == 'alpha' or char_type == 'ALPHA':
         try:       
             st = ref['alphabet'].index(start.lower())
             ed = ref['alphabet'].index(stop.lower())
+
+            if start == start.upper():
+                return [a.upper() for a in ref['alphabet'][st:ed+1]]
+            else:
+                return [a for a in ref['alphabet'][st:ed+1]]
         except:
             return 
 
-        if start == start.upper():
-            return [a.upper() for a in ref['alphabet'][st:ed+1]]
-        else:
-            return [a for a in ref['alphabet'][st:ed+1]]
-
     elif char_type.lower() == 'roman':
-        st = ref['roman numerals'].index(start.upper())
-        ed = ref['roman numerals'].index(stop.upper())
+        try: 
+            st = ref['roman numerals'].index(start.upper())
+            ed = ref['roman numerals'].index(stop.upper())
 
-        if start == start.upper():
-            return [a for a in ref['roman numerals'][st:ed+1]]
-        else:
-            return [a.lower() for a in ref['roman numerals'][st:ed+1]]
+            if start == start.upper():
+                return [a for a in ref['roman numerals'][st:ed+1]]
+            else:
+                return [a.lower() for a in ref['roman numerals'][st:ed+1]]
+        except:
+            return 
 
     elif char_type.lower() == 'digit':
         return [str(a) for a in np.arange(start,stop+1)]
@@ -332,9 +329,16 @@ def false_negative_subfigure_labels(char_delim: str) -> list:
         fp_labels: List of possible FN labels
     """
     if char_delim != 'ALPHA':
-        elements = [a for a in ref['chemical elements']]
+        elements = [a for a in ref['chemical elements']] + \
+                   [a.upper() for a in ref['chemical elements']]
     else:
-        elements = [a for a in ref['chemical elements'] if len(a) > 1]
+        elements = [a for a in ref['chemical elements'] if len(a) > 1] + \
+                   [a.upper() for a in ref['chemical elements'] if len(a) > 1]
     ambiguous_tokens  = ["("+a for a in ref["alphabet"]]
     fn_labels = elements+ambiguous_tokens
     return fn_labels
+
+def common_molecules() -> list:
+    """
+    """
+    return [a for a in ref["common molecules"]]

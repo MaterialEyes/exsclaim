@@ -171,7 +171,10 @@ class Pipeline:
                 mpatch = utils.labelbox_to_patch_v2(mimage['geometry'],figure)
                 os.makedirs(mbase, exist_ok=True)
                 mpatch =mpatch.copy(order='C')
-                plt.imsave(mbase+mname,mpatch)          
+                try:
+                    plt.imsave(mbase+mname,mpatch)  
+                except:
+                    pass        
                 rows.append([figure_dict["article_url"],figure_dict["figure_path"],fig_base.split("_fig")[-1],mbase+mname,\
                        mimage['subfigure_label']['text'], None, None,\
                        mimage['classification'],mimage['general'],mimage['caption'],mimage['keywords'],\
@@ -183,7 +186,11 @@ class Pipeline:
                     dname = "_".join([mname.split('par')[0]+"dep"+str(didx),dcls])+fig_ext
                     dpatch = utils.labelbox_to_patch_v2(dimage['geometry'],figure)
                     os.makedirs(dbase, exist_ok=True)
-                    plt.imsave(dbase+dname,dpatch)
+
+                    try:
+                        plt.imsave(dbase+dname,dpatch) 
+                    except:
+                        pass 
     
                     rows.append([figure_dict["article_url"],figure_dict["figure_path"],fig_base.split("_fig")[-1],dbase+dname,\
                         mimage['subfigure_label']['text'], str(didx), None,\
@@ -197,8 +204,12 @@ class Pipeline:
                         
                         ipatch = utils.labelbox_to_patch_v2(iimage['geometry'],figure)
                         os.makedirs(ibase, exist_ok=True)
-                        plt.imsave(ibase+iname,ipatch)
-        
+
+                        try:
+                            plt.imsave(ibase+iname,ipatch)
+                        except:
+                            pass 
+
                         rows.append([figure_dict["article_url"],figure_dict["figure_path"],fig_base.split("_fig")[-1],ibase+iname,\
                             mimage['subfigure_label']['text'], str(didx), str(iidx),\
                             iimage['classification'],None, None,\
@@ -210,7 +221,11 @@ class Pipeline:
                     iname = "_".join([mname.split(fig_ext)[0][0:-3]+"ins"+str(iidx),icls])+fig_ext
                     ipatch = utils.labelbox_to_patch_v2(iimage['geometry'],figure)
                     os.makedirs(ibase, exist_ok=True)
-                    plt.imsave(ibase+iname,ipatch)
+                    
+                    try:
+                        plt.imsave(ibase+iname,ipatch)
+                    except:
+                        pass 
     
                     rows.append([figure_dict["article_url"],figure_dict["figure_path"],fig_base.split("_fig")[-1],ibase+iname,\
                         mimage['subfigure_label']['text'], None, str(iidx),\

@@ -175,20 +175,44 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
         outputs = model(img)
         outputs = postprocess(outputs, dtype=dtype, 
                     conf_thre=confidence_threshold, nms_thre=nms_threshold)
-    if outputs[0] is None:
-        print("No Objects Deteted!!")
 
+    # This is how it was!
+    # if outputs[0] is None:
+    #     print("No Objects Deteted!!")
+
+    # bboxes = list()
+    # confidences = []
+    # for x1, y1, x2, y2, conf, cls_conf, cls_pred in outputs[0]:
+    #     box = yolobox2label([y1.data.cpu().numpy(), x1.data.cpu().numpy(), y2.data.cpu().numpy(), x2.data.cpu().numpy()], info_img)
+    #     box[0] = int(min(max(box[0],0),width-1))
+    #     box[1] = int(min(max(box[1],0),height-1))
+    #     box[2] = int(min(max(box[2],0),width))
+    #     box[3] = int(min(max(box[3],0),height))
+    #     if box[2]-box[0] > 5 and box[3]-box[1] > 5:
+    #         bboxes.append(box)
+    #         confidences.append("%.3f"%(cls_conf.item()))
+
+    # ====================================================== 
+    # ====== This is what I tried to replace it with! ====== 
+    # ====================================================== 
     bboxes = list()
     confidences = []
-    for x1, y1, x2, y2, conf, cls_conf, cls_pred in outputs[0]:
-        box = yolobox2label([y1.data.cpu().numpy(), x1.data.cpu().numpy(), y2.data.cpu().numpy(), x2.data.cpu().numpy()], info_img)
-        box[0] = int(min(max(box[0],0),width-1))
-        box[1] = int(min(max(box[1],0),height-1))
-        box[2] = int(min(max(box[2],0),width))
-        box[3] = int(min(max(box[3],0),height))
-        if box[2]-box[0] > 5 and box[3]-box[1] > 5:
-            bboxes.append(box)
-            confidences.append("%.3f"%(cls_conf.item()))
+
+    if outputs[0] is None:
+        print("No Objects Deteted!!")
+    else:
+        for x1, y1, x2, y2, conf, cls_conf, cls_pred in outputs[0]:
+            box = yolobox2label([y1.data.cpu().numpy(), x1.data.cpu().numpy(), y2.data.cpu().numpy(), x2.data.cpu().numpy()], info_img)
+            box[0] = int(min(max(box[0],0),width-1))
+            box[1] = int(min(max(box[1],0),height-1))
+            box[2] = int(min(max(box[2],0),width))
+            box[3] = int(min(max(box[3],0),height))
+            if box[2]-box[0] > 5 and box[3]-box[1] > 5:
+                bboxes.append(box)
+                confidences.append("%.3f"%(cls_conf.item()))
+    # ====================================================== 
+    # ====================================================== 
+    # ====================================================== 
 
     # save results
     sample_image_name = figure_path.split("/")[-1].split(".")[0]
@@ -359,12 +383,12 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
         
         pw,ph = patch.size
         if pw>ph:
-            ph = ph/pw*80
+            ph = max(1,ph/pw*80)
             pw = 80
         else:
-            pw = pw/ph*80
+            pw = max(1,pw/ph*80)
             ph = 80
-            
+
         patch = patch.resize((int(pw),int(ph)))
         result_image.paste(patch,box=(110,60+100*subfigure_id))
 
