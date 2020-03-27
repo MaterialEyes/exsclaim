@@ -100,7 +100,10 @@ def get_caption_tokenization(doc="spacy.tokens.doc.Doc", subfigure_tokens=list) 
         # Retokenize doc tagging the noun chunks (with caption tokens removed)
         with doc.retokenize() as retokenizer:
             for span in noun_chunk_spans:
-                retokenizer.merge(span,attrs={"TAG":"NC"})
+                try:
+                    retokenizer.merge(span,attrs={"TAG":"NC"})
+                except:
+                    pass
         return doc
 
     if subfigure_tokens != [(-99, None, -99, -99, '(0)', ['0'])]:
@@ -249,6 +252,7 @@ def caption_sentence_search(caption_chunks=list, pattern=str, caption_dict=dict)
 
     # Groups neighboring list entries (* and ! define neighbor borders) into single list.
     grouped_list = group_consecutive(pattern)
+
     # Iteratively move the anchor of the search 
     for anchor in range(len(caption_chunks)):
         # Get current start/end point
@@ -290,11 +294,16 @@ def caption_sentence_search(caption_chunks=list, pattern=str, caption_dict=dict)
                         intervals_extended.extend(fill_gaps(gl)) 
             # In an effort to eliminate solutions with multple "CAP"s and with full-stops in the middle...
             cap_count = [caption_chunks[a[0]][1] for a in intervals_extended if a[1] == 1].count('CAP')
+            
             # (*) Method #1 (lenient)- only search for stops among characters that are not ignored!
-            # midfs_count = [caption_chunks[a[0]][1] for a in intervals_extended[0:-1]].count('.')
-            # (*) Method #2 (strict) -  search for stops occuring between endpoints
-            pos_list = [caption_chunks[a][1] for a in list(np.arange(intervals_extended[0][0],intervals_extended[-1][0]))]
-            midfs_count = pos_list.count('.') + pos_list.count(';')
+            midfs_count = [caption_chunks[a[0]][1] for a in intervals_extended[0:-1]].count('.')
+            issue_1 = midfs_count > 3
+
+            # # (*) Method #2 (strict) -  search for stops occuring between endpoints
+            # pos_list = [caption_chunks[a][1] for a in list(np.arange(intervals_extended[0][0],intervals_extended[-1][0]))]
+            # midfs_count = pos_list.count('.') + pos_list.count(';')
+            # issue_1 = midfs_count > 0
+
             # Count number of internal references made (cue to include additional CAP separate from the remaining_caption CAP)
             # i.e. we want to keep (b) in this situation: (c) HAADF STEM image of the the region indicated in (b). 
             iref_count  = [caption_chunks[a[0]][1] for a in intervals_extended if a[1] == 1].count('IR')
@@ -306,7 +315,8 @@ def caption_sentence_search(caption_chunks=list, pattern=str, caption_dict=dict)
                     iref_valid = False
             # Issue #1:
             # Full stop punctuation in the middle of the line.
-            issue_1 = midfs_count != 0
+            # issue_1 = midfs_count > 3
+            # issue_1 = midfs_count > 0
             # Issue #2:
             # Multiple CAP refs without an IR indicator, 
             issue_2 = (cap_count >1 and iref_count==0)
@@ -324,9 +334,11 @@ def caption_sentence_search(caption_chunks=list, pattern=str, caption_dict=dict)
                 match = " ".join([caption_chunks[a[0]][0] for a in intervals_extended if a[1]==1])
                 # Assign key (determined by governing CAP) to the matched text string. 
                 caption_dict[cap_str]['description'].append(match.replace("( ","(").replace(" )",")"))
+    
     # Retain only unique values (entries)
     for k in list(caption_dict.keys()):
         caption_dict[k]['description'] = list(np.unique(caption_dict[k]['description']))
+    
     return caption_dict
 
 
@@ -405,8 +417,16 @@ def consolidate_entries(caption_dict=dict)-> "caption_dict":
     for key in caption_dict:
         # Keep longest unrelated entries in list
         str_list = list(np.unique(caption_dict[key]['description']))
-        ratio = 0.5
+
+        ratio = 0.7
         remove_list = []
+
+        # Go through all entries and remove all that contain ". a" style subfigure labels
+        # for entry in str_list:
+        #     if key in entry:
+        #         if entry.find(key)>1:
+        #             remove_list.append(entry)
+
         # Go through all pairs of strings in list and calculate similarity ratio
         for pair in itertools.combinations(str_list, r=2):
             v,w = pair
@@ -429,6 +449,7 @@ def consolidate_entries(caption_dict=dict)-> "caption_dict":
         # Remove superfluous spaces and punctuation marks
         selected = [text.strip(",").strip(".").strip(";").strip(" ").replace(" ,",",")+"." for text in str_resolved]
         caption_dict[key]['description'] = selected
+
     # Is unique across caption tokens?
     return filter_dual_membership(caption_dict)
 
@@ -450,6 +471,9 @@ def caption_sentence_findall(doc="spacy.tokens.doc.Doc", subfigure_tokens=list, 
     """
     caption_chunks = get_caption_chunks(doc, subfigure_tokens)
 
+    # View caption chunks:
+    # print("\nCAPTION CHUNKS: ",caption_chunks)
+
     subfigure_labels = []
     for cl in subfigure_tokens:
         subfigure_labels.append(cl[4])
@@ -463,5 +487,4 @@ def caption_sentence_findall(doc="spacy.tokens.doc.Doc", subfigure_tokens=list, 
     else: 
         for sentence_pattern in caption_sentence_regex['patterns']:
             caption_dict = caption_sentence_search(caption_chunks,list(ast.literal_eval(sentence_pattern)),caption_dict)
-
     return consolidate_entries(caption_dict)

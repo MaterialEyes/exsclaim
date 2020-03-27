@@ -274,9 +274,7 @@ def get_article_extensions(search_query: dict) -> list:
     article_delim, reader_delims = get_article_delimiters(search_query)
     start,stop,total = get_page_info(search_query)
     for pg in range(start,stop+1):
-        print(pg)
         request = create_request(search_query,pg)
-        print(request)
         soup = get_soup_from_request(request)
         for tags in soup.find_all('a',href=True):
             if len(tags.attrs['href'].split(article_delim)) > 1 :
@@ -300,6 +298,7 @@ def get_article_extensions_advanced(search_query: dict) -> list:
     article_delim, reader_delims = get_article_delimiters(search_query)
     page1_requests = create_page1_requests(search_query)
     for page1 in page1_requests:
+        print("GET request: ",page1)
         page_returns = []
         start,stop,total = get_page_info_advanced(page1,search_query)
         for pg_num in range(start,stop+1):
@@ -331,6 +330,7 @@ def get_article_figures(url: str, save_path="") -> dict:
     """
     soup = get_soup_from_request(url)
 
+    # Uncomment to save html
     os.makedirs(save_path+ "/html/", exist_ok=True)
     with open(save_path+ "/html/" + url.split("/")[-1]+'.html', "w", encoding='utf-8') as file:
         file.write(str(soup))

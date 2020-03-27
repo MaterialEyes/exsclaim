@@ -100,8 +100,12 @@ def caption_nlp_model():
     char_types      =  ['alpha','ALPHA','digit','roman','position']
     char_nums       =  range(1,9)
     custom_patterns =  [{'label': "parenthesis_02_none_ALPHA_02", 'pattern': [{'ORTH': "("},{'TEXT': {"REGEX":'[A-Z]{1}\d{1}'}},{'ORTH': ")"}]},\
-                        {'label': "parenthesis_02_none_alpha_02", 'pattern': [{'ORTH': "("},{'TEXT': {"REGEX":'[a-z]{1}\d{1}'}},{'ORTH': ")"}]}]
+                        {'label': "parenthesis_02_none_alpha_02", 'pattern': [{'ORTH': "("},{'TEXT': {"REGEX":'[a-z]{1}\d{1}'}},{'ORTH': ")"}]},\
+                        {'label': "period_00_none_alpha_01", 'pattern': [{'ORTH': "."},{'SHAPE': "x"}]},\
+                        {'label': "period_00_comma_alpha_02", 'pattern': [{'ORTH': "."},{'SHAPE': "x"},{'ORTH': ","},{'SHAPE': "x"}]},\
+                        {'label': "period_00_dash_alpha_02", 'pattern': [{'ORTH': "."},{'SHAPE': "x"},{'ORTH': "–"},{'SHAPE': "x"}]}]
 
+    # print("Return CAPTION rules.")
     # Create caption specific patterns from inputs
     caption_patterns = caption_pattern_collection(offsets,position_keys,separations,char_types,char_nums)
     caption_patterns.extend(custom_patterns)

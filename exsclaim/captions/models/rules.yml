@@ -25590,3 +25590,19 @@
   - TEXT:
       REGEX: '[a-z]{1}\d{1}'
   - ORTH: )
+- label: period_00_none_alpha_01
+  pattern:
+  - ORTH: .
+  - SHAPE: x
+- label: period_00_comma_alpha_02
+  pattern:
+  - ORTH: .
+  - SHAPE: x
+  - ORTH: ','
+  - SHAPE: x
+- label: period_00_dash_alpha_02
+  pattern:
+  - ORTH: .
+  - SHAPE: x
+  - ORTH: "\u2013"
+  - SHAPE: x

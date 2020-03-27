@@ -81,7 +81,7 @@ def find_subfigure_delimiter(caption_nlp_model=tuple, caption=str) -> str:
     
     # If alpha priority ratio high enough, then select the proper alpha/ALPHA. 
     if alpha_freq_ratio >= alpha_thresh:
-        char_delim = 'ALPHA' if np.argmax([c['alpha'],c['ALPHA']]) else 'alpha'
+        char_delim = 'ALPHA' if np.argmax([1.0*c['alpha'],0.5*c['ALPHA']]) else 'alpha'
     # Elif roman type exists as most frequent, assign it to char_delim.
     elif freq_type == 'roman':
         char_delim = freq_type
@@ -120,6 +120,10 @@ def get_subfigure_tokens(caption_nlp_model=tuple, caption=str) -> list:
     doc     = nlp(caption)
     matches = matcher(doc)
 
+    # Filter out matches that are not of the correct delimiter
+    matches = [a for a in matches \
+                 if nlp.vocab.strings[a[0]].split("_")[3] == delimiter]
+
     # Find start/stop slices of tokens that contain a delimiter in their 'word_type'
     ss = [list(range(a[1],a[2])) for a in matches \
                  if nlp.vocab.strings[a[0]].split("_")[3] == delimiter]
@@ -139,12 +143,11 @@ def get_subfigure_tokens(caption_nlp_model=tuple, caption=str) -> list:
     critical_tokens = [a for a in [matches[i] for i in critical_idxs]\
                          if utils.is_disjoint(doc[a[1]:a[2]].text.split(" "),\
                             interpret.false_negative_subfigure_labels(delimiter))]
-    
+
     # Filter out any remaining tokens that resemble molecules
     critical_tokens = [a for a in critical_tokens if not any(substring in doc[a[1]:a[2]].text for substring in interpret.common_molecules())]
 
-    # print("Critical tokens: ",[doc[entry[1]:entry[2]].text for entry in critical_tokens])
-    
+
     # Find all labels suggested by syntax (i.e. the label a–d suggests that in actuality, images a, b, c, d exist).
     suggested_labels = sorted(np.unique(list(utils.flatten([list(a) \
                    for a in [interpret.implied_chars(doc[entry[1]:entry[2]].text,delimiter)
@@ -164,9 +167,19 @@ def get_subfigure_tokens(caption_nlp_model=tuple, caption=str) -> list:
             implied = interpret.implied_chars(doc[start:end].text,delimiter)
             subfigure_tokens.append((match_id,nlp.vocab.strings[match_id],start,end,doc[start:end].text,implied))
 
+    if delimiter in ['alpha','ALPHA'] and len(subfigure_tokens)>0:
+        A_exist = 0
+        for tok in subfigure_tokens:
+           if tok[5][0].lower() == "a":
+            A_exist = 1
+
+        if not A_exist:
+            subfigure_tokens = []
+
     if subfigure_tokens == []:
         # When entire caption is a single token, assign a blank token.
         subfigure_tokens = [(-99, None, -99, -99, '(0)', ['0'])]
+
 
     return subfigure_tokens
 
@@ -227,8 +240,24 @@ def associate_caption_text(caption_nlp_model=tuple, caption=str, keywords={}, ke
     doc = nlp(caption)
 
     subfigure_tokens = get_subfigure_tokens(caption_nlp_model,caption)
-    
     de = regex.caption_sentence_findall(doc, subfigure_tokens, {})
+
+    # Find matching caption descriptions
+    for label in de:
+        # Remove any redundant descriptions when more specific "longer" description is present
+        # i.e. reduce ['HAADF-STEM', 'STEM', 'TEM', 'EELS'] to ['HAADF-STEM', 'EELS']
+        ratio = 0.2
+        remove_list = []
+        for pair in itertools.combinations(de[label]['description'], r=2):
+            v,w = pair
+            s = difflib.SequenceMatcher(None, v, w)
+            if s.ratio() >= ratio:
+                # If the two strings are similar, add shorter string to remove list
+                remove = pair[np.argmin([len(a) for a in pair])]
+                remove_list.append(remove)
+        remove_list = np.unique(remove_list)
+        for entry in remove_list:
+            de[label]['description'].remove(entry)
 
     # Create search dictionary from search_query 'term' keys and 'term'+'synonyms' as entries 
     search_list = {keywords[key]['term']:\
@@ -246,10 +275,6 @@ def associate_caption_text(caption_nlp_model=tuple, caption=str, keywords={}, ke
                     if keyword not in de[label]['keywords']:
                         de[label]['keywords'].append(keyword)
 
-            # Old - did not capture phrases
-            # if not utils.is_disjoint(search_list[keyword],description.split(" ")):
-            #     de[label]['keywords'].append(keyword)
-
     # Find matching general descriptions
     for label in de:
         for keyword in experiment_list:
@@ -261,7 +286,7 @@ def associate_caption_text(caption_nlp_model=tuple, caption=str, keywords={}, ke
 
         # Remove any redundant descriptions when more specific "longer" description is present
         # i.e. reduce ['HAADF-STEM', 'STEM', 'TEM', 'EELS'] to ['HAADF-STEM', 'EELS']
-        ratio = 0.5
+        ratio = 0.86
         remove_list = []
         for pair in itertools.combinations(de[label]['general'], r=2):
             v,w = pair
@@ -274,12 +299,157 @@ def associate_caption_text(caption_nlp_model=tuple, caption=str, keywords={}, ke
         for entry in remove_list:
             de[label]['general'].remove(entry)
 
-
     if keys == 'explicit':
         return de
     else:
+
         # Create dictionary with all implied subfigure_label keys and associated text as entries. 
+        implied_keys = list(set([item for sublist in [a[5] for a in subfigure_tokens] for item in sublist]))
+        implied_keys.sort()
         di = {}
-        for token in subfigure_tokens: 
-            di.update({k:{"description":de[token[4]]['description'],"keywords":de[token[4]]['keywords'],"general":de[token[4]]['general']} for k in token[5]})
+        
+        for k in implied_keys:
+            di.update({k:{"description":[],"keywords":[],"general":[]}})
+
+        for token in subfigure_tokens:
+            for imptok in token[5]:
+                for desc in de[token[4]]['description']:
+                    if de[token[4]]['description'] !=[] and desc not in di[imptok]["description"]:
+                        di[imptok]["description"].append(desc)
+
+        description_list = []
+        for token in subfigure_tokens:
+            for imptok in token[5]:
+                for entry in di[imptok]["description"]:
+                    # Check to see if exact and substring match exists
+                    exact_match = True in [True if a.replace(".","").strip() == entry.replace(".","").strip() else False for a in description_list]
+                    substring_match = True in [True if a.replace(".","").strip() in entry.replace(".","").strip() else False for a in description_list]
+
+                    # This takes care of case where too much text was retained in the description and the only unique portion of the string is the new information 
+                    # This new "unique" information is assigned to the description for the token
+                    if not exact_match and substring_match:
+                        idx = np.argmax([True if a.replace(".","").strip() in entry.replace(".","").strip() else False for a in description_list])
+                        a = description_list[idx]
+                        b = entry.replace(".","").strip()
+                        unique_text = "".join(b.replace(".","").strip().split(a.replace(".","").strip())).strip()
+                        di[imptok]["description"] = [unique_text]
+     
+                    description_list += di[imptok]["description"]
+                    description_list = list(set(description_list))
+
+                for keyw in de[token[4]]['keywords']:
+                    if de[token[4]]['keywords'] !=[] and keyw not in di[imptok]["keywords"]:
+                        di[imptok]["keywords"].append(keyw)
+
+
+        # Unclutter strings which are very similar
+        for key in di:
+            ratio = 0.65
+            remove_list = []
+            for pair in itertools.combinations(di[key]["description"], r=2):
+                v,w = pair
+                s = difflib.SequenceMatcher(None, v, w)
+                if s.ratio() >= ratio:
+                    # If the two strings are similar, add shorter string to remove list
+                    remove = pair[np.argmin([len(a) for a in pair])]
+                    remove_list.append(remove)
+            remove_list = np.unique(remove_list)
+            for entry in remove_list:
+                di[key]["description"].remove(entry)
+
+        # Find matching general descriptions
+        for key in di:
+            for keyword in experiment_list:
+                description = " ".join(di[key]['description'])
+                for elk in experiment_list[keyword]:
+                    if len(description.split(elk))>1:
+                        if keyword not in di[key]['general']:
+                            di[key]['general'].append(keyword)
+
+        # Remove general descriptions that are too similar
+        for key in di:
+            ratio = 0.6
+            remove_list = []
+            for pair in itertools.combinations(di[key]["general"], r=2):
+                v,w = pair
+                s = difflib.SequenceMatcher(None, v, w)
+                if s.ratio() >= ratio:
+                    # If the two strings are similar, add shorter string to remove list
+                    remove = pair[np.argmin([len(a) for a in pair])]
+                    remove_list.append(remove)
+            remove_list = np.unique(remove_list)
+            for entry in remove_list:
+                di[key]["general"].remove(entry)
+
         return di
+
+
+# THis works and is pretty good, no proximity scoring 
+        # # Create dictionary with all implied subfigure_label keys and associated text as entries. 
+        # implied_keys = list(set([item for sublist in [a[5] for a in subfigure_tokens] for item in sublist]))
+        # implied_keys.sort()
+        # di = {}
+        
+        # for k in implied_keys:
+        #     di.update({k:{"description":[],"keywords":[],"general":[]}})
+
+        # for token in subfigure_tokens:
+        #     for imptok in token[5]:
+        #         for desc in de[token[4]]['description']:
+        #             if de[token[4]]['description'] !=[] and desc not in di[imptok]["description"]:
+        #                 di[imptok]["description"].append(desc)
+        #         # for keyw in de[token[4]]['keywords']:
+        #         #     if de[token[4]]['keywords'] !=[] and keyw not in di[imptok]["keywords"]:
+        #         #         di[imptok]["keywords"].append(keyw)
+        #         # for genr in de[token[4]]['general']:
+        #         #     if de[token[4]]['general'] !=[] and genr not in di[imptok]["general"]:
+        #         #         di[imptok]["general"].append(genr)
+
+        # description_list = []
+        # for token in subfigure_tokens:
+        #     for imptok in token[5]:
+
+        #         for entry in di[imptok]["description"]:
+        #             # Check to see if exact and substring match exists
+        #             exact_match = True in [True if a.replace(".","").strip() == entry.replace(".","").strip() else False for a in description_list]
+        #             substring_match = True in [True if a.replace(".","").strip() in entry.replace(".","").strip() else False for a in description_list]
+
+        #             # This takes care of case where too much text was retained in the description and the only unique portion of the string is the new information 
+        #             # This new "unique" information is assigned to the description for the token
+        #             if not exact_match and substring_match:
+        #                 idx = np.argmax([True if a.replace(".","").strip() in entry.replace(".","").strip() else False for a in description_list])
+        #                 a = description_list[idx]
+        #                 b = entry.replace(".","").strip()
+        #                 unique_text = "".join(b.replace(".","").strip().split(a.replace(".","").strip())).strip()
+        #                 di[imptok]["description"] = [unique_text]
+     
+        #             description_list += di[imptok]["description"]
+        #             description_list = list(set(description_list))
+
+        #         for keyw in de[token[4]]['keywords']:
+        #             if de[token[4]]['keywords'] !=[] and keyw not in di[imptok]["keywords"]:
+        #                 di[imptok]["keywords"].append(keyw)
+        #         for genr in de[token[4]]['general']:
+        #             if de[token[4]]['general'] !=[] and genr not in di[imptok]["general"]:
+        #                 di[imptok]["general"].append(genr)
+
+
+        # # Unclutter strings which are very similar
+        # for key in di:
+        #     ratio = 0.33
+        #     remove_list = []
+        #     for pair in itertools.combinations(di[key]["description"], r=2):
+        #         v,w = pair
+        #         s = difflib.SequenceMatcher(None, v, w)
+        #         if s.ratio() >= ratio:
+        #             # If the two strings are similar, add shorter string to remove list
+        #             remove = pair[np.argmin([len(a) for a in pair])]
+        #             remove_list.append(remove)
+        #     remove_list = np.unique(remove_list)
+        #     for entry in remove_list:
+        #         di[key]["description"].remove(entry)
+
+
+
+        # print(di)
+        # return di

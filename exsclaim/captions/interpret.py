@@ -45,6 +45,7 @@ def implied_chars(str_text: str, char_type: str) -> str:
         implied_char_list: A list containing the chars implied by string syntax
     """
     str_text = (str_text.strip("(").strip(")").strip(" "))
+    str_text = str_text.strip(".")
     str_text = str_text.replace("and"," , ").replace(" ","").replace("-","–").replace(":","")
 
     discrete_tokens = [","]
@@ -314,6 +315,29 @@ def resolve_problem_sequences(str_text: str) -> str:
     str_text = str_text.replace("2 –","2 -")
     str_text = str_text.replace("3 –","3 -")
     str_text = str_text.replace("N-C.","N-C .")
+    str_text = str_text.replace(". "," . ")
+    # str_text = str_text.replace("a. ","a . ")
+    # str_text = str_text.replace("b. ","b . ")
+    # str_text = str_text.replace("c. ","c . ")
+    # str_text = str_text.replace("d. ","d . ")
+    # str_text = str_text.replace("e. ","e . ")
+    # str_text = str_text.replace("f. ","f . ")
+    # str_text = str_text.replace("g. ","g . ")
+    str_text = str_text.replace(". (a)"," (a)")
+
+    try:
+        if(str_text[0] == 'a' and str_text[1] == " "):
+            str_text = "(a)"+str_text[1:]
+        elif(str_text[0] == 'A' and str_text[1] == " "):
+            str_text = "(A)"+str_text[1:]
+    except:
+        pass
+
+    try:
+        if(str_text[-1] != "."):
+            str_text = str_text+" ."
+    except:
+        pass
     
     return str_text
 

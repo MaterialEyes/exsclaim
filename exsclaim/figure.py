@@ -199,7 +199,7 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
     confidences = []
 
     if outputs[0] is None:
-        print("No Objects Deteted!!")
+        print("No Objects Detected!!")
     else:
         for x1, y1, x2, y2, conf, cls_conf, cls_pred in outputs[0]:
             box = yolobox2label([y1.data.cpu().numpy(), x1.data.cpu().numpy(), y2.data.cpu().numpy(), x2.data.cpu().numpy()], info_img)
@@ -212,10 +212,12 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
                 confidences.append("%.3f"%(cls_conf.item()))
     # ====================================================== 
     # ====================================================== 
-    # ====================================================== 
+    # ======================================================
+
 
     # save results
-    sample_image_name = figure_path.split("/")[-1].split(".")[0]
+    sample_image_name = ".".join(figure_path.split("/")[-1].split(".")[0:-1])
+
     # img_raw.save(os.path.join(inpt_dir,sample_image_name+".png"))
     width, height = img_raw.size
     binary_img = np.zeros((height,width,1))
@@ -247,13 +249,15 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
                 detected_labels.append(label_value)
                 detected_bboxes.append([conf,x1,y1,x2,y2])
     
+
     # post processing
     assert len(detected_labels) == len(detected_bboxes)
     for i in range(len(detected_labels)):
         label_value = detected_labels[i]
         if (ord(label_value) - ord("a")) < (len(detected_labels)+2):
             conf,x1,y1,x2,y2 = detected_bboxes[i]
-            if (x2-x1) < 50 and (y2-y1)< 50:
+            # if (x2-x1) < 50 and (y2-y1)< 50: 
+            if (x2-x1) < 64 and (y2-y1)< 64: # Made this bigger because it was missing some images with labels
                 binary_img[y1:y2,x1:x2] = 255
                 text = "%s %f %d %d %d %d\n"%(label_value, conf, x1, y1, x2, y2)
                 subfigure_pair_info_bboxes.append(tuple([x1/width,y1/height,x2/width,y2/height, ord(label_value)-ord("a")]))
@@ -266,7 +270,8 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
     subfigure_pair_info_bboxes = np.array(subfigure_pair_info_bboxes, dtype=pair_dtype)
     concate_img = np.concatenate((np.array(img_raw),binary_img),axis=2)
     # np.save(os.path.join(concat_dir,sample_image_name+".npy"),concate_img)
-    
+
+
     pair_info = []
     pair_info.append([width, height])
     for bbox in subfigure_pair_info_bboxes:
@@ -347,7 +352,100 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
     img_draw = ImageDraw.Draw(label_img)
     # font_draw = ImageFont.truetype("FreeSerifBoldItalic.ttf", 15)
 
-    for subfigure_id in range(0, len(pair_info)-1):
+    # # Case where full-figure is the master image itself.
+    if len(pair_info) == 1:
+        subfigure_id = 0
+        sub_cat,x,y,w,h = (subfigure_padded_labels[0,subfigure_id]* feature_size[feature_index] ).to(torch.int16).data.cpu().numpy()
+        best_anchor = np.argmax(preds[:,y,x,4])
+        tx,ty = np.array(preds[best_anchor,y,x,:2]/32,np.int32)
+        best_anchor = np.argmax(preds[:,ty,tx,4])
+        x,y,w,h = preds[best_anchor,ty,tx,:4]
+        cls = np.argmax(preds[best_anchor,int(ty),int(tx),5:])
+        master_label = label_names[cls]
+        subfigure_label = chr(int(sub_cat/feature_size[feature_index])+ord("a"))
+
+        master_cls_conf = max(softmax(preds[best_anchor,int(ty),int(tx),5:]))
+        master_obj_conf = preds[best_anchor,ty,tx,4]
+        # print("CLASS: {0} ({1})".format(label_names[cls],master_cls_conf))
+
+        # x1 = (x-w/2)
+        # x2 = (x+w/2)
+        # y1 = (y-h/2)
+        # y2 = (y+h/2)
+        x1 = 0
+        x2 = np.shape(label_img)[1]
+        y1 = 0
+        y2 = np.shape(label_img)[0]
+ 
+        # x1,y1,x2,y2 = yolobox2label([y1,x1,y2,x2], info_img)
+
+
+        # print(np.shape(label_img))
+
+        # visualization
+        patch = img_raw.crop((int(x1),int(y1),int(x2),int(y2)))
+        
+        master_label = label_names[cls]
+        subfigure_label = chr(int(sub_cat/feature_size[feature_index])+ord("a"))
+        
+        text = "%s %f %d %d %d %d\n"%(master_label, master_cls_conf*master_obj_conf, int(x1), int(y1), int(x2), int(y2))
+
+        with open(os.path.join(save_path+"/extractions/",sample_image_name+".txt"),"a+") as results_file:
+            results_file.write(text)
+        
+        img_draw.line([(x1,y1),(x1,y2),(x2,y2),(x2,y1),(x1,y1)], fill=(255,0,0), width=3)
+        img_draw.rectangle((x2-100,y2-30,x2,y2),fill=(0,255,0))
+        img_draw.text((x2-100+2,y2-30+2),"{}, {}".format(master_label,subfigure_label),fill=(255,0,0))
+        
+        text = "%s\n%s"%(master_label,subfigure_label)
+        draw.text((10,60+100*subfigure_id),text,fill="white",font=font)
+        
+        pw,ph = patch.size
+        if pw>ph:
+            ph = max(1,ph/pw*80)
+            pw = 80
+        else:
+            pw = max(1,pw/ph*80)
+            ph = 80
+
+        patch = patch.resize((int(pw),int(ph)))
+        result_image.paste(patch,box=(110,60+100*subfigure_id))
+
+        # documentation
+        master_image_info = {}
+        master_image_info["classification"] = master_label
+        master_image_info["confidence"] = float("{0:.4f}".format(master_cls_conf))
+        master_image_info["geometry"] = []
+        for x in [int(x1), int(x2)]:
+            for y in [int(y1), int(y2)]:
+                geometry = {}
+                geometry["x"] = x
+                geometry["y"] = y
+                master_image_info["geometry"].append(geometry)
+        subfigure_label_info = {}
+        # subfigure_label_info["text"] = subfigure_label
+        subfigure_label_info["text"] = "0"
+        subfigure_label_info["geometry"] = []
+
+        # _,x1,y1,x2,y2 = subfigure_labels_copy[subfigure_id]
+        # x2 += x1
+        # y2 += y1
+        # for x in [int(x1), int(x2)]:
+        #     for y in [int(y1), int(y2)]:
+        #         geometry = {}
+        #         geometry["x"] = x
+        #         geometry["y"] = y
+        #         subfigure_label_info["geometry"].append(geometry)
+
+        master_image_info["subfigure_label"] = subfigure_label_info
+        current_info["master_images"].append(master_image_info)
+        
+    json_info["figure_separator_results"]=[current_info]
+        
+    result_image.save(os.path.join(save_path+"/extractions/"+sample_image_name+".png"))
+
+    for subfigure_id in range(0, len(pair_info)-1):   
+    # for subfigure_id in range(0, len(pair_info)-1):
         sub_cat,x,y,w,h = (subfigure_padded_labels[0,subfigure_id]* feature_size[feature_index] ).to(torch.int16).data.cpu().numpy()
         best_anchor = np.argmax(preds[:,y,x,4])
         tx,ty = np.array(preds[best_anchor,y,x,:2]/32,np.int32)

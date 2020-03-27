@@ -9,6 +9,7 @@ interchangeable.
 """
 import os
 import json
+import glob
 import copy
 import time
 
@@ -54,11 +55,48 @@ class JournalScraper(ExsclaimTool):
         exsclaim_dict.update(article_dict)
         return exsclaim_dict
 
+    def _appendJSON(self,filename,json_dict):
+        with open(filename,'w') as f: 
+            json.dump(json_dict, f, indent=3)
+
+    def _get_articles(self, search_query):
+
+        if search_query["journal_family"].lower() == 'nature':
+            location = "/articles/"
+
+        elif search_query["journal_family"].lower() == 'acs':
+            location = "/doi/10.1021/"
+        else:
+            print("WRITE THE PARSER FOR THIS FAMILY!!!")
+            return
+
+        try:
+            articles = []
+            with open(search_query['results_dir']+'_articles', 'r') as f:
+                for line in f:
+                    articles.append(location+line.strip())
+        except IOError:
+            articles = journal.get_article_extensions_advanced(search_query)
+            with open(search_query['results_dir']+'_articles', 'w+') as f:
+                for a in articles:
+                    f.write('%s\n' % a.split("/")[-1])
+
+        try:
+            with open(search_query['results_dir']+'_js.json','r') as f:
+                contents = f.read()
+            articles_visited = list(set([a.split("_fig")[0] for a in json.loads(contents)]))
+            articles = [a for a in articles if a.split("/")[-1] not in articles_visited]
+        except:
+            pass
+
+        return articles
+
     def run(self,search_query,exsclaim_dict={}):
         utils.Printer("Running Journal Scraper\n") 
+        os.makedirs(search_query['results_dir'], exist_ok=True)
         t0 = time.time()
         counter = 1
-        articles = journal.get_article_extensions_advanced(search_query)
+        articles = self._get_articles(search_query)
         for article in articles:
             utils.Printer(">>> ({0} of {1}) ".format(counter,+\
                 min(len(articles),search_query["maximum_scraped"]))+\
@@ -69,17 +107,15 @@ class JournalScraper(ExsclaimTool):
                 exsclaim_dict = self._update_exsclaim(exsclaim_dict,article_dict)
             except:
                 utils.Printer("<!> ERROR: An exception occurred\n")
+            
+            # Save to file every N iterations (to accomodate restart scenarios)
+            if counter%1000 == 0:
+                self._appendJSON(search_query['results_dir']+'_js.json',exsclaim_dict)
             counter += 1
+
         t1 = time.time()
         utils.Printer(">>> Time Elapsed: {0:.2f} sec ({1} articles)\n".format(t1-t0,int(counter-1)))
-        # -------------------------------- #  
-        # -- Save current exsclaim_dict -- #
-        # -------------------------------- # 
-        with open(search_query['results_dir']+'_js.json', 'w') as f:
-            json.dump(exsclaim_dict, f, indent=3)
-        # -------------------------------- #  
-        # -------------------------------- # 
-        # -------------------------------- # 
+        self._appendJSON(search_query['results_dir']+'_js.json',exsclaim_dict)
         return exsclaim_dict
 
 
@@ -107,8 +143,13 @@ class CaptionSeparator(ExsclaimTool):
             exsclaim_dict[figure_name]['unassigned']['captions'].append(master_image)
         return exsclaim_dict
 
+    def _appendJSON(self,filename,json_dict):
+        with open(filename,'w') as f: 
+            json.dump(json_dict, f, indent=3)
+
     def run(self,search_query,exsclaim_dict):
         utils.Printer("Running Caption Separator\n")
+        os.makedirs(search_query['results_dir'], exist_ok=True)
         t0 = time.time()
         model = self._load_model()
         counter = 1
@@ -116,11 +157,19 @@ class CaptionSeparator(ExsclaimTool):
             utils.Printer(">>> ({0} of {1}) ".format(counter,+\
                 len(exsclaim_dict))+\
                 "Parsing captions from: "+figure_name)
-            caption_text  = exsclaim_dict[figure_name]['full_caption']
-            delimiter = caption.find_subfigure_delimiter(model,caption_text)
-            caption_dict  = caption.associate_caption_text(model,caption_text,search_query['query'])
-            exsclaim_dict = self._update_exsclaim(exsclaim_dict,figure_name,delimiter,caption_dict)
+            try:
+                caption_text  = exsclaim_dict[figure_name]['full_caption']
+                delimiter = caption.find_subfigure_delimiter(model,caption_text)
+                caption_dict  = caption.associate_caption_text(model,caption_text,search_query['query'])
+                exsclaim_dict = self._update_exsclaim(exsclaim_dict,figure_name,delimiter,caption_dict) 
+            except:
+                utils.Printer("<!> ERROR: An exception occurred\n")
+        
+            # Save to file every N iterations (to accomodate restart scenarios)
+            if counter%1000 == 0:
+                self._appendJSON(search_query['results_dir']+'_cs.json',exsclaim_dict)
             counter += 1
+
         t1 = time.time()
         utils.Printer(">>> Time Elapsed: {0:.2f} sec ({1} captions)\n".format(t1-t0,int(counter-1)))
         # -------------------------------- #  
@@ -154,17 +203,20 @@ class FigureSeparator(ExsclaimTool):
 
     def _update_exsclaim(self,exsclaim_dict,figure_name,figure_dict):
         figure_name = figure_name.split("/")[-1]
-
         for master_image in figure_dict['figure_separator_results'][0]['master_images']:
             exsclaim_dict[figure_name]['master_images'].append(master_image)
 
         for unassigned in figure_dict['figure_separator_results'][0]['unassigned']:
             exsclaim_dict[figure_name]['unassigned']['master_images'].append(unassigned)
-
         return exsclaim_dict
+
+    def _appendJSON(self,filename,json_dict):
+        with open(filename,'w') as f: 
+            json.dump(json_dict, f, indent=3)
 
     def run(self,search_query,exsclaim_dict):
         utils.Printer("Running Figure Separator\n")
+        os.makedirs(search_query['results_dir'], exist_ok=True)
         t0 = time.time()
         sf_model, mi_model = self._load_model()
         counter = 1
@@ -173,12 +225,17 @@ class FigureSeparator(ExsclaimTool):
             utils.Printer(">>> ({0} of {1}) ".format(counter,+\
                 len(figures))+\
                 "Extracting images from: "+figure_name.split("/")[-1])
-            # try:
-            figure_dict = figure.extract_image_objects(sf_model, mi_model, figure_name, search_query['results_dir'])
-            exsclaim_dict = self._update_exsclaim(exsclaim_dict,figure_name,figure_dict)
-            # except:
-            # utils.Printer("<!> ERROR: An exception occurred\n")
+            try:
+                figure_dict = figure.extract_image_objects(sf_model, mi_model, figure_name, search_query['results_dir'])
+                exsclaim_dict = self._update_exsclaim(exsclaim_dict,figure_name,figure_dict)
+            except:
+                utils.Printer("<!> ERROR: An exception occurred\n")
+            
+            # Save to file every N iterations (to accomodate restart scenarios)
+            if counter%500 == 0:
+                self._appendJSON(search_query['results_dir']+'_fs.json',exsclaim_dict)
             counter += 1
+        
         t1 = time.time()
         utils.Printer(">>> Time Elapsed: {0:.2f} sec ({1} figures)\n".format(t1-t0,int(counter-1)))
         # -------------------------------- #  
