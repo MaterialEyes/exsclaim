@@ -100,8 +100,7 @@ class JournalScraper(ExsclaimTool):
         counter = 1
         articles = self._get_articles(search_query)
         for article in articles:
-            utils.Printer(">>> ({0} of {1}) ".format(counter,+\
-                min(len(articles),search_query["maximum_scraped"]))+\
+            utils.Printer(">>> ({0} of {1}) ".format(counter, len(articles)+\
                 "Extracting figures from: "+article.split("/")[-1])
             try:
                 request = journal.get_base_url(search_query) + article
