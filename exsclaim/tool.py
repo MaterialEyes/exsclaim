@@ -108,7 +108,7 @@ class JournalScraper(ExsclaimTool):
                 article_dict = journal.get_article_figures(request,search_query['results_dir'])
                 exsclaim_dict = self._update_exsclaim(exsclaim_dict,article_dict)
             except:
-                utils.Printer("<!> ERROR: An exception occurred\n")
+                utils.Printer("<!> ERROR: An exception occurred in JournalScraper\n")
             
             # Save to file every N iterations (to accomodate restart scenarios)
             if counter%1000 == 0:
@@ -165,7 +165,7 @@ class CaptionSeparator(ExsclaimTool):
                 caption_dict  = caption.associate_caption_text(model,caption_text,search_query['query'])
                 exsclaim_dict = self._update_exsclaim(exsclaim_dict,figure_name,delimiter,caption_dict) 
             except:
-                utils.Printer("<!> ERROR: An exception occurred\n")
+                utils.Printer("<!> ERROR: An exception occurred in CaptionSeparator\n")
         
             # Save to file every N iterations (to accomodate restart scenarios)
             if counter%1000 == 0:
@@ -231,7 +231,7 @@ class FigureSeparator(ExsclaimTool):
                 figure_dict = figure.extract_image_objects(sf_model, mi_model, figure_name, search_query['results_dir'])
                 exsclaim_dict = self._update_exsclaim(exsclaim_dict,figure_name,figure_dict)
             except:
-                utils.Printer("<!> ERROR: An exception occurred\n")
+                utils.Printer("<!> ERROR: An exception occurred in FigureSeparator\n")
             
             # Save to file every N iterations (to accomodate restart scenarios)
             if counter%500 == 0:
