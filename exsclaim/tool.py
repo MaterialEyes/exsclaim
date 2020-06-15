@@ -73,8 +73,10 @@ class JournalScraper(ExsclaimTool):
         try:
             articles = []
             with open(search_query['results_dir']+'_articles', 'r') as f:
-                for line in f:
+                for article_number, line in enumerate(f):
                     articles.append(location+line.strip())
+                    if article_number >= search_query['maximum_scraped'] - 1:
+                        break
         except IOError:
             articles = journal.get_article_extensions_advanced(search_query)
             with open(search_query['results_dir']+'_articles', 'w+') as f:
