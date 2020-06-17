@@ -66,10 +66,14 @@ class JournalScraper(ExsclaimTool):
 
         elif search_query["journal_family"].lower() == 'acs':
             location = "/doi/10.1021/"
+        
         else:
-            print("WRITE THE PARSER FOR THIS FAMILY!!!")
+            print("{} journal".format(search_query['journal_family']) + 
+            " family not supported. Please chose a different family or" +
+            " write a parser for it")
             return
 
+        ## Check if results_dir/_articles exists
         try:
             articles = []
             with open(search_query['results_dir']+'_articles', 'r') as f:
@@ -80,9 +84,10 @@ class JournalScraper(ExsclaimTool):
         except IOError:
             articles = journal.get_article_extensions_advanced(search_query)
             with open(search_query['results_dir']+'_articles', 'w+') as f:
-                for a in articles:
-                    f.write('%s\n' % a.split("/")[-1])
-
+                for article_number, article_path in enumerate(articles):
+                    f.write('%s\n' % article_path.split("/")[-1])
+                    if article_number >= search_query['maximum_scraped'] - 1:
+                        break
         try:
             with open(search_query['results_dir']+'_js.json','r') as f:
                 contents = f.read()
@@ -100,8 +105,8 @@ class JournalScraper(ExsclaimTool):
         counter = 1
         articles = self._get_articles(search_query)
         for article in articles:
-            utils.Printer(">>> ({0} of {1}) ".format(counter, len(articles)+\
-                "Extracting figures from: "+article.split("/")[-1])
+            utils.Printer(">>> ({0} of {1}) Extracting figures from: ".format(counter, len(articles))+\
+                article.split("/")[-1])
             try:
                 request = journal.get_base_url(search_query) + article
                 article_dict = journal.get_article_figures(request,search_query['results_dir'])

@@ -7,6 +7,7 @@ import urllib.request
 import requests
 import itertools
 import numpy as np
+import json
 
 from bs4 import BeautifulSoup
 from collections import OrderedDict
@@ -200,11 +201,18 @@ def get_page_info_advanced(request: str, search_query: dict) -> tuple:
     soup = get_soup_from_request(request, fast_load=True)
 
     if search_query['journal_family'].lower() == "nature":
-        parsed = str('{'+soup.text.split(',"keywords":')[0].split('"search":{')[-1].replace('"', "'")+'}')
-        search_info = ast.literal_eval(parsed)
+        ## Finds total results, page number, and total pages in article html
+        ## Data exists as json inside script tag with 'data-test'='dataLayer' attr.
+        data_layer = soup.find(attrs = {'data-test': 'dataLayer'})
+        data_layer_string = str(data_layer.string)
+        data_layer_json = "{" + data_layer_string.split("[{", 1)[1].split("}];", 1)[0] + "}"
+        parsed = json.loads(data_layer_json)
+        search_info = parsed["page"]["search"]
+
     elif search_query['journal_family'].lower() == "acs":
         parsed = [a.split("of")[-1].strip() for a in soup.text.split("Results:")[1].split("Follow")[0].split('-')]
         search_info = {"totalPages":math.ceil(float(parsed[1])/20)-1,"page":0,"totalResults":int(parsed[1])}
+
     elif search_query['journal_family'].lower() == "rsc":
         possible_entries = [a.strip("\n") for a in soup.text.split(" - Showing page 1 of")[0].split("Back to tab navigation")[-1].split(" ") if a.strip("\n").isdigit()]
         if len(possible_entries) == 1:
