@@ -305,6 +305,7 @@ def get_article_extensions_advanced(search_query: dict) -> list:
     extensions = []
     article_delim, reader_delims = get_article_delimiters(search_query)
     page1_requests = create_page1_requests(search_query)
+    articles_found = 0
     for page1 in page1_requests:
         print("GET request: ",page1)
         page_returns = []
@@ -316,7 +317,12 @@ def get_article_extensions_advanced(search_query: dict) -> list:
                 if len(tags.attrs['href'].split(article_delim)) > 1 :
                     page_returns.append(tags.attrs['href'])
         extensions.append(page_returns)
-
+        
+        #check if we have found enough articles
+        articles_found += len(page_returns)
+        if articles_found > search_query["maximum_scraped"]:
+            break
+    
     extensions = list(itertools.chain(*itertools.zip_longest(*extensions)))
     extensions = [a for a in extensions if a != None]
     extensions = [a for a in extensions if not \
