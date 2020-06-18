@@ -164,18 +164,17 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
     img, info_img = preprocess(img, image_size, jitter=0)
     
     img = np.transpose(img / 255., (2, 0, 1))
+    img = np.copy(img)
     img = torch.from_numpy(img).float().unsqueeze(0)
     img = Variable(img.type(dtype))
 
     # prediction
     img_raw = Image.open(figure_path).convert("RGB")
     width, height = img_raw.size
-
     with torch.no_grad():
         outputs = model(img)
         outputs = postprocess(outputs, dtype=dtype, 
                     conf_thre=confidence_threshold, nms_thre=nms_threshold)
-
     # This is how it was!
     # if outputs[0] is None:
     #     print("No Objects Deteted!!")
@@ -214,7 +213,6 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
     # ====================================================== 
     # ======================================================
 
-
     # save results
     sample_image_name = ".".join(figure_path.split("/")[-1].split(".")[0:-1])
 
@@ -249,7 +247,6 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
                 detected_labels.append(label_value)
                 detected_bboxes.append([conf,x1,y1,x2,y2])
     
-
     # post processing
     assert len(detected_labels) == len(detected_bboxes)
     for i in range(len(detected_labels)):
@@ -290,7 +287,6 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
     mask = preprocess_mask(mask, image_size, info_img)
     mask = np.transpose(mask / 255., (2, 0, 1))
     new_concate_img = np.concatenate((img,mask),axis=0)
-    
     img = torch.from_numpy(new_concate_img).float().unsqueeze(0)
     img = Variable(img.type(dtype))
 
@@ -322,7 +318,6 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
                       ] = subfigure_labels[:80]
     subfigure_padded_labels = (torch.from_numpy(subfigure_padded_labels)).float().unsqueeze(0)
     subfigure_padded_labels = Variable(subfigure_padded_labels.type(dtype))
-    
     padded_label_list = [None, subfigure_padded_labels]
     assert subfigure_padded_labels.size()[0] == 1
 
@@ -399,7 +394,6 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
         
         text = "%s\n%s"%(master_label,subfigure_label)
         draw.text((10,60+100*subfigure_id),text,fill="white",font=font)
-        
         pw,ph = patch.size
         if pw>ph:
             ph = max(1,ph/pw*80)
@@ -471,7 +465,6 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
         text = "%s %f %d %d %d %d\n"%(master_label, master_cls_conf*master_obj_conf, int(x1), int(y1), int(x2), int(y2))
         with open(os.path.join(save_path+"/extractions/",sample_image_name+".txt"),"a+") as results_file:
             results_file.write(text)
-        
         img_draw.line([(x1,y1),(x1,y2),(x2,y2),(x2,y1),(x1,y1)], fill=(255,0,0), width=3)
         img_draw.rectangle((x2-100,y2-30,x2,y2),fill=(0,255,0))
         img_draw.text((x2-100+2,y2-30+2),"{}, {}".format(master_label,subfigure_label),fill=(255,0,0))
