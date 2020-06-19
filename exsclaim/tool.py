@@ -73,28 +73,24 @@ class JournalScraper(ExsclaimTool):
             " write a parser for it")
             return
 
-        ## Check if results_dir/_articles exists
-        try:
-            articles = []
-            with open(search_query['results_dir']+'_articles', 'r') as f:
-                for article_number, line in enumerate(f):
-                    articles.append(location+line.strip())
-                    if article_number >= search_query['maximum_scraped'] - 1:
-                        break
-        except IOError:
-            articles = journal.get_article_extensions_advanced(search_query)
-            with open(search_query['results_dir']+'_articles', 'w+') as f:
-                for article_number, article_path in enumerate(articles):
+        ## Check if any articles have already been scraped by checking
+        ##   results_dir/_articles
+        articles_visited = []
+        if os.path.isfile(search_query['results_dir'] + "_articles"):
+            with open(search_query['results_dir']+'_articles','r') as f:
+                contents = f.readlines()
+            articles_visited = [a.strip() for a in contents]
+
+        ## Collects a new a list of articles, and checks them against
+        ##   the articles that have already been visited before writing
+        ##   them to the _articles file.
+        articles = journal.get_article_extensions_advanced(search_query)
+        with open(search_query['results_dir']+'_articles', 'w+') as f:
+            for article_number, article_path in enumerate(articles):
+                if article_path.split("/")[-1] not in articles_visited:
                     f.write('%s\n' % article_path.split("/")[-1])
-                    if article_number >= search_query['maximum_scraped'] - 1:
-                        break
-        try:
-            with open(search_query['results_dir']+'_js.json','r') as f:
-                contents = f.read()
-            articles_visited = list(set([a.split("_fig")[0] for a in json.loads(contents)]))
-            articles = [a for a in articles if a.split("/")[-1] not in articles_visited]
-        except:
-            pass
+                if article_number >= search_query['maximum_scraped'] - 1:
+                    break
 
         return articles
 
