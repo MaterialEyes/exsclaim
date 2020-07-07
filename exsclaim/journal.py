@@ -16,15 +16,33 @@ from selenium.webdriver.chrome.options import Options
 
 
 ### dictionaries to implement new journals ###
-journals = {"acs" :
-                    {'domain' : "https://pubs.acs.org",
-                    },
-            "nature" :
-                    {'domain' : "https://www.nature.com",
-                    },
-            "rsc" :
-                    {'domain' : "https://pubs.rsc.org",
-                    },
+journals = {
+    "acs" :
+        {'domain':      "https://pubs.acs.org",
+         'relevant':    "relevancy",
+         'recent':      "Earliest",
+         'path':        "/action/doSearch?AllField=\"",
+         'join':        "\"+\"",
+         'pre_sb':      "\"&publication=&accessType=allContent&Earliest=&pageSize=20&startPage=0&sortBy=",
+         'post_sb':     ""
+        },
+    "nature" :
+        {'domain' :     "https://www.nature.com",
+         'relevant':    "relevance",
+         'recent':      "date_desc",
+         'path':        "/search?q=\"",
+         'join':        "\"%20\"",
+         'pre_sb':      "\"&order=",
+         'post_sb':     "&page=1"
+        },
+    "rsc" :
+        {'domain' :     "https://pubs.rsc.org",
+         'relevant':    "Relevance",
+         'recent':      "Latest%20to%20oldest",
+         'path':        "/en/results?searchtext=",
+         'join':        "\"%20\"",
+         'pre_sb':      "\"&SortBy=",
+         'post_sb':     "&PageSize=1&tab=all&fcategory=all&filter=all&Article%20Access=Open+Access"        },
 }
 
 def get_soup_from_request(url: str, fast_load=True):
@@ -87,31 +105,28 @@ def get_search_parameters(search_query: dict) -> str:
     Returns:
         A list of url paths and queries as strings
     """
+    journal_family = search_query['journal_family'].lower()
+    if journal_family not in journals:
+        raise NameError('journal family {0} is not defined'.format(journal_family))
+    ## creates a list of search terms
     search_list = [[search_query['query'][key]['term']]+search_query['query'][key]['synonyms'] for key in search_query['query'] if len(search_query['query'][key]['synonyms'])>0]
     search_product = list(itertools.product(*search_list))
     extensions = []
-    for search_group in search_product:
-        if search_query['journal_family'].lower() == "nature":
-            if search_query['sortby'] == "recent":
-                sbext = "&order=date_desc"
-            else:
-                sbext = "&order=relevance"
-            extensions.append('/search?'+"q=\""+"\"%20\"".join(["+".join(a.split(" ")) for a in search_group])+"\""+sbext+"&page=1")
-        elif search_query['journal_family'].lower() == "acs":
-            if search_query['sortby'] == "recent":
-                sbext = "&sortBy=Earliest"
-            else:
-                sbext = "&sortBy=relevancy"
-            extensions.append("/action/doSearch?AllField=\""+"\"+\"".join(["+".join(a.split(" ")) for a in search_group])+"\""+"&publication=&accessType=allContent&Earliest=&pageSize=20&startPage=0"+sbext)
-        elif search_query['journal_family'].lower() == "rsc":
-            if search_query['sortby'] == "recent":
-                sbext = "&SortBy=Latest%20to%20oldest"
-            else:
-                sbext = "&SortBy=Relevance"
-            extensions.append('/en/results?searchtext='+"\""+"\"%20\"".join(["+".join(a.split(" ")) for a in search_group])+"\""+sbext+"&PageSize=1&tab=all&fcategory=all&filter=all&Article%20Access=Open+Access")
-        else:
-            raise NameError('journal family {0} is not defined'.format(search_query['journal_family'].lower()))
 
+    # save journal family's dictionar as variable
+    jdict = journals[journal_family]
+    # sortby is the requested method to sort results (relevancy or recency) and
+    # sbtext gives the journal specific parameter to sort as requested
+    sortby = search_query['sortby']
+    sbext = journals[journal_family][sortby]  
+
+    # this creates the url (excluding domain and protocol) for each search query
+    for search_group in search_product:
+        url_path_and_query = (jdict['path']
+            + jdict['join'].join(["+".join(a.split(" ")) for a in search_group])
+            + jdict['pre_sb'] + sbext + jdict['post_sb'])
+        extensions.append(url_path_and_query)
+    
     return extensions
 
 
