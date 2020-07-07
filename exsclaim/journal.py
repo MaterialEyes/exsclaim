@@ -14,6 +14,19 @@ from collections import OrderedDict
 from selenium import webdriver 
 from selenium.webdriver.chrome.options import Options
 
+
+### dictionaries to implement new journals ###
+journals = {"acs" :
+                    {'domain' : "https://pubs.acs.org",
+                    },
+            "nature" :
+                    {'domain' : "https://www.nature.com",
+                    },
+            "rsc" :
+                    {'domain' : "https://pubs.rsc.org",
+                    },
+}
+
 def get_soup_from_request(url: str, fast_load=True):
     """
     Get a BeautifulSoup parse tree (lxml parser) from a url request 
@@ -52,23 +65,18 @@ def get_soup_from_request(url: str, fast_load=True):
 
 def get_base_url(search_query: dict) -> str:
     """
-    Get url base path for the requested journal family in search_query.
+    Get url base path (domain name) for the requested journal family in search_query.
 
     Args:
         search_query: A query json
     Returns:
-        A base url.
+        The domain name of the journal, as a string
     """
-    if search_query['journal_family'].lower() == "nature":
-        base = "https://www.nature.com"
-    elif search_query['journal_family'].lower() == "acs":
-        base = "https://pubs.acs.org"
-    elif search_query['journal_family'].lower() == "rsc":
-        base = "https://pubs.rsc.org"
-        # base = "https://pubs-rsc-org.turing.library.northwestern.edu"
-    else:
+    journal_family = search_query['journal_family'].lower()
+    if journal_family not in journals:
         raise NameError('journal family {0} is not defined'.format(search_query['journal_family'].lower()))
-    return base
+
+    return journals[journal_family]['domain']
 
 
 def get_search_extension(search_query: dict) -> str:
@@ -114,9 +122,8 @@ def get_search_extensions_advanced(search_query: dict) -> str:
     Returns:
         A url extension.
     """
-    search_list = [[search_query['query'][key]['term']]+search_query['query'][key]['synonyms'] for key in search_query['query'] if len(search_query['query'][key]['synonyms'])>0] 
+    search_list = [[search_query['query'][key]['term']]+search_query['query'][key]['synonyms'] for key in search_query['query'] if len(search_query['query'][key]['synonyms'])>0]
     search_product = list(itertools.product(*search_list))
-
     extensions = []
     for search_group in search_product:
         if search_query['journal_family'].lower() == "nature":
