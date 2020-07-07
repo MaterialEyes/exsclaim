@@ -63,7 +63,7 @@ def get_soup_from_request(url: str, fast_load=True):
         soup =BeautifulSoup(r.text, 'lxml')
     return soup
 
-def get_base_url(search_query: dict) -> str:
+def get_domain_name(search_query: dict) -> str:
     """
     Get url base path (domain name) for the requested journal family in search_query.
 
@@ -78,49 +78,14 @@ def get_base_url(search_query: dict) -> str:
 
     return journals[journal_family]['domain']
 
-
-def get_search_extension(search_query: dict) -> str:
+def get_search_parameters(search_query: dict) -> str:
     """
-    Get prioritized url extension for search terms in search_query.
+    Get prioritized url extensions (path and search parameters) for search terms in search_query.
 
     Args:
         search_query: A query json
     Returns:
-        A url extension.
-    """
-    search_list = [search_query['query'][key]['term'] for key in search_query['query'] if len(search_query['query'][key]['term'])>0]
-    if search_query['journal_family'].lower() == "nature":
-        if search_query['sortby'] == "recent":
-            sbext = "&order=date_desc"
-        else:
-            sbext = "&order=relevance"
-        return '/search?'+"q="+",%20".join(["+".join(a.split(" ")) for a in search_list])+sbext+"&page=1"
-    elif search_query['journal_family'].lower() == "acs":
-        if search_query['sortby'] == "recent":
-            sbext = "&sortBy=Earliest"
-        else:
-            sbext = "&sortBy=relevancy"
-        return '/action/doSearch?'+"".join(["&field"+str(i+1)+"=AllField&text"+str(i+1)+"="+"+".join(search_list[i].split(" ")) for i in range(len(search_list))])+"&publication=&accessType=allContent&Earliest=&pageSize=20&startPage=0"+sbext
-    
-    elif search_query['journal_family'].lower() == "rsc":
-        if search_query['sortby'] == "recent":
-            sbext = "&SortBy=Latest%20to%20oldest"
-        else:
-            sbext = "&SortBy=Relevance"
-        return '/en/results?searchtext='+",%20".join(["+".join(a.split(" ")) for a in search_list])+sbext+"&PageSize=50&tab=all&fcategory=all&filter=all&Article%20Access=Open+Access"
-
-    else:
-        raise NameError('journal family {0} is not defined'.format(search_query['journal_family'].lower()))
-
-
-def get_search_extensions_advanced(search_query: dict) -> str:
-    """
-    Get prioritized url extension for search terms in search_query.
-
-    Args:
-        search_query: A query json
-    Returns:
-        A url extension.
+        A list of url paths and queries as strings
     """
     search_list = [[search_query['query'][key]['term']]+search_query['query'][key]['synonyms'] for key in search_query['query'] if len(search_query['query'][key]['synonyms'])>0]
     search_product = list(itertools.product(*search_list))
@@ -263,10 +228,10 @@ def create_page1_requests(search_query: dict) -> str:
     Returns:
         A url.
     """
-    extensions = get_search_extensions_advanced(search_query)
+    extensions = get_search_parameters(search_query)
     requests_list = []
     for extension in extensions:
-        url = get_base_url(search_query)+extension # (default) starts at index origin for journal 
+        url = get_domain_name(search_query)+extension # (default) starts at index origin for journal 
         if search_query['journal_family'].lower() == "nature":
             requests_list.append(url.split('&page=')[0]+'&page='+str(1))
         elif search_query['journal_family'].lower() == "acs":
