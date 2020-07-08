@@ -104,7 +104,7 @@ class JournalScraper(ExsclaimTool):
             utils.Printer(">>> ({0} of {1}) Extracting figures from: ".format(counter, len(articles))+\
                 article.split("/")[-1])
             try:
-                request = journal.get_base_url(search_query) + article
+                request = journal.get_domain_name(search_query) + article
                 article_dict = journal.get_article_figures(request,search_query['results_dir'])
                 exsclaim_dict = self._update_exsclaim(exsclaim_dict,article_dict)
             except:
