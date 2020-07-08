@@ -35,7 +35,9 @@ journals = {
          'pre_sb':      "Portion of the url that extends from the" +
                         "search terms to the paremeter value for" +
                         "sorting search results",
-         'post_sb':     "The final portion of the url" 
+         'post_sb':     "The final portion of the url", 
+         ## used for get_article_delimiters
+         'article_path':"The journal's url path to articles",
         },
     "acs" :
         {'domain':      "https://pubs.acs.org",
@@ -44,7 +46,8 @@ journals = {
          'path':        "/action/doSearch?AllField=\"",
          'join':        "\"+\"",
          'pre_sb':      "\"&publication=&accessType=allContent&Earliest=&pageSize=20&startPage=0&sortBy=",
-         'post_sb':     ""
+         'post_sb':     "",
+         'article_path':('/doi/',['abs','full','pdf']),
         },
     "nature" :
         {'domain' :     "https://www.nature.com",
@@ -53,7 +56,8 @@ journals = {
          'path':        "/search?q=\"",
          'join':        "\"%20\"",
          'pre_sb':      "\"&order=",
-         'post_sb':     "&page=1"
+         'post_sb':     "&page=1",
+         'article_path':('/articles/',''),
         },
     "rsc" :
         {'domain' :     "https://pubs.rsc.org",
@@ -62,7 +66,8 @@ journals = {
          'path':        "/en/results?searchtext=",
          'join':        "\"%20\"",
          'pre_sb':      "\"&SortBy=",
-         'post_sb':     "&PageSize=1&tab=all&fcategory=all&filter=all&Article%20Access=Open+Access"
+         'post_sb':     "&PageSize=1&tab=all&fcategory=all&filter=all&Article%20Access=Open+Access",
+         'article_path':('/en/content/articlehtml/',''),
          },
 }
 
@@ -150,7 +155,6 @@ def get_search_parameters(search_query: dict) -> str:
     
     return extensions
 
-
 def get_article_delimiters(search_query: dict) -> tuple:
     """
     Get delimiters specific to articles from requested journal family in search_query
@@ -161,13 +165,10 @@ def get_article_delimiters(search_query: dict) -> tuple:
         (delimiter for articles in the journal family url, \
         list containing delimiters for possible reader versions for an article).
     """
-    if search_query['journal_family'].lower() == "nature":
-        return ('/articles/','')
-    elif search_query['journal_family'].lower() == "acs":
-        return ('/doi/',['abs','full','pdf'])
-    elif search_query['journal_family'].lower() == "rsc":
-        return ('/en/content/articlehtml/','')
-
+    journal_family = search_query['journal_family'].lower()
+    if journal_family not in journals:
+        raise NameError('journal family {0} is not defined'.format(journal_family))
+    return journals[journal_family]['article_path']    
 
 def get_page_info(search_query: dict) -> tuple:
     """
