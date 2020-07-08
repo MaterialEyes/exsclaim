@@ -15,8 +15,28 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
 
-### dictionaries to implement new journals ###
+################ JOURNAL FAMILY SPECIFIC INFORMATION ################
+## To add a new journal family, add an entry to the journals 
+## dictionary below. Fill out the fields according to the 'sample' 
+## entry.
+#####################################################################
 journals = {
+    "sample" :
+        {'domain':      "The domain name of journal family",
+        ## the next 6 fields determine the url of journals search page
+         'relevant':    "The value for the journal's sorting field" +
+                        "that donotes sorting search results based" + 
+                        "on relevance in the search page url",
+         'recent':      "The sorting field value for recency",
+         'path':        "The portion of the url that runs from the" +
+                        "end of the domain to search terms",
+         'join':        "The portion of the url that appears between" +
+                        "consecutive search terms",
+         'pre_sb':      "Portion of the url that extends from the" +
+                        "search terms to the paremeter value for" +
+                        "sorting search results",
+         'post_sb':     "The final portion of the url" 
+        },
     "acs" :
         {'domain':      "https://pubs.acs.org",
          'relevant':    "relevancy",
@@ -42,7 +62,8 @@ journals = {
          'path':        "/en/results?searchtext=",
          'join':        "\"%20\"",
          'pre_sb':      "\"&SortBy=",
-         'post_sb':     "&PageSize=1&tab=all&fcategory=all&filter=all&Article%20Access=Open+Access"        },
+         'post_sb':     "&PageSize=1&tab=all&fcategory=all&filter=all&Article%20Access=Open+Access"
+         },
 }
 
 def get_soup_from_request(url: str, fast_load=True):
