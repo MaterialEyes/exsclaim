@@ -59,19 +59,7 @@ class JournalScraper(ExsclaimTool):
         with open(filename,'w') as f: 
             json.dump(json_dict, f, indent=3)
 
-    def _get_articles(self, search_query):
-
-        if search_query["journal_family"].lower() == 'nature':
-            location = "/articles/"
-
-        elif search_query["journal_family"].lower() == 'acs':
-            location = "/doi/10.1021/"
-        
-        else:
-            print("{} journal".format(search_query['journal_family']) + 
-            " family not supported. Please chose a different family or" +
-            " write a parser for it")
-            return
+    def _get_articles(self, search_query, j_instance):
 
         ## Check if any articles have already been scraped by checking
         ##   results_dir/_articles
@@ -84,7 +72,7 @@ class JournalScraper(ExsclaimTool):
         ## Collects a new a list of articles, and checks them against
         ##   the articles that have already been visited before writing
         ##   them to the _articles file.
-        articles = journal.get_article_extensions_advanced(search_query)
+        articles = j_instance.get_article_extensions()
         with open(search_query['results_dir']+'_articles', 'w+') as f:
             for article_number, article_path in enumerate(articles):
                 if article_path.split("/")[-1] not in articles_visited:
@@ -95,17 +83,27 @@ class JournalScraper(ExsclaimTool):
         return articles
 
     def run(self,search_query,exsclaim_dict={}):
-        utils.Printer("Running Journal Scraper\n") 
+        utils.Printer("Running Journal Scraper\n")
+        
+        ## Checks that user inputted journal family has been defined and
+        ## grabs instantiates an instance of the journal family object
+        journal_family = search_query['journal_family']
+        if journal_family not in journal.journals:
+            raise NameError('journal family {0} is not defined'.format(journal_family))
+        j_instance = journal.journals[journal_family](search_query)
+
+
         os.makedirs(search_query['results_dir'], exist_ok=True)
         t0 = time.time()
         counter = 1
-        articles = self._get_articles(search_query)
+        articles = self._get_articles(search_query, j_instance)
         for article in articles:
             utils.Printer(">>> ({0} of {1}) Extracting figures from: ".format(counter, len(articles))+\
                 article.split("/")[-1])
+
             try:
-                request = journal.get_domain_name(search_query) + article
-                article_dict = journal.get_article_figures(request,search_query['results_dir'])
+                request = j_instance.get_domain_name() + article
+                article_dict = j_instance.get_article_figures(request)
                 exsclaim_dict = self._update_exsclaim(exsclaim_dict,article_dict)
             except:
                 utils.Printer("<!> ERROR: An exception occurred in JournalScraper\n")
