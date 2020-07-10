@@ -11,8 +11,6 @@ import json
 
 from bs4 import BeautifulSoup
 from collections import OrderedDict
-from selenium import webdriver 
-from selenium.webdriver.chrome.options import Options
 
 
 class JournalFamily():
@@ -133,7 +131,7 @@ class JournalFamily():
             A list of urls (as strings)
         """
         search_query = self.search_query
-        extensions = self.get_search_parameters(search_query)
+        extensions = self.get_search_parameters()
         requests_list = []
         for extension in extensions:
             url = self.domain + extension # (default) starts at index origin for journal
@@ -202,31 +200,9 @@ class JournalFamily():
         Returns:
             A BeautifulSoup parse tree.
         """
-        dynamic_list = ["https://pubs.rsc.org/"]
-
-        if len([True for a in dynamic_list if a in url])>0:
-
-            chrome_options = Options()  
-            chrome_options.add_argument("--headless")
-            chrome_options.binary_location=os.path.dirname(__file__)+"/journals/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary"
-            driver = webdriver.Chrome(executable_path=os.path.dirname(__file__)+"/journals/chromedriver",chrome_options=chrome_options) 
-
-            driver.get(url)
-            if fast_load:
-                time.sleep(1)
-                soup = BeautifulSoup(driver.page_source, 'lxml')
-            else:
-                loaded_entries = BeautifulSoup(driver.page_source, 'lxml').text.count('https://doi.org/')
-                while loaded_entries < np.min([1000,int(url.split('&PageSize=')[-1].split('&tab=all')[0])]):
-                    time.sleep(0.1)
-                    loaded_entries = BeautifulSoup(driver.page_source, 'lxml').text.count('https://doi.org/')
-                # print("Entries fully loaded: {}".format(loaded_entries))
-            soup = BeautifulSoup(driver.page_source, 'lxml')
-            driver.quit()
-        else:
-            with requests.Session() as session:
-                r = session.get(url) 
-            soup =BeautifulSoup(r.text, 'lxml')
+        with requests.Session() as session:
+            r = session.get(url) 
+        soup =BeautifulSoup(r.text, 'lxml')
         return soup
 
     def find_captions(self, figure):
