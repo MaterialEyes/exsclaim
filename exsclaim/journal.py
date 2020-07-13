@@ -123,7 +123,7 @@ class JournalFamily():
         """ 
         print("implement get_page_info for journal")
 
-    def create_page1_requests(self) -> str:
+    def get_search_query_urls(self) -> str:
         """
         Create url for a GET request based on the search_query.
 
@@ -131,12 +131,30 @@ class JournalFamily():
             A list of urls (as strings)
         """
         search_query = self.search_query
-        extensions = self.get_search_parameters()
-        requests_list = []
-        for extension in extensions:
-            url = self.domain + extension # (default) starts at index origin for journal
-            requests_list.append(url)
-        return requests_list
+        ## creates a list of search terms
+        search_list = ([[search_query['query'][key]['term']] + 
+                       search_query['query'][key]['synonyms'] 
+                       for key in search_query['query'] 
+                       if len(search_query['query'][key]['synonyms'])>0])
+        search_product = list(itertools.product(*search_list))
+
+        # sortby is the requested method to sort results (relevancy or recency) and
+        # sbtext gives the journal specific parameter to sort as requested
+        sortby = search_query['sortby']
+        if sortby == 'relevant':
+            sbext = self.relevant
+        elif sortby == 'recent':
+            sbext = self.recent
+
+        search_query_urls = []
+        # this creates the url (excluding domain and protocol) for each search query
+        for search_group in search_product:
+            search_query_url = (self.domain + self.path
+                + self.join.join(["+".join(a.split(" ")) for a in search_group])
+                + self.pre_sb + sbext + self.post_sb)
+            search_query_urls.append(search_query_url)
+
+        return search_query_urls
 
     def get_article_extensions(self) -> list:
         """
@@ -148,12 +166,11 @@ class JournalFamily():
         search_query = self.search_query
         extensions = []
         article_delim, reader_delims = self.get_article_delimiters()
-        page1_requests = self.create_page1_requests()
+        search_query_urls = self.get_search_query_urls()
         articles_found = 0
-        for page1 in page1_requests:
+        for page1 in search_query_urls:
             print("GET request: ",page1)
             page_returns = []
-
             soup = self.get_soup_from_request(page1, fast_load=True)
             start,stop,total = self.get_page_info(soup)
             for pg_num in range(start,stop+1):
@@ -185,7 +202,7 @@ class JournalFamily():
         Args:
             url: a string, the url to be searched
         Returns:
-            A list of all figures in the article
+            A list of all figures in the article as BeaustifulSoup Tag objects
         """
         soup = self.get_soup_from_request(url)
         figure_list = [a for a in soup.find_all('figure') if str(a).find(self.extra_key)>-1]
@@ -367,16 +384,6 @@ class Nature(JournalFamily):
 
     def turn_page(self, url, pg_num, pg_size):
         return url.split('&page=')[0]+'&page='+str(pg_num)
-
-    def create_page1_requests(self):
-        search_query = self.search_query
-        extensions = self.get_search_parameters()
-        requests_list = []
-        for extension in extensions:
-            url = self.get_domain_name() + extension # (default) starts at index origin for journal 
-            requests_list.append(url.split('&page=')[0]+'&page='+str(1))
-
-        return requests_list
 
 class RSC(JournalFamily):
     domain =        "https://pubs.rsc.org"
