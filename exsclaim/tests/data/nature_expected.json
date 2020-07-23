@@ -7,7 +7,7 @@
       "caption_delimiter": "alpha",
       "figure_name": "s41467-018-06211-3_fig1.jpg",
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fs41467-018-06211-3/MediaObjects/41467_2018_6211_Fig1_HTML.png",
-      "figure_path": "extracted/nature-haadf-ag-nanoparticles/figures/s41467-018-06211-3_fig1.jpg",
+      "figure_path": "extracted/nature-test/figures/s41467-018-06211-3_fig1.jpg",
       "master_images": [
          {
             "classification": "microscopy",
@@ -493,7 +493,7 @@
       "caption_delimiter": "alpha",
       "figure_name": "s41467-018-06211-3_fig2.jpg",
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fs41467-018-06211-3/MediaObjects/41467_2018_6211_Fig2_HTML.png",
-      "figure_path": "extracted/nature-haadf-ag-nanoparticles/figures/s41467-018-06211-3_fig2.jpg",
+      "figure_path": "extracted/nature-test/figures/s41467-018-06211-3_fig2.jpg",
       "master_images": [
          {
             "classification": "microscopy",
@@ -837,7 +837,7 @@
       "caption_delimiter": "alpha",
       "figure_name": "s41467-018-06211-3_fig3.jpg",
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fs41467-018-06211-3/MediaObjects/41467_2018_6211_Fig3_HTML.png",
-      "figure_path": "extracted/nature-haadf-ag-nanoparticles/figures/s41467-018-06211-3_fig3.jpg",
+      "figure_path": "extracted/nature-test/figures/s41467-018-06211-3_fig3.jpg",
       "master_images": [
          {
             "classification": "graph",
@@ -1060,7 +1060,7 @@
       "caption_delimiter": "alpha",
       "figure_name": "s41467-018-06211-3_fig4.jpg",
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fs41467-018-06211-3/MediaObjects/41467_2018_6211_Fig4_HTML.png",
-      "figure_path": "extracted/nature-haadf-ag-nanoparticles/figures/s41467-018-06211-3_fig4.jpg",
+      "figure_path": "extracted/nature-test/figures/s41467-018-06211-3_fig4.jpg",
       "master_images": [
          {
             "classification": "graph",
@@ -1281,7 +1281,7 @@
       "caption_delimiter": "alpha",
       "figure_name": "s41467-018-06211-3_fig5.jpg",
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fs41467-018-06211-3/MediaObjects/41467_2018_6211_Fig5_HTML.png",
-      "figure_path": "extracted/nature-haadf-ag-nanoparticles/figures/s41467-018-06211-3_fig5.jpg",
+      "figure_path": "extracted/nature-test/figures/s41467-018-06211-3_fig5.jpg",
       "master_images": [
          {
             "classification": "graph",
@@ -1326,7 +1326,7 @@
                ]
             },
             "caption": [
-               "c, d"
+               "Precious metal dissolution tests in aluminum–air flow batteries (AAFBs) using the SMNp and Pt/C with 6   M KOH electrolyte after 6 h of discharging at 50   mA   cm−2"
             ],
             "keywords": [],
             "general": []
@@ -1498,7 +1498,7 @@
       "caption_delimiter": "alpha",
       "figure_name": "ncomms5946_fig1.jpg",
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fncomms5946/MediaObjects/41467_2014_Article_BFncomms5946_Fig1_HTML.jpg",
-      "figure_path": "extracted/nature-haadf-ag-nanoparticles/figures/ncomms5946_fig1.jpg",
+      "figure_path": "extracted/nature-test/figures/ncomms5946_fig1.jpg",
       "master_images": [
          {
             "classification": "microscopy",
@@ -1786,7 +1786,7 @@
       "caption_delimiter": "alpha",
       "figure_name": "ncomms5946_fig2.jpg",
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fncomms5946/MediaObjects/41467_2014_Article_BFncomms5946_Fig2_HTML.jpg",
-      "figure_path": "extracted/nature-haadf-ag-nanoparticles/figures/ncomms5946_fig2.jpg",
+      "figure_path": "extracted/nature-test/figures/ncomms5946_fig2.jpg",
       "master_images": [
          {
             "classification": "microscopy",
@@ -2098,7 +2098,7 @@
       "caption_delimiter": "alpha",
       "figure_name": "ncomms5946_fig3.jpg",
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fncomms5946/MediaObjects/41467_2014_Article_BFncomms5946_Fig3_HTML.jpg",
-      "figure_path": "extracted/nature-haadf-ag-nanoparticles/figures/ncomms5946_fig3.jpg",
+      "figure_path": "extracted/nature-test/figures/ncomms5946_fig3.jpg",
       "master_images": [
          {
             "classification": "graph",
@@ -2311,7 +2311,7 @@
       "caption_delimiter": "alpha",
       "figure_name": "ncomms5946_fig4.jpg",
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fncomms5946/MediaObjects/41467_2014_Article_BFncomms5946_Fig4_HTML.jpg",
-      "figure_path": "extracted/nature-haadf-ag-nanoparticles/figures/ncomms5946_fig4.jpg",
+      "figure_path": "extracted/nature-test/figures/ncomms5946_fig4.jpg",
       "master_images": [
          {
             "classification": "microscopy",
@@ -2488,7 +2488,7 @@
       "caption_delimiter": "alpha",
       "figure_name": "ncomms5946_fig5.jpg",
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fncomms5946/MediaObjects/41467_2014_Article_BFncomms5946_Fig5_HTML.jpg",
-      "figure_path": "extracted/nature-haadf-ag-nanoparticles/figures/ncomms5946_fig5.jpg",
+      "figure_path": "extracted/nature-test/figures/ncomms5946_fig5.jpg",
       "master_images": [
          {
             "classification": "graph",
@@ -2715,7 +2715,7 @@
       "caption_delimiter": "alpha",
       "figure_name": "ncomms5946_fig6.jpg",
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fncomms5946/MediaObjects/41467_2014_Article_BFncomms5946_Fig6_HTML.jpg",
-      "figure_path": "extracted/nature-haadf-ag-nanoparticles/figures/ncomms5946_fig6.jpg",
+      "figure_path": "extracted/nature-test/figures/ncomms5946_fig6.jpg",
       "master_images": [
          {
             "classification": "microscopy",
@@ -2888,7 +2888,7 @@
       "caption_delimiter": "alpha",
       "figure_name": "ncomms5946_fig7.jpg",
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fncomms5946/MediaObjects/41467_2014_Article_BFncomms5946_Fig7_HTML.jpg",
-      "figure_path": "extracted/nature-haadf-ag-nanoparticles/figures/ncomms5946_fig7.jpg",
+      "figure_path": "extracted/nature-test/figures/ncomms5946_fig7.jpg",
       "master_images": [
          {
             "classification": "microscopy",
@@ -3442,7 +3442,7 @@
       "caption_delimiter": "alpha",
       "figure_name": "ncomms5946_fig8.jpg",
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fncomms5946/MediaObjects/41467_2014_Article_BFncomms5946_Fig8_HTML.jpg",
-      "figure_path": "extracted/nature-haadf-ag-nanoparticles/figures/ncomms5946_fig8.jpg",
+      "figure_path": "extracted/nature-test/figures/ncomms5946_fig8.jpg",
       "master_images": [
          {
             "classification": "microscopy",
@@ -3763,7 +3763,7 @@
       "caption_delimiter": "alpha",
       "figure_name": "ncomms5946_fig9.jpg",
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fncomms5946/MediaObjects/41467_2014_Article_BFncomms5946_Fig9_HTML.jpg",
-      "figure_path": "extracted/nature-haadf-ag-nanoparticles/figures/ncomms5946_fig9.jpg",
+      "figure_path": "extracted/nature-test/figures/ncomms5946_fig9.jpg",
       "master_images": [
          {
             "classification": "microscopy",
@@ -4294,7 +4294,7 @@
       "caption_delimiter": "alpha",
       "figure_name": "ncomms6634_fig1.jpg",
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fncomms6634/MediaObjects/41467_2014_Article_BFncomms6634_Fig1_HTML.jpg",
-      "figure_path": "extracted/nature-haadf-ag-nanoparticles/figures/ncomms6634_fig1.jpg",
+      "figure_path": "extracted/nature-test/figures/ncomms6634_fig1.jpg",
       "master_images": [
          {
             "classification": "microscopy",
@@ -4605,7 +4605,7 @@
       "caption_delimiter": null,
       "figure_name": "ncomms6634_fig2.jpg",
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fncomms6634/MediaObjects/41467_2014_Article_BFncomms6634_Fig2_HTML.jpg",
-      "figure_path": "extracted/nature-haadf-ag-nanoparticles/figures/ncomms6634_fig2.jpg",
+      "figure_path": "extracted/nature-test/figures/ncomms6634_fig2.jpg",
       "master_images": [
          {
             "classification": "graph",
@@ -4657,7 +4657,7 @@
       "caption_delimiter": "alpha",
       "figure_name": "s41598-017-12553-7_fig1.jpg",
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fs41598-017-12553-7/MediaObjects/41598_2017_12553_Fig1_HTML.jpg",
-      "figure_path": "extracted/nature-haadf-ag-nanoparticles/figures/s41598-017-12553-7_fig1.jpg",
+      "figure_path": "extracted/nature-test/figures/s41598-017-12553-7_fig1.jpg",
       "master_images": [
          {
             "classification": "basic_photo",
@@ -4831,7 +4831,7 @@
       "caption_delimiter": null,
       "figure_name": "s41598-017-12553-7_fig2.jpg",
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fs41598-017-12553-7/MediaObjects/41598_2017_12553_Fig2_HTML.jpg",
-      "figure_path": "extracted/nature-haadf-ag-nanoparticles/figures/s41598-017-12553-7_fig2.jpg",
+      "figure_path": "extracted/nature-test/figures/s41598-017-12553-7_fig2.jpg",
       "master_images": [
          {
             "classification": "graph",
@@ -4885,7 +4885,7 @@
       "caption_delimiter": "alpha",
       "figure_name": "s41598-017-12553-7_fig3.jpg",
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fs41598-017-12553-7/MediaObjects/41598_2017_12553_Fig3_HTML.jpg",
-      "figure_path": "extracted/nature-haadf-ag-nanoparticles/figures/s41598-017-12553-7_fig3.jpg",
+      "figure_path": "extracted/nature-test/figures/s41598-017-12553-7_fig3.jpg",
       "master_images": [
          {
             "classification": "microscopy",
@@ -5243,7 +5243,7 @@
       "caption_delimiter": "alpha",
       "figure_name": "s41598-017-12553-7_fig4.jpg",
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fs41598-017-12553-7/MediaObjects/41598_2017_12553_Fig4_HTML.jpg",
-      "figure_path": "extracted/nature-haadf-ag-nanoparticles/figures/s41598-017-12553-7_fig4.jpg",
+      "figure_path": "extracted/nature-test/figures/s41598-017-12553-7_fig4.jpg",
       "master_images": [
          {
             "classification": "microscopy",
@@ -5600,7 +5600,7 @@
       "caption_delimiter": "alpha",
       "figure_name": "s41598-017-12553-7_fig5.jpg",
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fs41598-017-12553-7/MediaObjects/41598_2017_12553_Fig5_HTML.jpg",
-      "figure_path": "extracted/nature-haadf-ag-nanoparticles/figures/s41598-017-12553-7_fig5.jpg",
+      "figure_path": "extracted/nature-test/figures/s41598-017-12553-7_fig5.jpg",
       "master_images": [
          {
             "classification": "illustration",
@@ -5767,7 +5767,7 @@
       "caption_delimiter": null,
       "figure_name": "s41598-017-12553-7_fig6.jpg",
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fs41598-017-12553-7/MediaObjects/41598_2017_12553_Fig6_HTML.jpg",
-      "figure_path": "extracted/nature-haadf-ag-nanoparticles/figures/s41598-017-12553-7_fig6.jpg",
+      "figure_path": "extracted/nature-test/figures/s41598-017-12553-7_fig6.jpg",
       "master_images": [
          {
             "classification": "parent",
@@ -5819,7 +5819,7 @@
       "caption_delimiter": "alpha",
       "figure_name": "s41598-017-12553-7_fig7.jpg",
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fs41598-017-12553-7/MediaObjects/41598_2017_12553_Fig7_HTML.jpg",
-      "figure_path": "extracted/nature-haadf-ag-nanoparticles/figures/s41598-017-12553-7_fig7.jpg",
+      "figure_path": "extracted/nature-test/figures/s41598-017-12553-7_fig7.jpg",
       "master_images": [
          {
             "classification": "parent",
@@ -5894,7 +5894,7 @@
       "caption_delimiter": "alpha",
       "figure_name": "ncomms1737_fig1.jpg",
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fncomms1737/MediaObjects/41467_2012_Article_BFncomms1737_Fig1_HTML.jpg",
-      "figure_path": "extracted/nature-haadf-ag-nanoparticles/figures/ncomms1737_fig1.jpg",
+      "figure_path": "extracted/nature-test/figures/ncomms1737_fig1.jpg",
       "master_images": [
          {
             "classification": "microscopy",
@@ -6387,7 +6387,7 @@
       "caption_delimiter": "alpha",
       "figure_name": "ncomms1737_fig2.jpg",
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fncomms1737/MediaObjects/41467_2012_Article_BFncomms1737_Fig2_HTML.jpg",
-      "figure_path": "extracted/nature-haadf-ag-nanoparticles/figures/ncomms1737_fig2.jpg",
+      "figure_path": "extracted/nature-test/figures/ncomms1737_fig2.jpg",
       "master_images": [
          {
             "classification": "graph",
@@ -6911,7 +6911,7 @@
       "caption_delimiter": "alpha",
       "figure_name": "ncomms1737_fig3.jpg",
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fncomms1737/MediaObjects/41467_2012_Article_BFncomms1737_Fig3_HTML.jpg",
-      "figure_path": "extracted/nature-haadf-ag-nanoparticles/figures/ncomms1737_fig3.jpg",
+      "figure_path": "extracted/nature-test/figures/ncomms1737_fig3.jpg",
       "master_images": [
          {
             "classification": "microscopy",
@@ -7327,7 +7327,7 @@
       "caption_delimiter": "alpha",
       "figure_name": "ncomms1737_fig4.jpg",
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fncomms1737/MediaObjects/41467_2012_Article_BFncomms1737_Fig4_HTML.jpg",
-      "figure_path": "extracted/nature-haadf-ag-nanoparticles/figures/ncomms1737_fig4.jpg",
+      "figure_path": "extracted/nature-test/figures/ncomms1737_fig4.jpg",
       "master_images": [
          {
             "classification": "graph",
@@ -7444,7 +7444,7 @@
       "caption_delimiter": "alpha",
       "figure_name": "ncomms1737_fig5.jpg",
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fncomms1737/MediaObjects/41467_2012_Article_BFncomms1737_Fig5_HTML.jpg",
-      "figure_path": "extracted/nature-haadf-ag-nanoparticles/figures/ncomms1737_fig5.jpg",
+      "figure_path": "extracted/nature-test/figures/ncomms1737_fig5.jpg",
       "master_images": [
          {
             "classification": "microscopy",
@@ -7772,7 +7772,7 @@
       "caption_delimiter": null,
       "figure_name": "ncomms9788_fig1.jpg",
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fncomms9788/MediaObjects/41467_2015_Article_BFncomms9788_Fig1_HTML.jpg",
-      "figure_path": "extracted/nature-haadf-ag-nanoparticles/figures/ncomms9788_fig1.jpg",
+      "figure_path": "extracted/nature-test/figures/ncomms9788_fig1.jpg",
       "master_images": [
          {
             "classification": "illustration",
@@ -7851,7 +7851,7 @@
       "caption_delimiter": "alpha",
       "figure_name": "ncomms9788_fig2.jpg",
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fncomms9788/MediaObjects/41467_2015_Article_BFncomms9788_Fig2_HTML.jpg",
-      "figure_path": "extracted/nature-haadf-ag-nanoparticles/figures/ncomms9788_fig2.jpg",
+      "figure_path": "extracted/nature-test/figures/ncomms9788_fig2.jpg",
       "master_images": [
          {
             "classification": "microscopy",
@@ -8030,7 +8030,7 @@
       "caption_delimiter": "alpha",
       "figure_name": "ncomms9788_fig3.jpg",
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fncomms9788/MediaObjects/41467_2015_Article_BFncomms9788_Fig3_HTML.jpg",
-      "figure_path": "extracted/nature-haadf-ag-nanoparticles/figures/ncomms9788_fig3.jpg",
+      "figure_path": "extracted/nature-test/figures/ncomms9788_fig3.jpg",
       "master_images": [
          {
             "classification": "parent",
@@ -8255,7 +8255,7 @@
       "caption_delimiter": "alpha",
       "figure_name": "ncomms9788_fig4.jpg",
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fncomms9788/MediaObjects/41467_2015_Article_BFncomms9788_Fig4_HTML.jpg",
-      "figure_path": "extracted/nature-haadf-ag-nanoparticles/figures/ncomms9788_fig4.jpg",
+      "figure_path": "extracted/nature-test/figures/ncomms9788_fig4.jpg",
       "master_images": [
          {
             "classification": "graph",
@@ -8700,7 +8700,7 @@
       "caption_delimiter": null,
       "figure_name": "ncomms9788_fig5.jpg",
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fncomms9788/MediaObjects/41467_2015_Article_BFncomms9788_Fig5_HTML.jpg",
-      "figure_path": "extracted/nature-haadf-ag-nanoparticles/figures/ncomms9788_fig5.jpg",
+      "figure_path": "extracted/nature-test/figures/ncomms9788_fig5.jpg",
       "master_images": [
          {
             "classification": "illustration",
