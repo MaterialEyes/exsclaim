@@ -29,8 +29,8 @@ def load_subfigure_model(model_path=str) -> "figure_separator_model":
     """
 
     # Paths to config/checkpoint files
-    objd_ckpt = model_path + "checkpoints/snapshot13400.ckpt"
-    clsf_ckpt = model_path + "checkpoints/snapshot260.ckpt"  # classifier
+    objd_ckpt = model_path + "checkpoints/object_detection_model.pt"
+    clsf_ckpt = model_path + "checkpoints/text_recognition_model.pt"
     cnfg_file = model_path + "config/yolov3_default_subfig.cfg"
         
     # Open the config file
@@ -58,11 +58,11 @@ def load_subfigure_model(model_path=str) -> "figure_separator_model":
     cuda = torch.cuda.is_available() and (gpu_id >= 0)
     if objd_ckpt:
         if cuda:
-            model.load_state_dict(torch.load(objd_ckpt)["model_state_dict"])
-            classifier_model.load_state_dict(torch.load(clsf_ckpt)["model_state_dict"])
+            model.load_state_dict(torch.load(objd_ckpt))
+            classifier_model.load_state_dict(torch.load(clsf_ckpt))
         else:
-            model.load_state_dict(torch.load(objd_ckpt,map_location='cpu')["model_state_dict"])
-            classifier_model.load_state_dict(torch.load(clsf_ckpt, map_location='cpu')["model_state_dict"])
+            model.load_state_dict(torch.load(objd_ckpt,map_location='cpu'))
+            classifier_model.load_state_dict(torch.load(clsf_ckpt, map_location='cpu'))
     dtype = torch.cuda.FloatTensor if cuda else torch.FloatTensor
     if cuda:
         print("using cuda: ", args.gpu_id) 
@@ -86,7 +86,7 @@ def load_masterimg_model(model_path=str) -> "figure_separator_model":
         figure_separator_model: A tuple (model, confidence_threshold, nms_threshold, img_size, gpu)
     """
     # Paths to config/checkpoint files
-    objd_ckpt = model_path + "checkpoints/snapshot12000.ckpt" # object detector
+    objd_ckpt = model_path + "checkpoints/classifier_model.pt" 
     cnfg_file = model_path + "config/yolov3_default_master.cfg"
         
     # Open the config file
@@ -104,9 +104,9 @@ def load_masterimg_model(model_path=str) -> "figure_separator_model":
     cuda = torch.cuda.is_available() and (gpu_id >= 0)
     if objd_ckpt:
         if cuda:
-            model.load_state_dict(torch.load(objd_ckpt)["model_state_dict"])
+            model.load_state_dict(torch.load(objd_ckpt))
         else:
-            model.load_state_dict(torch.load(objd_ckpt,map_location='cpu')["model_state_dict"])
+            model.load_state_dict(torch.load(objd_ckpt,map_location='cpu'))
 
     dtype = torch.cuda.FloatTensor if cuda else torch.FloatTensor
     
