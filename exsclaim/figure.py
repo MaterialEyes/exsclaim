@@ -29,8 +29,8 @@ def load_subfigure_model(model_path=str) -> "figure_separator_model":
     """
 
     # Paths to config/checkpoint files
-    objd_ckpt = model_path + "checkpoints/snapshot13400.ckpt"
-    clsf_ckpt = model_path + "checkpoints/snapshot260.ckpt"  # classifier
+    objd_ckpt = model_path + "checkpoints/object_detection_model.pt"
+    clsf_ckpt = model_path + "checkpoints/text_recognition_model.pt"
     cnfg_file = model_path + "config/yolov3_default_subfig.cfg"
         
     # Open the config file
@@ -58,17 +58,20 @@ def load_subfigure_model(model_path=str) -> "figure_separator_model":
     cuda = torch.cuda.is_available() and (gpu_id >= 0)
     if objd_ckpt:
         if cuda:
-            model.load_state_dict(torch.load(objd_ckpt)["model_state_dict"])
-            classifier_model.load_state_dict(torch.load(clsf_ckpt)["model_state_dict"])
+            model.load_state_dict(torch.load(objd_ckpt))
+            classifier_model.load_state_dict(torch.load(clsf_ckpt))
         else:
-            model.load_state_dict(torch.load(objd_ckpt,map_location='cpu')["model_state_dict"])
-            classifier_model.load_state_dict(torch.load(clsf_ckpt, map_location='cpu')["model_state_dict"])
+            model.load_state_dict(torch.load(objd_ckpt,map_location='cpu'))
+            classifier_model.load_state_dict(torch.load(clsf_ckpt, map_location='cpu'))
     dtype = torch.cuda.FloatTensor if cuda else torch.FloatTensor
     if cuda:
         print("using cuda: ", args.gpu_id) 
         torch.cuda.set_device(device=args.gpu_id)
         model = model.cuda()
         classifier_model = classifier_model.cuda()
+
+    # with open("classifier_model.pt", "wb+") as f:
+    #     torch.save(classifier_model.state_dict(), f)
 
     return (model, classifier_model, dtype, confidence_threshold, nms_threshold, image_size, gpu_id)
 
@@ -83,7 +86,7 @@ def load_masterimg_model(model_path=str) -> "figure_separator_model":
         figure_separator_model: A tuple (model, confidence_threshold, nms_threshold, img_size, gpu)
     """
     # Paths to config/checkpoint files
-    objd_ckpt = model_path + "checkpoints/snapshot12000.ckpt" # object detector
+    objd_ckpt = model_path + "checkpoints/classifier_model.pt" 
     cnfg_file = model_path + "config/yolov3_default_master.cfg"
         
     # Open the config file
@@ -101,9 +104,9 @@ def load_masterimg_model(model_path=str) -> "figure_separator_model":
     cuda = torch.cuda.is_available() and (gpu_id >= 0)
     if objd_ckpt:
         if cuda:
-            model.load_state_dict(torch.load(objd_ckpt)["model_state_dict"])
+            model.load_state_dict(torch.load(objd_ckpt))
         else:
-            model.load_state_dict(torch.load(objd_ckpt,map_location='cpu')["model_state_dict"])
+            model.load_state_dict(torch.load(objd_ckpt,map_location='cpu'))
 
     dtype = torch.cuda.FloatTensor if cuda else torch.FloatTensor
     
@@ -131,6 +134,12 @@ def get_figure_paths(search_query: dict) -> list:
     return paths
 
 
+def detect_subfigure_labels(subfigure_label_model, figure_path):
+    subfigure_label_model.eval()
+
+
+
+
 def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple, figure_path=str, save_path="") -> "figure_dict":
     """
     Find individual image objects within a figure and classify based on functionality
@@ -149,12 +158,12 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
     model.eval()
     classifier_model.eval()
     mi_model.eval()
-
     os.makedirs(save_path+"/extractions", exist_ok=True)
     
     label_names = ["background","microscopy","parent","graph","illustration","diffraction","basic_photo",
                    "unclear","OtherSubfigure","a","b","c","d","e","f"]
 
+    # Preprocess the figure for the models
     img = io.imread(figure_path)
     if len(np.shape(img)) == 2:
         img = cv2.cvtColor(img,cv2.COLOR_GRAY2RGB)
@@ -347,98 +356,10 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
     img_draw = ImageDraw.Draw(label_img)
     # font_draw = ImageFont.truetype("FreeSerifBoldItalic.ttf", 15)
 
-    # # Case where full-figure is the master image itself.
-    if len(pair_info) == 1:
-        subfigure_id = 0
-        sub_cat,x,y,w,h = (subfigure_padded_labels[0,subfigure_id]* feature_size[feature_index] ).to(torch.int16).data.cpu().numpy()
-        best_anchor = np.argmax(preds[:,y,x,4])
-        tx,ty = np.array(preds[best_anchor,y,x,:2]/32,np.int32)
-        best_anchor = np.argmax(preds[:,ty,tx,4])
-        x,y,w,h = preds[best_anchor,ty,tx,:4]
-        cls = np.argmax(preds[best_anchor,int(ty),int(tx),5:])
-        master_label = label_names[cls]
-        subfigure_label = chr(int(sub_cat/feature_size[feature_index])+ord("a"))
+    full_figure_is_master = True if len(pair_info) == 1 else False
 
-        master_cls_conf = max(softmax(preds[best_anchor,int(ty),int(tx),5:]))
-        master_obj_conf = preds[best_anchor,ty,tx,4]
-        # print("CLASS: {0} ({1})".format(label_names[cls],master_cls_conf))
-
-        # x1 = (x-w/2)
-        # x2 = (x+w/2)
-        # y1 = (y-h/2)
-        # y2 = (y+h/2)
-        x1 = 0
-        x2 = np.shape(label_img)[1]
-        y1 = 0
-        y2 = np.shape(label_img)[0]
- 
-        # x1,y1,x2,y2 = yolobox2label([y1,x1,y2,x2], info_img)
-
-
-        # print(np.shape(label_img))
-
-        # visualization
-        patch = img_raw.crop((int(x1),int(y1),int(x2),int(y2)))
-        
-        master_label = label_names[cls]
-        subfigure_label = chr(int(sub_cat/feature_size[feature_index])+ord("a"))
-        
-        text = "%s %f %d %d %d %d\n"%(master_label, master_cls_conf*master_obj_conf, int(x1), int(y1), int(x2), int(y2))
-
-        with open(os.path.join(save_path+"/extractions/",sample_image_name+".txt"),"a+") as results_file:
-            results_file.write(text)
-        
-        img_draw.line([(x1,y1),(x1,y2),(x2,y2),(x2,y1),(x1,y1)], fill=(255,0,0), width=3)
-        img_draw.rectangle((x2-100,y2-30,x2,y2),fill=(0,255,0))
-        img_draw.text((x2-100+2,y2-30+2),"{}, {}".format(master_label,subfigure_label),fill=(255,0,0))
-        
-        text = "%s\n%s"%(master_label,subfigure_label)
-        draw.text((10,60+100*subfigure_id),text,fill="white",font=font)
-        pw,ph = patch.size
-        if pw>ph:
-            ph = max(1,ph/pw*80)
-            pw = 80
-        else:
-            pw = max(1,pw/ph*80)
-            ph = 80
-
-        patch = patch.resize((int(pw),int(ph)))
-        result_image.paste(patch,box=(110,60+100*subfigure_id))
-
-        # documentation
-        master_image_info = {}
-        master_image_info["classification"] = master_label
-        master_image_info["confidence"] = float("{0:.4f}".format(master_cls_conf))
-        master_image_info["geometry"] = []
-        for x in [int(x1), int(x2)]:
-            for y in [int(y1), int(y2)]:
-                geometry = {}
-                geometry["x"] = x
-                geometry["y"] = y
-                master_image_info["geometry"].append(geometry)
-        subfigure_label_info = {}
-        # subfigure_label_info["text"] = subfigure_label
-        subfigure_label_info["text"] = "0"
-        subfigure_label_info["geometry"] = []
-
-        # _,x1,y1,x2,y2 = subfigure_labels_copy[subfigure_id]
-        # x2 += x1
-        # y2 += y1
-        # for x in [int(x1), int(x2)]:
-        #     for y in [int(y1), int(y2)]:
-        #         geometry = {}
-        #         geometry["x"] = x
-        #         geometry["y"] = y
-        #         subfigure_label_info["geometry"].append(geometry)
-
-        master_image_info["subfigure_label"] = subfigure_label_info
-        current_info["master_images"].append(master_image_info)
-        
-    json_info["figure_separator_results"]=[current_info]
-        
-    result_image.save(os.path.join(save_path+"/extractions/"+sample_image_name+".png"))
-
-    for subfigure_id in range(0, len(pair_info)-1):   
+    # max to handle case where pair info has only 1 (the full figure is the master image)
+    for subfigure_id in range(0, max(len(pair_info)-1, 1)):   
     # for subfigure_id in range(0, len(pair_info)-1):
         sub_cat,x,y,w,h = (subfigure_padded_labels[0,subfigure_id]* feature_size[feature_index] ).to(torch.int16).data.cpu().numpy()
         best_anchor = np.argmax(preds[:,y,x,4])
@@ -446,21 +367,30 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
         best_anchor = np.argmax(preds[:,ty,tx,4])
         x,y,w,h = preds[best_anchor,ty,tx,:4]
         cls = np.argmax(preds[best_anchor,int(ty),int(tx),5:])
+        master_label = label_names[cls]
+        subfigure_label = chr(int(sub_cat/feature_size[feature_index])+ord("a"))
+
         master_cls_conf = max(softmax(preds[best_anchor,int(ty),int(tx),5:]))
         master_obj_conf = preds[best_anchor,ty,tx,4]
         # print("CLASS: {0} ({1})".format(label_names[cls],master_cls_conf))
 
-        x1 = (x-w/2)
-        x2 = (x+w/2)
-        y1 = (y-h/2)
-        y2 = (y+h/2)
+        if full_figure_is_master:
+            x1 = 0
+            x2 = np.shape(label_img)[1]
+            y1 = 0
+            y2 = np.shape(label_img)[0]
+            subfigure_label = "0"
+
+        else: 
+            x1 = (x-w/2)
+            x2 = (x+w/2)
+            y1 = (y-h/2)
+            y2 = (y+h/2)
  
-        x1,y1,x2,y2 = yolobox2label([y1,x1,y2,x2], info_img)
+            x1,y1,x2,y2 = yolobox2label([y1,x1,y2,x2], info_img)
+        
         # visualization
         patch = img_raw.crop((int(x1),int(y1),int(x2),int(y2)))
-        
-        master_label = label_names[cls]
-        subfigure_label = chr(int(sub_cat/feature_size[feature_index])+ord("a"))
         
         text = "%s %f %d %d %d %d\n"%(master_label, master_cls_conf*master_obj_conf, int(x1), int(y1), int(x2), int(y2))
         with open(os.path.join(save_path+"/extractions/",sample_image_name+".txt"),"a+") as results_file:
@@ -497,15 +427,17 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
         subfigure_label_info = {}
         subfigure_label_info["text"] = subfigure_label
         subfigure_label_info["geometry"] = []
-        _,x1,y1,x2,y2 = subfigure_labels_copy[subfigure_id]
-        x2 += x1
-        y2 += y1
-        for x in [int(x1), int(x2)]:
-            for y in [int(y1), int(y2)]:
-                geometry = {}
-                geometry["x"] = x
-                geometry["y"] = y
-                subfigure_label_info["geometry"].append(geometry)
+
+        if not full_figure_is_master:
+            _,x1,y1,x2,y2 = subfigure_labels_copy[subfigure_id]
+            x2 += x1
+            y2 += y1
+            for x in [int(x1), int(x2)]:
+                for y in [int(y1), int(y2)]:
+                    geometry = {}
+                    geometry["x"] = x
+                    geometry["y"] = y
+                    subfigure_label_info["geometry"].append(geometry)
         master_image_info["subfigure_label"] = subfigure_label_info
         current_info["master_images"].append(master_image_info)
         
