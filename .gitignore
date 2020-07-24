@@ -1,9 +1,7 @@
-CDE/env_cde
-CDE/.env_cde
-exsclaim/objects/models
+exsclaim/figures/checkpoints
 exsclaim/text/images
-exsclaim/objects/checkpoints
-exsclaim/objects/input_images
-images
-exsclaim/images
 utils/phase_out/
+*/__pycache__/
+*.ckpt
+*.pt
+extracted/
