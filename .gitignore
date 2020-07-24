@@ -1,7 +1,10 @@
 exsclaim/figures/checkpoints
 exsclaim/text/images
 utils/phase_out/
-*/__pycache__/
+__pycache__/
+*.py[cod]
 *.ckpt
 *.pt
 extracted/
+*.egg
+*.egg-info/
