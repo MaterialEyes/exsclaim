@@ -152,12 +152,13 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
         figure_dict: A dictionary with classified image_objects extracted from figure
     """
     # Unpack models and eval
-    model, classifier_model, dtype, confidence_threshold, nms_threshold, image_size, _ = subfigure_label_model
-    mi_model, _ = master_image_model
+    object_detection_model, text_recognition_model, dtype, confidence_threshold, nms_threshold, image_size, _ = subfigure_label_model
+    classifier_model, _ = master_image_model
 
-    model.eval()
+    object_detection_model.eval()
+    text_recognition_model.eval()
     classifier_model.eval()
-    mi_model.eval()
+    
     os.makedirs(save_path+"/extractions", exist_ok=True)
     
     label_names = ["background","microscopy","parent","graph","illustration","diffraction","basic_photo",
@@ -181,7 +182,7 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
     img_raw = Image.open(figure_path).convert("RGB")
     width, height = img_raw.size
     with torch.no_grad():
-        outputs = model(img)
+        outputs = object_detection_model(img)
         outputs = postprocess(outputs, dtype=dtype, 
                     conf_thre=confidence_threshold, nms_thre=nms_threshold)
     # This is how it was!
@@ -240,7 +241,7 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
         img_patch, _ = preprocess(img_patch, 28, jitter=0)
         img_patch = np.transpose(img_patch / 255., (2, 0, 1))
         img_patch = torch.from_numpy(img_patch).type(dtype).unsqueeze(0)
-        label_prediction = classifier_model(img_patch)
+        label_prediction = text_recognition_model(img_patch)
         label_conf = np.amax(F.softmax(label_prediction, dim=1).data.cpu().numpy())
         label_value = chr(label_prediction.argmax(dim=1).data.cpu().numpy()[0]+ord("a"))
         if label_value == "z":
@@ -334,7 +335,7 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
     img_raw = Image.fromarray(np.uint8(concate_img[...,:3].copy()[...,::-1]))
     width, height = img_raw.size
     with torch.no_grad():
-        outputs = mi_model(img, padded_label_list)
+        outputs = classifier_model(img, padded_label_list)
 
     # select the 13x13 grid as feature map
     feature_size = [13,26,52]
