@@ -129,6 +129,45 @@ def get_figure_paths(search_query: dict) -> list:
         paths+=glob.glob(search_query['results_dir']+'figures/*'+ext)
     return paths
 
+def detect_subfigure_boundaries(object_detection_model, confidence_threshold, nms_threshold, figure_path, image_size, dtype):
+    # Preprocess the figure for the models
+    img = io.imread(figure_path)
+    if len(np.shape(img)) == 2:
+        img = cv2.cvtColor(img,cv2.COLOR_GRAY2RGB)
+    else:
+        img = cv2.cvtColor(img,cv2.COLOR_RGBA2RGB)
+    
+    img, info_img = preprocess(img, image_size, jitter=0)
+    
+    img = np.transpose(img / 255., (2, 0, 1))
+    img = np.copy(img)
+    img = torch.from_numpy(img).float().unsqueeze(0)
+    img = Variable(img.type(dtype))
+
+    # prediction
+    img_raw = Image.open(figure_path).convert("RGB")
+    width, height = img_raw.size
+    with torch.no_grad():
+        outputs = object_detection_model(img)
+        outputs = postprocess(outputs, dtype=dtype, 
+                    conf_thre=confidence_threshold, nms_thre=nms_threshold)
+
+    bboxes = list()
+    confidences = []
+
+    if outputs[0] is None:
+        print("No Objects Detected!!")
+    else:
+        for x1, y1, x2, y2, conf, cls_conf, cls_pred in outputs[0]:
+            box = yolobox2label([y1.data.cpu().numpy(), x1.data.cpu().numpy(), y2.data.cpu().numpy(), x2.data.cpu().numpy()], info_img)
+            box[0] = int(min(max(box[0],0),width-1))
+            box[1] = int(min(max(box[1],0),height-1))
+            box[2] = int(min(max(box[2],0),width))
+            box[3] = int(min(max(box[3],0),height))
+            if box[2]-box[0] > 5 and box[3]-box[1] > 5:
+                bboxes.append(box)
+                confidences.append("%.3f"%(cls_conf.item()))
+    return bboxes, confidences, img, img_raw
 
 def detect_subfigure_labels(text_recognition_model, bboxes, confidences, img_raw):
     cuda = torch.cuda.is_available() and (gpu_id >= 0)
@@ -230,44 +269,8 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
     label_names = ["background","microscopy","parent","graph","illustration","diffraction","basic_photo",
                    "unclear","OtherSubfigure","a","b","c","d","e","f"]
 
-    # Preprocess the figure for the models
-    img = io.imread(figure_path)
-    if len(np.shape(img)) == 2:
-        img = cv2.cvtColor(img,cv2.COLOR_GRAY2RGB)
-    else:
-        img = cv2.cvtColor(img,cv2.COLOR_RGBA2RGB)
-    
-    img, info_img = preprocess(img, image_size, jitter=0)
-    
-    img = np.transpose(img / 255., (2, 0, 1))
-    img = np.copy(img)
-    img = torch.from_numpy(img).float().unsqueeze(0)
-    img = Variable(img.type(dtype))
-
-    # prediction
-    img_raw = Image.open(figure_path).convert("RGB")
-    width, height = img_raw.size
-    with torch.no_grad():
-        outputs = object_detection_model(img)
-        outputs = postprocess(outputs, dtype=dtype, 
-                    conf_thre=confidence_threshold, nms_thre=nms_threshold)
-
-    bboxes = list()
-    confidences = []
-
-    if outputs[0] is None:
-        print("No Objects Detected!!")
-    else:
-        for x1, y1, x2, y2, conf, cls_conf, cls_pred in outputs[0]:
-            box = yolobox2label([y1.data.cpu().numpy(), x1.data.cpu().numpy(), y2.data.cpu().numpy(), x2.data.cpu().numpy()], info_img)
-            box[0] = int(min(max(box[0],0),width-1))
-            box[1] = int(min(max(box[1],0),height-1))
-            box[2] = int(min(max(box[2],0),width))
-            box[3] = int(min(max(box[3],0),height))
-            if box[2]-box[0] > 5 and box[3]-box[1] > 5:
-                bboxes.append(box)
-                confidences.append("%.3f"%(cls_conf.item()))
-
+    bboxes, confidences, img, img_raw = detect_subfigure_boundaries(object_detection_model, confidence_threshold, nms_threshold,
+                                                     figure_path, image_size, dtype)
 
     # save results
     sample_image_name = ".".join(figure_path.split("/")[-1].split(".")[0:-1])
