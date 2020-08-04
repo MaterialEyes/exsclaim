@@ -232,8 +232,6 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
 
     width, height = img_raw.size
     binary_img = np.zeros((height,width,1))
-    pair_dtype = [("x1",float),("y1",float),("x2",float),("y2",float),("cat",int)]
-    subfigure_pair_info_bboxes = []
 
     detected_labels = []
     detected_bboxes = []
@@ -261,6 +259,8 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
     
     # post processing
     assert len(detected_labels) == len(detected_bboxes)
+    pair_info = []
+    # pair_info is list of tuples, each tuple being (x1, y1, x2, y2, label's alphabetical number) where coords are percentages
     for i in range(len(detected_labels)):
         label_value = detected_labels[i]
         if (ord(label_value) - ord("a")) < (len(detected_labels)+2):
@@ -268,16 +268,10 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
             if (x2-x1) < 64 and (y2-y1)< 64: # Made this bigger because it was missing some images with labels
                 binary_img[y1:y2,x1:x2] = 255
                 text = "%s %f %d %d %d %d\n"%(label_value, conf, x1, y1, x2, y2)
-                subfigure_pair_info_bboxes.append(tuple([x1/width,y1/height,x2/width,y2/height, ord(label_value)-ord("a")]))
+                pair_info.append(tuple([x1/width,y1/height,x2/width,y2/height, ord(label_value)-ord("a")]))
 
     # save concatenate image and pair info
-    subfigure_pair_info_bboxes = np.array(subfigure_pair_info_bboxes, dtype=pair_dtype)
     concate_img = np.concatenate((np.array(img_raw),binary_img),axis=2)
-
-    pair_info = []
-    pair_info.append([width, height])
-    for bbox in subfigure_pair_info_bboxes:
-        pair_info.append([bbox,bbox])
     
     # documentation
     json_info = {}
@@ -300,23 +294,22 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
     current_info["master_images"] = []
     current_info["unassigned"] = []
     
-    width, height = pair_info[0]
     subfigure_labels = []
-    for i in range(1, len(pair_info)):
-        subfigure, master = pair_info[i]
-        
+    for subfigure in pair_info:        
         x1,y1,x2,y2,c = subfigure
         x1, x2 = float(x1*width), float(x2*width)
         y1, y2 = float(y1*height), float(y2*height)
         subfigure_labels.append([])
         subfigure_labels[-1].append(c)
         subfigure_labels[-1].extend([x1,y1,x2-x1,y2-y1])
+
     
     subfigure_labels_copy = subfigure_labels.copy()
     
     subfigure_padded_labels = np.zeros((80, 5))
     if len(subfigure_labels) > 0:
         subfigure_labels = np.stack(subfigure_labels)
+        # convert coco labels to yolo
         subfigure_labels = label2yolobox(subfigure_labels, info_img, image_size, lrflip=False)
         subfigure_padded_labels[range(len(subfigure_labels))[:80]
                       ] = subfigure_labels[:80]
@@ -337,7 +330,7 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
     preds = outputs[feature_index]
     preds = preds[0].data.cpu().numpy()
     
-    result_image = Image.new(mode="RGB",size=(200,len(pair_info)*100-50))
+    result_image = Image.new(mode="RGB",size=(200,(len(pair_info)+1)*100-50))
     draw = ImageDraw.Draw(result_image)
     font = ImageFont.load_default()
 
@@ -350,11 +343,11 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
     label_img = img_raw.copy()
     img_draw = ImageDraw.Draw(label_img)
 
-    full_figure_is_master = True if len(pair_info) == 1 else False
+    full_figure_is_master = True if len(pair_info) == 0 else False
 
     # max to handle case where pair info has only 1 (the full figure is the master image)
-    for subfigure_id in range(0, max(len(pair_info)-1, 1)):   
-        sub_cat,x,y,w,h = (subfigure_padded_labels[0,subfigure_id]* feature_size[feature_index] ).to(torch.int16).data.cpu().numpy()
+    for subfigure_id in range(0, max(len(pair_info), 1)):   
+        sub_cat,x,y,w,h = (subfigure_padded_labels[0,subfigure_id] * 13 ).to(torch.int16).data.cpu().numpy()
         best_anchor = np.argmax(preds[:,y,x,4])
         tx,ty = np.array(preds[best_anchor,y,x,:2]/32,np.int32)
         best_anchor = np.argmax(preds[:,ty,tx,4])
