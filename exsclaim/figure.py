@@ -5,6 +5,7 @@ import yaml
 import glob
 import torch
 import shutil
+import pathlib
 
 import numpy as np
 import torch.nn.functional as F
@@ -16,6 +17,8 @@ from PIL import Image, ImageDraw, ImageFont
 
 from .figures.models.yolov3 import *
 from .figures.utils.utils import *
+from .figures.models.network import *
+
 
 def load_subfigure_model(model_path=str) -> "figure_separator_model":
     """
@@ -30,7 +33,7 @@ def load_subfigure_model(model_path=str) -> "figure_separator_model":
 
     # Paths to config/checkpoint files
     objd_ckpt = model_path + "checkpoints/object_detection_model.pt"
-    clsf_ckpt = model_path + "checkpoints/text_recognition_model.pt"
+    text_recognition_checkpoint = pathlib.Path(__file__).parent / 'figures' / 'checkpoints' / 'text_recognition_model.pt'
     cnfg_file = model_path + "config/yolov3_default_subfig.cfg"
         
     # Open the config file
@@ -45,35 +48,28 @@ def load_subfigure_model(model_path=str) -> "figure_separator_model":
     gpu_id                = 1
 
     # load object_detect model
-    model = YOLOv3(cfg['MODEL'])
-
+    object_detection_model = YOLOv3(cfg['MODEL'])
     # load classifier model
-    classifier_model = None
-    for m in model.module_list:
+    text_recognition_model = None
+    for m in object_detection_model.module_list:
         if hasattr(m,"classifier_model"):
-            classifier_model = m.classifier_model
+            text_recognition_model = m.classifier_model
             break
-    assert classifier_model != None
+    assert text_recognition_model != None
 
     cuda = torch.cuda.is_available() and (gpu_id >= 0)
-    if objd_ckpt:
-        if cuda:
-            model.load_state_dict(torch.load(objd_ckpt))
-            classifier_model.load_state_dict(torch.load(clsf_ckpt))
-        else:
-            model.load_state_dict(torch.load(objd_ckpt,map_location='cpu'))
-            classifier_model.load_state_dict(torch.load(clsf_ckpt, map_location='cpu'))
-    dtype = torch.cuda.FloatTensor if cuda else torch.FloatTensor
     if cuda:
+        object_detection_model.load_state_dict(torch.load(objd_ckpt))
+        text_recognition_model.load_state_dict(torch.load(text_recognition_checkpoint))
         print("using cuda: ", args.gpu_id) 
         torch.cuda.set_device(device=args.gpu_id)
-        model = model.cuda()
-        classifier_model = classifier_model.cuda()
-
-    # with open("classifier_model.pt", "wb+") as f:
-    #     torch.save(classifier_model.state_dict(), f)
-
-    return (model, classifier_model, dtype, confidence_threshold, nms_threshold, image_size, gpu_id)
+        object_detection_model = object_detection_model.cuda()
+        text_recognition_model = text_recognition_model.cuda()
+    else:
+        object_detection_model.load_state_dict(torch.load(objd_ckpt,map_location='cpu'))
+        text_recognition_model.load_state_dict(torch.load(text_recognition_checkpoint, map_location='cpu'))
+    dtype = torch.cuda.FloatTensor if cuda else torch.FloatTensor
+    return (object_detection_model, text_recognition_model, dtype, confidence_threshold, nms_threshold, image_size, gpu_id)
 
 def load_masterimg_model(model_path=str) -> "figure_separator_model":
     """
@@ -134,8 +130,54 @@ def get_figure_paths(search_query: dict) -> list:
     return paths
 
 
-def detect_subfigure_labels(subfigure_label_model, figure_path):
-    subfigure_label_model.eval()
+def detect_subfigure_labels(text_recognition_model, bboxes, confidences, img_raw):
+    cuda = torch.cuda.is_available() and (gpu_id >= 0)
+    dtype = torch.cuda.FloatTensor if cuda else torch.FloatTensor
+
+    width, height = img_raw.size
+    binary_img = np.zeros((height,width,1))
+
+    detected_labels = []
+    detected_bboxes = []
+    for i in range(len(bboxes)):
+        img_patch = img_raw.crop(tuple(bboxes[i]))
+        img_patch = np.array(img_patch)[:,:,::-1]
+        img_patch, _ = preprocess(img_patch, 28, jitter=0)
+        img_patch = np.transpose(img_patch / 255., (2, 0, 1))
+        img_patch = torch.from_numpy(img_patch).type(dtype).unsqueeze(0)
+        label_prediction = text_recognition_model(img_patch)
+        label_conf = np.amax(F.softmax(label_prediction, dim=1).data.cpu().numpy())
+        label_value = chr(label_prediction.argmax(dim=1).data.cpu().numpy()[0]+ord("a"))
+        if label_value == "z":
+            pass
+        else:
+            x1,y1,x2,y2 = int(bboxes[i][0]),int(bboxes[i][1]),int(bboxes[i][2]),int(bboxes[i][3])
+            conf = float(confidences[i])*label_conf
+            if label_value in detected_labels:
+                label_index = detected_labels.index(label_value)
+                if conf > detected_bboxes[label_index][0]:
+                    detected_bboxes[label_index] = [conf,x1,y1,x2,y2]
+            else:
+                detected_labels.append(label_value)
+                detected_bboxes.append([conf,x1,y1,x2,y2])
+    
+    # post processing
+    assert len(detected_labels) == len(detected_bboxes)
+    pair_info = []
+    # pair_info is list of tuples, each tuple being (x1, y1, x2, y2, label's alphabetical number) where coords are percentages
+    for i in range(len(detected_labels)):
+        label_value = detected_labels[i]
+        if (ord(label_value) - ord("a")) < (len(detected_labels)+2):
+            conf,x1,y1,x2,y2 = detected_bboxes[i]
+            if (x2-x1) < 64 and (y2-y1)< 64: # Made this bigger because it was missing some images with labels
+                binary_img[y1:y2,x1:x2] = 255
+                text = "%s %f %d %d %d %d\n"%(label_value, conf, x1, y1, x2, y2)
+                pair_info.append(tuple([x1/width,y1/height,x2/width,y2/height, ord(label_value)-ord("a")]))
+    # save concatenate image and pair info
+    concate_img = np.concatenate((np.array(img_raw),binary_img),axis=2)
+    
+    return pair_info, concate_img
+
 
 def make_visualization(image_raw, x1, x2, y1, y2, master_cls_conf, master_obj_conf, draw,
                        master_label, sample_image_name, img_draw, subfigure_label, font, subfigure_id):
@@ -233,46 +275,9 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
     width, height = img_raw.size
     binary_img = np.zeros((height,width,1))
 
-    detected_labels = []
-    detected_bboxes = []
-    for i in range(len(bboxes)):
-        img_patch = img_raw.crop(tuple(bboxes[i]))
-        img_patch = np.array(img_patch)[:,:,::-1]
-        img_patch, _ = preprocess(img_patch, 28, jitter=0)
-        img_patch = np.transpose(img_patch / 255., (2, 0, 1))
-        img_patch = torch.from_numpy(img_patch).type(dtype).unsqueeze(0)
-        label_prediction = text_recognition_model(img_patch)
-        label_conf = np.amax(F.softmax(label_prediction, dim=1).data.cpu().numpy())
-        label_value = chr(label_prediction.argmax(dim=1).data.cpu().numpy()[0]+ord("a"))
-        if label_value == "z":
-            pass
-        else:
-            x1,y1,x2,y2 = int(bboxes[i][0]),int(bboxes[i][1]),int(bboxes[i][2]),int(bboxes[i][3])
-            conf = float(confidences[i])*label_conf
-            if label_value in detected_labels:
-                label_index = detected_labels.index(label_value)
-                if conf > detected_bboxes[label_index][0]:
-                    detected_bboxes[label_index] = [conf,x1,y1,x2,y2]
-            else:
-                detected_labels.append(label_value)
-                detected_bboxes.append([conf,x1,y1,x2,y2])
-    
-    # post processing
-    assert len(detected_labels) == len(detected_bboxes)
-    pair_info = []
-    # pair_info is list of tuples, each tuple being (x1, y1, x2, y2, label's alphabetical number) where coords are percentages
-    for i in range(len(detected_labels)):
-        label_value = detected_labels[i]
-        if (ord(label_value) - ord("a")) < (len(detected_labels)+2):
-            conf,x1,y1,x2,y2 = detected_bboxes[i]
-            if (x2-x1) < 64 and (y2-y1)< 64: # Made this bigger because it was missing some images with labels
-                binary_img[y1:y2,x1:x2] = 255
-                text = "%s %f %d %d %d %d\n"%(label_value, conf, x1, y1, x2, y2)
-                pair_info.append(tuple([x1/width,y1/height,x2/width,y2/height, ord(label_value)-ord("a")]))
-
-    # save concatenate image and pair info
-    concate_img = np.concatenate((np.array(img_raw),binary_img),axis=2)
-    
+    ## Detect the subfigure labels on each of the bboxes found
+    pair_info, concate_img = detect_subfigure_labels(text_recognition_model, bboxes, confidences, img_raw)
+   
     # documentation
     json_info = {}
     json_info["figure_separator_results"] = []
