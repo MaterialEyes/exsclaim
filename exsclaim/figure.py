@@ -137,7 +137,33 @@ def get_figure_paths(search_query: dict) -> list:
 def detect_subfigure_labels(subfigure_label_model, figure_path):
     subfigure_label_model.eval()
 
+def make_visualization(image_raw, x1, x2, y1, y2, master_cls_conf, master_obj_conf, draw,
+                       master_label, sample_image_name, img_draw, subfigure_label, font, subfigure_id):
+    # visualization
+    patch = img_raw.crop((int(x1),int(y1),int(x2),int(y2)))
+    
+    text = "%s %f %d %d %d %d\n"%(master_label, master_cls_conf*master_obj_conf, int(x1), int(y1), int(x2), int(y2))
 
+    os.makedirs(save_path+"/extractions", exist_ok=True)
+    with open(os.path.join(save_path+"/extractions/",sample_image_name+".txt"),"a+") as results_file:
+        results_file.write(text)
+    img_draw.line([(x1,y1),(x1,y2),(x2,y2),(x2,y1),(x1,y1)], fill=(255,0,0), width=3)
+    img_draw.rectangle((x2-100,y2-30,x2,y2),fill=(0,255,0))
+    img_draw.text((x2-100+2,y2-30+2),"{}, {}".format(master_label,subfigure_label),fill=(255,0,0))
+    
+    text = "%s\n%s"%(master_label,subfigure_label)
+    draw.text((10,60+100*subfigure_id),text,fill="white",font=font)
+    
+    pw,ph = patch.size
+    if pw>ph:
+        ph = max(1,ph/pw*80)
+        pw = 80
+    else:
+        pw = max(1,pw/ph*80)
+        ph = 80
+
+    patch = patch.resize((int(pw),int(ph)))
+    result_image.paste(patch,box=(110,60+100*subfigure_id))    
 
 
 def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple, figure_path=str, save_path="") -> "figure_dict":
@@ -158,8 +184,6 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
     object_detection_model.eval()
     text_recognition_model.eval()
     classifier_model.eval()
-    
-    os.makedirs(save_path+"/extractions", exist_ok=True)
     
     label_names = ["background","microscopy","parent","graph","illustration","diffraction","basic_photo",
                    "unclear","OtherSubfigure","a","b","c","d","e","f"]
@@ -185,25 +209,7 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
         outputs = object_detection_model(img)
         outputs = postprocess(outputs, dtype=dtype, 
                     conf_thre=confidence_threshold, nms_thre=nms_threshold)
-    # This is how it was!
-    # if outputs[0] is None:
-    #     print("No Objects Deteted!!")
 
-    # bboxes = list()
-    # confidences = []
-    # for x1, y1, x2, y2, conf, cls_conf, cls_pred in outputs[0]:
-    #     box = yolobox2label([y1.data.cpu().numpy(), x1.data.cpu().numpy(), y2.data.cpu().numpy(), x2.data.cpu().numpy()], info_img)
-    #     box[0] = int(min(max(box[0],0),width-1))
-    #     box[1] = int(min(max(box[1],0),height-1))
-    #     box[2] = int(min(max(box[2],0),width))
-    #     box[3] = int(min(max(box[3],0),height))
-    #     if box[2]-box[0] > 5 and box[3]-box[1] > 5:
-    #         bboxes.append(box)
-    #         confidences.append("%.3f"%(cls_conf.item()))
-
-    # ====================================================== 
-    # ====== This is what I tried to replace it with! ====== 
-    # ====================================================== 
     bboxes = list()
     confidences = []
 
@@ -219,20 +225,16 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
             if box[2]-box[0] > 5 and box[3]-box[1] > 5:
                 bboxes.append(box)
                 confidences.append("%.3f"%(cls_conf.item()))
-    # ====================================================== 
-    # ====================================================== 
-    # ======================================================
+
 
     # save results
     sample_image_name = ".".join(figure_path.split("/")[-1].split(".")[0:-1])
 
-    # img_raw.save(os.path.join(inpt_dir,sample_image_name+".png"))
     width, height = img_raw.size
     binary_img = np.zeros((height,width,1))
     pair_dtype = [("x1",float),("y1",float),("x2",float),("y2",float),("cat",int)]
     subfigure_pair_info_bboxes = []
-    # with open(os.path.join(outpt_dir,sample_image_name+".txt"),"a+") as results_file:
-        # results_file.write("z 1 0 0 1 1\n")
+
     detected_labels = []
     detected_bboxes = []
     for i in range(len(bboxes)):
@@ -263,27 +265,19 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
         label_value = detected_labels[i]
         if (ord(label_value) - ord("a")) < (len(detected_labels)+2):
             conf,x1,y1,x2,y2 = detected_bboxes[i]
-            # if (x2-x1) < 50 and (y2-y1)< 50: 
             if (x2-x1) < 64 and (y2-y1)< 64: # Made this bigger because it was missing some images with labels
                 binary_img[y1:y2,x1:x2] = 255
                 text = "%s %f %d %d %d %d\n"%(label_value, conf, x1, y1, x2, y2)
                 subfigure_pair_info_bboxes.append(tuple([x1/width,y1/height,x2/width,y2/height, ord(label_value)-ord("a")]))
-                # with open(os.path.join(outpt_dir,sample_image_name+".txt"),"a+") as results_file:
-                #     results_file.write(text)
-        else:
-            pass
 
     # save concatenate image and pair info
     subfigure_pair_info_bboxes = np.array(subfigure_pair_info_bboxes, dtype=pair_dtype)
     concate_img = np.concatenate((np.array(img_raw),binary_img),axis=2)
-    # np.save(os.path.join(concat_dir,sample_image_name+".npy"),concate_img)
-
 
     pair_info = []
     pair_info.append([width, height])
     for bbox in subfigure_pair_info_bboxes:
         pair_info.append([bbox,bbox])
-    # np.save(os.path.join(pair_info_dir,sample_image_name+".npy"),pair_info)
     
     # documentation
     json_info = {}
@@ -355,13 +349,11 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
     
     label_img = img_raw.copy()
     img_draw = ImageDraw.Draw(label_img)
-    # font_draw = ImageFont.truetype("FreeSerifBoldItalic.ttf", 15)
 
     full_figure_is_master = True if len(pair_info) == 1 else False
 
     # max to handle case where pair info has only 1 (the full figure is the master image)
     for subfigure_id in range(0, max(len(pair_info)-1, 1)):   
-    # for subfigure_id in range(0, len(pair_info)-1):
         sub_cat,x,y,w,h = (subfigure_padded_labels[0,subfigure_id]* feature_size[feature_index] ).to(torch.int16).data.cpu().numpy()
         best_anchor = np.argmax(preds[:,y,x,4])
         tx,ty = np.array(preds[best_anchor,y,x,:2]/32,np.int32)
@@ -373,7 +365,6 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
 
         master_cls_conf = max(softmax(preds[best_anchor,int(ty),int(tx),5:]))
         master_obj_conf = preds[best_anchor,ty,tx,4]
-        # print("CLASS: {0} ({1})".format(label_names[cls],master_cls_conf))
 
         if full_figure_is_master:
             x1 = 0
@@ -394,6 +385,8 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
         patch = img_raw.crop((int(x1),int(y1),int(x2),int(y2)))
         
         text = "%s %f %d %d %d %d\n"%(master_label, master_cls_conf*master_obj_conf, int(x1), int(y1), int(x2), int(y2))
+
+        os.makedirs(save_path+"/extractions", exist_ok=True)
         with open(os.path.join(save_path+"/extractions/",sample_image_name+".txt"),"a+") as results_file:
             results_file.write(text)
         img_draw.line([(x1,y1),(x1,y2),(x2,y2),(x2,y1),(x1,y1)], fill=(255,0,0), width=3)
@@ -443,8 +436,7 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
         current_info["master_images"].append(master_image_info)
         
     json_info["figure_separator_results"]=[current_info]
-        
     del draw
     result_image.save(os.path.join(save_path+"/extractions/"+sample_image_name+".png"))
-
+    
     return json_info
