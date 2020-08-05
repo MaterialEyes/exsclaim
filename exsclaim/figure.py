@@ -167,7 +167,7 @@ def detect_subfigure_boundaries(object_detection_model, confidence_threshold, nm
             if box[2]-box[0] > 5 and box[3]-box[1] > 5:
                 bboxes.append(box)
                 confidences.append("%.3f"%(cls_conf.item()))
-    return bboxes, confidences, img, img_raw
+    return bboxes, confidences, img_raw
 
 def detect_subfigure_labels(text_recognition_model, bboxes, confidences, img_raw):
     cuda = torch.cuda.is_available() and (gpu_id >= 0)
@@ -217,74 +217,11 @@ def detect_subfigure_labels(text_recognition_model, bboxes, confidences, img_raw
     
     return pair_info, concate_img
 
-
-def make_visualization(image_raw, x1, x2, y1, y2, master_cls_conf, master_obj_conf, draw,
-                       master_label, sample_image_name, img_draw, subfigure_label, font, subfigure_id):
-    # visualization
-    patch = img_raw.crop((int(x1),int(y1),int(x2),int(y2)))
-    
-    text = "%s %f %d %d %d %d\n"%(master_label, master_cls_conf*master_obj_conf, int(x1), int(y1), int(x2), int(y2))
-
-    os.makedirs(save_path+"/extractions", exist_ok=True)
-    with open(os.path.join(save_path+"/extractions/",sample_image_name+".txt"),"a+") as results_file:
-        results_file.write(text)
-    img_draw.line([(x1,y1),(x1,y2),(x2,y2),(x2,y1),(x1,y1)], fill=(255,0,0), width=3)
-    img_draw.rectangle((x2-100,y2-30,x2,y2),fill=(0,255,0))
-    img_draw.text((x2-100+2,y2-30+2),"{}, {}".format(master_label,subfigure_label),fill=(255,0,0))
-    
-    text = "%s\n%s"%(master_label,subfigure_label)
-    draw.text((10,60+100*subfigure_id),text,fill="white",font=font)
-    
-    pw,ph = patch.size
-    if pw>ph:
-        ph = max(1,ph/pw*80)
-        pw = 80
-    else:
-        pw = max(1,pw/ph*80)
-        ph = 80
-
-    patch = patch.resize((int(pw),int(ph)))
-    result_image.paste(patch,box=(110,60+100*subfigure_id))    
-
-
-def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple, figure_path=str, save_path="") -> "figure_dict":
-    """
-    Find individual image objects within a figure and classify based on functionality
-
-    Args:
-        figure_separator_model: A tuple (model, confidence_threshold, nms_threshold, img_size, gpu)
-        figure_path: A path to the figure to separate
-
-    Returns:
-        figure_dict: A dictionary with classified image_objects extracted from figure
-    """
-    # Unpack models and eval
-    object_detection_model, text_recognition_model, dtype, confidence_threshold, nms_threshold, image_size, _ = subfigure_label_model
-    classifier_model, _ = master_image_model
-
-    object_detection_model.eval()
-    text_recognition_model.eval()
-    classifier_model.eval()
-    
+def classify_subfigures(pair_info, concate_img, classifier_model, image_size, dtype, figure_path, img_raw):
     label_names = ["background","microscopy","parent","graph","illustration","diffraction","basic_photo",
                    "unclear","OtherSubfigure","a","b","c","d","e","f"]
-
-    bboxes, confidences, img, img_raw = detect_subfigure_boundaries(object_detection_model, confidence_threshold, nms_threshold,
-                                                     figure_path, image_size, dtype)
-
-    # save results
-    sample_image_name = ".".join(figure_path.split("/")[-1].split(".")[0:-1])
-
     width, height = img_raw.size
-    binary_img = np.zeros((height,width,1))
 
-    ## Detect the subfigure labels on each of the bboxes found
-    pair_info, concate_img = detect_subfigure_labels(text_recognition_model, bboxes, confidences, img_raw)
-   
-    # documentation
-    json_info = {}
-    json_info["figure_separator_results"] = []
-        
     img = concate_img[...,:3].copy()
     mask = concate_img[...,3:].copy()
 
@@ -296,12 +233,6 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
     img = torch.from_numpy(new_concate_img).float().unsqueeze(0)
     img = Variable(img.type(dtype))
 
-    # documentation
-    current_info = {}
-    current_info["figure_name"] = figure_path.split("/")[-1]
-    current_info["master_images"] = []
-    current_info["unassigned"] = []
-    
     subfigure_labels = []
     for subfigure in pair_info:        
         x1,y1,x2,y2,c = subfigure
@@ -310,7 +241,6 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
         subfigure_labels.append([])
         subfigure_labels[-1].append(c)
         subfigure_labels[-1].extend([x1,y1,x2-x1,y2-y1])
-
     
     subfigure_labels_copy = subfigure_labels.copy()
     
@@ -338,18 +268,17 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
     preds = outputs[feature_index]
     preds = preds[0].data.cpu().numpy()
     
-    result_image = Image.new(mode="RGB",size=(200,(len(pair_info)+1)*100-50))
-    draw = ImageDraw.Draw(result_image)
-    font = ImageFont.load_default()
+    ## List of tuples where each tuple represents a subfigures as
+    ## (x1, y1, x2, y2, subfigure label, )
+    subfigure_info = []
 
-    # headline text
-    text = "labels"
-    draw.text((10,10),text,fill="white",font=font)
-    text = "master image"
-    draw.text((110,10),text,fill="white",font=font)
-    
-    label_img = img_raw.copy()
-    img_draw = ImageDraw.Draw(label_img)
+    ## Documentation
+    current_info = {}
+    current_info["figure_name"] = figure_path.split("/")[-1]
+    current_info["master_images"] = []
+    current_info["unassigned"] = []
+    json_info = {}
+    json_info["figure_separator_results"] = []
 
     full_figure_is_master = True if len(pair_info) == 0 else False
 
@@ -369,9 +298,9 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
 
         if full_figure_is_master:
             x1 = 0
-            x2 = np.shape(label_img)[1]
+            x2 = np.shape(img_raw)[1]
             y1 = 0
-            y2 = np.shape(label_img)[0]
+            y2 = np.shape(img_raw)[0]
             subfigure_label = "0"
 
         else: 
@@ -381,33 +310,7 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
             y2 = (y+h/2)
  
             x1,y1,x2,y2 = yolobox2label([y1,x1,y2,x2], info_img)
-        
-        # visualization
-        patch = img_raw.crop((int(x1),int(y1),int(x2),int(y2)))
-        
-        text = "%s %f %d %d %d %d\n"%(master_label, master_cls_conf*master_obj_conf, int(x1), int(y1), int(x2), int(y2))
-
-        os.makedirs(save_path+"/extractions", exist_ok=True)
-        with open(os.path.join(save_path+"/extractions/",sample_image_name+".txt"),"a+") as results_file:
-            results_file.write(text)
-        img_draw.line([(x1,y1),(x1,y2),(x2,y2),(x2,y1),(x1,y1)], fill=(255,0,0), width=3)
-        img_draw.rectangle((x2-100,y2-30,x2,y2),fill=(0,255,0))
-        img_draw.text((x2-100+2,y2-30+2),"{}, {}".format(master_label,subfigure_label),fill=(255,0,0))
-        
-        text = "%s\n%s"%(master_label,subfigure_label)
-        draw.text((10,60+100*subfigure_id),text,fill="white",font=font)
-        
-        pw,ph = patch.size
-        if pw>ph:
-            ph = max(1,ph/pw*80)
-            pw = 80
-        else:
-            pw = max(1,pw/ph*80)
-            ph = 80
-
-        patch = patch.resize((int(pw),int(ph)))
-        result_image.paste(patch,box=(110,60+100*subfigure_id))
-
+  
         # documentation
         master_image_info = {}
         master_image_info["classification"] = master_label
@@ -437,7 +340,86 @@ def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple,
         current_info["master_images"].append(master_image_info)
         
     json_info["figure_separator_results"]=[current_info]
-    del draw
-    result_image.save(os.path.join(save_path+"/extractions/"+sample_image_name+".png"))
     
+    return json_info
+
+
+def make_visualization(image_raw, x1, x2, y1, y2, master_cls_conf, master_obj_conf,
+                       master_label, subfigure_label):
+    sample_image_name = ".".join(figure_path.split("/")[-1].split(".")[0:-1])
+    # ## Make and save images
+    # result_image = Image.new(mode="RGB",size=(200,(len(pair_info)+1)*100-50))
+    # draw = ImageDraw.Draw(result_image)
+    # font = ImageFont.load_default()
+
+    # # headline text
+    # text = "labels"
+    # draw.text((10,10),text,fill="white",font=font)
+    # text = "master image"
+    # draw.text((110,10),text,fill="white",font=font)
+    
+    # label_img = img_raw.copy()
+    # img_draw = ImageDraw.Draw(label_img)
+
+    # # max to handle case where pair info has only 1 (the full figure is the master image)
+    # for subfigure_id in range(0, max(len(pair_info), 1)):   
+        
+    #     # visualization
+    #     patch = img_raw.crop((int(x1),int(y1),int(x2),int(y2)))
+        
+    #     text = "%s %f %d %d %d %d\n"%(master_label, master_cls_conf*master_obj_conf, int(x1), int(y1), int(x2), int(y2))
+
+    #     os.makedirs(save_path+"/extractions", exist_ok=True)
+    #     with open(os.path.join(save_path+"/extractions/",sample_image_name+".txt"),"a+") as results_file:
+    #         results_file.write(text)
+    #     img_draw.line([(x1,y1),(x1,y2),(x2,y2),(x2,y1),(x1,y1)], fill=(255,0,0), width=3)
+    #     img_draw.rectangle((x2-100,y2-30,x2,y2),fill=(0,255,0))
+    #     img_draw.text((x2-100+2,y2-30+2),"{}, {}".format(master_label,subfigure_label),fill=(255,0,0))
+        
+    #     text = "%s\n%s"%(master_label,subfigure_label)
+    #     draw.text((10,60+100*subfigure_id),text,fill="white",font=font)
+        
+    #     pw,ph = patch.size
+    #     if pw>ph:
+    #         ph = max(1,ph/pw*80)
+    #         pw = 80
+    #     else:
+    #         pw = max(1,pw/ph*80)
+    #         ph = 80
+
+    #     patch = patch.resize((int(pw),int(ph)))
+    #     result_image.paste(patch,box=(110,60+100*subfigure_id))
+
+    # del draw
+    # result_image.save(os.path.join(save_path+"/extractions/"+sample_image_name+".png"))   
+
+
+def extract_image_objects(subfigure_label_model=tuple, master_image_model=tuple, figure_path=str, save_path="") -> "figure_dict":
+    """
+    Find individual image objects within a figure and classify based on functionality
+
+    Args:
+        figure_separator_model: A tuple (model, confidence_threshold, nms_threshold, img_size, gpu)
+        figure_path: A path to the figure to separate
+
+    Returns:
+        figure_dict: A dictionary with classified image_objects extracted from figure
+    """
+    # Unpack models and eval
+    object_detection_model, text_recognition_model, dtype, confidence_threshold, nms_threshold, image_size, _ = subfigure_label_model
+    classifier_model, _ = master_image_model
+
+    object_detection_model.eval()
+    text_recognition_model.eval()
+    classifier_model.eval()
+    
+    ## Detect the bounding boxes of each subfigure
+    bboxes, confidences, img_raw = detect_subfigure_boundaries(object_detection_model, confidence_threshold, nms_threshold,
+                                                     figure_path, image_size, dtype)
+
+    ## Detect the subfigure labels on each of the bboxes found
+    pair_info, concate_img = detect_subfigure_labels(text_recognition_model, bboxes, confidences, img_raw)
+        
+    json_info = classify_subfigures(pair_info, concate_img, classifier_model, image_size, dtype, figure_path, img_raw)
+        
     return json_info
