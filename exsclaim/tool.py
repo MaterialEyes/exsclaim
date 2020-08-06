@@ -16,7 +16,6 @@ import time
 from . import utils
 from . import journal
 from . import caption
-from . import figure
 
 from abc import ABC, abstractmethod
 
@@ -176,72 +175,6 @@ class CaptionSeparator(ExsclaimTool):
         # -- Save current exsclaim_dict -- #
         # -------------------------------- # 
         with open(search_query['results_dir']+'_cs.json', 'w') as f:
-            json.dump(exsclaim_dict, f, indent=3)
-        # -------------------------------- #  
-        # -------------------------------- # 
-        # -------------------------------- # 
-        return exsclaim_dict
-
-
-class FigureSeparator(ExsclaimTool):
-    """ 
-    FigureSeparator object.
-    Separate subfigure images from full figure image
-    using CNN trained on crowdsourced labeled figures
-    Parameters:
-    None
-    """
-    def __init__(self , model_path=""):
-        super().__init__(model_path)
-
-    def _load_model(self):
-        if "" in self.model_path:
-            self.model_path = os.path.dirname(__file__)+'/figures/'
-        sf_model = figure.load_subfigure_model(self.model_path)
-        mi_model = figure.load_masterimg_model(self.model_path)
-        return (sf_model,mi_model)
-
-    def _update_exsclaim(self,exsclaim_dict,figure_name,figure_dict):
-        figure_name = figure_name.split("/")[-1]
-        for master_image in figure_dict['figure_separator_results'][0]['master_images']:
-            exsclaim_dict[figure_name]['master_images'].append(master_image)
-
-        for unassigned in figure_dict['figure_separator_results'][0]['unassigned']:
-            exsclaim_dict[figure_name]['unassigned']['master_images'].append(unassigned)
-        return exsclaim_dict
-
-    def _appendJSON(self,filename,json_dict):
-        with open(filename,'w') as f: 
-            json.dump(json_dict, f, indent=3)
-
-    def run(self,search_query,exsclaim_dict):
-        utils.Printer("Running Figure Separator\n")
-        os.makedirs(search_query['results_dir'], exist_ok=True)
-        t0 = time.time()
-        sf_model, mi_model = self._load_model()
-        counter = 1
-        figures = figure.get_figure_paths(search_query)
-        for figure_name in figures:
-            utils.Printer(">>> ({0} of {1}) ".format(counter,+\
-                len(figures))+\
-                "Extracting images from: "+figure_name.split("/")[-1])
-            try:
-                figure_dict = figure.extract_image_objects(sf_model, mi_model, figure_name, search_query['results_dir'])
-                exsclaim_dict = self._update_exsclaim(exsclaim_dict,figure_name,figure_dict)
-            except:
-                utils.Printer("<!> ERROR: An exception occurred in FigureSeparator\n")
-            
-            # Save to file every N iterations (to accomodate restart scenarios)
-            if counter%500 == 0:
-                self._appendJSON(search_query['results_dir']+'_fs.json',exsclaim_dict)
-            counter += 1
-        
-        t1 = time.time()
-        utils.Printer(">>> Time Elapsed: {0:.2f} sec ({1} figures)\n".format(t1-t0,int(counter-1)))
-        # -------------------------------- #  
-        # -- Save current exsclaim_dict -- #
-        # -------------------------------- # 
-        with open(search_query['results_dir']+'_fs.json', 'w') as f:
             json.dump(exsclaim_dict, f, indent=3)
         # -------------------------------- #  
         # -------------------------------- # 
