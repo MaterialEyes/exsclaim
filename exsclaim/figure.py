@@ -33,6 +33,7 @@ class FigureSeparator(ExsclaimTool):
     def __init__(self , model_path=""):
         super().__init__(model_path)
 
+
     def _load_model(self):
         ## Set configuration variables
         model_path = os.path.dirname(__file__)+'/figures/'
@@ -62,12 +63,7 @@ class FigureSeparator(ExsclaimTool):
 
         ## Load text recognition model
         text_recognition_checkpoint = pathlib.Path(__file__).parent / 'figures' / 'checkpoints' / 'text_recognition_model.pt'
-        text_recognition_model = None
-        for m in object_detection_model.module_list:
-            if hasattr(m,"classifier_model"):
-                text_recognition_model = m.classifier_model
-                break
-        assert text_recognition_model != None
+        text_recognition_model = resnet152()
         if self.cuda:
             text_recognition_model.load_state_dict(torch.load(text_recognition_checkpoint))
             text_recognition_model = text_recognition_model.cuda()  
@@ -83,7 +79,7 @@ class FigureSeparator(ExsclaimTool):
         classifier_model = YOLOv3img(master_config['MODEL'])
         if self.cuda:
             classifier_model.load_state_dict(torch.load(classifier_checkpoint))
-            classifier_model = model.cuda()
+            classifier_model = classifier_modelgit .cuda()
         else:
             classifier_model.load_state_dict(torch.load(classifier_checkpoint,map_location='cpu'))
         self.classifier_model = classifier_model
@@ -98,9 +94,11 @@ class FigureSeparator(ExsclaimTool):
             exsclaim_dict[figure_name]['unassigned']['master_images'].append(unassigned)
         return exsclaim_dict
 
+
     def _appendJSON(self,filename,json_dict):
         with open(filename,'w') as f: 
             json.dump(json_dict, f, indent=3)
+
 
     def run(self,search_query,exsclaim_dict):
         utils.Printer("Running Figure Separator\n")
@@ -152,6 +150,7 @@ class FigureSeparator(ExsclaimTool):
             paths+=glob.glob(search_query['results_dir']+'figures/*'+ext)
         return paths
 
+
     def detect_subfigure_boundaries(self, figure_path):
         # Preprocess the figure for the models
         img = io.imread(figure_path)
@@ -191,6 +190,7 @@ class FigureSeparator(ExsclaimTool):
                     bboxes.append(box)
                     confidences.append("%.3f"%(cls_conf.item()))
         return bboxes, confidences, img_raw
+
 
     def detect_subfigure_labels(self, bboxes, confidences, img_raw):
         width, height = img_raw.size
@@ -236,6 +236,7 @@ class FigureSeparator(ExsclaimTool):
         concate_img = np.concatenate((np.array(img_raw),binary_img),axis=2)
         
         return pair_info, concate_img
+
 
     def classify_subfigures(self, pair_info, concate_img, figure_path, img_raw):
         label_names = ["background","microscopy","parent","graph","illustration","diffraction","basic_photo",
