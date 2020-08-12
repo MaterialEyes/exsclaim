@@ -19,8 +19,6 @@ def assign_captions(figure):
     masters = []
 
     captions = unassigned.get("captions", {})
-
-    # not_assigned = set(captions.keys())
     not_assigned = set([a['label'] for a in captions])
 
     for index, master_image in enumerate(figure.get("master_images", [])):
@@ -131,14 +129,6 @@ class Pipeline:
             figure_json = self.exsclaim_dict[figure]
             masters, unassigned = assign_captions(figure_json)
 
-            # Shouldn't need this - its old. Remove eventually.
-            # if masters == [] and len(unassigned['captions']) == 1:
-            #     masters = [{'classification':'figure', 'confidence':None, 'geometry':figure_json["figure_path"],  \
-            #                "caption":unassigned['captions'][0]['description'],\
-            #                "keywords":unassigned['captions'][0]['keywords'],\
-            #                "general":unassigned['captions'][0]['general']}]
-            #     unassigned = {'master_images': [], 'dependent_images': [], 'inset_images': [], 'subfigure_labels': [], 'scale_bar_labels': [], 'scale_bar_lines': [], 'captions': []}
-
             figure_json["master_images"] = masters
             figure_json["unassigned"] = unassigned
 
@@ -147,21 +137,28 @@ class Pipeline:
 
         with open(search_query['results_dir']+'exsclaim.json', 'w') as f:
             json.dump(self.exsclaim_dict, f, indent=3)
+        
         return self.exsclaim_dict
 
     def to_file(self):
-        """
-
-
-
+        """ Saves data to a csv and saves subfigures as individual images
+        
+        Note: 
+            Will be run if 'save_subfigures' or 'csv' are in query['save_format']
+        Modifies:
+            Creates directories to save each subfigure and a csv file to save data
         """
         search_query = self.query_dict
-        utils.Printer("".join(["Printing Master Image Objects to: ",search_query['results_dir'].strip("/"),"/images","\n"]))
-        rows = [['article_url', 'figure_path','figure_num', 'image_path', \
-                 'master_label', 'dependent_id', 'inset_id', 'class', 'subclasses', 'caption', 'keywords', 'scale_bar', 'pixel_size']]
+        utils.Printer("".join(["Printing Master Image Objects to: ",
+                              search_query['results_dir'].strip("/"),"/images","\n"]))
+        # Rows for output csv file
+        rows = [['article_url', 'figure_path','figure_num', 'image_path',
+                 'master_label', 'dependent_id', 'inset_id', 'class',
+                 'subclasses', 'caption', 'keywords', 'scale_bar', 'pixel_size']]
 
         for figure_name in self.exsclaim_dict:
-            fig_base, fig_ext = os.path.splitext(figure_name)
+            # figure_name is <figure_root_name>.<figure_extension>
+            figure_root_name, figure_extension = os.path.splitext(figure_name)
             
             try:
                 figure = plt.imread(search_query['results_dir'] + "figures/" + figure_name)
@@ -169,94 +166,119 @@ class Pipeline:
                 print("Error printing {0} to file. It may be damaged!".format(figure_name))
                 figure = np.zeros((256,256))
 
+            ## Populate a CSV for each subfigure and save each master, inset, and
+            ## dependent image as their own file in a directory according to label
             figure_dict = self.exsclaim_dict[figure_name]
-            # Write masters to file
-            if figure_dict.get("master_images") == []:
-                pass
-            # I think I can delete this...
-            # elif not isinstance(figure_dict.get("master_images")[0]["geometry"], list):
-            #     image_dir  = figure_dict.get("master_images")[0]["geometry"].split("/")[-1].split(".jpg")[0]+"/0"
-            #     mname = figure_dict.get("master_images")[0]["geometry"].split("/")[-1].split(".jpg")[0]+"_0_fig.jpg"
-            #     mbase = "/".join([search_query['results_dir'].strip("/"),"images",image_dir])+"/"
-            #     os.makedirs(mbase, exist_ok=True)
-            #     try:
-            #         img = plt.imread(figure_dict.get("master_images")[0]['geometry'])
-            #         plt.imsave(mbase+mname,img) 
-            #     except:
-            #         pass 
-            else:
-                for midx, mimage in enumerate(figure_dict.get("master_images", [])):
-                    mbase = "/".join([search_query['results_dir'].strip("/"),"images",fig_base,mimage['subfigure_label']['text']])
-                    mcls  = 'uas' if mimage['classification'] is None else mimage['classification'][0:3].lower()
-                    mname = "/"+"_".join([figure_dict['figure_name'].split(fig_ext)[0],mimage['subfigure_label']['text'],mcls])+fig_ext
-                    mpatch = utils.labelbox_to_patch_v2(mimage['geometry'],figure)
-                    os.makedirs(mbase, exist_ok=True)
-                    mpatch =mpatch.copy(order='C')
+            for master_image in figure_dict.get("master_images", []):
+                # create a directory for each master image in 
+                # <results_dir>/images/<figure_name>/<subfigure_label>
+                directory = "/".join([search_query['results_dir'].strip("/"),
+                                      "images",
+                                      figure_root_name,
+                                      master_image['subfigure_label']['text']
+                                      ])
+                os.makedirs(directory, exist_ok=True)
+                # generate the name of the master_image
+                master_class  = ('uas' if master_image['classification'] is None 
+                                       else master_image['classification'][0:3].lower())
+                master_name = "/" + "_".join([figure_root_name,
+                                              master_image['subfigure_label']['text'],
+                                              master_class
+                                            ]) + figure_extension
+                # save master image to file
+                master_patch = utils.crop_from_geometry(master_image['geometry'], figure)
+                master_patch = master_patch.copy(order='C')
+                try:
+                    plt.imsave(directory + master_name, master_patch)  
+                except Exception as err:
+                    print("Error in saving cropped master image: {}".format(err))        
+                # append data to rows for csv
+                rows.append([figure_dict["article_url"], figure_dict["figure_path"],
+                             figure_root_name.split("_fig")[-1], 
+                             directory+master_name, 
+                             master_image['subfigure_label']['text'], None, None,
+                             master_image['classification'], master_image['general'],
+                             master_image['caption'], master_image['keywords'],
+                             master_image.get('scale_bar', {}).get('label', {}).get('text', None),
+                             None])
+                
+                # Repeat for dependents of the master image to file
+                for dependent_id, dependent_image in enumerate(master_image.get("dependent_images", [])):
+                    dependent_root_name = "/".join([directory, "dependent"])
+                    os.makedirs(dependent_root_name, exist_ok=True)
+                    dependent_class  = ('uas' if dependent_image['classification'] is None 
+                                              else dependent_image['classification'][0:3].lower())
+                    dependent_name = "_".join([master_name.split('par')[0] +
+                                              "dep" + str(dependent_id),
+                                              dependent_class
+                                              ]) + figure_extension
+                    # save dependent image to file
+                    dpatch = utils.crop_from_geometry(dependent_image['geometry'], figure)
                     try:
-                        plt.imsave(mbase+mname,mpatch)  
-                    except:
-                        pass        
-                    rows.append([figure_dict["article_url"],figure_dict["figure_path"],fig_base.split("_fig")[-1],mbase+mname,\
-                           mimage['subfigure_label']['text'], None, None,\
-                           mimage['classification'],mimage['general'],mimage['caption'],mimage['keywords'],\
-                           mimage.get('scale_bar', {}).get('label', {}).get('text', None),None])
-                    # Write dependents of masters to file
-                    for didx, dimage in enumerate(mimage.get("dependent_images", [])):
-                        dbase = "/".join([mbase,"dependent"])
-                        dcls  = 'uas' if dimage['classification'] is None else dimage['classification'][0:3].lower()
-                        dname = "_".join([mname.split('par')[0]+"dep"+str(didx),dcls])+fig_ext
-                        dpatch = utils.labelbox_to_patch_v2(dimage['geometry'],figure)
-                        os.makedirs(dbase, exist_ok=True)
-
-                        try:
-                            plt.imsave(dbase+dname,dpatch) 
-                        except:
-                            pass 
-        
-                        rows.append([figure_dict["article_url"],figure_dict["figure_path"],fig_base.split("_fig")[-1],dbase+dname,\
-                            mimage['subfigure_label']['text'], str(didx), None,\
-                            dimage['classification'],None, None,\
-                            dimage.get('scale_bar', {}).get('label', {}).get('text', None),None])
-                        # Write insets of dependents to file
-                        for iidx, iimage in enumerate(dimage.get("inset_images", [])):
-                            ibase = "/".join([dbase,"inset"])
-                            icls  = 'uas' if iimage['classification'] is None else iimage['classification'][0:3].lower()
-                            iname = "_".join([dname.split(fig_ext)[0][0:-3]+"ins"+str(iidx),icls])+fig_ext
-                            
-                            ipatch = utils.labelbox_to_patch_v2(iimage['geometry'],figure)
-                            os.makedirs(ibase, exist_ok=True)
-
-                            try:
-                                plt.imsave(ibase+iname,ipatch)
-                            except:
-                                pass 
-
-                            rows.append([figure_dict["article_url"],figure_dict["figure_path"],fig_base.split("_fig")[-1],ibase+iname,\
-                                mimage['subfigure_label']['text'], str(didx), str(iidx),\
-                                iimage['classification'],None, None,\
-                                iimage.get('scale_bar', {}).get('label', {}).get('text', None),None])
-                    # Write insets of masters to file
-                    for iidx, iimage in enumerate(mimage.get("inset_images", [])):
-                        ibase = "/".join([mbase,"inset"])
-                        icls  = 'uas' if iimage['classification'] is None else iimage['classification'][0:3].lower()
-                        iname = "_".join([mname.split(fig_ext)[0][0:-3]+"ins"+str(iidx),icls])+fig_ext
-                        ipatch = utils.labelbox_to_patch_v2(iimage['geometry'],figure)
-                        os.makedirs(ibase, exist_ok=True)
+                        plt.imsave(dependent_root_name+dependent_name,dpatch) 
+                    except Exception as err:
+                        print("Error in saving cropped dependent image: {}".format(err)) 
+                    # append data to rows for csv
+                    rows.append([figure_dict["article_url"], figure_dict["figure_path"],
+                                figure_root_name.split("_fig")[-1],
+                                dependent_root_name + dependent_name,
+                                master_image['subfigure_label']['text'],
+                                str(dependent_id), None,
+                                dependent_image['classification'], None, None,
+                                dependent_image.get('scale_bar', {}).get('label', {}).get('text', None),
+                                None])
+                    # Repeat for insets of dependents of master image to file
+                    for inset_id, inset_image in enumerate(dependent_image.get("inset_images", [])):
+                        inset_root_name = "/".join([dependent_root_name,"inset"])
+                        os.makedirs(inset_root_name, exist_ok=True)
+                        inset_classification  = ('uas' if inset_image['classification'] is None
+                                                 else inset_image['classification'][0:3].lower())
+                        inset_name = "_".join([dependent_name.split(figure_extension)[0][0:-3] +
+                                               "ins" + str(inset_id),
+                                               inset_classification]) + figure_extension
                         
+                        ipatch = utils.crop_from_geometry(inset_image['geometry'],figure)
+                        # save inset image to file
                         try:
-                            plt.imsave(ibase+iname,ipatch)
-                        except:
-                            pass 
-        
-                        rows.append([figure_dict["article_url"],figure_dict["figure_path"],fig_base.split("_fig")[-1],ibase+iname,\
-                            mimage['subfigure_label']['text'], None, str(iidx),\
-                            iimage['classification'],None, None,\
-                            iimage.get('scale_bar', {}).get('label', {}).get('text', None),None])
-
+                            plt.imsave(inset_root_name+inset_name,ipatch)
+                        except Exception as err:
+                            print("Error in saving cropped inset image: {}".format(err))
+                        # append data to rows for csv
+                        rows.append([figure_dict["article_url"], figure_dict["figure_path"],
+                                     figure_root_name.split("_fig")[-1],
+                                     inset_root_name+inset_name,
+                                     master_image['subfigure_label']['text'],
+                                     str(dependent_id), str(inset_id),
+                                     inset_image['classification'], None, None,
+                                     inset_image.get('scale_bar', {}).get('label', {}).get('text', None),
+                                     None])
+                # Write insets of masters to file
+                for inset_id, inset_image in enumerate(master_image.get("inset_images", [])):
+                    inset_root_name = "/".join([directory,"inset"])
+                    os.makedirs(inset_root_name, exist_ok=True)
+                    inset_classification  = ('uas' if inset_image['classification'] is None
+                                              else inset_image['classification'][0:3].lower())
+                    inset_name = "_".join([master_name.split(figure_extension)[0][0:-3] +
+                                           "ins" + str(inset_id),
+                                           inset_classification]) + figure_extension
+                    ipatch = utils.crop_from_geometry(inset_image['geometry'], figure)
+                    # save inset image to file
+                    try:
+                        plt.imsave(inset_root_name+inset_name,ipatch)
+                    except Exception as err:
+                        print("Error in saving cropped dependent image: {}".format(err))  
+                    # append data to rows for csv
+                    rows.append([figure_dict["article_url"], figure_dict["figure_path"],
+                                 figure_root_name.split("_fig")[-1],
+                                 inset_root_name + inset_name,
+                                 master_image['subfigure_label']['text'],
+                                 None, str(inset_id),
+                                 inset_image['classification'], None, None,
+                                 inset_image.get('scale_bar', {}).get('label', {}).get('text', None),
+                                 None])
+        # write rows to csv file
         with open(search_query['results_dir']+'labels.csv', 'w') as csvFile:
             writer = csv.writer(csvFile)
             writer.writerows(rows)
-        csvFile.close()
 
         utils.Printer(">>> SUCCESS!\n")
-

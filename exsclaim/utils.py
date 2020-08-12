@@ -3,15 +3,20 @@ import json
 import yaml
 import collections
 
-def labelbox_to_patch(lb,img):
-    x1,y1=lb[0]["x"],lb[0]["y"]
-    x2,y2=lb[2]["x"],lb[2]["y"]
-    return img[y1:y2,x1:x2]
+def crop_from_geometry(geometry, image):
+    """ Returns an image cropped to include coordinates in geometry
 
-def labelbox_to_patch_v2(lb,img):
-    x1,y1=lb[0]["x"],lb[0]["y"]
-    x2,y2=lb[2]["x"],lb[1]["y"]
-    return img[y1:y2,x1:x2]
+    Args:
+        geometry (list of dicts): Geometry JSON from exsclaim JSON.
+            4 dicts, each have x and y coords for corners of bounding
+            box. [Top left, bottom left, top right, bottom right]
+        image (np.array): Numpy array representing an image to be cropped
+    Returns:
+        Cropped image according to geometry given as numpy array
+    """
+    x1, y1 = geometry[0]["x"], geometry[0]["y"]
+    x2, y2 = geometry[3]["x"], geometry[3]["y"]
+    return image[y1:y2,x1:x2]
 
 def is_disjoint(l1,l2) -> bool:
     """
