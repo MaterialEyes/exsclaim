@@ -1,5 +1,6 @@
 from exsclaim.pipeline import Pipeline
-from exsclaim.tool import JournalScraper, CaptionSeparator, FigureSeparator
+from exsclaim.tool import JournalScraper, CaptionSeparator
+from exsclaim.figure import FigureSeparator
 
 # Set query paths
 query_path = "query/nature-twins-Fe3O4-thinfilms.json"

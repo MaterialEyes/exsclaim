@@ -34,10 +34,6 @@ class FigureSeparator(ExsclaimTool):
         super().__init__(model_path)
         self._load_model()
         self.exsclaim_json = {}
-        self.current_figure_json = {'master_images' : [],
-                                    'unassigned' : 
-                                        {'master_images' : []}
-                                    }
 
 
     def _load_model(self):
@@ -100,10 +96,6 @@ class FigureSeparator(ExsclaimTool):
             exsclaim_dict[figure_name]['unassigned']['master_images'].append(unassigned)
         return exsclaim_dict
 
-    
-    def _update_mongo(self, exsclaim_dict):
-        pass
-
 
     def _appendJSON(self,filename,json_dict):
         with open(filename,'w') as f: 
@@ -115,8 +107,8 @@ class FigureSeparator(ExsclaimTool):
         """
         utils.Printer("Running Figure Separator\n")
         os.makedirs(search_query['results_dir'], exist_ok=True)
+        self.exsclaim_json = exsclaim_dict
         t0 = time.time()
-        self._load_model()
         counter = 1
         figures = self.get_figure_paths(search_query)
         for figure_name in figures:
@@ -124,14 +116,14 @@ class FigureSeparator(ExsclaimTool):
                 len(figures))+\
                 "Extracting images from: "+figure_name.split("/")[-1])
             #try:
-            figure_dict = self.extract_image_objects(figure_name, search_query['results_dir'])
-            exsclaim_dict = self._update_exsclaim(exsclaim_dict,figure_name,figure_dict)
+            self.extract_image_objects(figure_name)
+            self.make_visualization(figure_name, search_query['results_dir'])
             #except:
             #    utils.Printer("<!> ERROR: An exception occurred in FigureSeparator\n")
             
             # Save to file every N iterations (to accomodate restart scenarios)
             if counter%500 == 0:
-                self._appendJSON(search_query['results_dir']+'_fs.json',exsclaim_dict)
+                self._appendJSON(search_query['results_dir']+'_fs.json',self.exsclaim_json)
             counter += 1
         
         t1 = time.time()
@@ -140,11 +132,11 @@ class FigureSeparator(ExsclaimTool):
         # -- Save current exsclaim_dict -- #
         # -------------------------------- # 
         with open(search_query['results_dir']+'_fs.json', 'w') as f:
-            json.dump(exsclaim_dict, f, indent=3)
+            json.dump(self.exsclaim_json, f, indent=3)
         # -------------------------------- #  
         # -------------------------------- # 
         # -------------------------------- # 
-        return exsclaim_dict
+        return self.exsclaim_json
 
 
     def get_figure_paths(self, search_query: dict) -> list:
@@ -170,7 +162,8 @@ class FigureSeparator(ExsclaimTool):
             figure_path: A string, path to an image of a figure
                 from a scientific journal
         Returns:
-            hmm
+            subfigure_info (list of lists): Each inner list is
+                x1, y1, x2, y2, confidence 
         """
         ## Preprocess the figure for the models
         img = io.imread(figure_path)
@@ -218,12 +211,27 @@ class FigureSeparator(ExsclaimTool):
 
     def detect_subfigure_labels(self, figure_path, subfigure_info):
         """ Uses text recognition to read subfigure labels from figure_path
-
+        
+        Note: 
+            To get sensible results, should be run only after
+            detect_subfigure_boundaries has been run
         Args:
             figure_path (str): A path to the image (.png, .jpg, or .gif)
-                file containing the article figure 
+                file containing the article figure
+            subfigure_info (list of lists): Details about bounding boxes
+                of each subfigure from detect_subfigure_boundaries(). Each
+                inner list has format [x1, y1, x2, y2, confidence] where
+                x1, y1 are upper left bounding box coordinates as ints, 
+                x2, y2, are lower right, and confidence the models confidence
         Returns:
-            hmm
+            subfigure_info (list of tuples): Details about bounding boxes and 
+                labels of each subfigure in figure. Tuples for each subfigure are
+                (x1, y1, x2, y2, label) where x1, y1 are upper left x and y coord
+                divided by image width/height and label is the an integer n 
+                meaning the label is the nth letter
+            concate_img (np.ndarray): A numpy array representing the figure.
+                Used in classify_subfigures. Ideally this will be removed to 
+                increase modularity. 
         """
         img_raw = Image.open(figure_path).convert("RGB")
         width, height = img_raw.size
@@ -280,6 +288,9 @@ class FigureSeparator(ExsclaimTool):
     def classify_subfigures(self, figure_path, subfigure_labels, concate_img):
         """ Classifies the type of image each subfigure in figure_path 
 
+        Note: 
+            To get sensible results, should be run only after
+            detect_subfigure_boundaries and detect_subfigure_labels have run
         Args:
             figure_path (str): A path to the image (.png, .jpg, or .gif)
                 file containing the article figure
@@ -292,7 +303,9 @@ class FigureSeparator(ExsclaimTool):
                 Has been modified in detect_subfigure_labels. Ideally this 
                 parameter will be removed to increase modularity.
         Returns:
-            hmm
+            figure_json (dict): A figure json describing the data collected.
+        Modifies:
+            self.exsclaim_json (dict): Adds figure_json to exsclaim_json
         """
         label_names = ["background", "microscopy", "parent", "graph", 
                        "illustration", "diffraction", "basic_photo", "unclear",
@@ -334,12 +347,13 @@ class FigureSeparator(ExsclaimTool):
         preds = preds[0].data.cpu().numpy()
 
         ## Documentation
-        current_info = {}
-        current_info["figure_name"] = figure_path.split("/")[-1]
-        current_info["master_images"] = []
-        current_info["unassigned"] = []
-        json_info = {}
-        json_info["figure_separator_results"] = []
+        figure_name = figure_path.split("/")[-1]
+        figure_json = self.exsclaim_json.get(figure_name, {})
+        figure_json["figure_name"] = figure_name
+        figure_json.get("master_images", [])
+        # create an unassigned field with a master images field if it doesn't exist
+        figure_json.get("unassigned", {'master_images' : []}).get('master_images', [])
+
 
         full_figure_is_master = True if len(subfigure_labels) == 0 else False
 
@@ -353,9 +367,7 @@ class FigureSeparator(ExsclaimTool):
             classification = np.argmax(preds[best_anchor,int(ty),int(tx),5:])
             master_label = label_names[classification]
             subfigure_label = chr(int(sub_cat/feature_size[feature_index])+ord("a"))
-
             master_cls_conf = max(softmax(preds[best_anchor,int(ty),int(tx),5:]))
-            master_obj_conf = preds[best_anchor,ty,tx,4]
 
             if full_figure_is_master:
                 img_raw = Image.fromarray(np.uint8(concate_img[...,:3].copy()[...,::-1]))
@@ -398,28 +410,30 @@ class FigureSeparator(ExsclaimTool):
                 y2 += y1
                 for x in [int(x1), int(x2)]:
                     for y in [int(y1), int(y2)]:
-                        geometry = {}
-                        geometry["x"] = x
-                        geometry["y"] = y
+                        geometry = { "x" : x, "y" : y}
                         subfigure_label_info["geometry"].append(geometry)
             master_image_info["subfigure_label"] = subfigure_label_info
-            current_info["master_images"].append(master_image_info)
+            figure_json["master_images"].append(master_image_info)
             
-        json_info["figure_separator_results"]=[current_info]
-        
-        return json_info
+        self.exsclaim_json[figure_name] = figure_json
+        return figure_json
 
 
-    def make_visualization(self, image_raw, x1, x2, y1, y2, master_cls_conf, master_obj_conf,
-                        master_label, subfigure_label, pair_info):
+    def make_visualization(self, figure_path, save_path):
         """ Save subfigures and their labels as images
 
         Args:
-        Returns:
+            figure_path (str): A path to the image (.png, .jpg, or .gif)
+                file containing the article figure
+        Modifies:
+            Creates images and text files in <save_path>/extractions folders
+            showing details about each subfigure
         """
         sample_image_name = ".".join(figure_path.split("/")[-1].split(".")[0:-1])
+        figure_name = figure_path.split("/")[-1]
         ## Make and save images
-        result_image = Image.new(mode="RGB",size=(200,(len(pair_info)+1)*100-50))
+        figure_json = self.exsclaim_json[figure_name]
+        result_image = Image.new(mode="RGB",size=(200,(len(figure_json["master_images"])+1)*100-50))
         draw = ImageDraw.Draw(result_image)
         font = ImageFont.load_default()
 
@@ -429,16 +443,24 @@ class FigureSeparator(ExsclaimTool):
         text = "master image"
         draw.text((110,10),text,fill="white",font=font)
         
+        img_raw = Image.open(figure_path).convert("RGB")
         label_img = img_raw.copy()
         img_draw = ImageDraw.Draw(label_img)
 
         # max to handle case where pair info has only 1 (the full figure is the master image)
-        for subfigure_id in range(0, max(len(pair_info), 1)):   
+        for subfigure_id in range(0, max(len(figure_json["master_images"]), 1)): 
+            # extract relevant data from exsclaim json  
+            subfigure = figure_json["master_images"][subfigure_id]
+            geometry = subfigure["geometry"]
+            x1, y1 = geometry[0]["x"], geometry[0]["y"]
+            x2, y2 = geometry[3]["x"], geometry[3]["y"]
+            master_label = subfigure["classification"]
+            confidence = subfigure["confidence"]
+            subfigure_label = subfigure["subfigure_label"]["text"]
             
-            # visualization
             patch = img_raw.crop((int(x1),int(y1),int(x2),int(y2)))
-            
-            text = "%s %f %d %d %d %d\n"%(master_label, master_cls_conf*master_obj_conf, int(x1), int(y1), int(x2), int(y2))
+            text = "%s %f %d %d %d %d\n"%(master_label, confidence,
+                                          int(x1), int(y1), int(x2), int(y2))
 
             os.makedirs(save_path+"/extractions", exist_ok=True)
             with open(os.path.join(save_path+"/extractions/",sample_image_name+".txt"),"a+") as results_file:
@@ -465,14 +487,14 @@ class FigureSeparator(ExsclaimTool):
         result_image.save(os.path.join(save_path+"/extractions/"+sample_image_name+".png"))   
 
 
-    def extract_image_objects(self, figure_path=str, save_path="") -> "figure_dict":
+    def extract_image_objects(self, figure_path=str) -> "figure_dict":
         """ Separate and classify subfigures in an article figure
 
         Args:
             figure_path (str): A path to the image (.png, .jpg, or .gif)
                 file containing the article figure
         Returns:
-            figure_dict (dict): A dictionary with classified image_objects
+            figure_json (dict): A dictionary with classified image_objects
                 extracted from figure
         """
         ## Set models to evaluation mode
@@ -487,6 +509,6 @@ class FigureSeparator(ExsclaimTool):
         subfigure_info, concate_img = self.detect_subfigure_labels(figure_path, subfigure_info)
             
         ## Classify the subfigures
-        json_info = self.classify_subfigures(figure_path, subfigure_info, concate_img)
+        figure_json = self.classify_subfigures(figure_path, subfigure_info, concate_img)
 
-        return json_info
+        return figure_json
