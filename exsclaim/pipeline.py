@@ -7,60 +7,14 @@ import matplotlib.pyplot as plt
 
 from . import utils
 
-def assign_captions(figure):
-    """ Assigns all captions to master_images JSONs
-
-    param figure: a Figure JSON
-
-    returns (masters, unassigned): where masters is a list of master_images
-        JSONs and unassigned is the updated unassigned JSON
-    """
-    unassigned = figure.get("unassigned", [])
-    masters = []
-
-    captions = unassigned.get("captions", {})
-    not_assigned = set([a['label'] for a in captions])
-
-    for index, master_image in enumerate(figure.get("master_images", [])):
-        label_json = master_image.get("subfigure_label", {})
-        subfigure_label = label_json.get("text", index)            
-        processed_label = subfigure_label.replace(")","")
-        processed_label = processed_label.replace("(","")
-        processed_label = processed_label.replace(".","")
-        paired = False
-        for caption_label in captions:
-            processed_caption_label = caption_label['label'].replace(")","")
-            processed_capiton_label = processed_caption_label.replace("(","")
-            processed_caption_label = processed_caption_label.replace(".","")
-            if (processed_caption_label.lower() == processed_label.lower()) and \
-               (processed_caption_label.lower() in [a.lower() for a in not_assigned]):
-                master_image["caption"]  = caption_label['description']
-                master_image["keywords"] = caption_label['keywords']
-                master_image["general"]  = caption_label['general']
-                masters.append(master_image)
-                not_assigned.remove(caption_label['label'])
-                paired = True
-                break
-        if paired:
-            continue
-
-        master_image["caption"] = []
-        master_image["keywords"]= []
-        master_image["general"] = []
-        masters.append(master_image)
-
-    # new_unassigned_captions = {}
-    new_unassigned_captions = []
-    for caption_label in captions:
-        if caption_label['label'] in not_assigned:
-            # new_unassigned_captions[caption_label] = captions[caption_label]
-            new_unassigned_captions.append(caption_label)
-
-    unassigned["captions"] = new_unassigned_captions
-    return masters, unassigned
-
 class Pipeline:
     def __init__(self , query_path, exsclaim_path):
+        """ initialize a Pipeline to run on query path and save to exsclaim path
+
+        Args:
+            query_path (dict or path to json): An EXSCLAIM user query JSON
+            exsclaim_path (dict or path to json): EXSCLAIM JSON
+        """
         self.query_path = query_path
         try:
             with open(self.query_path) as f:
@@ -79,7 +33,18 @@ class Pipeline:
             # Keep preset values
             self.exsclaim_dict = {}
 
+
     def run(self, tools):
+        """ Run EXSCLAIM pipeline on Pipeline instance's query path
+
+        Args:
+            tools (list of ExsclaimTools): list of ExsclaimTool objects
+                to run on query path in the order they will run
+        Returns:
+            exsclaim_dict (dict): an exsclaim json
+        Modifies:
+            self.exsclaim_dict
+        """
         print("""
         @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
         @@@@@@@@@@@@@@@@@@@&   /&@@@(   /@@@@@@@@@@@@@@@@@@@
@@ -107,17 +72,82 @@ class Pipeline:
         @@@@@@@@@@@@@@@ ,@@@@@@@@@@@@@@@@@@@ &@@@@@@@@@@@@@@
         @@@@@@@@@@@@@@@@@@@@   ,%@@&/   (@@@@@@@@@@@@@@@@@@@
         @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-        """)
-        search_query = self.query_dict
+        """)        
+        # run each ExsclaimTool on search query
         for tool in tools:
-            self.exsclaim_dict = tool.run(search_query,self.exsclaim_dict)
+            self.exsclaim_dict = tool.run(self.query_dict,self.exsclaim_dict)
+        
+        # group unassigned objects
+        self.group_objects()
+
+        # Save results as specified
+        save_methods = self.query_dict.get("save_format", [])
+        if 'csv' in save_methods or 'save_subfigures' in save_methods:
+            self.to_file()
+
         return self.exsclaim_dict
 
+
+    def assign_captions(self, figure):
+        """ Assigns all captions to master_images JSONs for single figure
+
+        Args:
+            figure (dict): a Figure JSON
+        Returns: 
+            masters (list of dicts): list of master_images JSONs
+            unassigned (dict): the updated unassigned JSON
+        """
+        unassigned = figure.get("unassigned", [])
+        masters = []
+
+        captions = unassigned.get("captions", {})
+        not_assigned = set([a['label'] for a in captions])
+
+        for index, master_image in enumerate(figure.get("master_images", [])):
+            label_json = master_image.get("subfigure_label", {})
+            subfigure_label = label_json.get("text", index)
+            # remove periods or commas from around subfigure label
+            processed_label = subfigure_label.replace(")","")
+            processed_label = processed_label.replace("(","")
+            processed_label = processed_label.replace(".","")
+            paired = False
+            for caption_label in captions:
+                # remove periods or commas from around caption label
+                processed_caption_label = caption_label['label'].replace(")","")
+                processed_capiton_label = processed_caption_label.replace("(","")
+                processed_caption_label = processed_caption_label.replace(".","")
+                # check if caption label and subfigure label match and caption label
+                # has not already been matched
+                if (processed_caption_label.lower() == processed_label.lower()) and \
+                (processed_caption_label.lower() in [a.lower() for a in not_assigned]):
+                    master_image["caption"]  = caption_label['description']
+                    master_image["keywords"] = caption_label['keywords']
+                    master_image["general"]  = caption_label['general']
+                    masters.append(master_image)
+                    not_assigned.remove(caption_label['label'])
+                    # break to next master image if a pairing was found
+                    paired = True
+                    break
+            if paired:
+                continue
+            # no pairing found, create empty fields
+            master_image["caption"] = []
+            master_image["keywords"]= []
+            master_image["general"] = []
+            masters.append(master_image)
+
+        # update unassigned captions
+        new_unassigned_captions = []
+        for caption_label in captions:
+            if caption_label['label'] in not_assigned:
+                new_unassigned_captions.append(caption_label)
+
+        unassigned["captions"] = new_unassigned_captions
+        return masters, unassigned
+
+
     def group_objects(self):
-        """
-        Gather image objects that are part of the "unassigned" exsclaim_dict entry 
-        and group together based on their association with a given subfigure label.
-        """
+        """ Pair captions with subfigures for each figure in exsclaim json """
         search_query = self.query_dict
         utils.Printer("Matching Image Objects to Caption Text\n")
         counter = 1
@@ -127,7 +157,7 @@ class Pipeline:
                 "Matching objects from figure: "+figure)
     
             figure_json = self.exsclaim_dict[figure]
-            masters, unassigned = assign_captions(figure_json)
+            masters, unassigned = self.assign_captions(figure_json)
 
             figure_json["master_images"] = masters
             figure_json["unassigned"] = unassigned
@@ -139,6 +169,7 @@ class Pipeline:
             json.dump(self.exsclaim_dict, f, indent=3)
         
         return self.exsclaim_dict
+
 
     def to_file(self):
         """ Saves data to a csv and saves subfigures as individual images

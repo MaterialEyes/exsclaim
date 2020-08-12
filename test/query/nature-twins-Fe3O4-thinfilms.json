@@ -26,5 +26,7 @@
         }
     },
 
-    "results_dir": "extracted/nature-twins-Fe3O4-thinfilms/"
+    "results_dir": "extracted/nature-twins-Fe3O4-thinfilms/",
+
+    "save_format": ["csv", "save_figures"]
 }

@@ -21,5 +21,7 @@
         }
     },
     
-    "results_dir": "extracted/nature-haadf-ag-nanoparticles/"
+    "results_dir": "extracted/nature-haadf-ag-nanoparticles/",
+
+    "save_format": ["csv", "save_figures"]
 }

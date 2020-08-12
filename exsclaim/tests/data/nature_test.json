@@ -21,5 +21,9 @@
         }
     },
     
-    "results_dir": "extracted/nature-test/"
+    "results_dir": "extracted/nature-test/",
+
+    "mongo_connection": "mongodb://localhost:27017/",
+    
+    "save_format": ["mongo"]
 }

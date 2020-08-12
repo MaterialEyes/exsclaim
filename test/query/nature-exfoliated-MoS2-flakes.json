@@ -26,5 +26,7 @@
         }
     },
     
-    "results_dir": "extracted/nature-exfoliated-MoS2-flakes/"
+    "results_dir": "extracted/nature-exfoliated-MoS2-flakes/",
+
+    "save_format": ["csv", "save_figures"]
 }

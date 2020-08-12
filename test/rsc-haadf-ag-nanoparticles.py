@@ -20,9 +20,3 @@ exsclaim_pipeline = Pipeline(query_path=query_path , exsclaim_path=exsclaim_path
 
 # Run the tools through the pipeline
 exsclaim_pipeline.run(tools)
-
-# Group related image objects into master images
-exsclaim_pipeline.group_objects()
-
-# Save results to file
-exsclaim_pipeline.to_file()
