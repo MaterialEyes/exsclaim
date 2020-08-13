@@ -45,7 +45,11 @@ class JournalScraper(ExsclaimTool):
     None
     """
     def __init__(self):
-        pass
+        self.journals = {
+            'acs':      journal.ACS,
+            'nature':   journal.Nature,
+            'rsc':      journal.RSC,
+        }
 
     def _load_model(self):
         pass
@@ -87,9 +91,9 @@ class JournalScraper(ExsclaimTool):
         ## Checks that user inputted journal family has been defined and
         ## grabs instantiates an instance of the journal family object
         journal_family = search_query['journal_family']
-        if journal_family not in journal.journals:
+        if journal_family not in self.journals:
             raise NameError('journal family {0} is not defined'.format(journal_family))
-        j_instance = journal.journals[journal_family](search_query)
+        j_instance = self.journals[journal_family](search_query)
 
         os.makedirs(search_query['results_dir'], exist_ok=True)
         t0 = time.time()
@@ -155,13 +159,13 @@ class CaptionSeparator(ExsclaimTool):
             utils.Printer(">>> ({0} of {1}) ".format(counter,+\
                 len(exsclaim_dict))+\
                 "Parsing captions from: "+figure_name)
-            try:
-                caption_text  = exsclaim_dict[figure_name]['full_caption']
-                delimiter = caption.find_subfigure_delimiter(model,caption_text)
-                caption_dict  = caption.associate_caption_text(model,caption_text,search_query['query'])
-                exsclaim_dict = self._update_exsclaim(exsclaim_dict,figure_name,delimiter,caption_dict) 
-            except:
-                utils.Printer("<!> ERROR: An exception occurred in CaptionSeparator\n")
+            #try:
+            caption_text  = exsclaim_dict[figure_name]['full_caption']
+            delimiter = caption.find_subfigure_delimiter(model,caption_text)
+            caption_dict  = caption.associate_caption_text(model,caption_text,search_query['query'])
+            exsclaim_dict = self._update_exsclaim(exsclaim_dict,figure_name,delimiter,caption_dict) 
+            #except:
+            #    utils.Printer("<!> ERROR: An exception occurred in CaptionSeparator\n")
         
             # Save to file every N iterations (to accomodate restart scenarios)
             if counter%1000 == 0:

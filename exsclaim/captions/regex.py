@@ -5,12 +5,14 @@ import difflib
 import itertools
 import numpy as np
 
-dir_path = os.path.dirname(os.path.realpath(__file__))
-with open(dir_path + '/models/patterns.yml', 'r') as stream:
-    try:
-        caption_sentence_regex = yaml.safe_load(stream)
-    except yaml.YAMLError as exc:
-        print(exc)
+def load_caption_sentence_regex():
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + '/models/patterns.yml', 'r') as stream:
+        try:
+            caption_sentence_regex = yaml.safe_load(stream)
+        except yaml.YAMLError as exc:
+            print(exc)
+    return caption_sentence_regex
 
 def get_caption_tokenization(doc="spacy.tokens.doc.Doc", subfigure_tokens=list) -> "spacy.tokens.doc.Doc":
     """
@@ -469,6 +471,7 @@ def caption_sentence_findall(doc="spacy.tokens.doc.Doc", subfigure_tokens=list, 
     Returns:
         caption_dict: A dictionary with subfigure tokens (doc_text) keys and associated text as entries. 
     """
+    caption_sentence_regex = load_caption_sentence_regex()
     caption_chunks = get_caption_chunks(doc, subfigure_tokens)
 
     # View caption chunks:
