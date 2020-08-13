@@ -5,7 +5,6 @@ import os
 
 import responses
 from deepdiff import DeepDiff
-import pymongo
 
 from ..pipeline import Pipeline
 from ..tool import JournalScraper, CaptionSeparator
@@ -75,16 +74,6 @@ class TestNatureFull(unittest.TestCase):
         # Run comparison of expected and resulting jsons
         diff = DeepDiff(expected, exsclaim_json, ignore_order=True)
         diff_off_by_one = DeepDiff(expected_floats, exsclaim_json, ignore_order=True)
-
-        # ## Push to database
-        
-        # db_client = pymongo.MongoClient("mongodb://localhost:27017/")
-
-        # db = db_client["materialeyes"]
-        # collection = db["nature"]
-        # db_push = list(exsclaim_json.values())
-        # collection.insert_many(db_push)
-
 
         ## Band-aid to handle https://github.com/MaterialEyes/exsclaim/issues/5
         ## in testing. This will call the test a pass if we find either of the 

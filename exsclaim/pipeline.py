@@ -6,6 +6,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from . import utils
+from .figure import FigureSeparator
+from .tool import CaptionSeparator, JournalScraper
 
 class Pipeline:
     def __init__(self , query_path, exsclaim_path):
@@ -34,12 +36,15 @@ class Pipeline:
             self.exsclaim_dict = {}
 
 
-    def run(self, tools):
+    def run(self, tools =
+            [JournalScraper(), CaptionSeparator(), FigureSeparator()]):
         """ Run EXSCLAIM pipeline on Pipeline instance's query path
 
         Args:
             tools (list of ExsclaimTools): list of ExsclaimTool objects
-                to run on query path in the order they will run
+                to run on query path in the order they will run. Default
+                argument is JournalScraper, CaptionSeparator, 
+                FigureSeparator
         Returns:
             exsclaim_dict (dict): an exsclaim json
         Modifies:
@@ -84,6 +89,15 @@ class Pipeline:
         save_methods = self.query_dict.get("save_format", [])
         if 'csv' in save_methods or 'save_subfigures' in save_methods:
             self.to_file()
+
+        if 'mongo' in save_methods:
+            import pymongo
+            db_client = pymongo.MongoClient(self.query_dict["mongo_connection"])
+
+            db = db_client["materialeyes"]
+            collection = db[self.query_dict["name"]]
+            db_push = list(self.exsclaim_dict.values())
+            collection.insert_many(db_push)
 
         return self.exsclaim_dict
 

@@ -25,5 +25,5 @@
 
     "mongo_connection": "mongodb://localhost:27017/",
     
-    "save_format": ["mongo"]
+    "save_format": []
 }

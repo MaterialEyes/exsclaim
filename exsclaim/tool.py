@@ -91,7 +91,6 @@ class JournalScraper(ExsclaimTool):
             raise NameError('journal family {0} is not defined'.format(journal_family))
         j_instance = journal.journals[journal_family](search_query)
 
-
         os.makedirs(search_query['results_dir'], exist_ok=True)
         t0 = time.time()
         counter = 1
