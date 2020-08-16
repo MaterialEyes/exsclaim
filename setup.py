@@ -17,7 +17,7 @@ from setuptools.command.install import install
 NAME = 'exsclaim'
 DESCRIPTION = 'EXSCLAIM! is a library for the automatic EXtraction, Separation, and Caption-based natural Language Annotation of IMages from scientific figures.'
 URL = 'https://github.com/MaterialEyes/exsclaim'
-EMAIL = 'eschwenk@u.northwestern.edu'
+EMAIL = 'developers@materialeyes.org'
 AUTHOR = 'Eric Schwenker','Trevor Spreadbury','Weixin Jiang','Maria Chan'
 REQUIRES_PYTHON = '>=3.6.0'
 VERSION = '0.1.0'
@@ -25,8 +25,7 @@ VERSION = '0.1.0'
 # What packages are required for this module to be executed?
 REQUIRED = [
         'beautifulsoup4>=4.8.1',
-        'bleach>=2.1.0',
-        'gdown',
+        'bleach>=2.1.0', 
         'lxml>=4.4.1',
         'opencv-python',
         'pillow',
@@ -144,12 +143,7 @@ setup(
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy'
     ],
-    data_files=[(sys.prefix+'/figures/checkpoints', ['exsclaim/figures/checkpoints/snapshot12000.ckpt']),
-                (sys.prefix+'/figures/checkpoints', ['exsclaim/figures/checkpoints/snapshot13400.ckpt']),
-                (sys.prefix+'/figures/checkpoints', ['exsclaim/figures/checkpoints/snapshot260.ckpt']),
-                (sys.prefix+'/journals/GoogleChromeCanary.app', listOfFiles),
-                (sys.prefix+'/journals', ['exsclaim/journals/chromedriver']),
-                (sys.prefix+'/captions/models/reference.yml',['exsclaim/captions/models/reference.yml']),
+    data_files=[(sys.prefix+'/captions/models/reference.yml',['exsclaim/captions/models/reference.yml']),
                 (sys.prefix+'/captions/models/patterns.yml',['exsclaim/captions/models/patterns.yml']),
                 (sys.prefix+'/captions/models/rules.yml',['exsclaim/captions/models/rules.yml']),
                 (sys.prefix+'/captions/models/characterization.yml',['exsclaim/captions/models/characterization.yml']),
