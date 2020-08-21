@@ -156,6 +156,17 @@ class JournalFamily():
 
         return search_query_urls
 
+    def get_license(self, soup):
+        """ Checks the article license and whether it is open access 
+
+        Args:
+            soup (a BeautifulSoup parse tree): representation of page html
+        Returns:
+            is_open (a bool): True if article is open
+            license (a string): Requried text of article license
+        """
+        return (False, "unknown")
+
     def get_article_extensions(self) -> list:
         """
         Create a list of article url extensions from search_query
@@ -164,35 +175,28 @@ class JournalFamily():
             A list of article url extensions from search.
         """
         search_query = self.search_query
-        extensions = []
         article_delim, reader_delims = self.get_article_delimiters()
         search_query_urls = self.get_search_query_urls()
-        articles_found = 0
+        article_paths = set()
         for page1 in search_query_urls:
-            print("GET request: ",page1)
-            page_returns = []
+            print("GET request: ", page1)
             soup = self.get_soup_from_request(page1, fast_load=True)
-            start,stop,total = self.get_page_info(soup)
-            for pg_num in range(start,stop+1):
-                request = self.turn_page(page1,pg_num,total)
-                soup = self.get_soup_from_request(request,fast_load=False)
+            start_page, stop_page, total_articles = self.get_page_info(soup)
+            for page_number in range(start_page, stop_page + 1):
+                request = self.turn_page(page1, page_number, total_articles)
+                soup = self.get_soup_from_request(request, fast_load=False)
                 for tags in soup.find_all('a',href=True):
                     if len(tags.attrs['href'].split(article_delim)) > 1 :
-                        page_returns.append(tags.attrs['href'])
-            extensions.append(page_returns)
-            
-            #check if we have found enough articles
-            articles_found += len(page_returns)
-            if articles_found > search_query["maximum_scraped"]:
-                break
-        
-        extensions = list(itertools.chain(*itertools.zip_longest(*extensions)))
+                        article_paths.add(tags.attrs['href'])
+                if len(article_paths) > search_query["maximum_scraped"]:
+                    break
+
+        extensions = list(article_paths)
         extensions = [a for a in extensions if a != None]
-        extensions = [a for a in extensions if not \
-                    len(set(reader_delims).intersection(set(a.split("/"))))>0]
+        extensions = [a for a in extensions if \
+                    len(set(reader_delims).intersection(set(a.split("/")))) <= 0]
         extensions = [a.split('?page=search')[0] for a in extensions]
     
-        extensions = list(OrderedDict.fromkeys(extensions))
         return extensions[0:search_query["maximum_scraped"]]
 
     def get_figure_list(self, url):
@@ -219,7 +223,7 @@ class JournalFamily():
         """
         with requests.Session() as session:
             r = session.get(url) 
-        soup =BeautifulSoup(r.text, 'lxml')
+        soup = BeautifulSoup(r.text, 'lxml')
         return soup
 
     def find_captions(self, figure):
@@ -258,6 +262,7 @@ class JournalFamily():
             A dict of figure_jsons from an article
         """
         soup = self.get_soup_from_request(url)
+        is_open, license = self.get_license(soup)
         save_path = self.search_query['results_dir']
 
         # Uncomment to save html
@@ -309,6 +314,8 @@ class JournalFamily():
             # save image info
             figure_json["figure_name"] = figure_name
             figure_json["image_url"] = image_url
+            figure_json["license"] = license
+            figure_json["open"] = is_open
 
             # save figure as image
             if save_path:
@@ -360,6 +367,14 @@ class ACS(JournalFamily):
     def turn_page(self, url, pg_num, pg_size):
         return url.split('&startPage=')[0]+'&startPage='+str(pg_num)+"&pageSize="+str(20)
 
+    def get_license(self, soup):
+        open_access = soup.find('div', {"class": "article_header-open-access"})
+        if open_access and open_access.text in ["ACS AuthorChoice", "ACS Editors' Choice"]:
+            is_open = True
+            return (is_open, open_access.text)
+        return (False, "unknown")
+
+
 class Nature(JournalFamily):
     domain =        "https://www.nature.com"
     relevant =      "relevance"
@@ -384,6 +399,24 @@ class Nature(JournalFamily):
 
     def turn_page(self, url, pg_num, pg_size):
         return url.split('&page=')[0]+'&page='+str(pg_num)
+
+    def get_license(self, soup):
+        data_layer = soup.find(attrs = {'data-test': 'dataLayer'})
+        data_layer_string = str(data_layer.string)
+        data_layer_json = "{" + data_layer_string.split("[{", 1)[1].split("}];", 1)[0] + "}"
+        parsed = json.loads(data_layer_json)
+        ## try to get whether the journal is open
+        try:
+            is_open = parsed["content"]["attributes"]["copyright"]["open"]
+        except:
+            is_open = False
+        ## try to get license
+        try:
+            license = parsed["content"]["attributes"]["copyright"]["legacy"]["webtrendsLicenceType"]
+        except:
+            license = "unknown"
+        return is_open, license
+        
 
 class RSC(JournalFamily):
     domain =        "https://pubs.rsc.org"
