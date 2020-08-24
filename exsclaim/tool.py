@@ -72,7 +72,7 @@ class JournalScraper(ExsclaimTool):
         ##   the articles that have already been visited before writing
         ##   them to the _articles file.
         articles = j_instance.get_article_extensions()
-        with open(search_query['results_dir']+'_articles', 'w+') as f:
+        with open(search_query['results_dir']+'_articles', 'a') as f:
             for article_number, article_path in enumerate(articles):
                 if article_path.split("/")[-1] not in articles_visited:
                     f.write('%s\n' % article_path.split("/")[-1])

@@ -110,7 +110,7 @@ class FigureSeparator(ExsclaimTool):
         self.exsclaim_json = exsclaim_dict
         t0 = time.time()
         counter = 1
-        figures = self.get_figure_paths(search_query)
+        figures = [self.exsclaim_json[figure]["figure_path"] for figure in self.exsclaim_json]
         for figure_name in figures:
             utils.Printer(">>> ({0} of {1}) ".format(counter,+\
                 len(figures))+\
@@ -413,7 +413,7 @@ class FigureSeparator(ExsclaimTool):
                         geometry = { "x" : x, "y" : y}
                         subfigure_label_info["geometry"].append(geometry)
             master_image_info["subfigure_label"] = subfigure_label_info
-            figure_json["master_images"].append(master_image_info)
+            figure_json.get("master_images", []).append(master_image_info)
             
         self.exsclaim_json[figure_name] = figure_json
         return figure_json
