@@ -32,6 +32,8 @@ class JournalFamily():
     pre_sb =        ("Portion of the url that extends from the"
                     "search terms to the paremeter value for"
                     "sorting search results"),
+    open_pre_sb =   ("Pre sb, except with parameter (if it exists)"
+                     " to only search for open access articles"),
     post_sb =       "The final portion of the url", 
     ## used for get_article_delimiters
     article_path =  "The journal's url path to articles"
@@ -55,38 +57,6 @@ class JournalFamily():
             The domain name of the journal, as a string
         """
         return self.domain
-
-    def get_search_parameters(self):
-        """
-        Get prioritized url extensions for search terms in search_query.
-
-        Returns:
-            A list of url paths and queries as strings
-        """
-        search_query = self.search_query
-        ## creates a list of search terms
-        search_list = ([[search_query['query'][key]['term']] + 
-                       search_query['query'][key]['synonyms'] 
-                       for key in search_query['query'] 
-                       if len(search_query['query'][key]['synonyms'])>0])
-        search_product = list(itertools.product(*search_list))
-        extensions = []
-
-        # sortby is the requested method to sort results (relevancy or recency) and
-        # sbtext gives the journal specific parameter to sort as requested
-        sortby = search_query['sortby']
-        if sortby == 'relevant':
-            sbext = self.relevant
-        elif sortby == 'recent':
-            sbext = self.recent
-
-        # this creates the url (excluding domain and protocol) for each search query
-        for search_group in search_product:
-            url_path_and_query = (self.path
-                + self.join.join(["+".join(a.split(" ")) for a in search_group])
-                + self.pre_sb + sbext + self.post_sb)
-            extensions.append(url_path_and_query)
-        return extensions
 
     def get_article_delimiters(self) -> tuple:
         """
@@ -146,6 +116,10 @@ class JournalFamily():
         elif sortby == 'recent':
             sbext = self.recent
 
+        # modify search to find only open access articles
+        if search_query.get("open", False):
+            self.pre_sb = self.open_pre_sb
+
         search_query_urls = []
         # this creates the url (excluding domain and protocol) for each search query
         for search_group in search_product:
@@ -190,6 +164,8 @@ class JournalFamily():
                         article_paths.add(tags.attrs['href'])
                 if len(article_paths) > search_query["maximum_scraped"]:
                     break
+            if len(article_paths) > search_query["maximum_scraped"]:
+                break
 
         extensions = list(article_paths)
         extensions = [a for a in extensions if a != None]
@@ -352,6 +328,7 @@ class ACS(JournalFamily):
     path =          "/action/doSearch?AllField=\""
     join =          "\"+\""
     pre_sb =        "\"&publication=&accessType=allContent&Earliest=&pageSize=20&startPage=0&sortBy="
+    open_pre_sb =   "\"&publication=&openAccess=18&accessType=openAccess&Earliest=&pageSize=20&startPage=0&sortBy="
     post_sb =       ""
     article_path =  ('/doi/',['abs','full','pdf'])
     prepend =       "https://pubs.acs.org"
@@ -369,7 +346,8 @@ class ACS(JournalFamily):
 
     def get_license(self, soup):
         open_access = soup.find('div', {"class": "article_header-open-access"})
-        if open_access and open_access.text in ["ACS AuthorChoice", "ACS Editors' Choice"]:
+        if open_access and ("ACS AuthorChoice" in open_access.text or
+                            "ACS Editors' Choice" in open_access.text):
             is_open = True
             return (is_open, open_access.text)
         return (False, "unknown")
@@ -382,6 +360,7 @@ class Nature(JournalFamily):
     path =          "/search?q=\""
     join =          "\"%20\""
     pre_sb =        "\"&order="
+    open_pre_sb =   "\"&order="
     post_sb =       "&page=1"
     article_path =  ('/articles/','')
     prepend =       ""
@@ -425,6 +404,7 @@ class RSC(JournalFamily):
     path =          "/en/results?searchtext="
     join =          "\"%20\""
     pre_sb =        "\"&SortBy="
+    open_pre_sb =   "\"&SortBy="
     post_sb =       "&PageSize=1&tab=all&fcategory=all&filter=all&Article%20Access=Open+Access"
     article_path =  ('/en/content/articlehtml/','')
     prepend =       "https://pubs.rsc.org"
