@@ -335,10 +335,9 @@ class ACS(JournalFamily):
     extra_key =     "inline-fig internalNav"
 
     def get_page_info(self, soup):
-        parsed = [a.split("of")[-1].strip() for a in soup.text.split("Results:")[1].split("Follow")[0].split('-')]
-        totalPages = math.ceil(float(parsed[1])/20)-1
+        totalResults = int(soup.find('span', {'class': "result__count"}).text)
+        totalPages = math.ceil(float(totalResults)/20)-1
         page = 0
-        totalResults = int(parsed[1])
         return page, totalPages, totalResults
 
     def turn_page(self, url, pg_num, pg_size):
