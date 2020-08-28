@@ -113,6 +113,8 @@ class FigureSeparator(ExsclaimTool):
             with open(search_query["results_dir"] + "_figures", "r") as f:
                 contents = f.readlines()
             figures_separated = {f.strip() for f in contents}
+        else:
+            figures_separated = set()
         new_figures_separated = set()
 
         counter = 1
