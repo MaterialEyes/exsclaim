@@ -134,7 +134,7 @@ class FigureSeparator(ExsclaimTool):
             # Save to file every N iterations (to accomodate restart scenarios)
             if counter%500 == 0:
                 self._appendJSON(search_query['results_dir']+'_fs.json',self.exsclaim_json)
-                with open(search_query["figure_path"] + "_figures", "a") as f:
+                with open(search_query["figure_path"] + "_figures", "a+") as f:
                     for figure in figures_separated:
                         f.write("%s\n" % figure.split("/")[-1])
             counter += 1
