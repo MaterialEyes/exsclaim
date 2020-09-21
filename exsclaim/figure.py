@@ -15,6 +15,8 @@ from skimage import io
 from scipy.special import softmax
 from torch.autograd import Variable
 from PIL import Image, ImageDraw, ImageFont
+import torchvision.models.detection
+from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 
 from .figures.models.yolov3 import *
 from .figures.utils.utils import *
@@ -85,6 +87,20 @@ class FigureSeparator(ExsclaimTool):
         else:
             classifier_model.load_state_dict(torch.load(classifier_checkpoint,map_location='cpu'))
         self.classifier_model = classifier_model
+
+        ## Load scale bar detection model
+        scale_bar_detection_checkpoint = model_path + "checkpoints/scale_bar_detection_model.pt"
+        # load an object detection model pre-trained on COCO
+        scale_bar_detection_model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=True)
+        input_features = scale_bar_detection_model.roi_heads.box_predictor.cls_score.in_features
+        number_classes = 3      # background, scale bar, scale bar label
+        scale_bar_detection_model.roi_heads.box_predictor = FastRCNNPredictor(input_features, number_classes)
+        if self.cuda:
+            scale_bar_detection_model.load_state_dict(torch.load(scale_bar_detection_checkpoint))
+            scale_bar_detection_model = scale_bar_detection_model.cuda()
+        else:
+            scale_bar_detection_model.load_state_dict(torch.load(scale_bar_detection_checkpoint, map_location='cpu'))
+        self.scale_bar_detection_model = scale_bar_detection_model
 
 
     def _update_exsclaim(self,exsclaim_dict,figure_name,figure_dict):
@@ -234,6 +250,7 @@ class FigureSeparator(ExsclaimTool):
                 increase modularity. 
         """
         img_raw = Image.open(figure_path).convert("RGB")
+        img_raw = img_raw.copy()
         width, height = img_raw.size
         binary_img = np.zeros((height,width,1))
 
@@ -484,9 +501,9 @@ class FigureSeparator(ExsclaimTool):
             result_image.paste(patch,box=(110,60+100*subfigure_id))
 
         del draw
-        result_image.save(os.path.join(save_path+"/extractions/"+sample_image_name+".png"))   
+        result_image.save(os.path.join(save_path+"/extractions/"+sample_image_name+".png"))
 
-
+    
     def extract_image_objects(self, figure_path=str) -> "figure_dict":
         """ Separate and classify subfigures in an article figure
 
@@ -501,6 +518,7 @@ class FigureSeparator(ExsclaimTool):
         self.object_detection_model.eval()
         self.text_recognition_model.eval()
         self.classifier_model.eval()
+        self.scale_bar_detection_model.eval()
         
         ## Detect the bounding boxes of each subfigure
         subfigure_info = self.detect_subfigure_boundaries(figure_path)
