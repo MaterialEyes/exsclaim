@@ -141,7 +141,7 @@ class JournalFamily():
         """
         return (False, "unknown")
 
-    def get_article_extensions(self) -> list:
+    def get_article_extensions(self, articles_visited=set()) -> list:
         """
         Create a list of article url extensions from search_query
 
@@ -160,20 +160,20 @@ class JournalFamily():
                 request = self.turn_page(page1, page_number, total_articles)
                 soup = self.get_soup_from_request(request, fast_load=False)
                 for tags in soup.find_all('a',href=True):
-                    if len(tags.attrs['href'].split(article_delim)) > 1 :
-                        article_paths.add(tags.attrs['href'])
+                    article = tags.attrs['href']
+                    article = article.split('?page=search')[0]
+                    if (len(article.split(article_delim)) > 1 
+                        and article.split("/")[-1] not in articles_visited
+                        and article != None
+                        and len(set(reader_delims).intersection(set(article.split("/")))) <= 0):
+                        article_paths.add(article)
                 if len(article_paths) > search_query["maximum_scraped"]:
                     break
             if len(article_paths) > search_query["maximum_scraped"]:
                 break
-
-        extensions = list(article_paths)
-        extensions = [a for a in extensions if a != None]
-        extensions = [a for a in extensions if \
-                    len(set(reader_delims).intersection(set(a.split("/")))) <= 0]
-        extensions = [a.split('?page=search')[0] for a in extensions]
     
-        return extensions[0:search_query["maximum_scraped"]]
+        articles = list(article_paths)
+        return articles[0:search_query["maximum_scraped"]]
 
     def get_figure_list(self, url):
         """
@@ -335,10 +335,9 @@ class ACS(JournalFamily):
     extra_key =     "inline-fig internalNav"
 
     def get_page_info(self, soup):
-        parsed = [a.split("of")[-1].strip() for a in soup.text.split("Results:")[1].split("Follow")[0].split('-')]
-        totalPages = math.ceil(float(parsed[1])/20)-1
+        totalResults = int(soup.find('span', {'class': "result__count"}).text)
+        totalPages = math.ceil(float(totalResults)/20)-1
         page = 0
-        totalResults = int(parsed[1])
         return page, totalPages, totalResults
 
     def turn_page(self, url, pg_num, pg_size):

@@ -20,8 +20,21 @@ from . import caption
 from abc import ABC, abstractmethod
 
 class ExsclaimTool(ABC):
-    def __init__(self , model_path):
-        self.model_path = model_path
+    def __init__(self, search_query):
+        self.initialize_query(search_query)
+
+    def initialize_query(self, search_query):
+        """ initializes search query as instance attribute
+
+        Args:
+            search_query (a dict or path to dict): The Query JSON
+        """
+        try:
+            with open(search_query) as f:
+                # Load query file to dict
+                self.search_query = json.load(f)
+        except: 
+            self.search_query = search_query
 
     @abstractmethod
     def _load_model(self):
@@ -44,8 +57,18 @@ class JournalScraper(ExsclaimTool):
     Parameters: 
     None
     """
-    def __init__(self):
-        pass
+    def __init__(self, search_query):
+        self.initialize_query(search_query)
+        self.new_articles_visited = set()
+
+        ## Check if any articles have already been scraped by checking
+        ##   results_dir/_articles
+        articles_visited = {}
+        if os.path.isfile(self.search_query['results_dir'] + "_articles"):
+            with open(self.search_query['results_dir']+'_articles','r') as f:
+                contents = f.readlines()
+            articles_visited ={a.strip() for a in contents}
+        self.articles_visited = articles_visited
 
     def _load_model(self):
         pass
@@ -57,27 +80,15 @@ class JournalScraper(ExsclaimTool):
     def _appendJSON(self,filename,json_dict):
         with open(filename,'w') as f: 
             json.dump(json_dict, f, indent=3)
+        with open(self.search_query["results_dir"] + "_articles", "a") as f:
+            for article in self.new_articles_visited:
+                f.write('%s\n' % article.split("/")[-1])
 
-    def _get_articles(self, search_query, j_instance):
-
-        ## Check if any articles have already been scraped by checking
-        ##   results_dir/_articles
-        articles_visited = []
-        if os.path.isfile(search_query['results_dir'] + "_articles"):
-            with open(search_query['results_dir']+'_articles','r') as f:
-                contents = f.readlines()
-            articles_visited = [a.strip() for a in contents]
-
+    def _get_articles(self, j_instance):
         ## Collects a new a list of articles, and checks them against
         ##   the articles that have already been visited before writing
         ##   them to the _articles file.
-        articles = j_instance.get_article_extensions()
-        with open(search_query['results_dir']+'_articles', 'a') as f:
-            for article_number, article_path in enumerate(articles):
-                if article_path.split("/")[-1] not in articles_visited:
-                    f.write('%s\n' % article_path.split("/")[-1])
-                if article_number >= search_query['maximum_scraped'] - 1:
-                    break
+        articles = j_instance.get_article_extensions(self.articles_visited)
 
         return articles
 
@@ -94,7 +105,7 @@ class JournalScraper(ExsclaimTool):
         os.makedirs(search_query['results_dir'], exist_ok=True)
         t0 = time.time()
         counter = 1
-        articles = self._get_articles(search_query, j_instance)
+        articles = self._get_articles(j_instance)
         for article in articles:
             utils.Printer(">>> ({0} of {1}) Extracting figures from: ".format(counter, len(articles))+\
                 article.split("/")[-1])
@@ -103,6 +114,7 @@ class JournalScraper(ExsclaimTool):
                 request = j_instance.get_domain_name() + article
                 article_dict = j_instance.get_article_figures(request)
                 exsclaim_dict = self._update_exsclaim(exsclaim_dict,article_dict)
+                self.new_articles_visited.add(article)
             except:
                 utils.Printer("<!> ERROR: An exception occurred in JournalScraper\n")
             
@@ -126,8 +138,9 @@ class CaptionSeparator(ExsclaimTool):
     model_path: str 
         Absolute path to caption nlp model 
     """
-    def __init__(self , model_path=""):
-        super().__init__(model_path)
+    def __init__(self , search_query={}):
+        super().__init__(search_query)
+        self.model_path = ""
 
     def _load_model(self):
         if "" in self.model_path:

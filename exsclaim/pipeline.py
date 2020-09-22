@@ -36,8 +36,7 @@ class Pipeline:
             self.exsclaim_dict = {}
 
 
-    def run(self, tools =
-            [JournalScraper(), CaptionSeparator(), FigureSeparator()]):
+    def run(self, tools = None):
         """ Run EXSCLAIM pipeline on Pipeline instance's query path
 
         Args:
@@ -77,7 +76,11 @@ class Pipeline:
         @@@@@@@@@@@@@@@ ,@@@@@@@@@@@@@@@@@@@ &@@@@@@@@@@@@@@
         @@@@@@@@@@@@@@@@@@@@   ,%@@&/   (@@@@@@@@@@@@@@@@@@@
         @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-        """)        
+        """)
+        # set default values
+        if tools is None: tools = [JournalScraper(self.query_dict),
+                                   CaptionSeparator(self.query_dict),
+                                   FigureSeparator(self.query_dict)]
         # run each ExsclaimTool on search query
         for tool in tools:
             self.exsclaim_dict = tool.run(self.query_dict,self.exsclaim_dict)
