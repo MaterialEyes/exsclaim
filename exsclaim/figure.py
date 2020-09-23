@@ -38,6 +38,7 @@ class FigureSeparator(ExsclaimTool):
 
 
     def _load_model(self):
+        """ Load relevant models for the object detection tasks """
         ## Set configuration variables
         model_path = os.path.dirname(__file__)+'/figures/'
         configuration_file = model_path + "config/yolov3_default_subfig.cfg"
@@ -102,7 +103,7 @@ class FigureSeparator(ExsclaimTool):
         self.scale_bar_detection_model = scale_bar_detection_model
 
 
-    def _update_exsclaim(self,exsclaim_dict,figure_name,figure_dict):
+    def _update_exsclaim(self, exsclaim_dict, figure_name, figure_dict):
         figure_name = figure_name.split("/")[-1]
         for master_image in figure_dict['figure_separator_results'][0]['master_images']:
             exsclaim_dict[figure_name]['master_images'].append(master_image)
@@ -112,12 +113,22 @@ class FigureSeparator(ExsclaimTool):
         return exsclaim_dict
 
 
-    def _appendJSON(self,filename,json_dict):
-        with open(filename,'w') as f: 
-            json.dump(json_dict, f, indent=3)
+    def _appendJSON(self, results_directory, exsclaim_json, figures_separated):
+        """ Commit updates to EXSCLAIM JSON and updates list of separated figures
+
+        Args:
+            results_directory (string): Path to results directory
+            exsclaim_json (dict): Updated EXSCLAIM JSON
+            figures_separated (set): Figures which have already been separated
+        """
+        with open(results_directory + "exsclaim.json", 'w') as f: 
+            json.dump(exsclaim_json, f, indent=3)
+        with open(results_directory + "_figures", "a+") as f:
+            for figure in figures_separated:
+                f.write("%s\n" % figure.split("/")[-1])
 
 
-    def run(self,search_query,exsclaim_dict):
+    def run(self, search_query, exsclaim_dict):
         """ Run the models relevant to manipulating article figures
         """
         utils.Printer("Running Figure Separator\n")
@@ -139,7 +150,7 @@ class FigureSeparator(ExsclaimTool):
         for figure_name in figures:
             utils.Printer(">>> ({0} of {1}) ".format(counter,+\
                 len(figures))+\
-                "Extracting images from: "+figure_name.split("/")[-1])
+                "Extracting images from: "+ figure_name.split("/")[-1])
             try:
                 self.extract_image_objects(figure_name)
                 self.make_visualization(figure_name, search_query['results_dir'])
@@ -149,22 +160,12 @@ class FigureSeparator(ExsclaimTool):
             
             # Save to file every N iterations (to accomodate restart scenarios)
             if counter%500 == 0:
-                self._appendJSON(search_query['results_dir']+'_fs.json',self.exsclaim_json)
-                with open(search_query["figure_path"] + "_figures", "a+") as f:
-                    for figure in figures_separated:
-                        f.write("%s\n" % figure.split("/")[-1])
+                self._appendJSON(search_query['results_dir'], self.exsclaim_json, new_figures_separated)
             counter += 1
         
         t1 = time.time()
         utils.Printer(">>> Time Elapsed: {0:.2f} sec ({1} figures)\n".format(t1-t0,int(counter-1)))
-        # -------------------------------- #  
-        # -- Save current exsclaim_dict -- #
-        # -------------------------------- # 
-        with open(search_query['results_dir']+'_fs.json', 'w') as f:
-            json.dump(self.exsclaim_json, f, indent=3)
-        # -------------------------------- #  
-        # -------------------------------- # 
-        # -------------------------------- # 
+        self._appendJSON(search_query["results_dir"], self.exsclaim_json, new_figures_separated)
         return self.exsclaim_json
 
 
