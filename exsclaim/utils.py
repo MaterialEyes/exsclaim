@@ -70,6 +70,12 @@ def exist_common_member(a: list, b: list) -> bool:
         return(True)  
     return(False)
 
+def convert_coords_to_labelbox(bbox_coordinates):
+    """ Converts x1,y1,x2,y2 to [{"x": x1, "y": y1}, ...] """
+    x1, y1, x2, y2 = bbox_coordinates
+    return [{"x": x1, "y": y1}, {"x": x1, "y": y2},
+            {"x": x2, "y": y2}, {"x": x2, "y": y1}]
+
 
 # Disable
 def blockPrint():
