@@ -16,6 +16,7 @@ from scipy.special import softmax
 from torch.autograd import Variable
 from PIL import Image, ImageDraw, ImageFont
 import torchvision.models.detection
+import torchvision.transforms as T
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 
 from .figures.models.yolov3 import *
@@ -151,12 +152,12 @@ class FigureSeparator(ExsclaimTool):
             utils.Printer(">>> ({0} of {1}) ".format(counter,+\
                 len(figures))+\
                 "Extracting images from: "+ figure_name.split("/")[-1])
-            try:
-                self.extract_image_objects(figure_name)
-                self.make_visualization(figure_name, search_query['results_dir'])
-                new_figures_separated.add(figure_name)
-            except:
-                utils.Printer("<!> ERROR: An exception occurred in FigureSeparator\n")
+            #try:
+            self.extract_image_objects(figure_name)
+            self.make_visualization(figure_name, search_query['results_dir'])
+            new_figures_separated.add(figure_name)
+            #except:
+            #    utils.Printer("<!> ERROR: An exception occurred in FigureSeparator\n")
             
             # Save to file every N iterations (to accomodate restart scenarios)
             if counter%500 == 0:
@@ -449,6 +450,55 @@ class FigureSeparator(ExsclaimTool):
         self.exsclaim_json[figure_name] = figure_json
         return figure_json
 
+    def determine_scale(self, figure_path, figure_json):
+        """ Adds scale information to figure by reading and measuring scale bars 
+
+        Args:
+            figure_path (str): A path to the image (.png, .jpg, or .gif)
+                file containing the article figure
+            figure_json (dict): A Figure JSON
+        Returns:
+            figure_json (dict): A dictionary with classified image_objects
+                extracted from figure
+        """
+        # pre-process image
+        image = Image.open(figure_path).convert("RGB")
+        image = T.ToTensor()(image)
+
+        # prediction
+        with torch.no_grad():
+            outputs = self.scale_bar_detection_model([image])
+
+        # post-process 
+        scale_bar_info = []
+        for i, box in enumerate(outputs[0]["boxes"]):
+            confidence = outputs[0]["scores"][i]
+            if confidence > 0.5:
+                x1, y1, x2, y2 = box
+                label = outputs[0]['labels'][i]
+                scale_bar_info.append([x1, y1, x2, y2, confidence, label])
+        scale_bar_info = non_max_suppression_malisiewicz(np.asarray(scale_bar_info), 0.4)
+        scale_bar_info = scale_bar_info
+
+        # add to figure_json
+        label_names = ["background", "scale bar", "scale label"]
+        unassigned = figure_json.get("unassigned", {})
+        scale_bars = unassigned.get("scale_bar_lines", [])
+        scale_labels = unassigned.get("scale_bar_labels", [])
+        for scale_object in scale_bar_info:
+            x1, y1, x2, y2, confidence, classification = scale_object
+            geometry = utils.convert_coords_to_labelbox([int(x1), int(y1), int(x2), int(y2)])
+            if label_names[int(classification)] == "scale bar":
+                scale_bars.append(geometry)
+            elif label_names[int(classification)] == "scale label":
+                label_json = {"geometry" : geometry}
+                scale_labels.append(label_json)
+        unassigned["scale_bar_lines"] = scale_bars
+        unassigned["scale_bar_labels"] = scale_labels
+        figure_json["unassigned"] = unassigned
+
+        return figure_json
+
 
     def make_visualization(self, figure_path, save_path):
         """ Save subfigures and their labels as images
@@ -542,5 +592,8 @@ class FigureSeparator(ExsclaimTool):
             
         ## Classify the subfigures
         figure_json = self.classify_subfigures(figure_path, subfigure_info, concate_img)
+
+        ## Detect scale bar lines and labels
+        figure_json = self.determine_scale(figure_path, figure_json)
 
         return figure_json
