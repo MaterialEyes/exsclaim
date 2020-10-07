@@ -258,21 +258,24 @@ def generate_dataset_scale_bar_labels(samples, input_directory, output_directory
     """
     scales = [round((10**scale) * i, 1) for i in range(1, 10) for scale in range(-1, 3)] + [2.5, 25, 250]
     scales = [str(i) for i in scales]
-    units = ["um", "nm", "A"]
+    units = ["um", "nm", "A", "mm"]
 
     for i in range(samples):
         # select text
-        text = random.choice(scales) + " " + random.choice(units)
+        scale = random.choice(scales)
+        unit = random.choice(units)
+        text = scale + " " + unit
         # open image
         image_name = random.choice(os.listdir(input_directory))
         image_name = os.fsdecode(image_name)
         image_path = input_directory + image_name
         image = Image.open(image_path).convert("RGB")
-
         cropped_image = draw_text_on_image(image, text)
         
+        # save to detect only unit
+
         # save image
-        save(cropped_image, os.path.join(output_directory, text, str(i) + ".png"))
+        save(cropped_image, os.path.join(output_directory, unit, str(i) + ".png"))
 
         if i % 500 == 0:
             print("Created {} samples".format(i))
@@ -280,5 +283,5 @@ def generate_dataset_scale_bar_labels(samples, input_directory, output_directory
 
 
 if __name__ == "__main__":
-    generate_dataset_scale_bar_labels(50, "no_text/", "scale_label_data")
+    generate_dataset_scale_bar_labels(5000, "no_text/", "unit_data")
 
