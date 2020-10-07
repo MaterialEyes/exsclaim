@@ -280,7 +280,70 @@ def generate_dataset_scale_bar_labels(samples, input_directory, output_directory
         if i % 500 == 0:
             print("Created {} samples".format(i))
 
+def generate_dataset_from_labelbox():
+    """ dataset w/ directories as scale label text and files as cropped scale label images """
+    with open("labelbox.json", "r") as f:
+        labelbox_dict = json.load(f)
 
+    ## Find how many times each scale bar label appears
+    scale_bar_labels = {}
+    for figure in labelbox_dict:
+        figure_name = figure["External ID"]
+        figure_path = os.path.join('all-figures', figure_name)
+        scale_labels = figure["Label"].get("Scale Bar Label", [])
+        if not os.path.isfile(figure_path):
+            continue
+        if scale_labels == []:
+            continue
+        for label in scale_labels:
+            text = clean_text(label["text"])
+            if not text:
+                continue
+            num = scale_bar_labels.get(text, 0)
+            scale_bar_labels[text] = num + 1
+
+    labels = 0
+    for figure in labelbox_dict:
+        figure_name = figure["External ID"]
+        figure_path = os.path.join("all-figures", figure_name)
+        labelbox_name = figure["ID"]
+        masters = figure["Label"].get("Master Image", [])
+        scale_bars = figure["Label"].get("Scale Bar Line", [])
+        scale_labels = figure["Label"].get("Scale Bar Label", [])
+        if not os.path.isfile(figure_path):
+            continue
+        if scale_labels == []:
+            continue
+        i = 0
+        for label in scale_labels:
+            text = clean_text(label["text"])
+            # only use labels that appear 10+ times (95% of labels)
+            if not text or scale_bar_labels[text] < 10:
+                continue
+            geometry = label["geometry"]
+            os.makedirs(os.path.join("scale_label_dataset", text), exist_ok=True)
+            image = Image.open(figure_path).convert("RGB")
+            cropped_image = image.crop(convert_box_format(geometry))
+
+            cropped_image.save(os.path.join("scale_label_dataset", text, figure_name.split(".")[0] + "-" + str(i) + ".jpg"))
+            i += 1
+
+
+def create_test_candidates():
+    """ finds figures with scale bars that are not in test or training data """
+    with open("labelbox.json", "r") as f:
+        labelbox_dict = json.load(f)
+
+    labelled_figures = {figure["External ID"] for figure in labelbox_dict}
+    useful_figures = []
+    for figure_name in os.listdir('all-figures'):
+        if figure_name in labelled_figures:
+            continue
+        if determine_scale("all-figures/" + figure_name) == []:
+            print(figure_name)
+        useful_figures.append(figure_name)
+
+    return useful_figures
 
 if __name__ == "__main__":
     generate_dataset_scale_bar_labels(5000, "no_text/", "unit_data")
