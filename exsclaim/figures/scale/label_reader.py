@@ -27,15 +27,14 @@ def load_split_train_test(datadir, valid_size = .2):
                                            transforms.Normalize(mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225]),])
     train_data = datasets.ImageFolder(datadir, transform=train_transforms)
     test_data = datasets.ImageFolder(datadir, transform=test_transforms)
-    print(train_data.class_to_idx)
     num_train = len(train_data)
     indices = list(range(num_train))
     split = int(np.floor(valid_size * num_train))
-    np.random.shuffle(indices)
-    from torch.utils.data.sampler import SubsetRandomSampler
+    #np.random.shuffle(indices)
+    from torch.utils.data.sampler import SequentialSampler
     train_idx, test_idx = indices[split+1:], indices[:split]
-    train_sampler = SubsetRandomSampler(train_idx)
-    test_sampler = SubsetRandomSampler(test_idx)
+    train_sampler = SequentialSampler(train_idx)
+    test_sampler = SequentialSampler(test_idx)
     trainloader = torch.utils.data.DataLoader(train_data,
                    sampler=train_sampler, batch_size=128)
     testloader = torch.utils.data.DataLoader(test_data,
@@ -53,14 +52,14 @@ def get_model(size, dataset_name, classes):
     for param in model.parameters():
         param.requires_grad = False
       
-        model.fc = nn.Sequential(nn.Linear(2048, 512),
-                                      nn.ReLU(),
-                                      nn.Dropout(0.2),
-                                      nn.Linear(512, classes),
-                                      nn.LogSoftmax(dim=1))
-        criterion = nn.NLLLoss()
-        optimizer = optim.Adam(model.fc.parameters(), lr=0.003)
-        model.to(device)
+    model.fc = nn.Sequential(nn.Linear(2048, 512),
+                                    nn.ReLU(),
+                                    nn.Dropout(0.2),
+                                    nn.Linear(512, classes),
+                                    nn.LogSoftmax(dim=1))
+    criterion = nn.NLLLoss()
+    optimizer = optim.Adam(model.fc.parameters(), lr=0.003)
+    model.to(device)
    
     # find previous model to resume training
     largest = -1
@@ -78,13 +77,16 @@ def get_model(size, dataset_name, classes):
     if best_checkpoint == None:
         return model, 0, criterion, optimizer
 
+    # Load saved information from checkpoint
     best_checkpoint = 'checkpoints/' + best_checkpoint
     cuda = torch.cuda.is_available() and (gpu_id >= 0)
     if cuda:
         model.load_state_dict(torch.load(best_checkpoint)["model_state_dict"])
+        optimizer.load_state_dict(torch.load(best_checkpoint)['optimizer_state_dict'])
         model = model.cuda()
     else:
         model.load_state_dict(torch.load(best_checkpoint, map_location='cpu')["model_state_dict"])
+        optimizer.load_state_dict(torch.load(best_checkpoint, map_location='cpu')['optimizer_state_dict'])
 
     ckpt = torch.load(best_checkpoint)
     epoch = ckpt['epoch']
@@ -100,13 +102,11 @@ def main(dataset_name, classes, model_size, save_frequency):
     model, current_epoch, criterion, optimizer = get_model(model_size, dataset_name, classes)
 
     epochs = 1000
-    steps = 0
     running_loss = 0
-    print_every = 10
-    train_losses, test_losses = [], []
-    for epoch in range(current_epoch + 1, epochs):
+    recent_train_losses, recent_test_losses = [], []
+    accuracies, unsaved_epochs = [], []
+    for epoch in range(current_epoch, epochs):
         for inputs, labels in trainloader:
-            steps += 1
             inputs, labels = inputs.to(device), labels.to(device)
             optimizer.zero_grad()
             logps = model.forward(inputs)
@@ -115,39 +115,50 @@ def main(dataset_name, classes, model_size, save_frequency):
             optimizer.step()
             running_loss += loss.item()
         
-            if steps % print_every == 0:
-                test_loss = 0
-                accuracy = 0
-                model.eval()
-                with torch.no_grad():
-                    for inputs, labels in testloader:
-                        inputs, labels = inputs.to(device), labels.to(device)
-                        logps = model.forward(inputs)
-                        batch_loss = criterion(logps, labels)
-                        test_loss += batch_loss.item()
-                        
-                        ps = torch.exp(logps)
-                        top_p, top_class = ps.topk(1, dim=1)
-                        equals = top_class == labels.view(*top_class.shape)
-                        accuracy += torch.mean(equals.type(torch.FloatTensor)).item()
-                train_losses.append(running_loss/len(trainloader))
-                test_losses.append(test_loss/len(testloader))                    
-                with open("results/{}_{}.txt".format(dataset_name, model_size), "a") as f: 
-                    f.write((f"Epoch {epoch+1}/{epochs}.. "
-                      f"Train loss: {running_loss/print_every:.3f}.. "
-                      f"Test loss: {test_loss/len(testloader):.3f}.. "
-                      f"Test accuracy: {accuracy/len(testloader):.3f}\n"))
-                running_loss = 0
-                model.train()
+        ## Test model performance on testing data
+        test_loss = 0
+        accuracy = 0
+        model.eval()
+        with torch.no_grad():
+            for inputs, labels in testloader:
+                inputs, labels = inputs.to(device), labels.to(device)
+                logps = model.forward(inputs)
+                batch_loss = criterion(logps, labels)
+                test_loss += batch_loss.item()
+                
+                ps = torch.exp(logps)
+                top_p, top_class = ps.topk(1, dim=1)
+                equals = top_class == labels.view(*top_class.shape)
+                accuracy += torch.mean(equals.type(torch.FloatTensor)).item()
+        
+        ## Save results until time to write to file
+        recent_train_losses.append(running_loss/len(trainloader))
+        recent_test_losses.append(test_loss/len(testloader))     
+        accuracies.append(accuracy/len(testloader))
+        unsaved_epochs.append(epoch)
+
+        ## Prepare to resume training
+        running_loss = 0
+        model.train()
+
         if epoch % save_frequency == 0:
             torch.save({
                     'epoch': epoch,
                     'model_state_dict': model.state_dict(),
                     'optimizer_state_dict': optimizer.state_dict()
                     }, "checkpoints/{}_{}-{}.pt".format(dataset_name, model_size, epoch))
+        
+            with open("results/{}_{}.txt".format(dataset_name, model_size), "a") as f:
+                for i in range(len(unsaved_epochs)): 
+                    f.write((f"Epoch {unsaved_epochs[i]}/{epochs}.. "
+                        f"Train loss: {recent_train_losses[i]:.3f}.. "
+                        f"Test loss: {recent_test_losses[i]:.3f}.. "
+                        f"Test accuracy: {accuracies[i]:.3f}\n"))
+            unsaved_epochs = []
+            recent_test_losses, recent_train_losses = [], []
+            accuracies = []
 
 if __name__ == "__main__":
-    #load_split_train_test("scale_label_dataset", 0.2)
     # for command line usage
     ap = argparse.ArgumentParser()
     ap.add_argument("-d", "--dataset_name", type=str, default="no_text",
@@ -158,6 +169,7 @@ if __name__ == "__main__":
                 help="save model every n epochs")
     ap.add_argument("-s", "--model_size", type=int, default=50,
                 help="size of resnet model")
+    ap.add_argument("-b", "--batch_size", type=int, default=128)
     args = vars(ap.parse_args())
 
     dataset_name = args["dataset_name"]
