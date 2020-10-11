@@ -259,6 +259,7 @@ def generate_dataset_scale_bar_labels(samples, input_directory, output_directory
     scales = [round((10**scale) * i, 1) for i in range(1, 10) for scale in range(-1, 3)] + [2.5, 25, 250]
     scales = [str(i) for i in scales]
     units = ["um", "nm", "A", "mm"]
+    train_to_test_ratio = 5
 
     for i in range(samples):
         # select text
@@ -272,9 +273,11 @@ def generate_dataset_scale_bar_labels(samples, input_directory, output_directory
         image = Image.open(image_path).convert("RGB")
         cropped_image = draw_text_on_image(image, text)
         
-        # save to detect only unit
-
         # save image
+        if i % train_to_test_ratio == 0:
+            output_directory = output_directory + "/test"
+        else:
+            output_directory = output_directory + "/train"
         save(cropped_image, os.path.join(output_directory, unit, str(i) + ".png"))
 
         if i % 500 == 0:
