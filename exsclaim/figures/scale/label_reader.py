@@ -16,7 +16,7 @@ def get_transform(train):
         transforms.append(T.RandomHorizontalFlip(0.5))
     return T.Compose(transforms)
 
-def load_split_train_test(datadir, valid_size = .2):
+def load_split_train_test(datadir):
     train_transforms = transforms.Compose([transforms.Resize(256), 
                                            transforms.CenterCrop(224),
                                            transforms.ToTensor(),
@@ -25,16 +25,16 @@ def load_split_train_test(datadir, valid_size = .2):
                                            transforms.CenterCrop(224),
                                            transforms.ToTensor(),
                                            transforms.Normalize(mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225]),])
-    train_data = datasets.ImageFolder(datadir, transform=train_transforms)
-    test_data = datasets.ImageFolder(datadir, transform=test_transforms)
+    train_data = datasets.ImageFolder(datadir + "/train", transform=train_transforms)
+    test_data = datasets.ImageFolder(datadir + "/test", transform=test_transforms)
     num_train = len(train_data)
     indices = list(range(num_train))
     split = int(np.floor(valid_size * num_train))
-    #np.random.shuffle(indices)
-    from torch.utils.data.sampler import SequentialSampler
+    np.random.shuffle(indices)
+    from torch.utils.data.sampler import SubsetRandomSampler
     train_idx, test_idx = indices[split+1:], indices[:split]
-    train_sampler = SequentialSampler(train_idx)
-    test_sampler = SequentialSampler(test_idx)
+    train_sampler = SubsetRandomSampler(train_idx)
+    test_sampler = SubsetRandomSampler(test_idx)
     trainloader = torch.utils.data.DataLoader(train_data,
                    sampler=train_sampler, batch_size=128)
     testloader = torch.utils.data.DataLoader(test_data,
@@ -95,7 +95,7 @@ def get_model(size, dataset_name, classes):
 
 
 def main(dataset_name, classes, model_size, save_frequency):
-    trainloader, testloader = load_split_train_test("~/exsclaim/dataset/dataset_generation/{}".format(dataset_name), .2)
+    trainloader, testloader = load_split_train_test("~/exsclaim/dataset/dataset_generation/{}".format(dataset_name))
     
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
@@ -134,7 +134,7 @@ def main(dataset_name, classes, model_size, save_frequency):
         ## Save results until time to write to file
         recent_train_losses.append(running_loss/len(trainloader))
         recent_test_losses.append(test_loss/len(testloader))     
-        accuracies.append(accuracy/len(testloader))
+        accuracies.append(float(accuracy/len(testloader)))
         unsaved_epochs.append(epoch)
 
         ## Prepare to resume training
