@@ -29,7 +29,7 @@ def load_split_train_test(datadir):
     test_data = datasets.ImageFolder(datadir + "/test", transform=test_transforms)
     trainloader = torch.utils.data.DataLoader(train_data, batch_size=128, shuffle=True)
     testloader = torch.utils.data.DataLoader(test_data, batch_size=128, shuffle=True)
-    return trainloader, testloader
+   return trainloader, testloader
 
 def get_model(size, dataset_name, classes):
     model = None
