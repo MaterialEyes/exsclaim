@@ -12,8 +12,6 @@ import os
 def get_transform(train):
     transforms = []
     transforms.append(T.ToTensor())
-    if train:
-        transforms.append(T.RandomHorizontalFlip(0.5))
     return T.Compose(transforms)
 
 def load_split_train_test(datadir):
@@ -29,18 +27,21 @@ def load_split_train_test(datadir):
     test_data = datasets.ImageFolder(datadir + "/test", transform=test_transforms)
     trainloader = torch.utils.data.DataLoader(train_data, batch_size=128, shuffle=True)
     testloader = torch.utils.data.DataLoader(test_data, batch_size=128, shuffle=True)
-   return trainloader, testloader
+    return trainloader, testloader
 
-def get_model(size, dataset_name, classes):
+def get_model(size, dataset_name, classes, pretrained, learning_rate):
     model = None
+    trained = True if pretrained == "pretrained" else False
     if size == 50:
-        model = models.resnet50(pretrained=True)
+        model = models.resnet50(pretrained=trained)
+    elif size == 18:
+        model = models.resnet18(pretrained = trained)
     elif size == 152:
-        model = models.resnet152(pretrained=True)
+        model = models.resnet152(pretrained=trained)
     
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-    for param in model.parameters():
-        param.requires_grad = False
+    #for param in model.parameters():
+    #    param.requires_grad = False
       
     model.fc = nn.Sequential(nn.Linear(2048, 512),
                                     nn.ReLU(),
@@ -48,13 +49,13 @@ def get_model(size, dataset_name, classes):
                                     nn.Linear(512, classes),
                                     nn.LogSoftmax(dim=1))
     criterion = nn.NLLLoss()
-    optimizer = optim.Adam(model.fc.parameters(), lr=0.003)
+    optimizer = optim.Adam(model.fc.parameters(), lr=learning_rate)
     model.to(device)
    
     # find previous model to resume training
     largest = -1
     best_checkpoint = None
-    for checkpoint in os.listdir('checkpoints'):
+    for checkpoint in os.listdir('checkpoints/{}'.format(pretrained)):
         filename = checkpoint.split(".")[0]
         model_name, number = filename.split("-")
         if model_name != dataset_name + "_" + str(size):
@@ -68,7 +69,7 @@ def get_model(size, dataset_name, classes):
         return model, 0, criterion, optimizer
 
     # Load saved information from checkpoint
-    best_checkpoint = 'checkpoints/' + best_checkpoint
+    best_checkpoint = 'checkpoints/{}/'.format(pretrained) + best_checkpoint
     cuda = torch.cuda.is_available() and (gpu_id >= 0)
     if cuda:
         model.load_state_dict(torch.load(best_checkpoint)["model_state_dict"])
@@ -84,13 +85,14 @@ def get_model(size, dataset_name, classes):
     return model, epoch, criterion, optimizer
 
 
-def main(dataset_name, classes, model_size, save_frequency):
+def main(dataset_name, classes, model_size, save_frequency, pretrained, learning_rate):
     trainloader, testloader = load_split_train_test("~/exsclaim/dataset/dataset_generation/{}".format(dataset_name))
     
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
-    model, current_epoch, criterion, optimizer = get_model(model_size, dataset_name, classes)
+    model, current_epoch, criterion, optimizer = get_model(model_size, dataset_name, classes, pretrained, learning_rate)
 
+    best_accuracy = 0
     epochs = 1000
     running_loss = 0
     recent_train_losses, recent_test_losses = [], []
@@ -131,14 +133,15 @@ def main(dataset_name, classes, model_size, save_frequency):
         running_loss = 0
         model.train()
 
-        if epoch % save_frequency == 0:
+        if epoch % (save_frequency*4) == 0 or accuracy > best_accuracy:
+            best_accuracy = accuracy
             torch.save({
                     'epoch': epoch,
                     'model_state_dict': model.state_dict(),
                     'optimizer_state_dict': optimizer.state_dict()
-                    }, "checkpoints/{}_{}-{}.pt".format(dataset_name, model_size, epoch))
+                    }, "checkpoints/{}/{}_{}-{}.pt".format(pretrained, dataset_name, model_size, epoch))
         
-            with open("results/{}_{}.txt".format(dataset_name, model_size), "a") as f:
+            with open("results/{}/{}_{}.txt".format(pretrained, dataset_name, model_size), "a") as f:
                 for i in range(len(unsaved_epochs)): 
                     f.write((f"Epoch {unsaved_epochs[i]}/{epochs}.. "
                         f"Train loss: {recent_train_losses[i]:.3f}.. "
@@ -160,10 +163,19 @@ if __name__ == "__main__":
     ap.add_argument("-s", "--model_size", type=int, default=50,
                 help="size of resnet model")
     ap.add_argument("-b", "--batch_size", type=int, default=128)
+    ap.add_argument("-p", "--pretrained", default=True, action='store_false')
+    ap.add_argument("-l", "--learning_rate", default = 0.003, type=int)   
+ 
     args = vars(ap.parse_args())
 
     dataset_name = args["dataset_name"]
     classes = args["classes"]
     save_frequency = args["save_frequency"]
     model_size = args["model_size"]
-    main(dataset_name, classes, model_size, save_frequency)
+    pretrained = args["pretrained"]
+    learning_rate = args["learning_rate"]
+    if pretrained:
+        pretrained = "pretrained"
+    else:
+        pretrained = "scratch"
+    main(dataset_name, classes, model_size, save_frequency, pretrained, learning_rate)
