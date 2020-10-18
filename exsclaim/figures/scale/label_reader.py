@@ -9,18 +9,9 @@ from torchvision import datasets, transforms, models
 import argparse
 import os
 
-def get_transform(train):
-    transforms = []
-    transforms.append(T.ToTensor())
-    return T.Compose(transforms)
 
 def load_split_train_test(datadir):
     train_transforms = transforms.Compose([transforms.Resize(256), 
-                                           transforms.CenterCrop(224),
-                                           transforms.ToTensor(),
-                                           transforms.Normalize(mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225]),])
-    test_transforms =  transforms.Compose([transforms.Resize(256), 
-                                           transforms.CenterCrop(224),
                                            transforms.ToTensor(),
                                            transforms.Normalize(mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225]),])
     train_data = datasets.ImageFolder(datadir + "/train", transform=train_transforms)
@@ -29,7 +20,7 @@ def load_split_train_test(datadir):
     testloader = torch.utils.data.DataLoader(test_data, batch_size=128, shuffle=True)
     return trainloader, testloader
 
-def get_model(size, dataset_name, classes, pretrained, learning_rate):
+def get_model(size, dataset_name, classes, pretrained):
     model = None
     trained = True if pretrained == "pretrained" else False
     if size == 50:
@@ -40,16 +31,13 @@ def get_model(size, dataset_name, classes, pretrained, learning_rate):
         model = models.resnet152(pretrained=trained)
     
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-    #for param in model.parameters():
-    #    param.requires_grad = False
       
     model.fc = nn.Sequential(nn.Linear(2048, 512),
                                     nn.ReLU(),
                                     nn.Dropout(0.2),
                                     nn.Linear(512, classes),
                                     nn.LogSoftmax(dim=1))
-    criterion = nn.NLLLoss()
-    optimizer = optim.Adam(model.fc.parameters(), lr=learning_rate)
+
     model.to(device)
    
     # find previous model to resume training
@@ -66,32 +54,39 @@ def get_model(size, dataset_name, classes, pretrained, learning_rate):
             largest = number
     # training hasn't started
     if best_checkpoint == None:
-        return model, 0, criterion, optimizer
+        return model, ""
 
-    # Load saved information from checkpoint
-    best_checkpoint = 'checkpoints/{}/'.format(pretrained) + best_checkpoint
-    cuda = torch.cuda.is_available() and (gpu_id >= 0)
-    if cuda:
-        model.load_state_dict(torch.load(best_checkpoint)["model_state_dict"])
-        optimizer.load_state_dict(torch.load(best_checkpoint)['optimizer_state_dict'])
-        model = model.cuda()
-    else:
-        model.load_state_dict(torch.load(best_checkpoint, map_location='cpu')["model_state_dict"])
-        optimizer.load_state_dict(torch.load(best_checkpoint, map_location='cpu')['optimizer_state_dict'])
-
-    ckpt = torch.load(best_checkpoint)
-    epoch = ckpt['epoch']
-
-    return model, epoch, criterion, optimizer
+    return model, checkpoint
 
 
 def main(dataset_name, classes, model_size, save_frequency, pretrained, learning_rate):
+    ## Load datasets
     trainloader, testloader = load_split_train_test("~/exsclaim/dataset/dataset_generation/{}".format(dataset_name))
     
+    ## Get model checkpoint
+    model, checkpoint_path = get_model(model_size, dataset_name, classes, pretrained)
+    criterion = nn.NLLLoss()
+    params = [p for p in model.parameters() if p.requires_grad]
+    optimizer = optim.Adam(params, lr=learning_rate)
+    # Dynamically reduce learning rate as testing loss stops improving
+    learning_rate_scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, "min")
+
+    # Load saved information from checkpoint
+    checkpoint_path = 'checkpoints/{}/'.format(pretrained) + checkpoint_path
+    cuda = torch.cuda.is_available() and (gpu_id >= 0)
+    if cuda:
+        checkpoint = torch.load(checkpoint_path)
+        model = model.cuda()
+    else:
+        checkpoint = torch.load(checkpoint_path, map_location="cpu")
+
+    current_epoch = checkpoint["epoch"]
+    model.load_state_dict(checkpoint["model_state_dict"])
+    optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+    learning_rate_scheduler.load_state_dict(checkpoint["learning_rate_state_dict"])
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
-    model, current_epoch, criterion, optimizer = get_model(model_size, dataset_name, classes, pretrained, learning_rate)
-
+    ## Train model
     best_accuracy = 0
     epochs = 1000
     running_loss = 0
@@ -122,6 +117,8 @@ def main(dataset_name, classes, model_size, save_frequency, pretrained, learning
                 top_p, top_class = ps.topk(1, dim=1)
                 equals = top_class == labels.view(*top_class.shape)
                 accuracy += torch.mean(equals.type(torch.FloatTensor)).item()
+        # update learning rate based on test loss
+        learning_rate_scheduler.step(test_loss)      
         
         ## Save results until time to write to file
         recent_train_losses.append(running_loss/len(trainloader))
@@ -138,15 +135,17 @@ def main(dataset_name, classes, model_size, save_frequency, pretrained, learning
             torch.save({
                     'epoch': epoch,
                     'model_state_dict': model.state_dict(),
-                    'optimizer_state_dict': optimizer.state_dict()
+                    'optimizer_state_dict': optimizer.state_dict(),
+                    'learning_rate_state_dict': learning_rate_scheduler.state_dict()
                     }, "checkpoints/{}/{}_{}-{}.pt".format(pretrained, dataset_name, model_size, epoch))
         
             with open("results/{}/{}_{}.txt".format(pretrained, dataset_name, model_size), "a") as f:
                 for i in range(len(unsaved_epochs)): 
-                    f.write((f"Epoch {unsaved_epochs[i]}/{epochs}.. "
-                        f"Train loss: {recent_train_losses[i]:.3f}.. "
-                        f"Test loss: {recent_test_losses[i]:.3f}.. "
-                        f"Test accuracy: {accuracies[i]:.3f}\n"))
+                    f.write(("Epoch {}/{}.. ".format(unsaved_epochs[i], epochs) +
+                        "Train loss: {}.. ".format(recent_train_losses[i]) +
+                        "Test loss: {}.. ".format(recent_test_losses[i]) +
+                        "Test accuracy: {}.. ".format(accuracies[i]) +
+                        "Learning Rate: {}".format(optimizer.param_groups[0]['lr'])))
             unsaved_epochs = []
             recent_test_losses, recent_train_losses = [], []
             accuracies = []
