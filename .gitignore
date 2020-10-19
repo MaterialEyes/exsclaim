@@ -15,3 +15,7 @@ extracted/nature-test/*
 !extracted/nature-test/figures/*
 *.egg
 *.egg-info/
+.vscode
+cookie
+reference_extracted/
+query/

@@ -32,3 +32,15 @@ if [ ! -f "$text_model" ]; then
 else
     echo "Already downloaded text_recognition_model.pt"
 fi
+
+scale_detection=exsclaim/figures/checkpoints/scale_bar_detection_model.pt
+scale_detection_googleid="18jGI7EsTJEYpZt2ISlFYaqfQZT4ttab5"
+if [ ! -f "$scale_detection" ]; then
+    if [ ! -d "$dir" ] ; then
+        mkdir exsclaim/figures/checkpoints
+    fi
+    curl -c ./cookie -s -L "https://drive.google.com/uc?export=download&id=${scale_detection_googleid}" > /dev/null
+    curl -Lb ./cookie "https://drive.google.com/uc?export=download&confirm=`awk '/download/ {print $NF}' ./cookie`&id=${scale_detection_googleid}" -o ${scale_detection}
+else
+    echo "Already downloaded scale_bar_detection_model.pt"
+fi

@@ -31,12 +31,8 @@ def is_disjoint(l1,l2) -> bool:
 
 def load_json(filename):
     with open(filename, 'r') as fp:
-        json.load(fp)
-        # try:
-        #     return json.load(fp)
-        # except:
-        #     print("JSON load error")
-        #     return
+        json_dict = json.load(fp)
+    return json_dict
 
 def load_yaml(filename):
     with open(filename, 'r') as stream:
@@ -45,9 +41,10 @@ def load_yaml(filename):
         except yaml.YAMLError as exc:
             print(exc)
 
-def intersection(lst1, lst2): 
-    lst3 = [value for value in lst1 if value in lst2] 
-    return lst3 
+def intersection(lst1, lst2):
+    """ Returns all elements in both list1 and list2 """
+    list_intersection = [value for value in lst1 if value in lst2] 
+    return list_intersection
     
 def flatten(items: list) -> list:
     """
@@ -70,6 +67,11 @@ def exist_common_member(a: list, b: list) -> bool:
         return(True)  
     return(False)
 
+def convert_coords_to_labelbox(bbox_coordinates):
+    """ Converts x1,y1,x2,y2 to [{"x": x1, "y": y1}, ...] """
+    x1, y1, x2, y2 = bbox_coordinates
+    return [{"x": x1, "y": y1}, {"x": x1, "y": y2},
+            {"x": x2, "y": y2}, {"x": x2, "y": y1}]
 
 # Disable
 def blockPrint():

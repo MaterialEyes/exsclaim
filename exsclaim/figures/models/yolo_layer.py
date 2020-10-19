@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import numpy as np
-from ..utils.utils import *
+from ..utils import *
 from .network import resnet152
 import cv2
 
@@ -106,7 +106,7 @@ class YOLOLayer(nn.Module):
 
         if compound_labels is None:  # not training
             pred[..., :4] *= self.stride
-            return pred.view(batchsize, -1, n_ch).data
+            return pred.reshape(batchsize, -1, n_ch).data
 
         pred = pred[..., :4].data
 

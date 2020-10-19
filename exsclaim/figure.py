@@ -15,9 +15,12 @@ from skimage import io
 from scipy.special import softmax
 from torch.autograd import Variable
 from PIL import Image, ImageDraw, ImageFont
+import torchvision.models.detection
+import torchvision.transforms as T
+from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 
 from .figures.models.yolov3 import *
-from .figures.utils.utils import *
+from .figures.utils import *
 from .figures.models.network import *
 from .tool import ExsclaimTool
 from . import utils
@@ -30,13 +33,13 @@ class FigureSeparator(ExsclaimTool):
     Parameters:
     None
     """
-    def __init__(self , model_path=""):
-        super().__init__(model_path)
+    def __init__(self , search_query):
         self._load_model()
         self.exsclaim_json = {}
 
 
     def _load_model(self):
+        """ Load relevant models for the object detection tasks """
         ## Set configuration variables
         model_path = os.path.dirname(__file__)+'/figures/'
         configuration_file = model_path + "config/yolov3_default_subfig.cfg"
@@ -86,8 +89,22 @@ class FigureSeparator(ExsclaimTool):
             classifier_model.load_state_dict(torch.load(classifier_checkpoint,map_location='cpu'))
         self.classifier_model = classifier_model
 
+        ## Load scale bar detection model
+        scale_bar_detection_checkpoint = model_path + "checkpoints/scale_bar_detection_model.pt"
+        # load an object detection model pre-trained on COCO
+        scale_bar_detection_model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=True)
+        input_features = scale_bar_detection_model.roi_heads.box_predictor.cls_score.in_features
+        number_classes = 3      # background, scale bar, scale bar label
+        scale_bar_detection_model.roi_heads.box_predictor = FastRCNNPredictor(input_features, number_classes)
+        if self.cuda:
+            scale_bar_detection_model.load_state_dict(torch.load(scale_bar_detection_checkpoint))
+            scale_bar_detection_model = scale_bar_detection_model.cuda()
+        else:
+            scale_bar_detection_model.load_state_dict(torch.load(scale_bar_detection_checkpoint, map_location='cpu'))
+        self.scale_bar_detection_model = scale_bar_detection_model
 
-    def _update_exsclaim(self,exsclaim_dict,figure_name,figure_dict):
+
+    def _update_exsclaim(self, exsclaim_dict, figure_name, figure_dict):
         figure_name = figure_name.split("/")[-1]
         for master_image in figure_dict['figure_separator_results'][0]['master_images']:
             exsclaim_dict[figure_name]['master_images'].append(master_image)
@@ -97,45 +114,59 @@ class FigureSeparator(ExsclaimTool):
         return exsclaim_dict
 
 
-    def _appendJSON(self,filename,json_dict):
-        with open(filename,'w') as f: 
-            json.dump(json_dict, f, indent=3)
+    def _appendJSON(self, results_directory, exsclaim_json, figures_separated):
+        """ Commit updates to EXSCLAIM JSON and updates list of separated figures
+
+        Args:
+            results_directory (string): Path to results directory
+            exsclaim_json (dict): Updated EXSCLAIM JSON
+            figures_separated (set): Figures which have already been separated
+        """
+        with open(results_directory + "exsclaim.json", 'w') as f: 
+            json.dump(exsclaim_json, f, indent=3)
+        with open(results_directory + "_figures", "a+") as f:
+            for figure in figures_separated:
+                f.write("%s\n" % figure.split("/")[-1])
 
 
-    def run(self,search_query,exsclaim_dict):
+    def run(self, search_query, exsclaim_dict):
         """ Run the models relevant to manipulating article figures
         """
         utils.Printer("Running Figure Separator\n")
         os.makedirs(search_query['results_dir'], exist_ok=True)
         self.exsclaim_json = exsclaim_dict
         t0 = time.time()
+        ## List figures that have already been separated
+        if os.path.isfile(search_query["results_dir"] + "_figures"):
+            with open(search_query["results_dir"] + "_figures", "r") as f:
+                contents = f.readlines()
+            figures_separated = {f.strip() for f in contents}
+        else:
+            figures_separated = set()
+        new_figures_separated = set()
+
         counter = 1
-        figures = self.get_figure_paths(search_query)
+        figures = ([self.exsclaim_json[figure]["figure_path"] for figure in self.exsclaim_json 
+                    if self.exsclaim_json[figure]["figure_name"] not in figures_separated])
         for figure_name in figures:
             utils.Printer(">>> ({0} of {1}) ".format(counter,+\
                 len(figures))+\
-                "Extracting images from: "+figure_name.split("/")[-1])
+                "Extracting images from: "+ figure_name.split("/")[-1])
             #try:
             self.extract_image_objects(figure_name)
             self.make_visualization(figure_name, search_query['results_dir'])
+            new_figures_separated.add(figure_name)
             #except:
             #    utils.Printer("<!> ERROR: An exception occurred in FigureSeparator\n")
             
             # Save to file every N iterations (to accomodate restart scenarios)
             if counter%500 == 0:
-                self._appendJSON(search_query['results_dir']+'_fs.json',self.exsclaim_json)
+                self._appendJSON(search_query['results_dir'], self.exsclaim_json, new_figures_separated)
             counter += 1
         
         t1 = time.time()
         utils.Printer(">>> Time Elapsed: {0:.2f} sec ({1} figures)\n".format(t1-t0,int(counter-1)))
-        # -------------------------------- #  
-        # -- Save current exsclaim_dict -- #
-        # -------------------------------- # 
-        with open(search_query['results_dir']+'_fs.json', 'w') as f:
-            json.dump(self.exsclaim_json, f, indent=3)
-        # -------------------------------- #  
-        # -------------------------------- # 
-        # -------------------------------- # 
+        self._appendJSON(search_query["results_dir"], self.exsclaim_json, new_figures_separated)
         return self.exsclaim_json
 
 
@@ -234,6 +265,7 @@ class FigureSeparator(ExsclaimTool):
                 increase modularity. 
         """
         img_raw = Image.open(figure_path).convert("RGB")
+        img_raw = img_raw.copy()
         width, height = img_raw.size
         binary_img = np.zeros((height,width,1))
 
@@ -413,9 +445,58 @@ class FigureSeparator(ExsclaimTool):
                         geometry = { "x" : x, "y" : y}
                         subfigure_label_info["geometry"].append(geometry)
             master_image_info["subfigure_label"] = subfigure_label_info
-            figure_json["master_images"].append(master_image_info)
+            figure_json.get("master_images", []).append(master_image_info)
             
         self.exsclaim_json[figure_name] = figure_json
+        return figure_json
+
+    def determine_scale(self, figure_path, figure_json):
+        """ Adds scale information to figure by reading and measuring scale bars 
+
+        Args:
+            figure_path (str): A path to the image (.png, .jpg, or .gif)
+                file containing the article figure
+            figure_json (dict): A Figure JSON
+        Returns:
+            figure_json (dict): A dictionary with classified image_objects
+                extracted from figure
+        """
+        # pre-process image
+        image = Image.open(figure_path).convert("RGB")
+        image = T.ToTensor()(image)
+
+        # prediction
+        with torch.no_grad():
+            outputs = self.scale_bar_detection_model([image])
+
+        # post-process 
+        scale_bar_info = []
+        for i, box in enumerate(outputs[0]["boxes"]):
+            confidence = outputs[0]["scores"][i]
+            if confidence > 0.5:
+                x1, y1, x2, y2 = box
+                label = outputs[0]['labels'][i]
+                scale_bar_info.append([x1, y1, x2, y2, confidence, label])
+        scale_bar_info = non_max_suppression_malisiewicz(np.asarray(scale_bar_info), 0.4)
+        scale_bar_info = scale_bar_info
+
+        # add to figure_json
+        label_names = ["background", "scale bar", "scale label"]
+        unassigned = figure_json.get("unassigned", {})
+        scale_bars = unassigned.get("scale_bar_lines", [])
+        scale_labels = unassigned.get("scale_bar_labels", [])
+        for scale_object in scale_bar_info:
+            x1, y1, x2, y2, confidence, classification = scale_object
+            geometry = utils.convert_coords_to_labelbox([int(x1), int(y1), int(x2), int(y2)])
+            if label_names[int(classification)] == "scale bar":
+                scale_bars.append(geometry)
+            elif label_names[int(classification)] == "scale label":
+                label_json = {"geometry" : geometry}
+                scale_labels.append(label_json)
+        unassigned["scale_bar_lines"] = scale_bars
+        unassigned["scale_bar_labels"] = scale_labels
+        figure_json["unassigned"] = unassigned
+
         return figure_json
 
 
@@ -484,9 +565,9 @@ class FigureSeparator(ExsclaimTool):
             result_image.paste(patch,box=(110,60+100*subfigure_id))
 
         del draw
-        result_image.save(os.path.join(save_path+"/extractions/"+sample_image_name+".png"))   
+        result_image.save(os.path.join(save_path+"/extractions/"+sample_image_name+".png"))
 
-
+    
     def extract_image_objects(self, figure_path=str) -> "figure_dict":
         """ Separate and classify subfigures in an article figure
 
@@ -501,6 +582,7 @@ class FigureSeparator(ExsclaimTool):
         self.object_detection_model.eval()
         self.text_recognition_model.eval()
         self.classifier_model.eval()
+        self.scale_bar_detection_model.eval()
         
         ## Detect the bounding boxes of each subfigure
         subfigure_info = self.detect_subfigure_boundaries(figure_path)
@@ -510,5 +592,8 @@ class FigureSeparator(ExsclaimTool):
             
         ## Classify the subfigures
         figure_json = self.classify_subfigures(figure_path, subfigure_info, concate_img)
+
+        ## Detect scale bar lines and labels
+        figure_json = self.determine_scale(figure_path, figure_json)
 
         return figure_json

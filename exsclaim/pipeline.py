@@ -10,7 +10,7 @@ from .figure import FigureSeparator
 from .tool import CaptionSeparator, JournalScraper
 
 class Pipeline:
-    def __init__(self , query_path, exsclaim_path):
+    def __init__(self , query_path):
         """ initialize a Pipeline to run on query path and save to exsclaim path
 
         Args:
@@ -26,18 +26,18 @@ class Pipeline:
             self.query_dict = query_path
             self.query_path = ""
 
-        self.exsclaim_path = exsclaim_path
+        
         try:
-            with open(exsclaim_path, 'r') as f:
+            self.exsclaim_path = self.query_dict["results_dir"] + "exsclaim.json"
+            with open(self.exsclaim_path, 'r') as f:
                 # Load configuration file values
                 self.exsclaim_dict = json.load(f)
-        except FileNotFoundError:
+        except:
             # Keep preset values
             self.exsclaim_dict = {}
 
 
-    def run(self, tools =
-            [JournalScraper(), CaptionSeparator(), FigureSeparator()]):
+    def run(self, tools = None):
         """ Run EXSCLAIM pipeline on Pipeline instance's query path
 
         Args:
@@ -77,7 +77,11 @@ class Pipeline:
         @@@@@@@@@@@@@@@ ,@@@@@@@@@@@@@@@@@@@ &@@@@@@@@@@@@@@
         @@@@@@@@@@@@@@@@@@@@   ,%@@&/   (@@@@@@@@@@@@@@@@@@@
         @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-        """)        
+        """)
+        # set default values
+        if tools is None: tools = [JournalScraper(self.query_dict),
+                                   CaptionSeparator(self.query_dict),
+                                   FigureSeparator(self.query_dict)]
         # run each ExsclaimTool on search query
         for tool in tools:
             self.exsclaim_dict = tool.run(self.query_dict,self.exsclaim_dict)
@@ -179,7 +183,7 @@ class Pipeline:
             counter +=1 
         utils.Printer(">>> SUCCESS!\n")
 
-        with open(search_query['results_dir']+'exsclaim.json', 'w') as f:
+        with open(search_query['results_dir'] + 'exsclaim.json', 'w') as f:
             json.dump(self.exsclaim_dict, f, indent=3)
         
         return self.exsclaim_dict

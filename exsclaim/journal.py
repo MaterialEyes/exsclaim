@@ -32,6 +32,8 @@ class JournalFamily():
     pre_sb =        ("Portion of the url that extends from the"
                     "search terms to the paremeter value for"
                     "sorting search results"),
+    open_pre_sb =   ("Pre sb, except with parameter (if it exists)"
+                     " to only search for open access articles"),
     post_sb =       "The final portion of the url", 
     ## used for get_article_delimiters
     article_path =  "The journal's url path to articles"
@@ -55,38 +57,6 @@ class JournalFamily():
             The domain name of the journal, as a string
         """
         return self.domain
-
-    def get_search_parameters(self):
-        """
-        Get prioritized url extensions for search terms in search_query.
-
-        Returns:
-            A list of url paths and queries as strings
-        """
-        search_query = self.search_query
-        ## creates a list of search terms
-        search_list = ([[search_query['query'][key]['term']] + 
-                       search_query['query'][key]['synonyms'] 
-                       for key in search_query['query'] 
-                       if len(search_query['query'][key]['synonyms'])>0])
-        search_product = list(itertools.product(*search_list))
-        extensions = []
-
-        # sortby is the requested method to sort results (relevancy or recency) and
-        # sbtext gives the journal specific parameter to sort as requested
-        sortby = search_query['sortby']
-        if sortby == 'relevant':
-            sbext = self.relevant
-        elif sortby == 'recent':
-            sbext = self.recent
-
-        # this creates the url (excluding domain and protocol) for each search query
-        for search_group in search_product:
-            url_path_and_query = (self.path
-                + self.join.join(["+".join(a.split(" ")) for a in search_group])
-                + self.pre_sb + sbext + self.post_sb)
-            extensions.append(url_path_and_query)
-        return extensions
 
     def get_article_delimiters(self) -> tuple:
         """
@@ -146,6 +116,10 @@ class JournalFamily():
         elif sortby == 'recent':
             sbext = self.recent
 
+        # modify search to find only open access articles
+        if search_query.get("open", False):
+            self.pre_sb = self.open_pre_sb
+
         search_query_urls = []
         # this creates the url (excluding domain and protocol) for each search query
         for search_group in search_product:
@@ -156,7 +130,18 @@ class JournalFamily():
 
         return search_query_urls
 
-    def get_article_extensions(self) -> list:
+    def get_license(self, soup):
+        """ Checks the article license and whether it is open access 
+
+        Args:
+            soup (a BeautifulSoup parse tree): representation of page html
+        Returns:
+            is_open (a bool): True if article is open
+            license (a string): Requried text of article license
+        """
+        return (False, "unknown")
+
+    def get_article_extensions(self, articles_visited=set()) -> list:
         """
         Create a list of article url extensions from search_query
 
@@ -164,36 +149,31 @@ class JournalFamily():
             A list of article url extensions from search.
         """
         search_query = self.search_query
-        extensions = []
         article_delim, reader_delims = self.get_article_delimiters()
         search_query_urls = self.get_search_query_urls()
-        articles_found = 0
+        article_paths = set()
         for page1 in search_query_urls:
-            print("GET request: ",page1)
-            page_returns = []
+            print("GET request: ", page1)
             soup = self.get_soup_from_request(page1, fast_load=True)
-            start,stop,total = self.get_page_info(soup)
-            for pg_num in range(start,stop+1):
-                request = self.turn_page(page1,pg_num,total)
-                soup = self.get_soup_from_request(request,fast_load=False)
+            start_page, stop_page, total_articles = self.get_page_info(soup)
+            for page_number in range(start_page, stop_page + 1):
+                request = self.turn_page(page1, page_number, total_articles)
+                soup = self.get_soup_from_request(request, fast_load=False)
                 for tags in soup.find_all('a',href=True):
-                    if len(tags.attrs['href'].split(article_delim)) > 1 :
-                        page_returns.append(tags.attrs['href'])
-            extensions.append(page_returns)
-            
-            #check if we have found enough articles
-            articles_found += len(page_returns)
-            if articles_found > search_query["maximum_scraped"]:
+                    article = tags.attrs['href']
+                    article = article.split('?page=search')[0]
+                    if (len(article.split(article_delim)) > 1 
+                        and article.split("/")[-1] not in articles_visited
+                        and article != None
+                        and len(set(reader_delims).intersection(set(article.split("/")))) <= 0):
+                        article_paths.add(article)
+                if len(article_paths) > search_query["maximum_scraped"]:
+                    break
+            if len(article_paths) > search_query["maximum_scraped"]:
                 break
-        
-        extensions = list(itertools.chain(*itertools.zip_longest(*extensions)))
-        extensions = [a for a in extensions if a != None]
-        extensions = [a for a in extensions if not \
-                    len(set(reader_delims).intersection(set(a.split("/"))))>0]
-        extensions = [a.split('?page=search')[0] for a in extensions]
     
-        extensions = list(OrderedDict.fromkeys(extensions))
-        return extensions[0:search_query["maximum_scraped"]]
+        articles = list(article_paths)
+        return articles[0:search_query["maximum_scraped"]]
 
     def get_figure_list(self, url):
         """
@@ -219,7 +199,7 @@ class JournalFamily():
         """
         with requests.Session() as session:
             r = session.get(url) 
-        soup =BeautifulSoup(r.text, 'lxml')
+        soup = BeautifulSoup(r.text, 'lxml')
         return soup
 
     def find_captions(self, figure):
@@ -258,6 +238,7 @@ class JournalFamily():
             A dict of figure_jsons from an article
         """
         soup = self.get_soup_from_request(url)
+        is_open, license = self.get_license(soup)
         save_path = self.search_query['results_dir']
 
         # Uncomment to save html
@@ -309,6 +290,8 @@ class JournalFamily():
             # save image info
             figure_json["figure_name"] = figure_name
             figure_json["image_url"] = image_url
+            figure_json["license"] = license
+            figure_json["open"] = is_open
 
             # save figure as image
             if save_path:
@@ -345,20 +328,29 @@ class ACS(JournalFamily):
     path =          "/action/doSearch?AllField=\""
     join =          "\"+\""
     pre_sb =        "\"&publication=&accessType=allContent&Earliest=&pageSize=20&startPage=0&sortBy="
+    open_pre_sb =   "\"&publication=&openAccess=18&accessType=openAccess&Earliest=&pageSize=20&startPage=0&sortBy="
     post_sb =       ""
     article_path =  ('/doi/',['abs','full','pdf'])
     prepend =       "https://pubs.acs.org"
     extra_key =     "inline-fig internalNav"
 
     def get_page_info(self, soup):
-        parsed = [a.split("of")[-1].strip() for a in soup.text.split("Results:")[1].split("Follow")[0].split('-')]
-        totalPages = math.ceil(float(parsed[1])/20)-1
+        totalResults = int(soup.find('span', {'class': "result__count"}).text)
+        totalPages = math.ceil(float(totalResults)/20)-1
         page = 0
-        totalResults = int(parsed[1])
         return page, totalPages, totalResults
 
     def turn_page(self, url, pg_num, pg_size):
         return url.split('&startPage=')[0]+'&startPage='+str(pg_num)+"&pageSize="+str(20)
+
+    def get_license(self, soup):
+        open_access = soup.find('div', {"class": "article_header-open-access"})
+        if open_access and ("ACS AuthorChoice" in open_access.text or
+                            "ACS Editors' Choice" in open_access.text):
+            is_open = True
+            return (is_open, open_access.text)
+        return (False, "unknown")
+
 
 class Nature(JournalFamily):
     domain =        "https://www.nature.com"
@@ -367,6 +359,7 @@ class Nature(JournalFamily):
     path =          "/search?q=\""
     join =          "\"%20\""
     pre_sb =        "\"&order="
+    open_pre_sb =   "\"&order="
     post_sb =       "&page=1"
     article_path =  ('/articles/','')
     prepend =       ""
@@ -385,6 +378,24 @@ class Nature(JournalFamily):
     def turn_page(self, url, pg_num, pg_size):
         return url.split('&page=')[0]+'&page='+str(pg_num)
 
+    def get_license(self, soup):
+        data_layer = soup.find(attrs = {'data-test': 'dataLayer'})
+        data_layer_string = str(data_layer.string)
+        data_layer_json = "{" + data_layer_string.split("[{", 1)[1].split("}];", 1)[0] + "}"
+        parsed = json.loads(data_layer_json)
+        ## try to get whether the journal is open
+        try:
+            is_open = parsed["content"]["attributes"]["copyright"]["open"]
+        except:
+            is_open = False
+        ## try to get license
+        try:
+            license = parsed["content"]["attributes"]["copyright"]["legacy"]["webtrendsLicenceType"]
+        except:
+            license = "unknown"
+        return is_open, license
+        
+
 class RSC(JournalFamily):
     domain =        "https://pubs.rsc.org"
     relevant =      "Relevance"
@@ -392,6 +403,7 @@ class RSC(JournalFamily):
     path =          "/en/results?searchtext="
     join =          "\"%20\""
     pre_sb =        "\"&SortBy="
+    open_pre_sb =   "\"&SortBy="
     post_sb =       "&PageSize=1&tab=all&fcategory=all&filter=all&Article%20Access=Open+Access"
     article_path =  ('/en/content/articlehtml/','')
     prepend =       "https://pubs.rsc.org"
