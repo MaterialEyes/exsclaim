@@ -20,7 +20,7 @@ import torchvision.transforms as T
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 
 from .figures.models.yolov3 import *
-from .figures.utils.utils import *
+from .figures.utils import *
 from .figures.models.network import *
 from .tool import ExsclaimTool
 from . import utils

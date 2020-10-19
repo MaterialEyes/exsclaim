@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import numpy as np
-from ..utils.utils import *
+from ..utils import *
 from .network import resnet152
 import cv2
 

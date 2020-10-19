@@ -1,5 +1,4 @@
 from __future__ import division
-from .utils_sup import *
 
 import torch
 import cv2
@@ -40,7 +39,6 @@ def parse_yolo_weights(model, weights_path):
 
         elif m._get_name() == 'YOLOLayer':
             # YOLO Layer (one conv with bias) Initialization
-#             offset, weights = parse_yolo_block(m, weights, offset, initflag)
             _, _ = parse_yolo_block(m, weights=[], offset=0, initflag=True)
             offset = yolo_offset[yolo_id]
             yolo_id += 1
@@ -304,15 +302,7 @@ def postprocess(prediction, dtype, conf_thre=0.7, nms_thre=0.45):
     output = [None for _ in range(len(prediction))]
     for i, image_pred in enumerate(prediction):
         # Filter out confidence scores below threshold
-#         print(image_pred.size())
-#         class_pred = torch.max(image_pred[:, :4], 1)
-# #         class_pred = torch.zeros(image_pred.size()[0])
-# #         print(class_pred.size())
-#         class_pred = class_pred[0]
-#         print(class_pred.size())
-#         class_pred = torch.zeros(image_pred.size()[0]).type(dtype)
         conf_mask = (image_pred[:, 4] >= conf_thre).squeeze()
-#         conf_mask = (image_pred[:, 4] * class_pred >= conf_thre).squeeze()
         image_pred = image_pred[conf_mask]
 
         # If none are remaining => process next image
@@ -321,11 +311,8 @@ def postprocess(prediction, dtype, conf_thre=0.7, nms_thre=0.45):
         # Get score and class with highest confidence
         class_conf = torch.ones(image_pred[:, 4:5].size()).type(dtype)
         class_pred = torch.zeros(image_pred[:, 4:5].size()).type(dtype)
-#         class_conf, class_pred = torch.max(
-#             image_pred[:, 5:5 + num_classes], 1,  keepdim=True)
 
         # Detections ordered as (x1, y1, x2, y2, obj_conf, class_conf, class_pred)
-#         print(image_pred[:, :5].size(),class_conf.size(),class_pred.size())
         detections = torch.cat(
             (image_pred[:, :5], class_conf.float(), class_pred.float()), 1)
         # Iterate through all predicted classes
@@ -372,10 +359,8 @@ def preprocess(img, imgsize, jitter, random_placing=False):
             h, w (int): original shape of the image
             nh, nw (int): shape of the resized image without padding
             dx, dy (int): pad size
-    """
-    
+    """    
     h, w, _ = img.shape
-#     print("h=%d,w=%d"%(h,w))
     img = img[:, :, ::-1]
     assert img is not None
 
@@ -403,7 +388,6 @@ def preprocess(img, imgsize, jitter, random_placing=False):
         dx = (imgsize - nw) // 2
         dy = (imgsize - nh) // 2
 
-#     print("nw=%d,nh=%d"%(nw,nh))
     img = cv2.resize(img, (nw, nh))
     sized = np.ones((imgsize, imgsize, 3), dtype=np.uint8) * 127
     sized[dy:dy+nh, dx:dx+nw, :] = img
@@ -458,3 +442,87 @@ def random_distort(img, hue, saturation, exposure):
     img = np.asarray(img, dtype=np.float32)
 
     return img
+
+def parse_conv_block(m, weights, offset, initflag):
+    """
+    Initialization of conv layers with batchnorm
+    Args:
+        m (Sequential): sequence of layers
+        weights (numpy.ndarray): pretrained weights data
+        offset (int): current position in the weights file
+        initflag (bool): if True, the layers are not covered by the weights file. \
+            They are initialized using darknet-style initialization.
+    Returns:
+        offset (int): current position in the weights file
+        weights (numpy.ndarray): pretrained weights data
+    """
+    conv_model = m[0]
+    bn_model = m[1]
+    param_length = m[1].bias.numel()
+
+    # batchnorm
+    for pname in ['bias', 'weight', 'running_mean', 'running_var']:
+        layerparam = getattr(bn_model, pname)
+
+        if initflag: # yolo initialization - scale to one, bias to zero
+            if pname == 'weight':
+                weights = np.append(weights, np.ones(param_length))
+            else:
+                weights = np.append(weights, np.zeros(param_length))
+
+        param = torch.from_numpy(weights[offset:offset + param_length]).view_as(layerparam)
+        layerparam.data.copy_(param)
+        offset += param_length
+
+    param_length = conv_model.weight.numel()
+
+    # conv
+    if initflag: # yolo initialization
+        n, c, k, _ = conv_model.weight.shape
+        scale = np.sqrt(2 / (k * k * c))
+        weights = np.append(weights, scale * np.random.normal(size=param_length))
+
+    param = torch.from_numpy(
+        weights[offset:offset + param_length]).view_as(conv_model.weight)
+    conv_model.weight.data.copy_(param)
+    offset += param_length
+
+    return offset, weights
+
+def parse_yolo_block(m, weights, offset, initflag):
+    """
+    YOLO Layer (one conv with bias) Initialization
+    Args:
+        m (Sequential): sequence of layers
+        weights (numpy.ndarray): pretrained weights data
+        offset (int): current position in the weights file
+        initflag (bool): if True, the layers are not covered by the weights file. \
+            They are initialized using darknet-style initialization.
+    Returns:
+        offset (int): current position in the weights file
+        weights (numpy.ndarray): pretrained weights data
+    """
+    conv_model = m._modules['conv']
+    param_length = conv_model.bias.numel()
+
+    if initflag: # yolo initialization - bias to zero
+        weights = np.append(weights, np.zeros(param_length))
+
+    param = torch.from_numpy(
+        weights[offset:offset + param_length]).view_as(conv_model.bias)
+    conv_model.bias.data.copy_(param)
+    offset += param_length
+
+    param_length = conv_model.weight.numel()
+
+    if initflag: # yolo initialization
+        n, c, k, _ = conv_model.weight.shape
+        scale = np.sqrt(2 / (k * k * c))
+        weights = np.append(weights, scale * np.random.normal(size=param_length))
+ 
+    param = torch.from_numpy(
+        weights[offset:offset + param_length]).view_as(conv_model.weight)
+    conv_model.weight.data.copy_(param)
+    offset += param_length
+
+    return offset, weights
