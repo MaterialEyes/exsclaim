@@ -23,5 +23,7 @@
     
     "results_dir": "extracted/nature-haadf-ag-nanoparticles/",
 
-    "save_format": ["csv", "save_figures"]
+    "save_format": ["csv", "save_figures"],
+
+    "open": true
 }

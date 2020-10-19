@@ -33,5 +33,7 @@
     
     "results_dir": "extracted/nature-point-defects-SiC/",
 
-    "save_format": ["csv", "save_figures"]
+    "save_format": ["csv", "save_figures"],
+
+    "open": true
 }
