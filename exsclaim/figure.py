@@ -7,6 +7,7 @@ import torch
 import shutil
 import pathlib
 import time
+import requests
 
 import numpy as np
 import torch.nn.functional as F
@@ -33,6 +34,16 @@ class FigureSeparator(ExsclaimTool):
     Parameters:
     None
     """
+
+    ## stores the google drive file IDs of default neural network checkpoints
+    ## replace these if you wish to change a model
+    model_names_to_googleids = {
+        "classifier_model.pt":          "1ZGkbAXeobzx4qFB7JfdhwYfwbmsaDJns",
+        "object_detection_model.pt":    "1cajTOMsompg-Q8rF3zeby6LNaP_0tpCE",
+        "text_recognition_model.pt":    "1frtRxgCs8wQsyGRqh6NQOFWaZ897GLs8",
+        "scale_bar_detection_model.pt": "18jGI7EsTJEYpZt2ISlFYaqfQZT4ttab5"
+    }
+
     def __init__(self , search_query):
         self._load_model()
         self.exsclaim_json = {}
@@ -57,51 +68,53 @@ class FigureSeparator(ExsclaimTool):
             torch.cuda.set_device(device=args.gpu_id)
 
         ## Load object detection model
-        object_detection_checkpoint = model_path + "checkpoints/object_detection_model.pt"
         object_detection_model = YOLOv3(configuration['MODEL'])
-        if self.cuda:
-            object_detection_model.load_state_dict(torch.load(object_detection_checkpoint))
-            object_detection_model = object_detection_model.cuda()
-        else:
-            object_detection_model.load_state_dict(torch.load(object_detection_checkpoint,map_location='cpu'))
-        self.object_detection_model = object_detection_model
-
+        self.object_detection_model = self.load_model_from_checkpoint(
+                                            object_detection_model,
+                                            "object_detection_model.pt")
         ## Load text recognition model
-        text_recognition_checkpoint = pathlib.Path(__file__).parent / 'figures' / 'checkpoints' / 'text_recognition_model.pt'
         text_recognition_model = resnet152()
-        if self.cuda:
-            text_recognition_model.load_state_dict(torch.load(text_recognition_checkpoint))
-            text_recognition_model = text_recognition_model.cuda()  
-        else:
-            text_recognition_model.load_state_dict(torch.load(text_recognition_checkpoint, map_location='cpu'))
-        self.text_recognition_model = text_recognition_model
-
+        self.text_recognition_model = self.load_model_from_checkpoint(
+                                            text_recognition_model,
+                                            'text_recognition_model.pt')
         ## Load classification model
-        classifier_checkpoint = model_path + "checkpoints/classifier_model.pt" 
         master_config_file = model_path + "config/yolov3_default_master.cfg"     
         with open(master_config_file, 'r') as f:
             master_config = yaml.load(f, Loader=yaml.FullLoader)
         classifier_model = YOLOv3img(master_config['MODEL'])
-        if self.cuda:
-            classifier_model.load_state_dict(torch.load(classifier_checkpoint))
-            classifier_model = classifier_model.cuda()
-        else:
-            classifier_model.load_state_dict(torch.load(classifier_checkpoint,map_location='cpu'))
-        self.classifier_model = classifier_model
-
+        self.classifier_model = self.load_model_from_checkpoint(
+                                            classifier_model,
+                                            "classifier_model.pt")
         ## Load scale bar detection model
-        scale_bar_detection_checkpoint = model_path + "checkpoints/scale_bar_detection_model.pt"
         # load an object detection model pre-trained on COCO
         scale_bar_detection_model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=True)
         input_features = scale_bar_detection_model.roi_heads.box_predictor.cls_score.in_features
         number_classes = 3      # background, scale bar, scale bar label
         scale_bar_detection_model.roi_heads.box_predictor = FastRCNNPredictor(input_features, number_classes)
+        self.scale_bar_detection_model = self.load_model_from_checkpoint(
+                                            scale_bar_detection_model,
+                                            "scale_bar_detection_model.pt")
+
+
+    def load_model_from_checkpoint(self, model, model_name):
+        """ load checkpoint weights into model """
+        checkpoints_path = pathlib.Path(__file__).parent / 'figures' / 'checkpoints'
+        checkpoint = checkpoints_path / model_name
+        
+        # download the model if isn't already
+        if not os.path.isfile(checkpoint):
+            os.makedirs(checkpoints_path, exist_ok=True)
+            file_id = FigureSeparator.model_names_to_googleids[model_name]
+            print(("Downloading: https://drive.google.com/uc?export=download&id={}"
+                   " to {}".format(file_id, checkpoint)))
+            utils.download_file_from_google_drive(file_id, checkpoint)
+        
         if self.cuda:
-            scale_bar_detection_model.load_state_dict(torch.load(scale_bar_detection_checkpoint))
-            scale_bar_detection_model = scale_bar_detection_model.cuda()
+            model.load_state_dict(torch.load(checkpoint))
+            model = model.cuda()
         else:
-            scale_bar_detection_model.load_state_dict(torch.load(scale_bar_detection_checkpoint, map_location='cpu'))
-        self.scale_bar_detection_model = scale_bar_detection_model
+            model.load_state_dict(torch.load(checkpoint, map_location="cpu"))
+        return model
 
 
     def _update_exsclaim(self, exsclaim_dict, figure_name, figure_dict):

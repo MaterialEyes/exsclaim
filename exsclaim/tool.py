@@ -57,6 +57,12 @@ class JournalScraper(ExsclaimTool):
     Parameters: 
     None
     """
+    journals = {
+        'acs':      journal.ACS,
+        'nature':   journal.Nature,
+        'rsc':      journal.RSC,
+    }
+
     def __init__(self, search_query):
         self.initialize_query(search_query)
         self.new_articles_visited = set()
