@@ -1,3 +1,0 @@
-include exsclaim/figures/checkpoints/classifier_model.pt
-include exsclaim/figures/checkpoints/object_detection_model.pt
-include exsclaim/figures/checkpoints/text_recognition_model.pt

@@ -7,8 +7,8 @@ with open(here / "README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="exsclaim-tspread", # Replace with your own username
-    version="0.0.2",
+    name="exsclaim-tspread",
+    version="0.0.4",
     author=('Eric Schwenker','Trevor Spreadbury','Weixin Jiang','Maria Chan'),
     author_email="developers@materialeyes.org",
     description="EXSCLAIM! is a library for the automatic EXtraction, Separation, and Caption-based natural Language Annotation of IMages from scientific figures.",
@@ -16,6 +16,14 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/MaterialEyes/exsclaim",
     packages=setuptools.find_packages(),
+    package_data={
+        'exsclaim': ['figures/config/yolov3_default_master.cfg',
+                     'figures/config/yolov3_default_subfig.cfg',
+                     'captions/models/characterization.yml',
+                     'captions/models/patterns.yml',
+                     'captions/models/reference.yml',
+                     'captions/models/rules.yml']
+    },
     classifiers=[
         "Development Status :: 1 - Planning",
         "Programming Language :: Python :: 3",

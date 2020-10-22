@@ -19,3 +19,5 @@ extracted/nature-test/*
 cookie
 reference_extracted/
 query/
+build/
+dist/
