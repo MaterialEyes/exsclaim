@@ -8,14 +8,14 @@ import torch.nn.functional as F
 from torchvision import datasets, transforms, models
 import argparse
 import os
-
+import time
 
 def load_split_train_test(datadir):
-    train_transforms = transforms.Compose([transforms.Resize(256), 
+    train_transforms = transforms.Compose([transforms.Resize((224, 224)),
                                            transforms.ToTensor(),
                                            transforms.Normalize(mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225]),])
     train_data = datasets.ImageFolder(datadir + "/train", transform=train_transforms)
-    test_data = datasets.ImageFolder(datadir + "/test", transform=test_transforms)
+    test_data = datasets.ImageFolder(datadir + "/test", transform=train_transforms)
     trainloader = torch.utils.data.DataLoader(train_data, batch_size=128, shuffle=True)
     testloader = torch.utils.data.DataLoader(test_data, batch_size=128, shuffle=True)
     return trainloader, testloader
@@ -31,8 +31,14 @@ def get_model(size, dataset_name, classes, pretrained):
         model = models.resnet152(pretrained=trained)
     
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-      
-    model.fc = nn.Sequential(nn.Linear(2048, 512),
+    
+    if size == 18:  
+        model.fc = nn.Sequential(   nn.ReLU(),
+                                    nn.Dropout(0.2),
+                                    nn.Linear(512, classes),
+                                    nn.LogSoftmax(dim=1))
+    else:
+        model.fc = nn.Sequential(   nn.Linear(2048, 512),
                                     nn.ReLU(),
                                     nn.Dropout(0.2),
                                     nn.Linear(512, classes),
@@ -56,10 +62,13 @@ def get_model(size, dataset_name, classes, pretrained):
     if best_checkpoint == None:
         return model, ""
 
-    return model, checkpoint
+    return model, best_checkpoint
 
 
 def main(dataset_name, classes, model_size, save_frequency, pretrained, learning_rate):
+    ## Start Tracking Time
+    t0 = time.process_time()
+
     ## Load datasets
     trainloader, testloader = load_split_train_test("~/exsclaim/dataset/dataset_generation/{}".format(dataset_name))
     
@@ -71,23 +80,28 @@ def main(dataset_name, classes, model_size, save_frequency, pretrained, learning
     # Dynamically reduce learning rate as testing loss stops improving
     learning_rate_scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, "min")
 
-    # Load saved information from checkpoint
-    checkpoint_path = 'checkpoints/{}/'.format(pretrained) + checkpoint_path
-    cuda = torch.cuda.is_available() and (gpu_id >= 0)
-    if cuda:
-        checkpoint = torch.load(checkpoint_path)
-        model = model.cuda()
-    else:
-        checkpoint = torch.load(checkpoint_path, map_location="cpu")
+    if checkpoint_path != "":
+        # Load saved information from checkpoint
+        checkpoint_path = 'checkpoints/{}/'.format(pretrained) + checkpoint_path
+        cuda = torch.cuda.is_available() and (gpu_id >= 0)
+        if cuda:
+            checkpoint = torch.load(checkpoint_path)
+            model = model.cuda()
+        else:
+            checkpoint = torch.load(checkpoint_path, map_location="cpu")
 
-    current_epoch = checkpoint["epoch"]
-    model.load_state_dict(checkpoint["model_state_dict"])
-    optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-    learning_rate_scheduler.load_state_dict(checkpoint["learning_rate_state_dict"])
+        current_epoch = checkpoint["epoch"]
+        model.load_state_dict(checkpoint["model_state_dict"])
+        optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+        learning_rate_scheduler.load_state_dict(checkpoint["learning_rate_state_dict"])
+        best_accuracy = checkpoint["accuracy"]
+    else:
+        current_epoch = 0
+        best_accuracy = 0
+ 
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
     ## Train model
-    best_accuracy = 0
     epochs = 1000
     running_loss = 0
     recent_train_losses, recent_test_losses = [], []
@@ -130,13 +144,24 @@ def main(dataset_name, classes, model_size, save_frequency, pretrained, learning
         running_loss = 0
         model.train()
 
-        if epoch % (save_frequency*4) == 0 or accuracy > best_accuracy:
+        ## Check if we have enough time to continue
+        t1 = time.process_time()
+        time_per_epoch = (t1 - t0) / float(epoch - current_epoch + 1)
+        print(time_per_epoch)
+        save = (21600 - (t1 - t0) < time_per_epoch)
+
+        learning_rate = optimizer.param_groups[0]['lr']
+        if learning_rate < 0.00000001:
+            save = True
+
+        if epoch % (save_frequency) == 0 or accuracy > best_accuracy or save:
             best_accuracy = accuracy
             torch.save({
                     'epoch': epoch,
                     'model_state_dict': model.state_dict(),
                     'optimizer_state_dict': optimizer.state_dict(),
-                    'learning_rate_state_dict': learning_rate_scheduler.state_dict()
+                    'learning_rate_state_dict': learning_rate_scheduler.state_dict(),
+                    'accuracy': accuracy
                     }, "checkpoints/{}/{}_{}-{}.pt".format(pretrained, dataset_name, model_size, epoch))
         
             with open("results/{}/{}_{}.txt".format(pretrained, dataset_name, model_size), "a") as f:
@@ -145,13 +170,30 @@ def main(dataset_name, classes, model_size, save_frequency, pretrained, learning
                         "Train loss: {}.. ".format(recent_train_losses[i]) +
                         "Test loss: {}.. ".format(recent_test_losses[i]) +
                         "Test accuracy: {}.. ".format(accuracies[i]) +
-                        "Learning Rate: {}".format(optimizer.param_groups[0]['lr'])))
+                        "Learning Rate: {}\n".format(learning_rate)))
+
+                if learning_rate < 0.00000001:
+                    f.write("Training complete!")
+                    return
             unsaved_epochs = []
             recent_test_losses, recent_train_losses = [], []
             accuracies = []
 
 if __name__ == "__main__":
-    # for command line usage
+    dataset_to_classes = {"unit_data":  4,
+                          "some":       69,
+                          "all":        117,
+                          "scale_all":  39,
+                          "scale_some": 23
+                         }
+     
+    dataset_to_save_frequency = {"unit_data":  50,
+                                  "some":       40,
+                                  "all":        30,
+                                  "scale_all":  30,
+                                  "scale_some": 40
+                                 }
+       # for command line usage
     ap = argparse.ArgumentParser()
     ap.add_argument("-d", "--dataset_name", type=str, default="no_text",
                 help="path to directory of images to train on")
@@ -163,16 +205,19 @@ if __name__ == "__main__":
                 help="size of resnet model")
     ap.add_argument("-b", "--batch_size", type=int, default=128)
     ap.add_argument("-p", "--pretrained", default=True, action='store_false')
-    ap.add_argument("-l", "--learning_rate", default = 0.003, type=int)   
+    ap.add_argument("-l", "--learning_rate", default = 0.01, type=int)   
  
     args = vars(ap.parse_args())
 
     dataset_name = args["dataset_name"]
     classes = args["classes"]
+    classes = dataset_to_classes[dataset_name]
     save_frequency = args["save_frequency"]
+    save_frequency = dataset_to_save_frequency[dataset_name]
     model_size = args["model_size"]
     pretrained = args["pretrained"]
     learning_rate = args["learning_rate"]
+
     if pretrained:
         pretrained = "pretrained"
     else:
