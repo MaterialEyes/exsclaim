@@ -113,7 +113,7 @@ class FigureSeparator(ExsclaimTool):
         unit_data = {0: 'A', 1: 'mm', 2: 'nm', 3: 'um'}
         # select id_to_class dict(s)
         self.id_to_class_full = all
-        self.id_to_class_number = scale_some
+        self.id_to_class_number = scale_all
         self.id_to_class_unit = unit_data
         # paths to models
         some = model_path + "checkpoints/some.pt"
@@ -122,13 +122,12 @@ class FigureSeparator(ExsclaimTool):
         scale_some = model_path + "checkpoints/scale_some.pt"
         unit_data = model_path + "checkpoints/unit_data.pt"
         # load models of choice
-        self.full_scale_bar_reader = self.get_classification_model(some, 69, 50)
-        self.unit_scale_bar_reader = self.get_classification_model(unit_data, 4, 50, False)
-        self.number_scale_bar_reader = self.get_classification_model(scale_some, 23, 152, False)
+        self.full_scale_bar_reader = self.get_classification_model(all, 117, 18)
+        self.unit_scale_bar_reader = self.get_classification_model(unit_data, 4, 18, True)
+        self.number_scale_bar_reader = self.get_classification_model(scale_all, 39, 18, True)
 
         ## Save scale laber reader transforms
-        self.label_reader_transforms = T.Compose([T.Resize(256), 
-                                        T.CenterCrop(224),
+        self.label_reader_transforms = T.Compose([T.Resize((224, 224)),
                                         T.ToTensor(),
                                         T.Normalize(mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225]),])
 
@@ -138,13 +137,22 @@ class FigureSeparator(ExsclaimTool):
         ## Load scale bar label reading model
         
         # load an object detection model pre-trained on COCO
-        if depth == 50:
+        if depth == 18:
+            model = models.resnet18(pretrained=pretrained)
+        elif depth == 50:
             model = models.resnet50(pretrained=pretrained)
         elif depth == 152:
             model = models.resnet152(pretrained=pretrained)
     
         device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-        model.fc = nn.Sequential(nn.Linear(2048, 512),
+        
+        if depth == 18:
+            model.fc = nn.Sequential(nn.ReLU(),
+                                    nn.Dropout(0.2),
+                                    nn.Linear(512, classes),
+                                    nn.LogSoftmax(dim=1))
+        else:
+            model.fc = nn.Sequential(nn.Linear(2048, 512),
                                     nn.ReLU(),
                                     nn.Dropout(0.2),
                                     nn.Linear(512, classes),
