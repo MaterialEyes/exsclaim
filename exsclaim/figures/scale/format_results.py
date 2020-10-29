@@ -72,6 +72,7 @@ def make_confusion_matrix(model_name, actual, predicted, ax=None, pdf=None):
     y_tick_marks = np.arange(len(confusion_matrix.index))
     ax.set_xticks(x_tick_marks)
     ax.set_xticklabels(confusion_matrix.columns)
+    ax.xaxis.set_tick_params(rotation=45)
     ax.set_yticks(y_tick_marks)
     ax.set_yticklabels(confusion_matrix.index)
     #plt.tight_layout()
@@ -127,7 +128,8 @@ def make_metadata_chart(model_name, results_dict, ax=None):
 
     classes_stats = get_accuracy_stats(model_name, results_dict)
     total_stats = classes_stats["all"]
-    ax.text(0, 0, "Dataset: {}\nDepth: {}\nEpochs: {}\n{}".format(dataset, depth, epochs, str(total_stats)))
+    accuracy = results_dict["accuracy"]
+    ax.text(0, 0, "Dataset: {}\nDepth: {}\nEpochs: {}\nAccuracy: {}".format(dataset, depth, epochs, str(accuracy)))
 
 
 def get_accuracy_by_confidence(resutls_dict, ax=None):
@@ -137,29 +139,40 @@ def get_accuracy_by_confidence(resutls_dict, ax=None):
 
     confidence_thresholds = [0.05*i for i in range(1, 20)]
     accuracies = []
+    valid = []
     for threshold in confidence_thresholds:
         correct = 0
         incorrect = 0
+        num_valid = 0
         for prediction, truth, confidence in zip(predicted, actual, confidences):
             if confidence < threshold:
                 continue
+            num_valid += 1
             if prediction == truth:
                 correct += 1
             else:
                 incorrect += 1
         accuracies.append(correct / float(correct + incorrect + 0.00000001))
+        valid.append(num_valid)
     
     ax.plot(confidence_thresholds, accuracies)
     ax.title.set_text("Accuracy By Confidence Threshold")
     ax.set_xlabel("Confidence Threshold")
     ax.set_ylabel("Accuracy")
+    
+    ax2 = ax.twinx()
+    ax2.set_ylabel("# of Images")
+    #ax2.set_ylim([0.0, 1.0])
+    line_3 = ax2.bar(confidence_thresholds, valid, width=0.01, align='center', label="Test Accuracy", color="tab:green")
+
+
 
 def generate_report(results_file, training_results_directory):
     with open("results.txt", "r") as f:
         results_dict = json.load(f)
     
     ## Configure matplotlib
-    font = {'size'   : 5}
+    font = {'size'   : 4}
     matplotlib.rc('font', **font)
 
     with PdfPages('multipage_pdf.pdf') as pdf:
@@ -218,4 +231,4 @@ def format_object_detection_results(results_file):
 if __name__ == "__main__":
     #format_classification_results("/home/trevor/Documents/argonne/exsclaim/results/pretrained/scale_all_50.txt")
     #format_object_detection_results("scale_bar_detector.txt")
-    generate_report("results.txt", "/home/trevor/Documents/argonne/exsclaim/exsclaim/figures/scale/results/pretrained/")
+    generate_report("results.txt", "/home/tspread/exsclaim/exsclaim/figures/scale/results/pretrained/")
