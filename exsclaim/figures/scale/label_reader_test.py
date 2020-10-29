@@ -163,8 +163,6 @@ class ScaleBarReaderTest():
                     correct += 1
                 else:
                     incorrect += 1  
-            if correct + incorrect > 100:
-                break          
 
         accuracy = correct / float(correct + incorrect + 0.0000000000000001)
         return {"predicted_class": predicted_classes, 
