@@ -9,13 +9,27 @@ from torchvision import datasets, transforms, models
 import argparse
 import os
 import time
+import cv2
+
+def random_guassian_blur(image):
+    image = np.array(image)
+    if True:
+        image_blur = cv2.GaussianBlur(image,(15,15),10)
+        new_image = image_blur
+        return new_image
+    return image
 
 def load_split_train_test(datadir):
-    train_transforms = transforms.Compose([transforms.Resize((224, 224)),
+    normalize_transform = transforms.Compose([transforms.Resize((224, 224)),
                                            transforms.ToTensor(),
                                            transforms.Normalize(mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225]),])
-    train_data = datasets.ImageFolder(datadir + "/train", transform=train_transforms)
-    test_data = datasets.ImageFolder(datadir + "/test", transform=train_transforms)
+    blur_transform = transforms.Compose([transforms.Resize((224, 224)),
+                                            transforms.Lambda(random_guassian_blur),
+                                           transforms.ToTensor()])
+    resize_transform = transforms.Compose([transforms.Resize((224, 224)),
+                                           transforms.ToTensor()])       
+    train_data = datasets.ImageFolder(datadir + "/train", transform=blur_transform)
+    test_data = datasets.ImageFolder(datadir + "/test", transform=resize_transform)
     trainloader = torch.utils.data.DataLoader(train_data, batch_size=128, shuffle=True)
     testloader = torch.utils.data.DataLoader(test_data, batch_size=128, shuffle=True)
     return trainloader, testloader
