@@ -7,33 +7,28 @@ Automatic **EX**traction, **S**eparation, and **C**aption-based natural **L**ang
 ## Getting started
 
 ### Requirements
-You need a working python 3.x installation to be able to use EXSCLAIM!, and [gdown](https://github.com/wkentaro/gdown) to directly download the current figure separation model. We highly recommend using [Anaconda](https://anaconda.org/) to manage the installation environment.
-
+You need a working python 3.x installation to be able to use EXSCLAIM! We recommend using a conda or virtualenv environment to install dependencies. 
 ### Installation
-Clone this repo and create a new conda environment with Python 3.7 and gdown:
-```sh
-git clone https://github.com/eschwenk/exsclaim
-conda create -n exsclaim -c conda-forge python=3.7 gdown
-```
-Activate this environment, navigate to the root directory and download the models:
-```sh
-conda activate exsclaim
-cd exsclaim
-./bin/download_models.sh
-```
-Install with pip:
-```sh
-pip install .
-```
-Finally, download required model for the spaCy installation:
-```python
-python -m spacy download en_core_web_sm
-```
 
-__NOTE__: For now, code development is easiest if you create a separate conda an environment from the
-[environment.yml](https://github.com/eschwenk/exsclaim-prerelease/tree/master/bin/environment.yml) and do not install the package.
+To install test version:
+```
+pip install -i https://test.pypi.org/simple/ exsclaim-tspread
+```
+To test that it has been installed correctly, run the following python code:
+```
+from exsclaim.pipeline import Pipeline
+test_pipeline = Pipeline("", test=True)
+results = test_pipeline.run()
+```
+You should then see something like:
+```
+Running Journal Scraper
+GET request: https://www.nature.com/.....
+>>>> (1 of 10) ....
+```
+When complete the results should be in extracted/nature-test/ and the json will be stored in the 'results' variable.
 
-## Usage
+### Usage
 
 ### REQUIRED: Formulate a JSON search query
 A JSON search query is the singular point-of-entry for using the EXSCLAIM! search and retrieval tools.

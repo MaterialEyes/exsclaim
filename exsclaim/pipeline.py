@@ -4,27 +4,35 @@ import json
 import time
 import numpy as np
 import matplotlib.pyplot as plt
+import pathlib
 
 from . import utils
 from .figure import FigureSeparator
 from .tool import CaptionSeparator, JournalScraper
 
 class Pipeline:
-    def __init__(self , query_path):
+    def __init__(self , query_path, test=False):
         """ initialize a Pipeline to run on query path and save to exsclaim path
 
         Args:
             query_path (dict or path to json): An EXSCLAIM user query JSON
             exsclaim_path (dict or path to json): EXSCLAIM JSON
         """
-        self.query_path = query_path
-        try:
-            with open(self.query_path) as f:
-                # Load query file to dict
+        if test:
+            current_path = pathlib.Path(__file__).resolve().parent
+            self.query_path = current_path / 'tests' / 'data' / 'nature_test.json'
+            with open(self.query_path, "r") as f:
                 self.query_dict = json.load(f)
-        except: 
-            self.query_dict = query_path
-            self.query_path = ""
+        
+        else:
+            self.query_path = query_path
+            try:
+                with open(self.query_path) as f:
+                    # Load query file to dict
+                    self.query_dict = json.load(f)
+            except: 
+                self.query_dict = query_path
+                self.query_path = ""
 
         
         try:
