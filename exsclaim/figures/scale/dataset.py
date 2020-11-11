@@ -6,17 +6,23 @@ from PIL import Image
 from utils import convert_box_format
 
 class ScaleBarDataset():
-    def __init__(self, root, transforms):
+    def __init__(self, root, transforms, test=True):
         ## initiates a dataset from a json
         self.root = root
         self.transforms = transforms
+        if test:
+            scale_bar_dataset = os.path.join(root, "scale_bars_dataset_test.json")
+        else:
+            scale_bar_dataset = os.path.join(root, "scale_bars_dataset_train.json")
 
-        with open("scale_bars_dataset.json", "r") as f:
+
+        with open(scale_bar_dataset, "r") as f:
             self.data = json.load(f)
-
-        self.images = [figure for figure in self.data if os.path.isfile(os.path.join("all-figures", figure))]
-        print(len(self.images))
-
+        all_figures = os.path.join(root, "all-figures")
+        self.images = [figure for figure in self.data 
+                       if os.path.isfile(os.path.join(all_figures,
+                                                      figure))]
+    
     def __getitem__(self, idx):
         image_path = os.path.join(self.root, "all-figures", self.images[idx])
         image = Image.open(image_path).convert("RGB")
@@ -48,7 +54,7 @@ class ScaleBarDataset():
         target["iscrowd"] = iscrowd
 
         if self.transforms is not None:
-            image, target = self.transforms(image, target)
+            image = self.transforms(image)
 
         return image, target
 

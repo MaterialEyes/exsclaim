@@ -5,10 +5,11 @@ from engine import train_one_epoch, evaluate
 from PIL import Image, ImageDraw
 import utils
 import torch
-import transforms as T
+import torchvision.transforms as T
 import skimage as io
 import numpy as np
 import os
+import pathlib
 
 current_model = "scale_bar_model"
 
@@ -25,60 +26,7 @@ def get_model(num_classes):
     in_features = model.roi_heads.box_predictor.cls_score.in_features
     # replace the pre-trained head with a new on
     model.roi_heads.box_predictor = FastRCNNPredictor(in_features, num_classes)
-    largest = -1
-    best_checkpoint = None
-    for checkpoint in os.listdir('checkpoints'):
-        filename = checkpoint.split(".")[0]
-        model_name, number = filename.split("-")
-        if model_name != current_model:
-            continue
-        number = int(number)
-        if number > largest:
-            best_checkpoint = checkpoint
-            largest = number
-    if best_checkpoint == None:
-        raise TypeError
-    best_checkpoint = 'checkpoints/' + best_checkpoint
-    cuda = torch.cuda.is_available() and (gpu_id >= 0)
-    if cuda:
-        model.load_state_dict(torch.load(best_checkpoint)["model_state_dict"])
-        model = model.cuda()  
-    else:
-        model.load_state_dict(torch.load(best_checkpoint, map_location='cpu')["model_state_dict"])
-    
-    ckpt = torch.load(best_checkpoint)
-    epoch = ckpt['epoch']   
-
-    return model, epoch
-
-def main():
-    # train on the GPU or on the CPU, if a GPU is not available
-    device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-
-    num_classes = 3
-    # use our dataset and defined transformations
-    dataset = ScaleBarDataset('', get_transform(train=True))
-    dataset_test = ScaleBarDataset('', get_transform(train=False))
-
-    # split the dataset in train and test set
-    indices = torch.randperm(len(dataset)).tolist()
-    dataset = torch.utils.data.Subset(dataset, indices[:-100])
-    dataset_test = torch.utils.data.Subset(dataset_test, indices[-100:])
-
-    # define training and validation data loaders
-    data_loader = torch.utils.data.DataLoader(
-        dataset, batch_size=64, shuffle=True, num_workers=0,
-        collate_fn=utils.collate_fn)
-
-    data_loader_test = torch.utils.data.DataLoader(
-        dataset_test, batch_size=64, shuffle=False, num_workers=4,
-        collate_fn=utils.collate_fn)
-
-    # get the model using our helper function
-    model, start_epoch = get_model(num_classes)
-    # move model to the right device
-    model.to(device)
-
+ 
     # construct an optimizer
     params = [p for p in model.parameters() if p.requires_grad]
     optimizer = torch.optim.SGD(params, lr=0.005,
@@ -87,6 +35,65 @@ def main():
     lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer,
                                                    step_size=3,
                                                    gamma=0.1)
+    # find if there is a previous checkpoint
+    largest = -1
+    best_checkpoint = None
+    for checkpoint in os.listdir('checkpoints'):
+        filename = checkpoint.split(".")[0]
+        if not os.path.isfile(os.path.join('checkpoints', checkpoint)):
+            continue
+        model_name, number = filename.split("-")
+        if model_name != current_model:
+            continue
+        number = int(number)
+        if number > largest:
+            best_checkpoint = checkpoint
+            largest = number
+    if best_checkpoint == None:
+        return model, lr_scheduler, optimizer, 0
+
+    best_checkpoint = 'checkpoints/' + best_checkpoint
+    cuda = torch.cuda.is_available() and (gpu_id >= 0)
+    if cuda:
+        checkpoint = torch.load(best_checkpoint)["model_state_dict"]
+        model = model.cuda()  
+    else:
+        model.load_state_dict(torch.load(best_checkpoint, map_location='cpu')["model_state_dict"])
+   
+    model.load_state_dict(checkpoint["model_state_dict"])
+    optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+    lr_scheduler.load_state_dict(checkpoint["lr_state_dict"])
+    epoch = checkpoint['epoch']   
+
+    return model, lr_scheduler, optimizer, epoch
+
+def main():
+    # train on the GPU or on the CPU, if a GPU is not available
+    device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+
+    num_classes = 3
+
+    current_path = pathlib.Path(__file__).resolve(strict=True)
+    root_directory = current_path.parent.parent.parent.parent / 'dataset' / 'dataset_generation' 
+    print(root_directory)
+    # use our dataset and defined transformations
+    dataset_train = ScaleBarDataset(root_directory, get_transform(train=True), False)
+    dataset_test = ScaleBarDataset(root_directory, get_transform(train=False), True)
+
+    # define training and validation data loaders
+    data_loader = torch.utils.data.DataLoader(
+        dataset_train, batch_size=64, shuffle=True, num_workers=0,
+        collate_fn=utils.collate_fn)
+
+    data_loader_test = torch.utils.data.DataLoader(
+        dataset_test, batch_size=64, shuffle=False, num_workers=0,
+        collate_fn=utils.collate_fn)
+
+    # get the model using our helper function
+    model, lr_scheduler, optimizer,  start_epoch = get_model(num_classes)
+    # move model to the right device
+    model.to(device)
+
 
     num_epochs = 200
 
@@ -101,10 +108,12 @@ def main():
 
         if epoch % 1 == 0:
             torch.save({
-                    'epoch': epoch,
-                    'model_state_dict': model.state_dict(),
-                    'optimizer_state_dict': optimizer.state_dict()
-                    }, current_model + "-{}.pt".format(epoch))
+                        'epoch': epoch,
+                        'model_state_dict': model.state_dict(),
+                        'optimizer_state_dict': optimizer.state_dict(),
+                        'lr_state_dict': lr_scheduler.state_dict()
+                       },
+                       current_model + "-{}.pt".format(epoch))
 
 
 def run():
