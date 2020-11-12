@@ -10,19 +10,32 @@ import skimage as io
 import numpy as np
 import os
 import pathlib
+import random
+import cv2
 
+random.seed(27)
 current_model = "scale_bar_model"
+
+def random_gaussian_blur(image):
+    image = np.array(image)
+    random_value = random.randint(0,4)
+    if random_value == 2:
+        image_blur = cv2.GaussianBlur(image,(15,15),10)
+        new_image = image_blur
+        return new_image
+    return image
 
 def get_transform(train):
     transforms = []
-    transforms.append(T.ToTensor())
     if train:
-        transforms.append(T.RandomHorizontalFlip(0.5))
+        transforms.append(T.Lambda(random_gaussian_blur))
+    transforms.append(T.ToTensor())
     return T.Compose(transforms)
 
 def get_model(num_classes):
     # load an object detection model pre-trained on COCO
-    model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=True)# get the number of input features for the classifier
+    model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=True)
+    # get the number of input features for the classifier
     in_features = model.roi_heads.box_predictor.cls_score.in_features
     # replace the pre-trained head with a new on
     model.roi_heads.box_predictor = FastRCNNPredictor(in_features, num_classes)
