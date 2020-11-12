@@ -56,6 +56,7 @@ class FigureSeparator(ExsclaimTool):
         if self.cuda:
             print("using cuda: ", args.gpu_id) 
             torch.cuda.set_device(device=args.gpu_id)
+        self.device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
         ## Load object detection model
         object_detection_checkpoint = model_path + "checkpoints/object_detection_model.pt"
@@ -116,20 +117,19 @@ class FigureSeparator(ExsclaimTool):
         self.id_to_class_number = scale_all
         self.id_to_class_unit = unit_data
         # paths to models
-        some = model_path + "checkpoints/some.pt"
+        some = model_path + "checkpoints/some_18-156.pt"
         all = model_path + "checkpoints/all.pt"
         scale_all = model_path + "checkpoints/scale_all.pt"
         scale_some = model_path + "checkpoints/scale_some.pt"
         unit_data = model_path + "checkpoints/unit_data.pt"
         # load models of choice
-        self.full_scale_bar_reader = self.get_classification_model(all, 117, 18)
-        self.unit_scale_bar_reader = self.get_classification_model(unit_data, 4, 18, True)
-        self.number_scale_bar_reader = self.get_classification_model(scale_all, 39, 18, True)
+        self.full_scale_bar_reader = self.get_classification_model(some, 69, 18)
+        #self.unit_scale_bar_reader = self.get_classification_model(unit_data, 4, 18, True)
+        #self.number_scale_bar_reader = self.get_classification_model(scale_all, 39, 18, True)
 
         ## Save scale laber reader transforms
         self.label_reader_transforms = T.Compose([T.Resize((224, 224)),
-                                        T.ToTensor(),
-                                        T.Normalize(mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225]),])
+                                        T.ToTensor(),])
 
 
     def get_classification_model(self, scale_label_recognition_checkpoint, classes, depth, pretrained=True):
@@ -143,8 +143,6 @@ class FigureSeparator(ExsclaimTool):
             model = models.resnet50(pretrained=pretrained)
         elif depth == 152:
             model = models.resnet152(pretrained=pretrained)
-    
-        device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
         
         if depth == 18:
             model.fc = nn.Sequential(nn.ReLU(),
@@ -157,7 +155,7 @@ class FigureSeparator(ExsclaimTool):
                                     nn.Dropout(0.2),
                                     nn.Linear(512, classes),
                                     nn.LogSoftmax(dim=1))
-        model.to(device)
+        model.to(self.device)
         
         if self.cuda:
             model.load_state_dict(torch.load(scale_label_recognition_checkpoint))
@@ -515,6 +513,16 @@ class FigureSeparator(ExsclaimTool):
         self.exsclaim_json[figure_name] = figure_json
         return figure_json
 
+    def read_scale_bar(self, cropped_image):
+        """ Outputs the text of an image cropped to a scale bar label bbox 
+
+        Args:
+            cropped_image (Image): An PIL RGB image cropped to the bounding box
+                of a scale bar label. 
+        Returns:
+            label_text (string): The text of the scale bar label
+        """
+        return self.read_scale_bar_full(cropped_image)
 
     def read_scale_bar_full(self, cropped_image):
         """ Outputs the text of an image cropped to a scale bar label bbox 
@@ -534,7 +542,7 @@ class FigureSeparator(ExsclaimTool):
         probabilities = list(probabilities.numpy()[0])
         predicted_idx = probabilities.index(max(probabilities))
         label_text = self.id_to_class_full[predicted_idx]
-        return label_text
+        return label_text, probabilities[predicted_idx]
 
     def read_scale_bar_parts(self, cropped_image):
         """ Outputs the text of an image cropped to a scale bar label bbox 
@@ -564,19 +572,21 @@ class FigureSeparator(ExsclaimTool):
         predicted_idx = probabilities.index(max(probabilities))
         number_text = self.id_to_class_number[predicted_idx]
 
-        return number_text + " " + unit_text
+        return number_text + " " + unit_text, probabilities[predicted_idx]
 
+    def find_image_dimensions(self, figure_json):
+        pass
 
-    def determine_scale(self, figure_path, figure_json):
-        """ Adds scale information to figure by reading and measuring scale bars 
+    def detect_scale_objects(self, figure_path):
+        """ Detects bounding boxes of scale bars and scale bar labels 
 
         Args:
             figure_path (str): A path to the image (.png, .jpg, or .gif)
                 file containing the article figure
-            figure_json (dict): A Figure JSON
         Returns:
-            figure_json (dict): A dictionary with classified image_objects
-                extracted from figure
+            scale_bar_info (list): A list of lists with the following 
+                pattern: [[x1,y1,x2,y2, confidence, label],...] where
+                label is 1 for scale bars and 2 for scale bar labelss 
         """
         # pre-process image
         image = Image.open(figure_path).convert("RGB")
@@ -595,7 +605,20 @@ class FigureSeparator(ExsclaimTool):
                 label = outputs[0]['labels'][i]
                 scale_bar_info.append([x1, y1, x2, y2, confidence, label])
         scale_bar_info = non_max_suppression_malisiewicz(np.asarray(scale_bar_info), 0.4)
-        scale_bar_info = scale_bar_info
+        return scale_bar_info
+
+    def determine_scale(self, figure_path, figure_json):
+        """ Adds scale information to figure by reading and measuring scale bars 
+
+        Args:
+            figure_path (str): A path to the image (.png, .jpg, or .gif)
+                file containing the article figure
+            figure_json (dict): A Figure JSON
+        Returns:
+            figure_json (dict): A dictionary with classified image_objects
+                extracted from figure
+        """
+        scale_bar_info = self.detect_scale_objects(figure_path)
 
         # add to figure_json
         label_names = ["background", "scale bar", "scale label"]
@@ -611,7 +634,7 @@ class FigureSeparator(ExsclaimTool):
                 scale_bar_label_image = T.ToPILImage()(image).convert("RGB")
                 scale_bar_label_image.crop((int(x1), int(y1), int(x2), int(y2)))
                 ## Read Scale Text
-                scale_label_text = self.read_scale_bar_full(scale_bar_label_image)
+                scale_label_text, confidence = self.read_scale_bar_full(scale_bar_label_image)
                 label_json = {"geometry" : geometry, "label" : scale_label_text}
                 scale_labels.append(label_json)
         unassigned["scale_bar_lines"] = scale_bars
@@ -619,7 +642,6 @@ class FigureSeparator(ExsclaimTool):
         figure_json["unassigned"] = unassigned
 
         return figure_json
-
 
     def make_visualization(self, figure_path, save_path):
         """ Save subfigures and their labels as images
@@ -687,7 +709,6 @@ class FigureSeparator(ExsclaimTool):
 
         del draw
         result_image.save(os.path.join(save_path+"/extractions/"+sample_image_name+".png"))
-
     
     def extract_image_objects(self, figure_path=str) -> "figure_dict":
         """ Separate and classify subfigures in an article figure
