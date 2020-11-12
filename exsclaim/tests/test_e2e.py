@@ -17,17 +17,8 @@ class TestNatureFull(unittest.TestCase):
         # Set query paths
         query_path = pathlib.Path(__file__).parent / 'data' / 'nature_test.json'
 
-        # Set path to initial exsclaim_dict JSON (if applicable)
-        exsclaim_path = ""
-
-        # Initialize EXSCLAIM! tools
-        self.js = JournalScraper()
-        self.cs = CaptionSeparator()
-        self.fs = FigureSeparator()
-
         # Initialize EXSCLAIM! pipeline
-        self.exsclaim_pipeline = Pipeline(query_path =    query_path,
-                                          exsclaim_path = exsclaim_path)
+        self.exsclaim_pipeline = Pipeline(query_path)
 
     @responses.activate
     def test_full_run(self):
@@ -68,8 +59,7 @@ class TestNatureFull(unittest.TestCase):
                 )
 
         # Run the tools through the pipeline
-        tools = [self.js,self.cs,self.fs] # define run order
-        exsclaim_json = self.exsclaim_pipeline.run(tools)
+        exsclaim_json = self.exsclaim_pipeline.run()
 
         # Run comparison of expected and resulting jsons
         diff = DeepDiff(expected, exsclaim_json, ignore_order=True)
