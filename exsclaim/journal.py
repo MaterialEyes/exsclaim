@@ -8,6 +8,9 @@ import requests
 import itertools
 import numpy as np
 import json
+import random
+import time
+
 
 from bs4 import BeautifulSoup
 from collections import OrderedDict
@@ -104,8 +107,7 @@ class JournalFamily():
         ## creates a list of search terms
         search_list = ([[search_query['query'][key]['term']] + 
                        search_query['query'][key]['synonyms'] 
-                       for key in search_query['query'] 
-                       if len(search_query['query'][key]['synonyms'])>0])
+                       for key in search_query['query']])
         search_product = list(itertools.product(*search_list))
 
         # sortby is the requested method to sort results (relevancy or recency) and
@@ -197,8 +199,15 @@ class JournalFamily():
         Returns:
             A BeautifulSoup parse tree.
         """
+        headers = {"Accept":   "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+                   "Accept-Encoding": "gzip, deflate, br",
+                   "Accept-Language": "en-US,en;q=0.5",
+                   "Upgrade-Insecure-Requests":   "1",
+                   "User-Agent":  "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:82.0) Gecko/20100101 Firefox/82.0"}
+        wait_time = float(random.randint(0, 50))
+        time.sleep(wait_time/float(10))
         with requests.Session() as session:
-            r = session.get(url) 
+            r = session.get(url, headers=headers) 
         soup = BeautifulSoup(r.text, 'lxml')
         return soup
 
@@ -312,6 +321,7 @@ class JournalFamily():
             figures += 1
 
         return article_json
+
 
 ################ JOURNAL FAMILY SPECIFIC INFORMATION ################
 ## To add a new journal family, create a new subclass of 

@@ -15,3 +15,13 @@ extracted/nature-test/*
 !extracted/nature-test/figures/*
 *.egg
 *.egg-info/
+dataset/dataset_generation/all/
+dataset/dataset_generation/unit_data/
+dataset/dataset_generation/scale_all/
+dataset/dataset_generation/scale_some/
+dataset/dataset_generation/some/
+exsclaim/tests/data/scale_label_dataset/
+*.cobaltlog
+*.error
+*.output
+*/cobaltlogs/
