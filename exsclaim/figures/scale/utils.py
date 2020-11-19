@@ -9,7 +9,7 @@ import torch.distributed as dist
 
 import errno
 import os
-
+import pathlib
 
 class SmoothedValue(object):
     """Track a series of values and provide access to smoothed values over a
@@ -144,9 +144,12 @@ def reduce_dict(input_dict, average=True):
 
 
 class MetricLogger(object):
-    def __init__(self, delimiter="\t"):
+    def __init__(self, delimiter="\t", model_name="unnamed_model"):
         self.meters = defaultdict(SmoothedValue)
         self.delimiter = delimiter
+        current_file = pathlib.Path(__file__).resolve(strict=True)
+        self.save_file = current_file.parent / 'results' / '{}.txt'.format(model_name)
+            
 
     def update(self, **kwargs):
         for k, v in kwargs.items():
@@ -207,6 +210,10 @@ class MetricLogger(object):
                 'data: {data}'
             ])
         MB = 1024.0 * 1024.0
+
+
+        f = open(self.save_file, "a")
+
         for obj in iterable:
             data_time.update(time.time() - end)
             yield obj
@@ -215,13 +222,13 @@ class MetricLogger(object):
                 eta_seconds = iter_time.global_avg * (len(iterable) - i)
                 eta_string = str(datetime.timedelta(seconds=int(eta_seconds)))
                 if torch.cuda.is_available():
-                    print(log_msg.format(
+                    f.write(log_msg.format(
                         i, len(iterable), eta=eta_string,
                         meters=str(self),
                         time=str(iter_time), data=str(data_time),
                         memory=torch.cuda.max_memory_allocated() / MB))
                 else:
-                    print(log_msg.format(
+                    f.write(log_msg.format(
                         i, len(iterable), eta=eta_string,
                         meters=str(self),
                         time=str(iter_time), data=str(data_time)))
@@ -229,8 +236,9 @@ class MetricLogger(object):
             end = time.time()
         total_time = time.time() - start_time
         total_time_str = str(datetime.timedelta(seconds=int(total_time)))
-        print('{} Total time: {} ({:.4f} s / it)'.format(
+        f.write('{} Total time: {} ({:.4f} s / it)\n'.format(
             header, total_time_str, total_time / len(iterable)))
+        f.close()
 
 
 def collate_fn(batch):
