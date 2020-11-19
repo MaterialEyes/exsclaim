@@ -12,9 +12,9 @@ import os
 import pathlib
 import random
 import cv2
+import argparse
 
-random.seed(27)
-current_model = "scale_bar_model"
+
 
 def random_gaussian_blur(image):
     image = np.array(image)
@@ -32,9 +32,17 @@ def get_transform(train):
     transforms.append(T.ToTensor())
     return T.Compose(transforms)
 
-def get_model(num_classes):
+def get_model(train_status):
+    num_classes = 3 #background, scale bar, scale_label
+    train_statuses = {"p" : True, "s": False}
+    faster = train_statuses[train_status[0]]
+    resnet = train_statuses[train_status[1]]
+    
+    current_model = "scale_bar_model_{}".format(train_status)
+    
     # load an object detection model pre-trained on COCO
-    model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=True)
+    model = torchvision.models.detection.fasterrcnn_resnet50_fpn(
+        pretrained=faster, pretrained_backbone=True)
     # get the number of input features for the classifier
     in_features = model.roi_heads.box_predictor.cls_score.in_features
     # replace the pre-trained head with a new on
@@ -68,10 +76,10 @@ def get_model(num_classes):
     best_checkpoint = 'checkpoints/' + best_checkpoint
     cuda = torch.cuda.is_available() and (gpu_id >= 0)
     if cuda:
-        checkpoint = torch.load(best_checkpoint)["model_state_dict"]
+        checkpoint = torch.load(best_checkpoint)
         model = model.cuda()  
     else:
-        model.load_state_dict(torch.load(best_checkpoint, map_location='cpu')["model_state_dict"])
+        checkpoint = torch.load(best_checkpoint, map_location='cpu')
    
     model.load_state_dict(checkpoint["model_state_dict"])
     optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
@@ -80,15 +88,12 @@ def get_model(num_classes):
 
     return model, lr_scheduler, optimizer, epoch
 
-def main():
+def train_object_detector(train_status):
     # train on the GPU or on the CPU, if a GPU is not available
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
-    num_classes = 3
-
     current_path = pathlib.Path(__file__).resolve(strict=True)
     root_directory = current_path.parent.parent.parent.parent / 'dataset' / 'dataset_generation' 
-    print(root_directory)
     # use our dataset and defined transformations
     dataset_train = ScaleBarDataset(root_directory, get_transform(train=True), False)
     dataset_test = ScaleBarDataset(root_directory, get_transform(train=False), True)
@@ -103,21 +108,20 @@ def main():
         collate_fn=utils.collate_fn)
 
     # get the model using our helper function
-    model, lr_scheduler, optimizer,  start_epoch = get_model(num_classes)
+    model, lr_scheduler, optimizer,  start_epoch = get_model(train_status)
     # move model to the right device
     model.to(device)
 
-
+    model_name = "scale_bar_model_{}".format(train_status)
     num_epochs = 200
-
     for epoch in range(start_epoch + 1, num_epochs):
-        print("EPOCH: ", epoch)
         # train for one epoch, printing every 10 iterations
-        train_one_epoch(model, optimizer, data_loader, device, epoch, print_freq=5)
+        train_one_epoch(model, optimizer, data_loader, device,
+                        epoch, print_freq=5, model_name=model_name)
         # update the learning rate
         lr_scheduler.step()
         # evaluate on the test dataset
-        evaluate(model, data_loader_test, device=device)
+        evaluate(model, data_loader_test, device=device, model_name=model_name)
 
         if epoch % 1 == 0:
             torch.save({
@@ -126,7 +130,7 @@ def main():
                         'optimizer_state_dict': optimizer.state_dict(),
                         'lr_state_dict': lr_scheduler.state_dict()
                        },
-                       current_model + "-{}.pt".format(epoch))
+                       "checkpoints/scale_bar_model_{}-{}.pt".format(train_status, epoch))
 
 
 def run():
@@ -174,4 +178,13 @@ def run():
     image.save("test.png")
 
 if __name__ == "__main__":
-    main()
+    # for command line usage
+    ap = argparse.ArgumentParser()
+    ap.add_argument("-t", "--train_status", type=str, default="pp",
+                help="whether faster rcc and resent backbone are pretrained")
+
+    args = vars(ap.parse_args())
+
+    train_status = args["train_status"]
+
+    train_object_detector(train_status)
