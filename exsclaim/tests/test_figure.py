@@ -10,6 +10,7 @@ import torch
 from .. import figure
 from ..figures.scale.dataset import ScaleBarDataset
 from ..figures.scale.engine import evaluate
+from ..figures.scale.utils import collate_fn
 
 class TestScaleDetection(unittest.TestCase):
 
@@ -20,10 +21,9 @@ class TestScaleDetection(unittest.TestCase):
         with open(nature_json, "r") as f:
             query = json.load(f)
 
-        with open(groundtruth_file, "r") as f:
-            self.groundtruth_data = json.load(f)
         self.query = query
         self.figure_separator = figure.FigureSeparator(query)
+        self.current_directory = pathlib.Path(__file__).resolve(strict=True).parent
     
     def is_number(self, n):
         """ returns true if a string n represents a float """
@@ -45,8 +45,7 @@ class TestScaleDetection(unittest.TestCase):
 
     def test_scale_object_detection_validity(self):
         """ Tests the accuracy and validity of scale bar object detection """
-        current_path = pathlib.Path(__file__).resolve(strict=True)
-        test_image_directory = current_path.parent / 'data' / 'images'
+        test_image_directory = self.current_directory / 'data' / 'images'
         for image_path in os.listdir(test_image_directory):
             predicted_scale_bar_info = (
                 self.figure_separator.detect_scale_objects(image_path))
@@ -58,8 +57,11 @@ class TestScaleDetection(unittest.TestCase):
             
     def test_scale_object_detection_accuracy(self):
         """ Tests the accuracy and validity of scale bar object detection """
-        dataset = ScaleBarDataset('', T.ToTensor(), True)
-        dataloader = torch.utils.data.DataLoader(dataset)
+        test_image_directory = self.current_directory / 'data' / 'scale_bar'
+        dataset = ScaleBarDataset(test_image_directory, T.ToTensor(), True)
+        dataloader = torch.utils.data.DataLoader(dataset, batch_size=32,
+                                                 collate_fn=collate_fn, num_workers=0,
+                                                 shuffle=False)
         coco_eval = evaluate(self.figure_separator.scale_bar_detection_model,
                              dataloader, self.figure_separator.device)
         coco_eval.summarize()
@@ -110,7 +112,7 @@ class TestScaleDetection(unittest.TestCase):
             
             if confidence < low_confidence_threshold:
                 continue
-            print("Result: {}, Label: {}, Conf: {}".format(result, label, confidence))
+            #print("Result: {}, Label: {}, Conf: {}".format(result, label, confidence))
             # if confidence above lower threshold
             low_total += 1
             if result == label:
