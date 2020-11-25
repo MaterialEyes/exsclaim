@@ -3,7 +3,7 @@
 
     "journal_family": "nature",
 
-    "maximum_scraped": 10,
+    "maximum_scraped": 2,
 
     "sortby": "relevant",
 
@@ -25,5 +25,7 @@
 
     "mongo_connection": "mongodb://localhost:27017/",
     
-    "save_format": []
+    "save_format": [],
+
+    "open": false
 }
