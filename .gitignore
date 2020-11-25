@@ -9,10 +9,6 @@ __pycache__/
 *.jpg
 *.gif
 extracted/*
-!extracted/nature-test/
-extracted/nature-test/*
-!extracted/nature-test/figures/
-!extracted/nature-test/figures/*
 *.egg
 *.egg-info/
 dataset/dataset_generation/all/
@@ -25,3 +21,7 @@ exsclaim/tests/data/scale_label_dataset/
 *.error
 *.output
 */cobaltlogs/
+.vscode
+cookie
+dist/
+build/
