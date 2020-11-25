@@ -163,6 +163,7 @@ class JournalFamily():
             A list of article url extensions from search.
         """
         search_query = self.search_query
+        maximum_scraped = search_query["maximum_scraped"]
         article_delim, reader_delims = self.get_article_delimiters()
         search_query_urls = self.get_search_query_urls()
         article_paths = set()
@@ -183,13 +184,9 @@ class JournalFamily():
                             and not (self.open
                                      and not self.is_link_to_open_article(tag))):
                         article_paths.add(article)
-                if len(article_paths) > search_query["maximum_scraped"]:
-                    break
-            if len(article_paths) > search_query["maximum_scraped"]:
-                break
-    
-        articles = list(article_paths)
-        return articles[0:search_query["maximum_scraped"]]
+                    if len(article_paths) >= maximum_scraped:
+                        return list(article_paths)
+        return list(article_paths)
 
     def get_figure_list(self, url):
         """
@@ -402,7 +399,9 @@ class Nature(JournalFamily):
         data_layer_json = "{" + data_layer_string.split("[{", 1)[1].split("}];", 1)[0] + "}"
         parsed = json.loads(data_layer_json)
         search_info = parsed["page"]["search"]
-        return (search_info["page"],search_info["totalPages"],search_info["totalResults"])  
+        return (search_info["page"],
+                search_info["totalPages"], 
+                search_info["totalResults"])
 
     def turn_page(self, url, pg_num, pg_size):
         return url.split('&page=')[0]+'&page='+str(pg_num)
