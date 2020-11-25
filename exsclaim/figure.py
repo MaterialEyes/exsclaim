@@ -593,6 +593,7 @@ class FigureSeparator(ExsclaimTool):
         image = T.ToTensor()(image)
 
         # prediction
+        self.scale_bar_detection_model.eval()
         with torch.no_grad():
             outputs = self.scale_bar_detection_model([image])
 
@@ -619,6 +620,8 @@ class FigureSeparator(ExsclaimTool):
                 extracted from figure
         """
         scale_bar_info = self.detect_scale_objects(figure_path)
+        image = Image.open(figure_path).convert("RGB")
+        image = T.ToTensor()(image)
 
         # add to figure_json
         label_names = ["background", "scale bar", "scale label"]
