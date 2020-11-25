@@ -51,6 +51,7 @@ class JournalFamily():
             An initialized instance of a search on a journal family
         """
         self.search_query = search_query
+        self.open = search_query.get("open", False)
 
     def get_domain_name(self) -> str:
         """
@@ -143,6 +144,17 @@ class JournalFamily():
         """
         return (False, "unknown")
 
+    def is_link_to_open_article(self, tag):
+        """ Checks if link is to an open access article 
+        
+        Args:
+            tag (bs4.tag): A tag containing an href attribute that
+                links to an article
+        Returns:
+            True if the article is confirmed open_access 
+        """
+        return False
+
     def get_article_extensions(self, articles_visited=set()) -> list:
         """
         Create a list of article url extensions from search_query
@@ -161,13 +173,15 @@ class JournalFamily():
             for page_number in range(start_page, stop_page + 1):
                 request = self.turn_page(page1, page_number, total_articles)
                 soup = self.get_soup_from_request(request, fast_load=False)
-                for tags in soup.find_all('a',href=True):
-                    article = tags.attrs['href']
+                for tag in soup.find_all('a', href=True):
+                    article = tag.attrs['href']
                     article = article.split('?page=search')[0]
                     if (len(article.split(article_delim)) > 1 
-                        and article.split("/")[-1] not in articles_visited
-                        and article != None
-                        and len(set(reader_delims).intersection(set(article.split("/")))) <= 0):
+                            and article.split("/")[-1] not in articles_visited
+                            and article != None
+                            and len(set(reader_delims).intersection(set(article.split("/")))) <= 0
+                            and not (self.open
+                                     and not self.is_link_to_open_article(tag))):
                         article_paths.add(article)
                 if len(article_paths) > search_query["maximum_scraped"]:
                     break
@@ -361,6 +375,11 @@ class ACS(JournalFamily):
             return (is_open, open_access.text)
         return (False, "unknown")
 
+    def is_link_to_open_article(self, tag):
+        # ACS allows filtering for search. Therefore, if self.open is
+        # true, all results will be open.
+        return self.open
+
 
 class Nature(JournalFamily):
     domain =        "https://www.nature.com"
@@ -404,6 +423,18 @@ class Nature(JournalFamily):
         except:
             license = "unknown"
         return is_open, license
+
+    def is_link_to_open_article(self, tag):
+        i = 0
+        current_tag = tag
+        while current_tag.parent and i < 3:
+            current_tag = current_tag.parent
+            i += 1
+        candidates = current_tag.find_all("span", class_="text-orange")
+        for candidate in candidates:
+            if candidate.text == "Open":
+                return True
+        return False
         
 
 class RSC(JournalFamily):
