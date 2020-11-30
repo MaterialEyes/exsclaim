@@ -15,6 +15,7 @@ import pycocotools.mask as mask_util
 from collections import defaultdict
 
 from . import utils
+import pathlib
 
 
 class CocoEvaluator(object):
@@ -55,11 +56,14 @@ class CocoEvaluator(object):
         for coco_eval in self.coco_eval.values():
             coco_eval.accumulate()
 
-    def summarize(self):
+    def summarize(self, model_name="unnamed_model"):
+        current_file = pathlib.Path(__file__).resolve(strict=True)
+        save_file = current_file.parent / 'results' / '{}.txt'.format(model_name)
         for iou_type, coco_eval in self.coco_eval.items():
-            print("IoU metric: {}".format(iou_type))
-            coco_eval.summarize()
-
+            with open(save_file, "a") as f:
+                f.write("IoU metric: {}\n".format(iou_type))
+                coco_eval.summarize()
+                f.write(str(coco_eval))
     def prepare(self, predictions, iou_type):
         if iou_type == "bbox":
             return self.prepare_for_coco_detection(predictions)

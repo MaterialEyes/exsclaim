@@ -9,11 +9,12 @@ import torchvision.models.detection.mask_rcnn
 from .coco_utils import get_coco_api_from_dataset
 from .coco_eval import CocoEvaluator
 from . import utils
+import pathlib
 
-
-def train_one_epoch(model, optimizer, data_loader, device, epoch, print_freq):
+def train_one_epoch(model, optimizer, data_loader, device, epoch,
+                    print_freq, model_name="unnamed_model"):
     model.train()
-    metric_logger = utils.MetricLogger(delimiter="  ")
+    metric_logger = utils.MetricLogger(delimiter="  ", model_name=model_name)
     metric_logger.add_meter('lr', utils.SmoothedValue(window_size=1, fmt='{value:.6f}'))
     header = 'Epoch: [{}]'.format(epoch)
 
@@ -69,13 +70,13 @@ def _get_iou_types(model):
 
 
 @torch.no_grad()
-def evaluate(model, data_loader, device):
+def evaluate(model, data_loader, device, model_name="unnamed_model"):
     n_threads = torch.get_num_threads()
     # FIXME remove this and make paste_masks_in_image run on the GPU
     torch.set_num_threads(1)
     cpu_device = torch.device("cpu")
     model.eval()
-    metric_logger = utils.MetricLogger(delimiter="  ")
+    metric_logger = utils.MetricLogger(delimiter="  ", model_name=model_name)
     header = 'Test:'
 
     coco = get_coco_api_from_dataset(data_loader.dataset)
@@ -100,11 +101,16 @@ def evaluate(model, data_loader, device):
 
     # gather the stats from all processes
     metric_logger.synchronize_between_processes()
-    print("Averaged stats:", metric_logger)
+    
+    current_file = pathlib.Path(__file__).resolve(strict=True)
+    save_file = current_file.parent / 'results' / '{}.txt'.format(model_name)
+    with open(save_file, "a") as f:
+        f.write("Averaged stats:{}\n".format(metric_logger))
+
     coco_evaluator.synchronize_between_processes()
 
     # accumulate predictions from all images
     coco_evaluator.accumulate()
-    coco_evaluator.summarize()
+    coco_evaluator.summarize(model_name=model_name)
     torch.set_num_threads(n_threads)
     return coco_evaluator
