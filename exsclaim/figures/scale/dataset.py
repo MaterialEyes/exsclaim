@@ -3,10 +3,11 @@ import torch
 import numpy as np
 import os
 from PIL import Image
+import random
 from .utils import convert_box_format
 
 class ScaleBarDataset():
-    def __init__(self, root, transforms, test=True):
+    def __init__(self, root, transforms, test=True, size=None):
         ## initiates a dataset from a json
         self.root = root
         self.transforms = transforms
@@ -22,6 +23,8 @@ class ScaleBarDataset():
         self.images = [figure for figure in self.data 
                        if os.path.isfile(os.path.join(all_figures,
                                                       figure))]
+        if size != None:
+            self.images = random.sample(self.images, size)
     
     def __getitem__(self, idx):
         image_path = os.path.join(self.root, "all-figures", self.images[idx])
