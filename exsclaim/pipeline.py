@@ -16,7 +16,7 @@ class Pipeline:
 
         Args:
             query_path (dict or path to json): An EXSCLAIM user query JSON
-            exsclaim_path (dict or path to json): EXSCLAIM JSON
+            test (boolean): if True, initialize with test query json
         """
         if test:
             current_path = pathlib.Path(__file__).resolve().parent
@@ -45,7 +45,7 @@ class Pipeline:
             self.exsclaim_dict = {}
 
 
-    def run(self, tools = None):
+    def run(self, tools=None, figure_separator=True, caption_separator=True, journal_scraper=True):
         """ Run EXSCLAIM pipeline on Pipeline instance's query path
 
         Args:
@@ -53,6 +53,12 @@ class Pipeline:
                 to run on query path in the order they will run. Default
                 argument is JournalScraper, CaptionSeparator, 
                 FigureSeparator
+            journal_scraper (boolean): true if JournalScraper should
+                be included in tools list. Overriden by a tools argument
+            caption_separator (boolean): true if CaptionSeparator should
+                be included in tools list. Overriden by a tools argument
+            figure_separator (boolean): true if FigureSeparator should
+                be included in tools list. Overriden by a tools argument
         Returns:
             exsclaim_dict (dict): an exsclaim json
         Modifies:
@@ -87,9 +93,14 @@ class Pipeline:
         @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
         """)
         # set default values
-        if tools is None: tools = [JournalScraper(self.query_dict),
-                                   CaptionSeparator(self.query_dict),
-                                   FigureSeparator(self.query_dict)]
+        if tools is None:
+            tools = []
+            if journal_scraper:
+                tools.append(JournalScraper(self.query_dict))
+            if caption_separator:
+                tools.append(CaptionSeparator(self.query_dict))
+            if figure_separator:
+                tools.append(FigureSeparator(self.query_dict))
         # run each ExsclaimTool on search query
         for tool in tools:
             self.exsclaim_dict = tool.run(self.query_dict,self.exsclaim_dict)
