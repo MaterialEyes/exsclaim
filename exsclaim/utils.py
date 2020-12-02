@@ -91,3 +91,30 @@ class Printer():
         sys.stdout.write("\r\x1b[K"+data.__str__())
         sys.stdout.flush()
 
+def is_contained(inner, outer, padding=0):
+    """ tests whether one bounding box is within another """
+    inner_x1, inner_y1, inner_x2, inner_y2 = convert_labelbox_to_coords(inner)
+    outer_x1, outer_y1, outer_x2, outer_y2 = convert_labelbox_to_coords(outer)
+    outer_x1, outer_y1 = outer_x1 - padding, outer_y1 - padding
+    outer_x2, outer_y2 = outer_x2 + padding, outer_y2 + padding
+
+    if (inner_x1 > outer_x1 and inner_x2 < outer_x2 and
+        inner_y1 > outer_y1 and inner_y2 < outer_y2):
+        return True
+    else:
+        return False
+
+def convert_labelbox_to_coords(geometry):
+    """ Converts from [{"x": x1, "y": y1}, ...] to (x1, y1, ...) """
+    #print(geometry)
+    x1 = min([point["x"] for point in geometry])
+    y1 = min([point["y"] for point in geometry])
+    x2 = max([point["x"] for point in geometry])
+    y2 = max([point["y"] for point in geometry])
+
+    return x1, y1, x2, y2
+
+def find_box_center(geometry):
+    """ Returns the center (x, y) coords of the box """
+    x1, y1, x2, y2 = convert_labelbox_to_coords(geometry)
+    return (x2 - x1) / 2.0, (y2 - y1) / 2.0

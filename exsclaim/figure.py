@@ -215,12 +215,12 @@ class FigureSeparator(ExsclaimTool):
             utils.Printer(">>> ({0} of {1}) ".format(counter,+\
                 len(figures))+\
                 "Extracting images from: "+ figure_name.split("/")[-1])
-            #try:
-            self.extract_image_objects(figure_name)
-            self.make_visualization(figure_name, search_query['results_dir'])
-            new_figures_separated.add(figure_name)
-            #except:
-            #    utils.Printer("<!> ERROR: An exception occurred in FigureSeparator\n")
+            try:
+                self.extract_image_objects(figure_name)
+                self.make_visualization(figure_name, search_query['results_dir'])
+                new_figures_separated.add(figure_name)
+            except:
+                utils.Printer("<!> ERROR: An exception occurred in FigureSeparator\n")
             
             # Save to file every N iterations (to accomodate restart scenarios)
             if counter%500 == 0:
@@ -488,6 +488,8 @@ class FigureSeparator(ExsclaimTool):
             master_image_info = {}
             master_image_info["classification"] = master_label
             master_image_info["confidence"] = float("{0:.4f}".format(master_cls_conf))
+            master_image_info["height"] = y2 - y1
+            master_image_info["width"] = x2 -x1
             master_image_info["geometry"] = []
             for x in [int(x1), int(x2)]:
                 for y in [int(y1), int(y2)]:
@@ -574,29 +576,70 @@ class FigureSeparator(ExsclaimTool):
 
         return number_text + " " + unit_text, probabilities[predicted_idx]
 
-    def find_image_dimensions(self, figure_json):
-        pass
+    def create_scale_bar_objects(self, scale_bar_lines, scale_bar_labels):
+        """ Match scale bar lines with labels to create scale bar jsons
+        
+        Args:
+            scale_bar_lines (list of dicts): A list of dictionaries
+                representing predicted scale bars with 'geometry', 'length',
+                and 'confidence' attributes.
+            scale_bar_labels (list of dicts): A list of dictionaries
+                representing predicted scale bar labesl with 'geometry',
+                'text', 'confidence', 'box_confidence', 'nm' attributes.
+        Returns:
+            scale_bar_jsons (list of Scale Bar JSONS): Scale Bar JSONS that
+                were made from pairing scale labels and scale lines
+            unassigned_labels (list of dicts): List of dictionaries
+                representing scale bar labels that were not matched.
+        """
+        scale_bar_jsons = []
+        paired_labels = set()
+        for line in scale_bar_lines:
+            x_line, y_line = utils.find_box_center(line["geometry"])
+            best_distance = 1000000
+            best_label = None
+            for label_index, label in enumerate(scale_bar_labels):
+                x_label, y_label = utils.find_box_center(label["geometry"])
+                distance = (x_label - x_line)**2 + (y_label - y_line)**2
+                if distance < best_distance:
+                    best_distance = distance
+                    best_index = label_index
+                    best_label = label
+            # If the best match is not very good, keep this line unassigned
+            if best_distance > 5000:
+                best_index = -1
+                best_label = None
+                best_distance = -1
+            paired_labels.add(best_index)
+            scale_bar_json = {
+                "label" : best_label,
+                "geometry" : line["geometry"],
+                "confidence" : float(line.get("confidence", None)),
+                "length" : line.get("length", None),
+                "label_line_distance" : best_distance
+            }
+            scale_bar_jsons.append(scale_bar_json)
+        # Check which labels were left unassigned
+        unassigned_labels = []
+        for i, label in enumerate(scale_bar_labels):
+            if i not in paired_labels:
+                unassigned_labels.append(label)
+        return scale_bar_jsons, unassigned_labels
 
-    def detect_scale_objects(self, figure_path):
+    def detect_scale_objects(self, image):
         """ Detects bounding boxes of scale bars and scale bar labels 
 
         Args:
-            figure_path (str): A path to the image (.png, .jpg, or .gif)
-                file containing the article figure
+            image (PIL Image): A PIL image object
         Returns:
             scale_bar_info (list): A list of lists with the following 
                 pattern: [[x1,y1,x2,y2, confidence, label],...] where
                 label is 1 for scale bars and 2 for scale bar labelss 
         """
-        # pre-process image
-        image = Image.open(figure_path).convert("RGB")
-        image = T.ToTensor()(image)
-
         # prediction
         self.scale_bar_detection_model.eval()
         with torch.no_grad():
             outputs = self.scale_bar_detection_model([image])
-
         # post-process 
         scale_bar_info = []
         for i, box in enumerate(outputs[0]["boxes"]):
@@ -619,31 +662,78 @@ class FigureSeparator(ExsclaimTool):
             figure_json (dict): A dictionary with classified image_objects
                 extracted from figure
         """
-        scale_bar_info = self.detect_scale_objects(figure_path)
-        image = Image.open(figure_path).convert("RGB")
-        image = T.ToTensor()(image)
-
-        # add to figure_json
-        label_names = ["background", "scale bar", "scale label"]
+        convert_to_nm = {
+            "a"  : 0.1,
+            "nm" : 1.0,
+            "um" : 1000.0,
+            "mm" : 1000000.0,
+            "cm" : 10000000.0,
+            "m"  : 1000000000.0,
+        }
         unassigned = figure_json.get("unassigned", {})
-        scale_bars = unassigned.get("scale_bar_lines", [])
-        scale_labels = unassigned.get("scale_bar_labels", [])
-        for scale_object in scale_bar_info:
-            x1, y1, x2, y2, confidence, classification = scale_object
-            geometry = utils.convert_coords_to_labelbox([int(x1), int(y1), int(x2), int(y2)])
-            if label_names[int(classification)] == "scale bar":
-                scale_bars.append(geometry)
-            elif label_names[int(classification)] == "scale label":
-                scale_bar_label_image = T.ToPILImage()(image).convert("RGB")
-                scale_bar_label_image.crop((int(x1), int(y1), int(x2), int(y2)))
-                ## Read Scale Text
-                scale_label_text, confidence = self.read_scale_bar_full(scale_bar_label_image)
-                label_json = {"geometry" : geometry, "label" : scale_label_text}
-                scale_labels.append(label_json)
-        unassigned["scale_bar_lines"] = scale_bars
-        unassigned["scale_bar_labels"] = scale_labels
+        unassigned_scale_labels = unassigned.get("scale_bar_labels", [])
+        master_images = figure_json.get("master_images", [])
+        image = Image.open(figure_path).convert("RGB")
+        # Detect the scale of each individual subfigure (master image)
+        for master_image_json in master_images:
+            x1, y1, x2, y2 = utils.convert_labelbox_to_coords(
+                master_image_json["geometry"])
+            master_image = image.crop((x1, y1, x2, y2))
+            master_image = T.ToTensor()(master_image)
+            # Detect scale bar objects
+            scale_bar_info = self.detect_scale_objects(master_image)
+            label_names = ["background", "scale bar", "scale label"]
+            scale_bars = []
+            scale_labels = []
+            for scale_object in scale_bar_info:
+                x1, y1, x2, y2, confidence, classification = scale_object
+                geometry = utils.convert_coords_to_labelbox([int(x1), int(y1),
+                                                            int(x2), int(y2)])
+                if label_names[int(classification)] == "scale bar":
+                    scale_bar_json = {
+                        "geometry" : geometry,
+                        "confidence" : float(confidence),
+                        "length" : int(x2 - x1)
+                    }
+                    scale_bars.append(scale_bar_json)
+                elif label_names[int(classification)] == "scale label":
+                    scale_bar_label_image = image.crop((int(x1), int(y1),
+                                                       int(x2), int(y2)))
+                    ## Read Scale Text
+                    scale_label_text, label_confidence = self.read_scale_bar_full(
+                        scale_bar_label_image)
+                    magnitude, unit = scale_label_text.split(" ")
+                    magnitude = float(magnitude)
+                    length_in_nm = magnitude * convert_to_nm[unit.strip().lower()]
+                    label_json = {
+                        "geometry" : geometry,
+                        "label" : scale_label_text,
+                        "label_confidence" : float(label_confidence),
+                        "box_confidence" : float(confidence),
+                        "nm" : length_in_nm
+                    }
+                    scale_labels.append(label_json)
+            # Match scale bars to labels and to subfigures (master images)
+            scale_bar_jsons, unassigned_labels = (
+                self.create_scale_bar_objects(scale_bars, scale_labels))
+            unassigned_scale_labels += unassigned_labels
+            master_image_json["scale_bars"] = scale_bar_jsons
+            if scale_bar_jsons == []:
+                continue
+            try:
+                scale_bar = master_image_json["scale_bars"][0]
+                nm_to_pixel = (scale_bar["label"]["nm"]
+                               / float(scale_bar["length"]))
+                master_image_json["nm_height"] = (master_image_json["height"]
+                                                    * nm_to_pixel)
+                master_image_json["nm_width"] = (master_image_json["width"]
+                                                    * nm_to_pixel)
+            except:
+                continue
+        # Save info to JSON
+        unassigned["scale_bar_labels"] = unassigned_scale_labels
         figure_json["unassigned"] = unassigned
-
+        figure_json["master_images"] = master_images
         return figure_json
 
     def make_visualization(self, figure_path, save_path):
