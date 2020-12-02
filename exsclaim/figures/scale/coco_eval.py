@@ -14,7 +14,7 @@ import pycocotools.mask as mask_util
 
 from collections import defaultdict
 
-from . import utils
+import utils
 import pathlib
 
 
@@ -63,7 +63,36 @@ class CocoEvaluator(object):
             with open(save_file, "a") as f:
                 f.write("IoU metric: {}\n".format(iou_type))
                 coco_eval.summarize()
-                f.write(str(coco_eval))
+                f.write(self.prepare_summary(coco_eval))
+        return coco_eval.stats
+    
+    def prepare_summary(self, coco_eval):
+        summary = ("Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | "
+                    "maxDets=100 ] = {}\n"
+                    "Average Precision  (AP) @[ IoU=0.50      | area=   all | "
+                    "maxDets=100 ] = {}\n"
+                    "Average Precision  (AP) @[ IoU=0.75      | area=   all | "
+                    "maxDets=100 ] = {}\n"
+                    "Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | "
+                    "maxDets=100 ] = {}\n"
+                    "Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | "
+                    "maxDets=100 ] = {}\n"
+                    "Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | "
+                    "maxDets=100 ] = {}\n"
+                    "Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | "
+                    "maxDets=  1 ] = {}\n"
+                    "Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | "
+                    "maxDets= 10 ] = {}\n"
+                    "Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | "
+                    "maxDets=100 ] = {}\n"
+                    "Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | "
+                    "maxDets=100 ] = {}\n"
+                    "Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | "
+                    "maxDets=100 ] = {}\n"
+                    "Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | "
+                    "maxDets=100 ] = {}\n".format(*coco_eval.stats.tolist()))
+        return summary
+
     def prepare(self, predictions, iou_type):
         if iou_type == "bbox":
             return self.prepare_for_coco_detection(predictions)

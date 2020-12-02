@@ -4,7 +4,7 @@ import numpy as np
 import os
 from PIL import Image
 import random
-from .utils import convert_box_format
+from utils import convert_box_format
 
 class ScaleBarDataset():
     def __init__(self, root, transforms, test=True, size=None):
