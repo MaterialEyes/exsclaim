@@ -8,7 +8,7 @@ with open(here / "README.md", "r") as fh:
 
 setuptools.setup(
     name="exsclaim-tspread",
-    version="0.0.12",
+    version="0.0.14",
     author=('Eric Schwenker','Trevor Spreadbury','Weixin Jiang','Maria Chan'),
     author_email="developers@materialeyes.org",
     description="EXSCLAIM! is a library for the automatic EXtraction, Separation, and Caption-based natural Language Annotation of IMages from scientific figures.",
@@ -20,10 +20,10 @@ setuptools.setup(
         "numpy",
         "pillow",
         "beautifulsoup4",
-        "pyyaml",
+        "pyyaml>=5.1",
         "scipy",
         "scikit-image",
-        "torch",
+        "torch>=1.6",
         "opencv-python",
         "requests",
         "torchvision",
