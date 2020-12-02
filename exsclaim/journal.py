@@ -10,7 +10,6 @@ import numpy as np
 import json
 
 from bs4 import BeautifulSoup
-from collections import OrderedDict
 
 
 class JournalFamily():
