@@ -8,6 +8,9 @@ import requests
 import itertools
 import numpy as np
 import json
+import random
+import time
+
 
 from bs4 import BeautifulSoup
 from collections import OrderedDict
@@ -48,6 +51,7 @@ class JournalFamily():
             An initialized instance of a search on a journal family
         """
         self.search_query = search_query
+        self.open = search_query.get("open", False)
 
     def get_domain_name(self) -> str:
         """
@@ -104,8 +108,7 @@ class JournalFamily():
         ## creates a list of search terms
         search_list = ([[search_query['query'][key]['term']] + 
                        search_query['query'][key]['synonyms'] 
-                       for key in search_query['query'] 
-                       if len(search_query['query'][key]['synonyms'])>0])
+                       for key in search_query['query']])
         search_product = list(itertools.product(*search_list))
 
         # sortby is the requested method to sort results (relevancy or recency) and
@@ -141,6 +144,17 @@ class JournalFamily():
         """
         return (False, "unknown")
 
+    def is_link_to_open_article(self, tag):
+        """ Checks if link is to an open access article 
+        
+        Args:
+            tag (bs4.tag): A tag containing an href attribute that
+                links to an article
+        Returns:
+            True if the article is confirmed open_access 
+        """
+        return False
+
     def get_article_extensions(self, articles_visited=set()) -> list:
         """
         Create a list of article url extensions from search_query
@@ -149,6 +163,7 @@ class JournalFamily():
             A list of article url extensions from search.
         """
         search_query = self.search_query
+        maximum_scraped = search_query["maximum_scraped"]
         article_delim, reader_delims = self.get_article_delimiters()
         search_query_urls = self.get_search_query_urls()
         article_paths = set()
@@ -159,21 +174,19 @@ class JournalFamily():
             for page_number in range(start_page, stop_page + 1):
                 request = self.turn_page(page1, page_number, total_articles)
                 soup = self.get_soup_from_request(request, fast_load=False)
-                for tags in soup.find_all('a',href=True):
-                    article = tags.attrs['href']
+                for tag in soup.find_all('a', href=True):
+                    article = tag.attrs['href']
                     article = article.split('?page=search')[0]
                     if (len(article.split(article_delim)) > 1 
-                        and article.split("/")[-1] not in articles_visited
-                        and article != None
-                        and len(set(reader_delims).intersection(set(article.split("/")))) <= 0):
+                            and article.split("/")[-1] not in articles_visited
+                            and article != None
+                            and len(set(reader_delims).intersection(set(article.split("/")))) <= 0
+                            and not (self.open
+                                     and not self.is_link_to_open_article(tag))):
                         article_paths.add(article)
-                if len(article_paths) > search_query["maximum_scraped"]:
-                    break
-            if len(article_paths) > search_query["maximum_scraped"]:
-                break
-    
-        articles = list(article_paths)
-        return articles[0:search_query["maximum_scraped"]]
+                    if len(article_paths) >= maximum_scraped:
+                        return list(article_paths)
+        return list(article_paths)
 
     def get_figure_list(self, url):
         """
@@ -197,8 +210,15 @@ class JournalFamily():
         Returns:
             A BeautifulSoup parse tree.
         """
+        headers = {"Accept":   "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+                   "Accept-Encoding": "gzip, deflate, br",
+                   "Accept-Language": "en-US,en;q=0.5",
+                   "Upgrade-Insecure-Requests":   "1",
+                   "User-Agent":  "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:82.0) Gecko/20100101 Firefox/82.0"}
+        wait_time = float(random.randint(0, 50))
+        time.sleep(wait_time/float(10))
         with requests.Session() as session:
-            r = session.get(url) 
+            r = session.get(url, headers=headers) 
         soup = BeautifulSoup(r.text, 'lxml')
         return soup
 
@@ -313,6 +333,7 @@ class JournalFamily():
 
         return article_json
 
+
 ################ JOURNAL FAMILY SPECIFIC INFORMATION ################
 ## To add a new journal family, create a new subclass of 
 ## JournalFamily. Fill out the methods and attributes according to
@@ -351,6 +372,11 @@ class ACS(JournalFamily):
             return (is_open, open_access.text)
         return (False, "unknown")
 
+    def is_link_to_open_article(self, tag):
+        # ACS allows filtering for search. Therefore, if self.open is
+        # true, all results will be open.
+        return self.open
+
 
 class Nature(JournalFamily):
     domain =        "https://www.nature.com"
@@ -373,7 +399,9 @@ class Nature(JournalFamily):
         data_layer_json = "{" + data_layer_string.split("[{", 1)[1].split("}];", 1)[0] + "}"
         parsed = json.loads(data_layer_json)
         search_info = parsed["page"]["search"]
-        return (search_info["page"],search_info["totalPages"],search_info["totalResults"])  
+        return (search_info["page"],
+                search_info["totalPages"], 
+                search_info["totalResults"])
 
     def turn_page(self, url, pg_num, pg_size):
         return url.split('&page=')[0]+'&page='+str(pg_num)
@@ -394,6 +422,18 @@ class Nature(JournalFamily):
         except:
             license = "unknown"
         return is_open, license
+
+    def is_link_to_open_article(self, tag):
+        i = 0
+        current_tag = tag
+        while current_tag.parent and i < 3:
+            current_tag = current_tag.parent
+            i += 1
+        candidates = current_tag.find_all("span", class_="text-orange")
+        for candidate in candidates:
+            if candidate.text == "Open":
+                return True
+        return False
         
 
 class RSC(JournalFamily):

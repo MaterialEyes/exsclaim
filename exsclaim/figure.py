@@ -18,6 +18,7 @@ from PIL import Image, ImageDraw, ImageFont
 import torchvision.models.detection
 import torchvision.transforms as T
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
+from torchvision import models
 
 from .figures.models.yolov3 import *
 from .figures.utils import *
@@ -55,6 +56,7 @@ class FigureSeparator(ExsclaimTool):
         if self.cuda:
             print("using cuda: ", args.gpu_id) 
             torch.cuda.set_device(device=args.gpu_id)
+        self.device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
         ## Load object detection model
         object_detection_checkpoint = model_path + "checkpoints/object_detection_model.pt"
@@ -102,6 +104,67 @@ class FigureSeparator(ExsclaimTool):
         else:
             scale_bar_detection_model.load_state_dict(torch.load(scale_bar_detection_checkpoint, map_location='cpu'))
         self.scale_bar_detection_model = scale_bar_detection_model
+
+        ## Code to set up scale label reading model(s)
+        # id_to_class dictionaries for model outputs
+        all = {0: '0.1 A', 1: '0.1 nm', 2: '0.1 um', 3: '0.2 A', 4: '0.2 nm', 5: '0.2 um', 6: '0.3 A', 7: '0.3 nm', 8: '0.3 um', 9: '0.4 A', 10: '0.4 nm', 11: '0.4 um', 12: '0.5 A', 13: '0.5 nm', 14: '0.5 um', 15: '0.6 A', 16: '0.6 nm', 17: '0.6 um', 18: '0.7 A', 19: '0.7 nm', 20: '0.7 um', 21: '0.8 A', 22: '0.8 nm', 23: '0.8 um', 24: '0.9 A', 25: '0.9 nm', 26: '0.9 um', 27: '1 A', 28: '1 nm', 29: '1 um', 30: '10 A', 31: '10 nm', 32: '10 um', 33: '100 A', 34: '100 nm', 35: '100 um', 36: '2 A', 37: '2 nm', 38: '2 um', 39: '2.5 A', 40: '2.5 nm', 41: '2.5 um', 42: '20 A', 43: '20 nm', 44: '20 um', 45: '200 A', 46: '200 nm', 47: '200 um', 48: '25 A', 49: '25 nm', 50: '25 um', 51: '250 A', 52: '250 nm', 53: '250 um', 54: '3 A', 55: '3 nm', 56: '3 um', 57: '30 A', 58: '30 nm', 59: '30 um', 60: '300 A', 61: '300 nm', 62: '300 um', 63: '4 A', 64: '4 nm', 65: '4 um', 66: '40 A', 67: '40 nm', 68: '40 um', 69: '400 A', 70: '400 nm', 71: '400 um', 72: '5 A', 73: '5 nm', 74: '5 um', 75: '50 A', 76: '50 nm', 77: '50 um', 78: '500 A', 79: '500 nm', 80: '500 um', 81: '6 A', 82: '6 nm', 83: '6 um', 84: '60 A', 85: '60 nm', 86: '60 um', 87: '600 A', 88: '600 nm', 89: '600 um', 90: '7 A', 91: '7 nm', 92: '7 um', 93: '70 A', 94: '70 nm', 95: '70 um', 96: '700 A', 97: '700 nm', 98: '700 um', 99: '8 A', 100: '8 nm', 101: '8 um', 102: '80 A', 103: '80 nm', 104: '80 um', 105: '800 A', 106: '800 nm', 107: '800 um', 108: '9 A', 109: '9 nm', 110: '9 um', 111: '90 A', 112: '90 nm', 113: '90 um', 114: '900 A', 115: '900 nm', 116: '900 um'}
+        some = {0: '0.1 A', 1: '0.1 nm', 2: '0.1 um', 3: '0.2 A', 4: '0.2 nm', 5: '0.2 um', 6: '0.3 A', 7: '0.3 nm', 8: '0.3 um', 9: '0.4 A', 10: '0.4 nm', 11: '0.4 um', 12: '0.5 A', 13: '0.5 nm', 14: '0.5 um', 15: '1 A', 16: '1 nm', 17: '1 um', 18: '10 A', 19: '10 nm', 20: '10 um', 21: '100 A', 22: '100 nm', 23: '100 um', 24: '2 A', 25: '2 nm', 26: '2 um', 27: '2.5 A', 28: '2.5 nm', 29: '2.5 um', 30: '20 A', 31: '20 nm', 32: '20 um', 33: '200 A', 34: '200 nm', 35: '200 um', 36: '25 A', 37: '25 nm', 38: '25 um', 39: '250 A', 40: '250 nm', 41: '250 um', 42: '3 A', 43: '3 nm', 44: '3 um', 45: '30 A', 46: '30 nm', 47: '30 um', 48: '300 A', 49: '300 nm', 50: '300 um', 51: '4 A', 52: '4 nm', 53: '4 um', 54: '40 A', 55: '40 nm', 56: '40 um', 57: '400 A', 58: '400 nm', 59: '400 um', 60: '5 A', 61: '5 nm', 62: '5 um', 63: '50 A', 64: '50 nm', 65: '50 um', 66: '500 A', 67: '500 nm', 68: '500 um'}        
+        scale_some = {0: '0.1', 1: '0.2', 2: '0.3', 3: '0.4', 4: '0.5', 5: '1', 6: '10', 7: '100', 8: '2', 9: '2.5', 10: '20', 11: '200', 12: '25', 13: '250', 14: '3', 15: '30', 16: '300', 17: '4', 18: '40', 19: '400', 20: '5', 21: '50', 22: '500'}
+        scale_all = {0: '0.1', 1: '0.2', 2: '0.3', 3: '0.4', 4: '0.5', 5: '0.6', 6: '0.7', 7: '0.8', 8: '0.9', 9: '1', 10: '10', 11: '100', 12: '2', 13: '2.5', 14: '20', 15: '200', 16: '25', 17: '250', 18: '3', 19: '30', 20: '300', 21: '4', 22: '40', 23: '400', 24: '5', 25: '50', 26: '500', 27: '6', 28: '60', 29: '600', 30: '7', 31: '70', 32: '700', 33: '8', 34: '80', 35: '800', 36: '9', 37: '90', 38: '900'}
+        unit_data = {0: 'A', 1: 'mm', 2: 'nm', 3: 'um'}
+        # select id_to_class dict(s)
+        self.id_to_class_full = all
+        self.id_to_class_number = scale_all
+        self.id_to_class_unit = unit_data
+        # paths to models
+        some = model_path + "checkpoints/some_18-156.pt"
+        all = model_path + "checkpoints/all.pt"
+        scale_all = model_path + "checkpoints/scale_all.pt"
+        scale_some = model_path + "checkpoints/scale_some.pt"
+        unit_data = model_path + "checkpoints/unit_data.pt"
+        # load models of choice
+        self.full_scale_bar_reader = self.get_classification_model(some, 69, 18)
+        #self.unit_scale_bar_reader = self.get_classification_model(unit_data, 4, 18, True)
+        #self.number_scale_bar_reader = self.get_classification_model(scale_all, 39, 18, True)
+
+        ## Save scale laber reader transforms
+        self.label_reader_transforms = T.Compose([T.Resize((224, 224)),
+                                        T.ToTensor(),])
+
+
+    def get_classification_model(self, scale_label_recognition_checkpoint, classes, depth, pretrained=True):
+        """ """
+        ## Load scale bar label reading model
+        
+        # load an object detection model pre-trained on COCO
+        if depth == 18:
+            model = models.resnet18(pretrained=pretrained)
+        elif depth == 50:
+            model = models.resnet50(pretrained=pretrained)
+        elif depth == 152:
+            model = models.resnet152(pretrained=pretrained)
+        
+        if depth == 18:
+            model.fc = nn.Sequential(nn.ReLU(),
+                                    nn.Dropout(0.2),
+                                    nn.Linear(512, classes),
+                                    nn.LogSoftmax(dim=1))
+        else:
+            model.fc = nn.Sequential(nn.Linear(2048, 512),
+                                    nn.ReLU(),
+                                    nn.Dropout(0.2),
+                                    nn.Linear(512, classes),
+                                    nn.LogSoftmax(dim=1))
+        model.to(self.device)
+        
+        if self.cuda:
+            model.load_state_dict(torch.load(scale_label_recognition_checkpoint))
+            model = model.cuda()
+        else:
+            model.load_state_dict(torch.load(scale_label_recognition_checkpoint, map_location='cpu')["model_state_dict"])
+        
+        model.eval()
+        return model
 
 
     def _update_exsclaim(self, exsclaim_dict, figure_name, figure_dict):
@@ -152,12 +215,12 @@ class FigureSeparator(ExsclaimTool):
             utils.Printer(">>> ({0} of {1}) ".format(counter,+\
                 len(figures))+\
                 "Extracting images from: "+ figure_name.split("/")[-1])
-            #try:
-            self.extract_image_objects(figure_name)
-            self.make_visualization(figure_name, search_query['results_dir'])
-            new_figures_separated.add(figure_name)
-            #except:
-            #    utils.Printer("<!> ERROR: An exception occurred in FigureSeparator\n")
+            try:
+                self.extract_image_objects(figure_name)
+                self.make_visualization(figure_name, search_query['results_dir'])
+                new_figures_separated.add(figure_name)
+            except:
+                utils.Printer("<!> ERROR: An exception occurred in FigureSeparator\n")
             
             # Save to file every N iterations (to accomodate restart scenarios)
             if counter%500 == 0:
@@ -425,6 +488,8 @@ class FigureSeparator(ExsclaimTool):
             master_image_info = {}
             master_image_info["classification"] = master_label
             master_image_info["confidence"] = float("{0:.4f}".format(master_cls_conf))
+            master_image_info["height"] = y2 - y1
+            master_image_info["width"] = x2 -x1
             master_image_info["geometry"] = []
             for x in [int(x1), int(x2)]:
                 for y in [int(y1), int(y2)]:
@@ -450,6 +515,142 @@ class FigureSeparator(ExsclaimTool):
         self.exsclaim_json[figure_name] = figure_json
         return figure_json
 
+    def read_scale_bar(self, cropped_image):
+        """ Outputs the text of an image cropped to a scale bar label bbox 
+
+        Args:
+            cropped_image (Image): An PIL RGB image cropped to the bounding box
+                of a scale bar label. 
+        Returns:
+            label_text (string): The text of the scale bar label
+        """
+        return self.read_scale_bar_full(cropped_image)
+
+    def read_scale_bar_full(self, cropped_image):
+        """ Outputs the text of an image cropped to a scale bar label bbox 
+
+        Args:
+            cropped_image (Image): An PIL RGB image cropped to the bounding box
+                of a scale bar label. 
+        Returns:
+            label_text (string): The text of the scale bar label
+        """
+        cropped_image = self.label_reader_transforms(cropped_image)
+        cropped_image =  cropped_image.unsqueeze(0)
+
+        with torch.no_grad():
+            log_probabilities = self.full_scale_bar_reader(cropped_image)
+        probabilities = torch.exp(log_probabilities)
+        probabilities = list(probabilities.numpy()[0])
+        predicted_idx = probabilities.index(max(probabilities))
+        label_text = self.id_to_class_full[predicted_idx]
+        return label_text, probabilities[predicted_idx]
+
+    def read_scale_bar_parts(self, cropped_image):
+        """ Outputs the text of an image cropped to a scale bar label bbox 
+
+        Args:
+            cropped_image (Image): An image cropped to the bounding box
+                of a scale bar label. 
+        Returns:
+            label_text (string): The text of the scale bar label
+        """
+        cropped_image = self.label_reader_transforms(cropped_image)
+        cropped_image = cropped_image.unsqueeze(0)
+
+        ## Find predicted scale unit
+        with torch.no_grad():
+            log_probabilities = self.unit_scale_bar_reader(cropped_image)
+        probabilities = torch.exp(log_probabilities)
+        probabilities = list(probabilities.numpy()[0])
+        predicted_idx = probabilities.index(max(probabilities))
+        unit_text = self.id_to_class_unit[predicted_idx]
+
+        ## Find predicted scale number
+        with torch.no_grad():
+            log_probabilities = self.number_scale_bar_reader(cropped_image)
+        probabilities = torch.exp(log_probabilities)
+        probabilities = list(probabilities.numpy()[0])
+        predicted_idx = probabilities.index(max(probabilities))
+        number_text = self.id_to_class_number[predicted_idx]
+
+        return number_text + " " + unit_text, probabilities[predicted_idx]
+
+    def create_scale_bar_objects(self, scale_bar_lines, scale_bar_labels):
+        """ Match scale bar lines with labels to create scale bar jsons
+        
+        Args:
+            scale_bar_lines (list of dicts): A list of dictionaries
+                representing predicted scale bars with 'geometry', 'length',
+                and 'confidence' attributes.
+            scale_bar_labels (list of dicts): A list of dictionaries
+                representing predicted scale bar labesl with 'geometry',
+                'text', 'confidence', 'box_confidence', 'nm' attributes.
+        Returns:
+            scale_bar_jsons (list of Scale Bar JSONS): Scale Bar JSONS that
+                were made from pairing scale labels and scale lines
+            unassigned_labels (list of dicts): List of dictionaries
+                representing scale bar labels that were not matched.
+        """
+        scale_bar_jsons = []
+        paired_labels = set()
+        for line in scale_bar_lines:
+            x_line, y_line = utils.find_box_center(line["geometry"])
+            best_distance = 1000000
+            best_label = None
+            for label_index, label in enumerate(scale_bar_labels):
+                x_label, y_label = utils.find_box_center(label["geometry"])
+                distance = (x_label - x_line)**2 + (y_label - y_line)**2
+                if distance < best_distance:
+                    best_distance = distance
+                    best_index = label_index
+                    best_label = label
+            # If the best match is not very good, keep this line unassigned
+            if best_distance > 5000:
+                best_index = -1
+                best_label = None
+                best_distance = -1
+            paired_labels.add(best_index)
+            scale_bar_json = {
+                "label" : best_label,
+                "geometry" : line["geometry"],
+                "confidence" : float(line.get("confidence", None)),
+                "length" : line.get("length", None),
+                "label_line_distance" : best_distance
+            }
+            scale_bar_jsons.append(scale_bar_json)
+        # Check which labels were left unassigned
+        unassigned_labels = []
+        for i, label in enumerate(scale_bar_labels):
+            if i not in paired_labels:
+                unassigned_labels.append(label)
+        return scale_bar_jsons, unassigned_labels
+
+    def detect_scale_objects(self, image):
+        """ Detects bounding boxes of scale bars and scale bar labels 
+
+        Args:
+            image (PIL Image): A PIL image object
+        Returns:
+            scale_bar_info (list): A list of lists with the following 
+                pattern: [[x1,y1,x2,y2, confidence, label],...] where
+                label is 1 for scale bars and 2 for scale bar labelss 
+        """
+        # prediction
+        self.scale_bar_detection_model.eval()
+        with torch.no_grad():
+            outputs = self.scale_bar_detection_model([image])
+        # post-process 
+        scale_bar_info = []
+        for i, box in enumerate(outputs[0]["boxes"]):
+            confidence = outputs[0]["scores"][i]
+            if confidence > 0.5:
+                x1, y1, x2, y2 = box
+                label = outputs[0]['labels'][i]
+                scale_bar_info.append([x1, y1, x2, y2, confidence, label])
+        scale_bar_info = non_max_suppression_malisiewicz(np.asarray(scale_bar_info), 0.4)
+        return scale_bar_info
+
     def determine_scale(self, figure_path, figure_json):
         """ Adds scale information to figure by reading and measuring scale bars 
 
@@ -461,44 +662,79 @@ class FigureSeparator(ExsclaimTool):
             figure_json (dict): A dictionary with classified image_objects
                 extracted from figure
         """
-        # pre-process image
-        image = Image.open(figure_path).convert("RGB")
-        image = T.ToTensor()(image)
-
-        # prediction
-        with torch.no_grad():
-            outputs = self.scale_bar_detection_model([image])
-
-        # post-process 
-        scale_bar_info = []
-        for i, box in enumerate(outputs[0]["boxes"]):
-            confidence = outputs[0]["scores"][i]
-            if confidence > 0.5:
-                x1, y1, x2, y2 = box
-                label = outputs[0]['labels'][i]
-                scale_bar_info.append([x1, y1, x2, y2, confidence, label])
-        scale_bar_info = non_max_suppression_malisiewicz(np.asarray(scale_bar_info), 0.4)
-        scale_bar_info = scale_bar_info
-
-        # add to figure_json
-        label_names = ["background", "scale bar", "scale label"]
+        convert_to_nm = {
+            "a"  : 0.1,
+            "nm" : 1.0,
+            "um" : 1000.0,
+            "mm" : 1000000.0,
+            "cm" : 10000000.0,
+            "m"  : 1000000000.0,
+        }
         unassigned = figure_json.get("unassigned", {})
-        scale_bars = unassigned.get("scale_bar_lines", [])
-        scale_labels = unassigned.get("scale_bar_labels", [])
-        for scale_object in scale_bar_info:
-            x1, y1, x2, y2, confidence, classification = scale_object
-            geometry = utils.convert_coords_to_labelbox([int(x1), int(y1), int(x2), int(y2)])
-            if label_names[int(classification)] == "scale bar":
-                scale_bars.append(geometry)
-            elif label_names[int(classification)] == "scale label":
-                label_json = {"geometry" : geometry}
-                scale_labels.append(label_json)
-        unassigned["scale_bar_lines"] = scale_bars
-        unassigned["scale_bar_labels"] = scale_labels
+        unassigned_scale_labels = unassigned.get("scale_bar_labels", [])
+        master_images = figure_json.get("master_images", [])
+        image = Image.open(figure_path).convert("RGB")
+        # Detect the scale of each individual subfigure (master image)
+        for master_image_json in master_images:
+            x1, y1, x2, y2 = utils.convert_labelbox_to_coords(
+                master_image_json["geometry"])
+            master_image = image.crop((x1, y1, x2, y2))
+            master_image = T.ToTensor()(master_image)
+            # Detect scale bar objects
+            scale_bar_info = self.detect_scale_objects(master_image)
+            label_names = ["background", "scale bar", "scale label"]
+            scale_bars = []
+            scale_labels = []
+            for scale_object in scale_bar_info:
+                x1, y1, x2, y2, confidence, classification = scale_object
+                geometry = utils.convert_coords_to_labelbox([int(x1), int(y1),
+                                                            int(x2), int(y2)])
+                if label_names[int(classification)] == "scale bar":
+                    scale_bar_json = {
+                        "geometry" : geometry,
+                        "confidence" : float(confidence),
+                        "length" : int(x2 - x1)
+                    }
+                    scale_bars.append(scale_bar_json)
+                elif label_names[int(classification)] == "scale label":
+                    scale_bar_label_image = image.crop((int(x1), int(y1),
+                                                       int(x2), int(y2)))
+                    ## Read Scale Text
+                    scale_label_text, label_confidence = self.read_scale_bar_full(
+                        scale_bar_label_image)
+                    magnitude, unit = scale_label_text.split(" ")
+                    magnitude = float(magnitude)
+                    length_in_nm = magnitude * convert_to_nm[unit.strip().lower()]
+                    label_json = {
+                        "geometry" : geometry,
+                        "label" : scale_label_text,
+                        "label_confidence" : float(label_confidence),
+                        "box_confidence" : float(confidence),
+                        "nm" : length_in_nm
+                    }
+                    scale_labels.append(label_json)
+            # Match scale bars to labels and to subfigures (master images)
+            scale_bar_jsons, unassigned_labels = (
+                self.create_scale_bar_objects(scale_bars, scale_labels))
+            unassigned_scale_labels += unassigned_labels
+            master_image_json["scale_bars"] = scale_bar_jsons
+            if scale_bar_jsons == []:
+                continue
+            try:
+                scale_bar = master_image_json["scale_bars"][0]
+                nm_to_pixel = (scale_bar["label"]["nm"]
+                               / float(scale_bar["length"]))
+                master_image_json["nm_height"] = (master_image_json["height"]
+                                                    * nm_to_pixel)
+                master_image_json["nm_width"] = (master_image_json["width"]
+                                                    * nm_to_pixel)
+            except:
+                continue
+        # Save info to JSON
+        unassigned["scale_bar_labels"] = unassigned_scale_labels
         figure_json["unassigned"] = unassigned
-
+        figure_json["master_images"] = master_images
         return figure_json
-
 
     def make_visualization(self, figure_path, save_path):
         """ Save subfigures and their labels as images
@@ -566,7 +802,6 @@ class FigureSeparator(ExsclaimTool):
 
         del draw
         result_image.save(os.path.join(save_path+"/extractions/"+sample_image_name+".png"))
-
     
     def extract_image_objects(self, figure_path=str) -> "figure_dict":
         """ Separate and classify subfigures in an article figure
