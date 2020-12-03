@@ -55,7 +55,7 @@ class TestNatureFull(unittest.TestCase):
         responses.add(responses.GET, search_url_1, body = article_html)
         responses.add(responses.GET, search_url_2, body = article_html)
         # For images
-        images = self.data / "images"
+        images = self.data / "images" / "pipeline"
         for image in expected:
             url = expected[image]["image_url"]
             image_path = images / image
