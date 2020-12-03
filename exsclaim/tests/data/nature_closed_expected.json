@@ -14,6 +14,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
+            "height": 301.27526981314435,
+            "width": 241.14805148198056,
             "geometry": [
                {
                   "x": 249,
@@ -53,8 +55,34 @@
                   }
                ]
             },
+            "scale_bars": [
+               {
+                  "label": null,
+                  "geometry": [
+                     {
+                        "x": 186,
+                        "y": 289
+                     },
+                     {
+                        "x": 186,
+                        "y": 293
+                     },
+                     {
+                        "x": 213,
+                        "y": 293
+                     },
+                     {
+                        "x": 213,
+                        "y": 289
+                     }
+                  ],
+                  "confidence": 0.986860454082489,
+                  "length": 26,
+                  "label_line_distance": -1
+               }
+            ],
             "caption": [
-               "HR-TEM images of three representative Ag nanoparticles ; scale bar, 20\u2009nm . (c) TEM image of the Ag\u2013Pd hollow nanostructures formed after 4\u2009h of immersion of the Ag nanoparticles in 50 \u2009 \u03bcM PdCl2 aqueous solution . For ease of comparison."
+               "HR-TEM images of three representative Ag nanoparticles ; scale bar, 20 \u2009 nm . (c) TEM image of the Ag\u2013Pd hollow nanostructures formed after 4\u2009h of immersion of the Ag nanoparticles in 50 \u2009 \u03bcM PdCl2 aqueous solution . For ease of comparison."
             ],
             "keywords": [
                "Ag nanoparticle"
@@ -67,6 +95,8 @@
          {
             "classification": "graph",
             "confidence": 0.1626,
+            "height": 136.67695664867912,
+            "width": 165.79922886995166,
             "geometry": [
                {
                   "x": 518,
@@ -106,8 +136,34 @@
                   }
                ]
             },
+            "scale_bars": [
+               {
+                  "label": null,
+                  "geometry": [
+                     {
+                        "x": 2,
+                        "y": 110
+                     },
+                     {
+                        "x": 2,
+                        "y": 112
+                     },
+                     {
+                        "x": 14,
+                        "y": 112
+                     },
+                     {
+                        "x": 14,
+                        "y": 110
+                     }
+                  ],
+                  "confidence": 0.6104662418365479,
+                  "length": 11,
+                  "label_line_distance": -1
+               }
+            ],
             "caption": [
-               "TEM image of the Ag\u2013Pd hollow nanostructures formed after 4\u2009h of immersion of the Ag nanoparticles in 50 \u2009 \u03bcM PdCl2 aqueous solution . For ease of comparison, the image scale is identical to that in a ; scale bar, 50\u2009nm . (d,e) EDS spectra of a Ag nanoparticle and a Ag\u2013Pd hollow-shell nanostructure, respectively."
+               "TEM image of the Ag\u2013Pd hollow nanostructures formed after 4\u2009h of immersion of the Ag nanoparticles in 50 \u2009 \u03bcM PdCl2 aqueous solution . For ease of comparison, the image scale is identical to that in a ; scale bar, 50 \u2009 nm . (d,e) EDS spectra of a Ag nanoparticle and a Ag\u2013Pd hollow-shell nanostructure, respectively."
             ],
             "keywords": [
                "Ag nanoparticle"
@@ -121,6 +177,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
+            "height": 231.18146444104383,
+            "width": 183.91563929044284,
             "geometry": [
                {
                   "x": 23,
@@ -160,8 +218,9 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
-               "TEM image of the initial Ag nanoparticles ; scale bar, 50\u2009nm."
+               "TEM image of the initial Ag nanoparticles ; scale bar, 50 \u2009 nm."
             ],
             "keywords": [
                "Ag nanoparticle"
@@ -174,6 +233,8 @@
          {
             "classification": "graph",
             "confidence": 0.1626,
+            "height": 171.12659572326035,
+            "width": 161.80922535749585,
             "geometry": [
                {
                   "x": 518,
@@ -213,8 +274,9 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
-               "TEM image of the Ag\u2013Pd hollow nanostructures formed after 4\u2009h of immersion of the Ag nanoparticles in 50 \u2009 \u03bcM PdCl2 aqueous solution . For ease of comparison, the image scale is identical to that in a ; scale bar, 50\u2009nm . (d,e) EDS spectra of a Ag nanoparticle and a Ag\u2013Pd hollow-shell nanostructure, respectively."
+               "TEM image of the Ag\u2013Pd hollow nanostructures formed after 4\u2009h of immersion of the Ag nanoparticles in 50 \u2009 \u03bcM PdCl2 aqueous solution . For ease of comparison, the image scale is identical to that in a ; scale bar, 50 \u2009 nm . (d,e) EDS spectra of a Ag nanoparticle and a Ag\u2013Pd hollow-shell nanostructure, respectively."
             ],
             "keywords": [
                "Ag nanoparticle"
@@ -228,6 +290,8 @@
          {
             "classification": "parent",
             "confidence": 0.1625,
+            "height": 63.05531924532863,
+            "width": 214.07516332773062,
             "geometry": [
                {
                   "x": 20,
@@ -267,8 +331,34 @@
                   }
                ]
             },
+            "scale_bars": [
+               {
+                  "label": null,
+                  "geometry": [
+                     {
+                        "x": 153,
+                        "y": 41
+                     },
+                     {
+                        "x": 153,
+                        "y": 45
+                     },
+                     {
+                        "x": 180,
+                        "y": 45
+                     },
+                     {
+                        "x": 180,
+                        "y": 41
+                     }
+                  ],
+                  "confidence": 0.9865854978561401,
+                  "length": 26,
+                  "label_line_distance": -1
+               }
+            ],
             "caption": [
-               "(b) HR-TEM images of three representative Ag nanoparticles ; scale bar"
+               "(b) HR-TEM images of three representative Ag nanoparticles ; scale bar, 20 \u2009 nm"
             ],
             "keywords": [
                "Ag nanoparticle"
@@ -285,62 +375,7 @@
          "inset_images": [],
          "subfigure_labels": [],
          "scale_bar_labels": [],
-         "scale_bar_lines": [
-            [
-               {
-                  "x": 435,
-                  "y": 289
-               },
-               {
-                  "x": 435,
-                  "y": 293
-               },
-               {
-                  "x": 462,
-                  "y": 293
-               },
-               {
-                  "x": 462,
-                  "y": 289
-               }
-            ],
-            [
-               {
-                  "x": 172,
-                  "y": 234
-               },
-               {
-                  "x": 172,
-                  "y": 238
-               },
-               {
-                  "x": 199,
-                  "y": 238
-               },
-               {
-                  "x": 199,
-                  "y": 234
-               }
-            ],
-            [
-               {
-                  "x": 173,
-                  "y": 295
-               },
-               {
-                  "x": 173,
-                  "y": 299
-               },
-               {
-                  "x": 200,
-                  "y": 299
-               },
-               {
-                  "x": 200,
-                  "y": 295
-               }
-            ]
-         ],
+         "scale_bar_lines": [],
          "captions": []
       }
    },
@@ -359,6 +394,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
+            "height": 192.73245292486146,
+            "width": 200.8267597051767,
             "geometry": [
                {
                   "x": 15,
@@ -398,6 +435,32 @@
                   }
                ]
             },
+            "scale_bars": [
+               {
+                  "label": null,
+                  "geometry": [
+                     {
+                        "x": 146,
+                        "y": 176
+                     },
+                     {
+                        "x": 146,
+                        "y": 180
+                     },
+                     {
+                        "x": 172,
+                        "y": 180
+                     },
+                     {
+                        "x": 172,
+                        "y": 176
+                     }
+                  ],
+                  "confidence": 0.9859064817428589,
+                  "length": 26,
+                  "label_line_distance": -1
+               }
+            ],
             "caption": [],
             "keywords": [],
             "general": []
@@ -405,6 +468,8 @@
          {
             "classification": "graph",
             "confidence": 0.1626,
+            "height": 192.19080370525984,
+            "width": 223.78760906366205,
             "geometry": [
                {
                   "x": 461,
@@ -444,6 +509,7 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [],
             "keywords": [],
             "general": []
@@ -451,6 +517,8 @@
          {
             "classification": "graph",
             "confidence": 0.1626,
+            "height": 212.36222023187682,
+            "width": 225.20310025948748,
             "geometry": [
                {
                   "x": 459,
@@ -490,6 +558,7 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [],
             "keywords": [],
             "general": []
@@ -497,6 +566,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
+            "height": 185.8524232021598,
+            "width": 201.29717469215393,
             "geometry": [
                {
                   "x": 16,
@@ -536,6 +607,32 @@
                   }
                ]
             },
+            "scale_bars": [
+               {
+                  "label": null,
+                  "geometry": [
+                     {
+                        "x": 144,
+                        "y": 174
+                     },
+                     {
+                        "x": 144,
+                        "y": 178
+                     },
+                     {
+                        "x": 171,
+                        "y": 178
+                     },
+                     {
+                        "x": 171,
+                        "y": 174
+                     }
+                  ],
+                  "confidence": 0.9841406345367432,
+                  "length": 26,
+                  "label_line_distance": -1
+               }
+            ],
             "caption": [],
             "keywords": [],
             "general": []
@@ -543,6 +640,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
+            "height": 195.27784019292787,
+            "width": 193.79156506978546,
             "geometry": [
                {
                   "x": 238,
@@ -582,6 +681,32 @@
                   }
                ]
             },
+            "scale_bars": [
+               {
+                  "label": null,
+                  "geometry": [
+                     {
+                        "x": 26,
+                        "y": 182
+                     },
+                     {
+                        "x": 26,
+                        "y": 186
+                     },
+                     {
+                        "x": 58,
+                        "y": 186
+                     },
+                     {
+                        "x": 58,
+                        "y": 182
+                     }
+                  ],
+                  "confidence": 0.9824851155281067,
+                  "length": 32,
+                  "label_line_distance": -1
+               }
+            ],
             "caption": [],
             "keywords": [],
             "general": []
@@ -589,6 +714,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
+            "height": 195.69071907220885,
+            "width": 191.23383668752817,
             "geometry": [
                {
                   "x": 246,
@@ -628,6 +755,32 @@
                   }
                ]
             },
+            "scale_bars": [
+               {
+                  "label": null,
+                  "geometry": [
+                     {
+                        "x": 18,
+                        "y": 177
+                     },
+                     {
+                        "x": 18,
+                        "y": 181
+                     },
+                     {
+                        "x": 50,
+                        "y": 181
+                     },
+                     {
+                        "x": 50,
+                        "y": 177
+                     }
+                  ],
+                  "confidence": 0.990023672580719,
+                  "length": 32,
+                  "label_line_distance": -1
+               }
+            ],
             "caption": [],
             "keywords": [],
             "general": []
@@ -639,85 +792,12 @@
          "inset_images": [],
          "subfigure_labels": [],
          "scale_bar_labels": [],
-         "scale_bar_lines": [
-            [
-               {
-                  "x": 160,
-                  "y": 189
-               },
-               {
-                  "x": 160,
-                  "y": 193
-               },
-               {
-                  "x": 188,
-                  "y": 193
-               },
-               {
-                  "x": 188,
-                  "y": 189
-               }
-            ],
-            [
-               {
-                  "x": 263,
-                  "y": 189
-               },
-               {
-                  "x": 263,
-                  "y": 193
-               },
-               {
-                  "x": 297,
-                  "y": 193
-               },
-               {
-                  "x": 297,
-                  "y": 189
-               }
-            ],
-            [
-               {
-                  "x": 264,
-                  "y": 396
-               },
-               {
-                  "x": 264,
-                  "y": 400
-               },
-               {
-                  "x": 296,
-                  "y": 400
-               },
-               {
-                  "x": 296,
-                  "y": 396
-               }
-            ],
-            [
-               {
-                  "x": 160,
-                  "y": 397
-               },
-               {
-                  "x": 160,
-                  "y": 400
-               },
-               {
-                  "x": 188,
-                  "y": 400
-               },
-               {
-                  "x": 188,
-                  "y": 397
-               }
-            ]
-         ],
+         "scale_bar_lines": [],
          "captions": [
             {
                "label": "0",
                "description": [
-                  "HAADF \u2013 STEM images of ( a, b)\u2014the initial Ag nanoparticles and (d, e ) the Ag\u2013Pd hollow nanostructures formed after 4\u2009h of immersion of the Ag nanoparticles in 50 \u2009 \u03bcM PdCl2 aqueous solution . To facilitate comparison, the image scales are identical in a, d, ( scale bar, 100\u2009nm ) and in b, e (scale bar, 20 \u2009 nm ) . Distribution of nanoparticle sizes of (c)\u2014the initial Ag nanoparticles and (f)\u2014the Ag\u2013Pd nanostructures."
+                  "HAADF \u2013STEM images of (a,b)\u2014the initial Ag nanoparticles and ( d, e ) the Ag\u2013Pd hollow nanostructures formed after 4\u2009h of immersion of the Ag nanoparticles in 50 \u2009 \u03bcM PdCl2 aqueous solution . To facilitate comparison, the image scales are identical in a,d, (scale bar, 100\u2009nm ) and in b,e (scale bar, 20 \u2009 nm ) . Distribution of nanoparticle sizes of (c)\u2014the initial Ag nanoparticles and ( f)\u2014the Ag\u2013Pd nanostructures."
                ],
                "keywords": [
                   "Ag nanoparticle"
@@ -746,6 +826,8 @@
          {
             "classification": "graph",
             "confidence": 0.1626,
+            "height": 235.45144846598308,
+            "width": 326.46104115706225,
             "geometry": [
                {
                   "x": 5,
@@ -785,6 +867,7 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
                "the Ag 3d spectra of a silver single crystal standard."
             ],
@@ -794,6 +877,8 @@
          {
             "classification": "graph",
             "confidence": 0.1626,
+            "height": 234.791535542806,
+            "width": 325.81130440418536,
             "geometry": [
                {
                   "x": 359,
@@ -833,8 +918,9 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
-               "(d) Pd Auger electron spectrum of the composite Ag \u2013 Pd nanoshells formed by galvanic replacement"
+               "(d) Pd Auger electron spectrum of the composite Ag\u2013Pd nanoshells formed by galvanic replacement"
             ],
             "keywords": [],
             "general": []
@@ -842,6 +928,8 @@
          {
             "classification": "graph",
             "confidence": 0.1626,
+            "height": 226.6049368286133,
+            "width": 331.3628796430734,
             "geometry": [
                {
                   "x": 0,
@@ -881,6 +969,7 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
                "X-ray photoelectron spectra of Ag 3d core levels of the composite Ag \u2013 Pd nanoshells compared with."
             ],
@@ -890,6 +979,8 @@
          {
             "classification": "graph",
             "confidence": 0.1626,
+            "height": 235.21898142496744,
+            "width": 333.88151251352747,
             "geometry": [
                {
                   "x": 351,
@@ -929,6 +1020,7 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
                "(c) X-ray photoelectron spectrum of Pd 3d core levels of the nanoshells"
             ],
@@ -961,6 +1053,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
+            "height": 145.2394440544976,
+            "width": 211.56475910773642,
             "geometry": [
                {
                   "x": 16,
@@ -1000,8 +1094,58 @@
                   }
                ]
             },
+            "scale_bars": [
+               {
+                  "label": null,
+                  "geometry": [
+                     {
+                        "x": 9,
+                        "y": 136
+                     },
+                     {
+                        "x": 9,
+                        "y": 141
+                     },
+                     {
+                        "x": 32,
+                        "y": 141
+                     },
+                     {
+                        "x": 32,
+                        "y": 136
+                     }
+                  ],
+                  "confidence": 0.9725247025489807,
+                  "length": 23,
+                  "label_line_distance": -1
+               },
+               {
+                  "label": null,
+                  "geometry": [
+                     {
+                        "x": 179,
+                        "y": 136
+                     },
+                     {
+                        "x": 179,
+                        "y": 140
+                     },
+                     {
+                        "x": 194,
+                        "y": 140
+                     },
+                     {
+                        "x": 194,
+                        "y": 136
+                     }
+                  ],
+                  "confidence": 0.9615978002548218,
+                  "length": 14,
+                  "label_line_distance": -1
+               }
+            ],
             "caption": [
-               "Initial TEM image of an ensemble of Ag nanoparticles in the liquid cell (scale bar, 100\u2009nm) and higher magnification images of two of the particles (right of panel, scale bar, 20 \u2009 nm) . a and b: 811 \u2009 e\u2212 \u2009 \u00c5\u22122."
+               "Initial TEM image of an ensemble of Ag nanoparticles in the liquid cell (scale bar, 100\u2009nm) and higher magnification images of two of the particles (right of panel, scale bar, 20\u2009nm)."
             ],
             "keywords": [
                "Ag nanoparticle"
@@ -1014,6 +1158,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
+            "height": 144.48361180623374,
+            "width": 203.67583256501416,
             "geometry": [
                {
                   "x": 257,
@@ -1053,21 +1199,96 @@
                   }
                ]
             },
+            "scale_bars": [
+               {
+                  "label": null,
+                  "geometry": [
+                     {
+                        "x": 9,
+                        "y": 138
+                     },
+                     {
+                        "x": 9,
+                        "y": 142
+                     },
+                     {
+                        "x": 33,
+                        "y": 142
+                     },
+                     {
+                        "x": 33,
+                        "y": 138
+                     }
+                  ],
+                  "confidence": 0.9842368364334106,
+                  "length": 23,
+                  "label_line_distance": -1
+               },
+               {
+                  "label": null,
+                  "geometry": [
+                     {
+                        "x": 177,
+                        "y": 137
+                     },
+                     {
+                        "x": 177,
+                        "y": 141
+                     },
+                     {
+                        "x": 192,
+                        "y": 141
+                     },
+                     {
+                        "x": 192,
+                        "y": 137
+                     }
+                  ],
+                  "confidence": 0.9503254294395447,
+                  "length": 14,
+                  "label_line_distance": -1
+               },
+               {
+                  "label": null,
+                  "geometry": [
+                     {
+                        "x": 195,
+                        "y": 129
+                     },
+                     {
+                        "x": 195,
+                        "y": 131
+                     },
+                     {
+                        "x": 202,
+                        "y": 131
+                     },
+                     {
+                        "x": 202,
+                        "y": 129
+                     }
+                  ],
+                  "confidence": 0.6607740521430969,
+                  "length": 6,
+                  "label_line_distance": -1
+               }
+            ],
             "caption": [
-               "The same group of nanoparticles (scale bar, 100\u2009nm), and the same two individual particles (right of panel, scale bar 20 \u2009 nm) after 52\u2009s . Electron dose rate : 15.6\u2009e\u2212 \u2009 \u00c5\u22122 \u2009 s\u22121 . Total dose per image : 5.2\u2009e\u2212 \u2009 \u00c5\u22122 . Cumulative electron dose between.",
-               "Initial TEM image of an ensemble of Ag nanoparticles in the liquid cell (scale bar, 100\u2009nm) and higher magnification images of two of the particles (right of panel, scale bar, 20 \u2009 nm) . (b) The same group of nanoparticles (scale bar."
+               "The same group of nanoparticles (scale bar, 100\u2009nm), and the same two individual particles (right of panel, scale bar 20 \u2009 nm) after 52 \u2009 s . Electron dose rate : 15.6 \u2009 e\u2212 \u2009 \u00c5\u22122 \u2009 s\u22121 . Total dose per image : 5.2 \u2009 e\u2212 \u2009 \u00c5\u22122 . Cumulative electron dose between.",
+               "Ag nanoparticles in the liquid cell (scale bar, 100\u2009nm) and higher magnification images of two of the particles (right of panel, scale bar, 20\u2009nm) . (b) The same group of nanoparticles (scale bar."
             ],
             "keywords": [
                "Ag nanoparticle"
             ],
             "general": [
-               "TEM",
                "Nanoparticle"
             ]
          },
          {
             "classification": "microscopy",
             "confidence": 0.1626,
+            "height": 140.418714650472,
+            "width": 189.26007866859436,
             "geometry": [
                {
                   "x": 494,
@@ -1107,8 +1328,34 @@
                   }
                ]
             },
+            "scale_bars": [
+               {
+                  "label": null,
+                  "geometry": [
+                     {
+                        "x": 8,
+                        "y": 132
+                     },
+                     {
+                        "x": 8,
+                        "y": 136
+                     },
+                     {
+                        "x": 29,
+                        "y": 136
+                     },
+                     {
+                        "x": 29,
+                        "y": 132
+                     }
+                  ],
+                  "confidence": 0.9810567498207092,
+                  "length": 21,
+                  "label_line_distance": -1
+               }
+            ],
             "caption": [
-               "Ex situ high-resolution Z-contrast image of three Ag \u2013 Pd nanoparticles formed in the process (scale bar."
+               "Cumulative electron dose between (c) Ex situ high-resolution Z-contrast image of three Ag\u2013Pd nanoparticles formed in the process (scale bar."
             ],
             "keywords": [],
             "general": [
@@ -1122,98 +1369,7 @@
          "inset_images": [],
          "subfigure_labels": [],
          "scale_bar_labels": [],
-         "scale_bar_lines": [
-            [
-               {
-                  "x": 434,
-                  "y": 138
-               },
-               {
-                  "x": 434,
-                  "y": 142
-               },
-               {
-                  "x": 449,
-                  "y": 142
-               },
-               {
-                  "x": 449,
-                  "y": 138
-               }
-            ],
-            [
-               {
-                  "x": 195,
-                  "y": 138
-               },
-               {
-                  "x": 195,
-                  "y": 142
-               },
-               {
-                  "x": 210,
-                  "y": 142
-               },
-               {
-                  "x": 210,
-                  "y": 138
-               }
-            ],
-            [
-               {
-                  "x": 25,
-                  "y": 138
-               },
-               {
-                  "x": 25,
-                  "y": 142
-               },
-               {
-                  "x": 49,
-                  "y": 142
-               },
-               {
-                  "x": 49,
-                  "y": 138
-               }
-            ],
-            [
-               {
-                  "x": 267,
-                  "y": 139
-               },
-               {
-                  "x": 267,
-                  "y": 144
-               },
-               {
-                  "x": 291,
-                  "y": 144
-               },
-               {
-                  "x": 291,
-                  "y": 139
-               }
-            ],
-            [
-               {
-                  "x": 502,
-                  "y": 138
-               },
-               {
-                  "x": 502,
-                  "y": 142
-               },
-               {
-                  "x": 523,
-                  "y": 142
-               },
-               {
-                  "x": 523,
-                  "y": 138
-               }
-            ]
-         ],
+         "scale_bar_lines": [],
          "captions": []
       }
    },
@@ -1232,6 +1388,8 @@
          {
             "classification": "graph",
             "confidence": 0.1626,
+            "height": 152.97217409661476,
+            "width": 167.76106476783752,
             "geometry": [
                {
                   "x": 517,
@@ -1271,8 +1429,9 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
-               "EDS spectrum from a Ag \u2013 Pd nanocage."
+               "EDS spectrum from a Ag\u2013Pd nanocage."
             ],
             "keywords": [],
             "general": [
@@ -1282,6 +1441,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
+            "height": 139.93594555144614,
+            "width": 160.32365872309757,
             "geometry": [
                {
                   "x": 8,
@@ -1321,8 +1482,34 @@
                   }
                ]
             },
+            "scale_bars": [
+               {
+                  "label": null,
+                  "geometry": [
+                     {
+                        "x": 20,
+                        "y": 136
+                     },
+                     {
+                        "x": 20,
+                        "y": 139
+                     },
+                     {
+                        "x": 45,
+                        "y": 139
+                     },
+                     {
+                        "x": 45,
+                        "y": 136
+                     }
+                  ],
+                  "confidence": 0.9759583473205566,
+                  "length": 25,
+                  "label_line_distance": -1
+               }
+            ],
             "caption": [
-               "High-resolution HAADF \u2013 STEM images of representative porous Ag \u2013 Pd nanocages ; scale bar, 20\u2009nm . Note the arrays of small nanoparticles in the vicinity of the larger nanocages (outlined by a dashed oval)."
+               "High-resolution HAADF \u2013STEM images of representative porous Ag \u2013 Pd nanocages ; scale bar, 20 \u2009 nm . Note the arrays of small nanoparticles in the vicinity of the larger nanocages (outlined by a dashed oval)."
             ],
             "keywords": [],
             "general": [
@@ -1334,6 +1521,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
+            "height": 150.33851461207612,
+            "width": 143.12320388280426,
             "geometry": [
                {
                   "x": 368,
@@ -1373,8 +1562,34 @@
                   }
                ]
             },
+            "scale_bars": [
+               {
+                  "label": null,
+                  "geometry": [
+                     {
+                        "x": 17,
+                        "y": 134
+                     },
+                     {
+                        "x": 17,
+                        "y": 139
+                     },
+                     {
+                        "x": 42,
+                        "y": 139
+                     },
+                     {
+                        "x": 42,
+                        "y": 134
+                     }
+                  ],
+                  "confidence": 0.9849226474761963,
+                  "length": 25,
+                  "label_line_distance": -1
+               }
+            ],
             "caption": [
-               "High-resolution HAADF \u2013 STEM images of representative porous Ag \u2013 Pd nanocages ; scale bar, 20\u2009nm . Note the arrays of small nanoparticles in the vicinity of the larger nanocages (outlined by a dashed oval)."
+               "High-resolution HAADF \u2013STEM images of representative porous Ag \u2013 Pd nanocages ; scale bar, 20 \u2009 nm . Note the arrays of small nanoparticles in the vicinity of the larger nanocages (outlined by a dashed oval)."
             ],
             "keywords": [],
             "general": [
@@ -1386,6 +1601,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
+            "height": 147.64320495280813,
+            "width": 160.24852046599753,
             "geometry": [
                {
                   "x": 186,
@@ -1425,8 +1642,34 @@
                   }
                ]
             },
+            "scale_bars": [
+               {
+                  "label": null,
+                  "geometry": [
+                     {
+                        "x": 23,
+                        "y": 137
+                     },
+                     {
+                        "x": 23,
+                        "y": 141
+                     },
+                     {
+                        "x": 49,
+                        "y": 141
+                     },
+                     {
+                        "x": 49,
+                        "y": 137
+                     }
+                  ],
+                  "confidence": 0.9833431243896484,
+                  "length": 25,
+                  "label_line_distance": -1
+               }
+            ],
             "caption": [
-               "High-resolution HAADF \u2013 STEM images of representative porous Ag \u2013 Pd nanocages ; scale bar, 20\u2009nm . Note the arrays of small nanoparticles in the vicinity of the larger nanocages (outlined by a dashed oval)."
+               "High-resolution HAADF \u2013STEM images of representative porous Ag \u2013 Pd nanocages ; scale bar, 20 \u2009 nm . Note the arrays of small nanoparticles in the vicinity of the larger nanocages (outlined by a dashed oval)."
             ],
             "keywords": [],
             "general": [
@@ -1442,62 +1685,7 @@
          "inset_images": [],
          "subfigure_labels": [],
          "scale_bar_labels": [],
-         "scale_bar_lines": [
-            [
-               {
-                  "x": 28,
-                  "y": 139
-               },
-               {
-                  "x": 28,
-                  "y": 144
-               },
-               {
-                  "x": 53,
-                  "y": 144
-               },
-               {
-                  "x": 53,
-                  "y": 139
-               }
-            ],
-            [
-               {
-                  "x": 209,
-                  "y": 139
-               },
-               {
-                  "x": 209,
-                  "y": 143
-               },
-               {
-                  "x": 235,
-                  "y": 143
-               },
-               {
-                  "x": 235,
-                  "y": 139
-               }
-            ],
-            [
-               {
-                  "x": 385,
-                  "y": 138
-               },
-               {
-                  "x": 385,
-                  "y": 142
-               },
-               {
-                  "x": 410,
-                  "y": 142
-               },
-               {
-                  "x": 410,
-                  "y": 138
-               }
-            ]
-         ],
+         "scale_bar_lines": [],
          "captions": []
       }
    },
@@ -1516,6 +1704,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
+            "height": 251.8347742650416,
+            "width": 208.5994675526252,
             "geometry": [
                {
                   "x": 10,
@@ -1555,8 +1745,34 @@
                   }
                ]
             },
+            "scale_bars": [
+               {
+                  "label": null,
+                  "geometry": [
+                     {
+                        "x": 21,
+                        "y": 240
+                     },
+                     {
+                        "x": 21,
+                        "y": 246
+                     },
+                     {
+                        "x": 53,
+                        "y": 246
+                     },
+                     {
+                        "x": 53,
+                        "y": 240
+                     }
+                  ],
+                  "confidence": 0.9888880848884583,
+                  "length": 31,
+                  "label_line_distance": -1
+               }
+            ],
             "caption": [
-               "High-resolution BF-STEM and HAADF \u2013 STEM images of a representative hollow cage Ag \u2013 Pd nanoparticle (inset : FFT of the entire nanocage, Fig."
+               "High-resolution BF-STEM and HAADF \u2013 STEM images of a representative hollow cage Ag\u2013Pd nanoparticle (inset : FFT of the entire nanocage, Fig."
             ],
             "keywords": [],
             "general": [
@@ -1567,6 +1783,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
+            "height": 250.49188331504922,
+            "width": 199.85927141629733,
             "geometry": [
                {
                   "x": 255,
@@ -1606,8 +1824,9 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
-               "High-resolution BF-STEM and HAADF \u2013 STEM images of a representative hollow cage Ag \u2013 Pd nanoparticle (inset : FFT of the entire nanocage, Fig."
+               "High-resolution BF-STEM and HAADF \u2013 STEM images of a representative hollow cage Ag\u2013Pd nanoparticle (inset : FFT of the entire nanocage, Fig."
             ],
             "keywords": [],
             "general": [
@@ -1618,6 +1837,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
+            "height": 251.34829434481534,
+            "width": 183.1271461340097,
             "geometry": [
                {
                   "x": 497,
@@ -1657,11 +1878,39 @@
                   }
                ]
             },
+            "scale_bars": [
+               {
+                  "label": null,
+                  "geometry": [
+                     {
+                        "x": 9,
+                        "y": 241
+                     },
+                     {
+                        "x": 9,
+                        "y": 245
+                     },
+                     {
+                        "x": 77,
+                        "y": 245
+                     },
+                     {
+                        "x": 77,
+                        "y": 241
+                     }
+                  ],
+                  "confidence": 0.9163011908531189,
+                  "length": 67,
+                  "label_line_distance": -1
+               }
+            ],
             "caption": [
-               "Higher magnification of the square area marked in a."
+               "h, hole in the nanoparticle surface . Scale bar, 5 \u2009 nm . (c) Higher magnification of the square area marked in a . Scale bar, 5 \u2009 nm."
             ],
             "keywords": [],
-            "general": []
+            "general": [
+               "Nanoparticle"
+            ]
          }
       ],
       "unassigned": {
@@ -1670,44 +1919,7 @@
          "inset_images": [],
          "subfigure_labels": [],
          "scale_bar_labels": [],
-         "scale_bar_lines": [
-            [
-               {
-                  "x": 507,
-                  "y": 242
-               },
-               {
-                  "x": 507,
-                  "y": 247
-               },
-               {
-                  "x": 575,
-                  "y": 247
-               },
-               {
-                  "x": 575,
-                  "y": 242
-               }
-            ],
-            [
-               {
-                  "x": 32,
-                  "y": 242
-               },
-               {
-                  "x": 32,
-                  "y": 247
-               },
-               {
-                  "x": 63,
-                  "y": 247
-               },
-               {
-                  "x": 63,
-                  "y": 242
-               }
-            ]
-         ],
+         "scale_bar_lines": [],
          "captions": []
       }
    },
@@ -1726,6 +1938,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
+            "height": 89.33020175298054,
+            "width": 100.22509451095875,
             "geometry": [
                {
                   "x": 11,
@@ -1765,8 +1979,9 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
-               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution."
+               "Sequence of HAADF\u2013STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution."
             ],
             "keywords": [],
             "general": [
@@ -1777,6 +1992,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
+            "height": 91.10841986338298,
+            "width": 207.62270789880023,
             "geometry": [
                {
                   "x": 477,
@@ -1816,8 +2033,9 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
-               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution."
+               "Sequence of HAADF\u2013STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution."
             ],
             "keywords": [],
             "general": [
@@ -1828,6 +2046,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1524,
+            "height": 88.88346316019694,
+            "width": 208.63241984294012,
             "geometry": [
                {
                   "x": 13,
@@ -1867,8 +2087,9 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
-               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution."
+               "Sequence of HAADF\u2013STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution."
             ],
             "keywords": [],
             "general": [
@@ -1879,6 +2100,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
+            "height": 75.88249015808105,
+            "width": 105.53862305787894,
             "geometry": [
                {
                   "x": 245,
@@ -1918,8 +2141,9 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
-               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution."
+               "Sequence of HAADF\u2013STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution."
             ],
             "keywords": [],
             "general": [
@@ -1930,6 +2154,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
+            "height": 89.62392609914144,
+            "width": 102.09594414784358,
             "geometry": [
                {
                   "x": 114,
@@ -1969,8 +2195,9 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
-               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution."
+               "Sequence of HAADF\u2013STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution."
             ],
             "keywords": [],
             "general": [
@@ -1981,6 +2208,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
+            "height": 83.08802642822266,
+            "width": 88.32257775159985,
             "geometry": [
                {
                   "x": 585,
@@ -2020,8 +2249,9 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
-               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution."
+               "Sequence of HAADF\u2013STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution."
             ],
             "keywords": [],
             "general": [
@@ -2032,6 +2262,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
+            "height": 95.28628193537395,
+            "width": 95.01863264120544,
             "geometry": [
                {
                   "x": 243,
@@ -2071,8 +2303,9 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
-               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution."
+               "Sequence of HAADF\u2013STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution."
             ],
             "keywords": [],
             "general": [
@@ -2083,6 +2316,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
+            "height": 89.48444957733155,
+            "width": 112.07566398840686,
             "geometry": [
                {
                   "x": 343,
@@ -2122,8 +2357,9 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
-               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution."
+               "Sequence of HAADF\u2013STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution."
             ],
             "keywords": [],
             "general": [
@@ -2134,6 +2370,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
+            "height": 82.50977579752605,
+            "width": 106.65593559925378,
             "geometry": [
                {
                   "x": 468,
@@ -2173,8 +2411,9 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
-               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution."
+               "Sequence of HAADF\u2013STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution."
             ],
             "keywords": [],
             "general": [
@@ -2185,6 +2424,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
+            "height": 82.8054801940918,
+            "width": 108.61543481166547,
             "geometry": [
                {
                   "x": 348,
@@ -2224,8 +2465,9 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
-               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution."
+               "Sequence of HAADF\u2013STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution."
             ],
             "keywords": [],
             "general": [
@@ -2240,31 +2482,12 @@
          "inset_images": [],
          "subfigure_labels": [],
          "scale_bar_labels": [],
-         "scale_bar_lines": [
-            [
-               {
-                  "x": 639,
-                  "y": 191
-               },
-               {
-                  "x": 639,
-                  "y": 195
-               },
-               {
-                  "x": 673,
-                  "y": 195
-               },
-               {
-                  "x": 673,
-                  "y": 191
-               }
-            ]
-         ],
+         "scale_bar_lines": [],
          "captions": [
             {
                "label": "f",
                "description": [
-                  "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution."
+                  "Sequence of HAADF\u2013STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution."
                ],
                "keywords": [],
                "general": [
@@ -2275,7 +2498,7 @@
             {
                "label": "h",
                "description": [
-                  "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution."
+                  "Sequence of HAADF\u2013STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution."
                ],
                "keywords": [],
                "general": [
@@ -2301,6 +2524,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
+            "height": 92.89551417032878,
+            "width": 100.8966466096731,
             "geometry": [
                {
                   "x": 469,
@@ -2340,8 +2565,9 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
-               "Time-lapse series of dark-field STEM images following one Ag particle over 50.4 \u2009 s in 50 \u2009 \u03bcM aqueous PdCl2 solution . Electron dose rate : 6.26\u2009e\u2212 \u2009 \u00c5\u22122 \u2009 s\u22121, frame time: 8.4\u2009s . Electron dose per image : 52\u2009e\u2212 \u2009 \u00c5\u22122 . Scale bar."
+               ": Time-lapse series of dark-field STEM images following one Ag particle over 50.4 \u2009 s in 50 \u2009 \u03bcM aqueous PdCl2 solution . Electron dose rate : 6.26 \u2009 e\u2212 \u2009 \u00c5\u22122 \u2009 s\u22121."
             ],
             "keywords": [],
             "general": [
@@ -2351,6 +2577,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1625,
+            "height": 92.78649012247722,
+            "width": 91.93474173545837,
             "geometry": [
                {
                   "x": 16,
@@ -2390,8 +2618,9 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
-               "Time-lapse series of dark-field STEM images following one Ag particle over 50.4 \u2009 s in 50 \u2009 \u03bcM aqueous PdCl2 solution . Electron dose rate : 6.26\u2009e\u2212 \u2009 \u00c5\u22122 \u2009 s\u22121, frame time: 8.4\u2009s . Electron dose per image : 52\u2009e\u2212 \u2009 \u00c5\u22122 . Scale bar."
+               ": Time-lapse series of dark-field STEM images following one Ag particle over 50.4 \u2009 s in 50 \u2009 \u03bcM aqueous PdCl2 solution . Electron dose rate : 6.26 \u2009 e\u2212 \u2009 \u00c5\u22122 \u2009 s\u22121."
             ],
             "keywords": [],
             "general": [
@@ -2401,6 +2630,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
+            "height": 84.788818359375,
+            "width": 100.07258809529822,
             "geometry": [
                {
                   "x": 581,
@@ -2440,8 +2671,9 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
-               "Time-lapse series of dark-field STEM images following one Ag particle over 50.4 \u2009 s in 50 \u2009 \u03bcM aqueous PdCl2 solution . Electron dose rate : 6.26\u2009e\u2212 \u2009 \u00c5\u22122 \u2009 s\u22121, frame time: 8.4\u2009s . Electron dose per image : 52\u2009e\u2212 \u2009 \u00c5\u22122 . Scale bar."
+               ": Time-lapse series of dark-field STEM images following one Ag particle over 50.4 \u2009 s in 50 \u2009 \u03bcM aqueous PdCl2 solution . Electron dose rate : 6.26 \u2009 e\u2212 \u2009 \u00c5\u22122 \u2009 s\u22121."
             ],
             "keywords": [],
             "general": [
@@ -2451,6 +2683,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
+            "height": 94.85582987467448,
+            "width": 96.66202604770659,
             "geometry": [
                {
                   "x": 118,
@@ -2490,8 +2724,9 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
-               "Time-lapse series of dark-field STEM images following one Ag particle over 50.4 \u2009 s in 50 \u2009 \u03bcM aqueous PdCl2 solution . Electron dose rate : 6.26\u2009e\u2212 \u2009 \u00c5\u22122 \u2009 s\u22121, frame time: 8.4\u2009s . Electron dose per image : 52\u2009e\u2212 \u2009 \u00c5\u22122 . Scale bar."
+               ": Time-lapse series of dark-field STEM images following one Ag particle over 50.4 \u2009 s in 50 \u2009 \u03bcM aqueous PdCl2 solution . Electron dose rate : 6.26 \u2009 e\u2212 \u2009 \u00c5\u22122 \u2009 s\u22121."
             ],
             "keywords": [],
             "general": [
@@ -2501,6 +2736,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
+            "height": 97.4200407663981,
+            "width": 98.82013096259192,
             "geometry": [
                {
                   "x": 354,
@@ -2540,8 +2777,9 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
-               "Time-lapse series of dark-field STEM images following one Ag particle over 50.4 \u2009 s in 50 \u2009 \u03bcM aqueous PdCl2 solution . Electron dose rate : 6.26\u2009e\u2212 \u2009 \u00c5\u22122 \u2009 s\u22121, frame time: 8.4\u2009s . Electron dose per image : 52\u2009e\u2212 \u2009 \u00c5\u22122 . Scale bar."
+               ": Time-lapse series of dark-field STEM images following one Ag particle over 50.4 \u2009 s in 50 \u2009 \u03bcM aqueous PdCl2 solution . Electron dose rate : 6.26 \u2009 e\u2212 \u2009 \u00c5\u22122 \u2009 s\u22121."
             ],
             "keywords": [],
             "general": [
@@ -2551,6 +2789,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
+            "height": 95.77053705851237,
+            "width": 99.45531996396869,
             "geometry": [
                {
                   "x": 238,
@@ -2590,8 +2830,9 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
-               "Time-lapse series of dark-field STEM images following one Ag particle over 50.4 \u2009 s in 50 \u2009 \u03bcM aqueous PdCl2 solution . Electron dose rate : 6.26\u2009e\u2212 \u2009 \u00c5\u22122 \u2009 s\u22121, frame time: 8.4\u2009s . Electron dose per image : 52\u2009e\u2212 \u2009 \u00c5\u22122 . Scale bar."
+               ": Time-lapse series of dark-field STEM images following one Ag particle over 50.4 \u2009 s in 50 \u2009 \u03bcM aqueous PdCl2 solution . Electron dose rate : 6.26 \u2009 e\u2212 \u2009 \u00c5\u22122 \u2009 s\u22121."
             ],
             "keywords": [],
             "general": [
@@ -2605,26 +2846,7 @@
          "inset_images": [],
          "subfigure_labels": [],
          "scale_bar_labels": [],
-         "scale_bar_lines": [
-            [
-               {
-                  "x": 22,
-                  "y": 89
-               },
-               {
-                  "x": 22,
-                  "y": 93
-               },
-               {
-                  "x": 49,
-                  "y": 93
-               },
-               {
-                  "x": 49,
-                  "y": 89
-               }
-            ]
-         ],
+         "scale_bar_lines": [],
          "captions": []
       }
    },
@@ -2643,6 +2865,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
+            "height": 105.97865453259698,
+            "width": 111.17913053585933,
             "geometry": [
                {
                   "x": 14,
@@ -2682,6 +2906,7 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
                "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution with added isopropanol."
             ],
@@ -2694,6 +2919,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
+            "height": 111.21401872306035,
+            "width": 107.42901416925284,
             "geometry": [
                {
                   "x": 7,
@@ -2733,6 +2960,7 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
                "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution with added isopropanol."
             ],
@@ -2745,6 +2973,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
+            "height": 102.59745420258622,
+            "width": 120.29771896509021,
             "geometry": [
                {
                   "x": 431,
@@ -2784,6 +3014,7 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
                "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution with added isopropanol."
             ],
@@ -2796,6 +3027,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1625,
+            "height": 98.2102092874461,
+            "width": 111.78977177693292,
             "geometry": [
                {
                   "x": 153,
@@ -2835,6 +3068,7 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
                "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution with added isopropanol."
             ],
@@ -2847,6 +3081,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
+            "height": 108.521484375,
+            "width": 111.89091508205115,
             "geometry": [
                {
                   "x": 432,
@@ -2886,6 +3122,7 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
                "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution with added isopropanol."
             ],
@@ -2898,6 +3135,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
+            "height": 108.33081475619612,
+            "width": 115.59898367294898,
             "geometry": [
                {
                   "x": 292,
@@ -2937,6 +3176,7 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
                "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution with added isopropanol."
             ],
@@ -2949,6 +3189,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
+            "height": 111.16708058324353,
+            "width": 118.27029255720288,
             "geometry": [
                {
                   "x": 564,
@@ -2988,6 +3230,7 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
                "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution with added isopropanol."
             ],
@@ -3000,6 +3243,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
+            "height": 112.65869561557113,
+            "width": 112.02756093098569,
             "geometry": [
                {
                   "x": 149,
@@ -3039,6 +3284,7 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
                "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution with added isopropanol."
             ],
@@ -3051,6 +3297,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
+            "height": 106.7464599609375,
+            "width": 118.57571996175324,
             "geometry": [
                {
                   "x": 288,
@@ -3090,6 +3338,7 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
                "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution with added isopropanol."
             ],
@@ -3102,6 +3351,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
+            "height": 99.96681581694503,
+            "width": 109.44019056283514,
             "geometry": [
                {
                   "x": 575,
@@ -3141,6 +3392,7 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
                "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution with added isopropanol."
             ],
@@ -3157,26 +3409,7 @@
          "inset_images": [],
          "subfigure_labels": [],
          "scale_bar_labels": [],
-         "scale_bar_lines": [
-            [
-               {
-                  "x": 635,
-                  "y": 222
-               },
-               {
-                  "x": 635,
-                  "y": 227
-               },
-               {
-                  "x": 675,
-                  "y": 227
-               },
-               {
-                  "x": 675,
-                  "y": 222
-               }
-            ]
-         ],
+         "scale_bar_lines": [],
          "captions": []
       }
    },
@@ -3195,6 +3428,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
+            "height": 164.56174392700194,
+            "width": 209.99485822824334,
             "geometry": [
                {
                   "x": 13,
@@ -3234,10 +3469,35 @@
                   }
                ]
             },
+            "scale_bars": [
+               {
+                  "label": null,
+                  "geometry": [
+                     {
+                        "x": 159,
+                        "y": 155
+                     },
+                     {
+                        "x": 159,
+                        "y": 159
+                     },
+                     {
+                        "x": 196,
+                        "y": 159
+                     },
+                     {
+                        "x": 196,
+                        "y": 155
+                     }
+                  ],
+                  "confidence": 0.991709291934967,
+                  "length": 36,
+                  "label_line_distance": -1
+               }
+            ],
             "caption": [
-               "High - resolution transmission electron microscopy (HR-TEM) images of the SMNp and high-magnified image the box in f, which shows zigzag atomic arrangements with intragranular cracking.",
-               "the box in f.",
-               "images of high-magnified image (g)."
+               "High - resolution transmission electron microscopy (HR-TEM) images of the SMNp.",
+               "of the box in f, which shows zigzag atomic arrangements with intragranular cracking . Fast Fourier transform (FFT) image of g presents the lattice planes of (\u2013100) and (001) along the [010] zone, indicating the orthorhombic structure of Ag2MnO4."
             ],
             "keywords": [],
             "general": [
@@ -3247,6 +3507,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
+            "height": 96.42179946899415,
+            "width": 209.24484500518207,
             "geometry": [
                {
                   "x": 17,
@@ -3286,19 +3548,46 @@
                   }
                ]
             },
+            "scale_bars": [
+               {
+                  "label": null,
+                  "geometry": [
+                     {
+                        "x": 167,
+                        "y": 85
+                     },
+                     {
+                        "x": 167,
+                        "y": 90
+                     },
+                     {
+                        "x": 190,
+                        "y": 90
+                     },
+                     {
+                        "x": 190,
+                        "y": 85
+                     }
+                  ],
+                  "confidence": 0.9550259709358215,
+                  "length": 23,
+                  "label_line_distance": -1
+               }
+            ],
             "caption": [
-               "the summary of the SMNp . c\u2013e.",
-               "Inverse FFT images of applied masks at the blue circle (c), 500\u2009nm.",
-               "a wide range of dislocations with defects . The dislocations are shown by circles and edge dislocations are represented by a T-shaped symbol . The upper right insets in h and i indicate the applied masks and the lattice spacing of the (101) plane is denoted as the left inset in h . Scale bars, 5\u2009\u03bcm (c), 500\u2009nm."
+               "Scanning electronic microscopy (SEM) images of the BM.",
+               "Inverse FFT images of applied masks at the blue circle (c), 500 \u2009 nm."
             ],
             "keywords": [],
             "general": [
-               "Dislocation"
+               "SEM"
             ]
          },
          {
             "classification": "microscopy",
             "confidence": 0.1626,
+            "height": 90.32446460723878,
+            "width": 219.60021844277017,
             "geometry": [
                {
                   "x": 11,
@@ -3338,19 +3627,48 @@
                   }
                ]
             },
+            "scale_bars": [
+               {
+                  "label": null,
+                  "geometry": [
+                     {
+                        "x": 172,
+                        "y": 75
+                     },
+                     {
+                        "x": 172,
+                        "y": 79
+                     },
+                     {
+                        "x": 197,
+                        "y": 79
+                     },
+                     {
+                        "x": 197,
+                        "y": 75
+                     }
+                  ],
+                  "confidence": 0.9781046509742737,
+                  "length": 24,
+                  "label_line_distance": -1
+               }
+            ],
             "caption": [
-               "the summary of the SMNp . c\u2013e.",
-               "Inverse FFT images of applied masks at the blue circle (d), 200\u2009nm.",
-               "a wide range of dislocations with defects . The dislocations are shown by circles and edge dislocations are represented by a T-shaped symbol . The upper right insets in h and i indicate the applied masks and the lattice spacing of the (101) plane is denoted as the left inset in h . Scale bars, 5\u2009\u03bcm (d), 200\u2009nm."
+               "Scanning electronic microscopy (SEM) images of the BM.",
+               "Inverse FFT images of applied masks at the blue circle (d), 200 \u2009 nm.",
+               "a wide range of dislocations with defects . The dislocations are shown by circles and edge dislocations are represented by a T-shaped symbol . The upper right insets in h and i indicate the applied masks and the lattice spacing of the (101) plane is denoted as the left inset in h . Scale bars, 5 \u2009 \u03bcm (d), 200 \u2009 nm."
             ],
             "keywords": [],
             "general": [
+               "SEM",
                "Dislocation"
             ]
          },
          {
             "classification": "illustration",
             "confidence": 0.1626,
+            "height": 272.429398727417,
+            "width": 205.05636141850397,
             "geometry": [
                {
                   "x": 458,
@@ -3390,9 +3708,10 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
                "Schematic of the synthesis process.",
-               "the summary of the catalytic effects (b)."
+               "Schematic of the catalytic effects (b)."
             ],
             "keywords": [],
             "general": [
@@ -3402,6 +3721,8 @@
          {
             "classification": "illustration",
             "confidence": 0.1626,
+            "height": 244.95845718383785,
+            "width": 400.5028651310848,
             "geometry": [
                {
                   "x": 43,
@@ -3441,17 +3762,22 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
+               "of the bulk manganese oxides (BM), polyhedron manganese oxide (PM), and silver manganate nanoplate (SMNp), and the summary of the catalytic effects.",
                "Schematic of the synthesis process (a)."
             ],
             "keywords": [],
             "general": [
-               "Schematic"
+               "Schematic",
+               "Nanoplate"
             ]
          },
          {
             "classification": "microscopy",
             "confidence": 0.1626,
+            "height": 169.7217578887939,
+            "width": 196.7145450298603,
             "geometry": [
                {
                   "x": 251,
@@ -3491,10 +3817,35 @@
                   }
                ]
             },
+            "scale_bars": [
+               {
+                  "label": null,
+                  "geometry": [
+                     {
+                        "x": 166,
+                        "y": 160
+                     },
+                     {
+                        "x": 166,
+                        "y": 165
+                     },
+                     {
+                        "x": 189,
+                        "y": 165
+                     },
+                     {
+                        "x": 189,
+                        "y": 160
+                     }
+                  ],
+                  "confidence": 0.9910735487937927,
+                  "length": 23,
+                  "label_line_distance": -1
+               }
+            ],
             "caption": [
-               "the box in f, which shows zigzag atomic arrangements with intragranular cracking . Fast Fourier transform (FFT) image of g presents the lattice planes of (\u2013 100) and (001) along the [010] zone, indicating the orthorhombic structure of Ag2MnO4 . h, i.",
                "Inverse FFT images of applied masks at the blue circle (h) and red circle.",
-               "applied masks at the blue circle (h) and red circle (i) in g, showing a wide range of dislocations with defects . The dislocations are shown by circles and edge dislocations are represented by a T-shaped symbol . The upper right insets in h and i indicate the applied masks and the lattice spacing of the (101) plane is denoted as the left inset in h . Scale bars, 5\u2009\u03bcm (c)."
+               "applied masks at the blue circle (h) and red circle (i) in g, showing a wide range of dislocations with defects . The dislocations are shown by circles and edge dislocations are represented by a T-shaped symbol . The upper right insets in h and i indicate the applied masks and the lattice spacing of the (101) plane is denoted as the left inset in h . Scale bars, 5 \u2009 \u03bcm (c), 500 \u2009 nm (d), 200 \u2009 nm (e), 100\u2009nm (f)."
             ],
             "keywords": [],
             "general": [
@@ -3504,6 +3855,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
+            "height": 170.3761333465576,
+            "width": 199.6537938484779,
             "geometry": [
                {
                   "x": 483,
@@ -3543,10 +3896,35 @@
                   }
                ]
             },
+            "scale_bars": [
+               {
+                  "label": null,
+                  "geometry": [
+                     {
+                        "x": 165,
+                        "y": 163
+                     },
+                     {
+                        "x": 165,
+                        "y": 167
+                     },
+                     {
+                        "x": 189,
+                        "y": 167
+                     },
+                     {
+                        "x": 189,
+                        "y": 163
+                     }
+                  ],
+                  "confidence": 0.9881309270858765,
+                  "length": 23,
+                  "label_line_distance": -1
+               }
+            ],
             "caption": [
                "Inverse FFT images of applied masks at the blue circle.",
-               "the box in f, which shows zigzag atomic arrangements with intragranular cracking . Fast Fourier transform (FFT) image of g presents the lattice planes of (\u2013 100) and (001) along the [010] zone, indicating the orthorhombic structure of Ag2MnO4 . h, i.",
-               "Inverse FFT images of applied masks at the blue circle (i) in g, showing a wide range of dislocations with defects . The dislocations are shown by circles and edge dislocations are represented by a T-shaped symbol . The upper right insets in h and i indicate the applied masks and the lattice spacing of the (101) plane is denoted as the left inset in h . Scale bars, 5\u2009\u03bcm."
+               "Inverse FFT images of applied masks at the blue circle (i) in g, showing a wide range of dislocations with defects . The dislocations are shown by circles and edge dislocations are represented by a T-shaped symbol . The upper right insets in h and i indicate the applied masks and the lattice spacing of the (101) plane is denoted as the left inset in h . Scale bars, 5 \u2009 \u03bcm."
             ],
             "keywords": [],
             "general": [
@@ -3556,6 +3934,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
+            "height": 179.12710533142092,
+            "width": 196.28058736140912,
             "geometry": [
                {
                   "x": 484,
@@ -3595,9 +3975,35 @@
                   }
                ]
             },
+            "scale_bars": [
+               {
+                  "label": null,
+                  "geometry": [
+                     {
+                        "x": 163,
+                        "y": 171
+                     },
+                     {
+                        "x": 163,
+                        "y": 176
+                     },
+                     {
+                        "x": 186,
+                        "y": 176
+                     },
+                     {
+                        "x": 186,
+                        "y": 171
+                     }
+                  ],
+                  "confidence": 0.9868260025978088,
+                  "length": 23,
+                  "label_line_distance": -1
+               }
+            ],
             "caption": [
-               "High - resolution transmission electron microscopy (HR-TEM) images of the SMNp and high-magnified image the box in f, which shows zigzag atomic arrangements with intragranular cracking.",
-               "a wide range of dislocations with defects . The dislocations are shown by circles and edge dislocations are represented by a T-shaped symbol . The upper right insets in h and i indicate the applied masks and the lattice spacing of the (101) plane is denoted as the left inset in h . Scale bars, 5\u2009\u03bcm (f), 4 \u2009 nm.",
+               "High - resolution transmission electron microscopy (HR-TEM) images of the SMNp.",
+               "a wide range of dislocations with defects . The dislocations are shown by circles and edge dislocations are represented by a T-shaped symbol . The upper right insets in h and i indicate the applied masks and the lattice spacing of the (101) plane is denoted as the left inset in h . Scale bars, 5 \u2009 \u03bcm (f), 4 \u2009 nm.",
                "plate-like structures with the SMNp (f)."
             ],
             "keywords": [],
@@ -3609,6 +4015,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
+            "height": 180.7687843322754,
+            "width": 205.52121107394876,
             "geometry": [
                {
                   "x": 255,
@@ -3648,12 +4056,39 @@
                   }
                ]
             },
+            "scale_bars": [
+               {
+                  "label": null,
+                  "geometry": [
+                     {
+                        "x": 152,
+                        "y": 165
+                     },
+                     {
+                        "x": 152,
+                        "y": 169
+                     },
+                     {
+                        "x": 192,
+                        "y": 169
+                     },
+                     {
+                        "x": 192,
+                        "y": 165
+                     }
+                  ],
+                  "confidence": 0.9919663667678833,
+                  "length": 39,
+                  "label_line_distance": -1
+               }
+            ],
             "caption": [
-               "the summary of the SMNp . c\u2013e.",
-               "a wide range of dislocations with defects . The dislocations are shown by circles and edge dislocations are represented by a T-shaped symbol . The upper right insets in h and i indicate the applied masks and the lattice spacing of the (101) plane is denoted as the left inset in h . Scale bars, 5\u2009\u03bcm (e), 100\u2009nm."
+               "Scanning electronic microscopy (SEM) images of the BM.",
+               "a wide range of dislocations with defects . The dislocations are shown by circles and edge dislocations are represented by a T-shaped symbol . The upper right insets in h and i indicate the applied masks and the lattice spacing of the (101) plane is denoted as the left inset in h . Scale bars, 5 \u2009 \u03bcm (e), 100\u2009nm."
             ],
             "keywords": [],
             "general": [
+               "SEM",
                "Dislocation"
             ]
          }
@@ -3664,134 +4099,7 @@
          "inset_images": [],
          "subfigure_labels": [],
          "scale_bar_labels": [],
-         "scale_bar_lines": [
-            [
-               {
-                  "x": 171,
-                  "y": 649
-               },
-               {
-                  "x": 171,
-                  "y": 655
-               },
-               {
-                  "x": 210,
-                  "y": 655
-               },
-               {
-                  "x": 210,
-                  "y": 649
-               }
-            ],
-            [
-               {
-                  "x": 647,
-                  "y": 457
-               },
-               {
-                  "x": 647,
-                  "y": 462
-               },
-               {
-                  "x": 670,
-                  "y": 462
-               },
-               {
-                  "x": 670,
-                  "y": 457
-               }
-            ],
-            [
-               {
-                  "x": 406,
-                  "y": 455
-               },
-               {
-                  "x": 406,
-                  "y": 460
-               },
-               {
-                  "x": 447,
-                  "y": 460
-               },
-               {
-                  "x": 447,
-                  "y": 455
-               }
-            ],
-            [
-               {
-                  "x": 183,
-                  "y": 372
-               },
-               {
-                  "x": 183,
-                  "y": 377
-               },
-               {
-                  "x": 206,
-                  "y": 377
-               },
-               {
-                  "x": 206,
-                  "y": 372
-               }
-            ],
-            [
-               {
-                  "x": 185,
-                  "y": 462
-               },
-               {
-                  "x": 185,
-                  "y": 465
-               },
-               {
-                  "x": 208,
-                  "y": 465
-               },
-               {
-                  "x": 208,
-                  "y": 462
-               }
-            ],
-            [
-               {
-                  "x": 416,
-                  "y": 650
-               },
-               {
-                  "x": 416,
-                  "y": 655
-               },
-               {
-                  "x": 443,
-                  "y": 655
-               },
-               {
-                  "x": 443,
-                  "y": 650
-               }
-            ],
-            [
-               {
-                  "x": 647,
-                  "y": 652
-               },
-               {
-                  "x": 647,
-                  "y": 656
-               },
-               {
-                  "x": 673,
-                  "y": 656
-               },
-               {
-                  "x": 673,
-                  "y": 652
-               }
-            ]
-         ],
+         "scale_bar_lines": [],
          "captions": []
       }
    },
@@ -3810,6 +4118,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
+            "height": 186.23293464000415,
+            "width": 296.9396746969972,
             "geometry": [
                {
                   "x": 17,
@@ -3849,15 +4159,47 @@
                   }
                ]
             },
+            "scale_bars": [
+               {
+                  "label": null,
+                  "geometry": [
+                     {
+                        "x": 249,
+                        "y": 173
+                     },
+                     {
+                        "x": 249,
+                        "y": 177
+                     },
+                     {
+                        "x": 282,
+                        "y": 177
+                     },
+                     {
+                        "x": 282,
+                        "y": 173
+                     }
+                  ],
+                  "confidence": 0.9853157997131348,
+                  "length": 33,
+                  "label_line_distance": -1
+               }
+            ],
             "caption": [
-               "f, g"
+               "intensity profiles of the white box in d present the peaks of the silver and manganese atomic columns . f, g.",
+               "and the corresponding electron energy loss spectroscopy (EELS) profiles (g) at the marked sites, showing Ag M4,5-edge, O K - edge, and Mn L2,3-edge."
             ],
             "keywords": [],
-            "general": []
+            "general": [
+               "EELS",
+               "Intensity profile"
+            ]
          },
          {
             "classification": "parent",
             "confidence": 0.1548,
+            "height": 366.04754502956683,
+            "width": 276.0106173610188,
             "geometry": [
                {
                   "x": 408,
@@ -3897,6 +4239,32 @@
                   }
                ]
             },
+            "scale_bars": [
+               {
+                  "label": null,
+                  "geometry": [
+                     {
+                        "x": 216,
+                        "y": 178
+                     },
+                     {
+                        "x": 216,
+                        "y": 184
+                     },
+                     {
+                        "x": 246,
+                        "y": 184
+                     },
+                     {
+                        "x": 246,
+                        "y": 178
+                     }
+                  ],
+                  "confidence": 0.9923386573791504,
+                  "length": 30,
+                  "label_line_distance": -1
+               }
+            ],
             "caption": [
                "continuous arrangements of manganese elements . c, d.",
                "the highest electron density with red color and the lowest with black."
@@ -3909,6 +4277,8 @@
          {
             "classification": "parent",
             "confidence": 0.1625,
+            "height": 270.74074763518115,
+            "width": 377.6560750432039,
             "geometry": [
                {
                   "x": 4,
@@ -3948,10 +4318,86 @@
                   }
                ]
             },
-            "caption": [
-               "Filtered high - angle annular dark - field - scanning transmission electron microscopy (HAADF -STEM) and energy-dispersive X-ray spectroscopy (EDX) mapping image of the silver manganate nanoplate (SMNp) along the [010] zone axis with its fast Fourier transform (FFT) pattern, showing continuous arrangements of silver and manganese atoms."
+            "scale_bars": [
+               {
+                  "label": null,
+                  "geometry": [
+                     {
+                        "x": 352,
+                        "y": 116
+                     },
+                     {
+                        "x": 352,
+                        "y": 121
+                     },
+                     {
+                        "x": 369,
+                        "y": 121
+                     },
+                     {
+                        "x": 369,
+                        "y": 116
+                     }
+                  ],
+                  "confidence": 0.9893621802330017,
+                  "length": 17,
+                  "label_line_distance": -1
+               },
+               {
+                  "label": null,
+                  "geometry": [
+                     {
+                        "x": 351,
+                        "y": 241
+                     },
+                     {
+                        "x": 351,
+                        "y": 245
+                     },
+                     {
+                        "x": 369,
+                        "y": 245
+                     },
+                     {
+                        "x": 369,
+                        "y": 241
+                     }
+                  ],
+                  "confidence": 0.9883805513381958,
+                  "length": 18,
+                  "label_line_distance": -1
+               },
+               {
+                  "label": null,
+                  "geometry": [
+                     {
+                        "x": 203,
+                        "y": 240
+                     },
+                     {
+                        "x": 203,
+                        "y": 246
+                     },
+                     {
+                        "x": 262,
+                        "y": 246
+                     },
+                     {
+                        "x": 262,
+                        "y": 240
+                     }
+                  ],
+                  "confidence": 0.9867159128189087,
+                  "length": 58,
+                  "label_line_distance": -1
+               }
             ],
-            "keywords": [],
+            "caption": [
+               "Filtered high-angle annular dark-field-scanning transmission electron microscopy (HAADF-STEM) and energy-dispersive X-ray spectroscopy (EDX) mapping image of the silver manganate nanoplate (SMNp) along the [010] zone axis with its fast Fourier transform (FFT) pattern, showing continuous arrangements of silver and manganese atoms."
+            ],
+            "keywords": [
+               "HAADF-STEM"
+            ],
             "general": [
                "HAADF-STEM",
                "STEM",
@@ -3962,6 +4408,8 @@
          {
             "classification": "graph",
             "confidence": 0.1626,
+            "height": 246.49596746151263,
+            "width": 368.3423906096613,
             "geometry": [
                {
                   "x": 8,
@@ -4001,8 +4449,9 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
-               "(EDX) mapping image of the silver manganate nanoplate (SMNp) along the [010] zone axis with its fast Fourier transform (FFT) pattern, showing continuous arrangements of silver and manganese atoms . b."
+               "EDX) mapping image of the silver manganate nanoplate (SMNp) along the [010] zone axis with its fast Fourier transform (FFT) pattern, showing continuous arrangements of silver and manganese atoms . b."
             ],
             "keywords": [],
             "general": [
@@ -4013,6 +4462,8 @@
          {
             "classification": "graph",
             "confidence": 0.1626,
+            "height": 185.5664291748634,
+            "width": 328.6954783894005,
             "geometry": [
                {
                   "x": 355,
@@ -4052,15 +4503,20 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
-               "f, g"
+               "intensity profiles of the white box in d present the peaks of the silver and manganese atomic columns . f, g."
             ],
             "keywords": [],
-            "general": []
+            "general": [
+               "Intensity profile"
+            ]
          },
          {
             "classification": "graph",
             "confidence": 0.1626,
+            "height": 114.46254785244287,
+            "width": 255.06834419609993,
             "geometry": [
                {
                   "x": 414,
@@ -4100,6 +4556,7 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
                "Corresponding ABF intensity profiles of the white box in d present the peaks of the silver and manganese atomic columns."
             ],
@@ -4116,116 +4573,7 @@
          "inset_images": [],
          "subfigure_labels": [],
          "scale_bar_labels": [],
-         "scale_bar_lines": [
-            [
-               {
-                  "x": 624,
-                  "y": 178
-               },
-               {
-                  "x": 624,
-                  "y": 184
-               },
-               {
-                  "x": 655,
-                  "y": 184
-               },
-               {
-                  "x": 655,
-                  "y": 178
-               }
-            ],
-            [
-               {
-                  "x": 355,
-                  "y": 116
-               },
-               {
-                  "x": 355,
-                  "y": 121
-               },
-               {
-                  "x": 373,
-                  "y": 121
-               },
-               {
-                  "x": 373,
-                  "y": 116
-               }
-            ],
-            [
-               {
-                  "x": 355,
-                  "y": 240
-               },
-               {
-                  "x": 355,
-                  "y": 245
-               },
-               {
-                  "x": 374,
-                  "y": 245
-               },
-               {
-                  "x": 374,
-                  "y": 240
-               }
-            ],
-            [
-               {
-                  "x": 207,
-                  "y": 240
-               },
-               {
-                  "x": 207,
-                  "y": 245
-               },
-               {
-                  "x": 265,
-                  "y": 245
-               },
-               {
-                  "x": 265,
-                  "y": 240
-               }
-            ],
-            [
-               {
-                  "x": 265,
-                  "y": 724
-               },
-               {
-                  "x": 265,
-                  "y": 729
-               },
-               {
-                  "x": 300,
-                  "y": 729
-               },
-               {
-                  "x": 300,
-                  "y": 724
-               }
-            ],
-            [
-               {
-                  "x": 628,
-                  "y": 389
-               },
-               {
-                  "x": 628,
-                  "y": 394
-               },
-               {
-                  "x": 656,
-                  "y": 394
-               },
-               {
-                  "x": 656,
-                  "y": 389
-               }
-            ]
-         ],
+         "scale_bar_lines": [],
          "captions": [
             {
                "label": "d",
@@ -4257,6 +4605,8 @@
          {
             "classification": "graph",
             "confidence": 0.1626,
+            "height": 239.4367365635179,
+            "width": 339.7030251759749,
             "geometry": [
                {
                   "x": 345,
@@ -4296,8 +4646,9 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
-               "a commercial Pt/C catalyst at a rotating ring \u2013 disk electrode (1600 r.p.m) in O2-saturated 0.1\u2009M KOH solution with a scan rate of 5 \u2009 mV \u2009 s\u20131 . All data have been calibrated by using Ar-saturated 0.1\u2009M KOH solution . d Chronoamperometric response of the SMNp and 20 \u2009 wt% Pt/C in O2-saturated 0.1 \u2009 M KOH electrolytes at 0.85\u2009V (vs . RHE) with 1600 r.p.m showing good stability of SMNp compared with Pt/C."
+               "a commercial Pt/C catalyst at a rotating ring\u2013disk electrode (1600 r.p.m) in O2-saturated 0.1\u2009M KOH solution with a scan rate of 5 \u2009 mV \u2009 s\u20131 . All data have been calibrated by using Ar-saturated 0.1\u2009M KOH solution . d Chronoamperometric response of the SMNp and 20 \u2009 wt% Pt/C in O2-saturated 0.1 \u2009 M KOH electrolytes at 0.85\u2009V (vs . RHE) with 1600 r.p.m showing good stability of SMNp compared with Pt/C."
             ],
             "keywords": [],
             "general": []
@@ -4305,6 +4656,8 @@
          {
             "classification": "graph",
             "confidence": 0.1626,
+            "height": 250.23403587714083,
+            "width": 350.2198937306037,
             "geometry": [
                {
                   "x": 334,
@@ -4344,10 +4697,11 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
                "The corresponding number of transferred electrons.",
-               "a commercial Pt/C catalyst at a rotating ring \u2013 disk electrode (1600 r.p.m) in O2-saturated 0.1\u2009M KOH solution with a scan rate of 5 \u2009 mV \u2009 s\u20131 . All data have been calibrated by using Ar-saturated 0.1\u2009M KOH solution . b, c.",
-               "a commercial Pt/C catalyst at transferred electrons (b)."
+               "a commercial Pt/C catalyst at a rotating ring\u2013disk electrode (1600 r.p.m) in O2-saturated 0.1\u2009M KOH solution with a scan rate of 5 \u2009 mV \u2009 s\u20131 . All data have been calibrated by using Ar-saturated 0.1\u2009M KOH solution . b, c.",
+               "O2-saturated 0.1\u2009M KOH solution with transferred electrons (b)."
             ],
             "keywords": [],
             "general": []
@@ -4355,6 +4709,8 @@
          {
             "classification": "graph",
             "confidence": 0.1626,
+            "height": 247.54017301180465,
+            "width": 324.0327224364648,
             "geometry": [
                {
                   "x": 2,
@@ -4394,10 +4750,11 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
                "The corresponding number of transferred electrons.",
-               "a commercial Pt/C catalyst at a rotating ring \u2013 disk electrode (1600 r.p.m) in O2-saturated 0.1\u2009M KOH solution with a scan rate of 5 \u2009 mV \u2009 s\u20131 . All data have been calibrated by using Ar-saturated 0.1\u2009M KOH solution . b, c.",
-               "a commercial Pt/C catalyst at a rotating ring \u2013 (c) of the Ag."
+               "a commercial Pt/C catalyst at a rotating ring\u2013disk electrode (1600 r.p.m) in O2-saturated 0.1\u2009M KOH solution with a scan rate of 5 \u2009 mV \u2009 s\u20131 . All data have been calibrated by using Ar-saturated 0.1\u2009M KOH solution . b, c.",
+               "obtained at a potential of 0.30\u2009V in a."
             ],
             "keywords": [],
             "general": []
@@ -4405,6 +4762,8 @@
          {
             "classification": "graph",
             "confidence": 0.1626,
+            "height": 243.0676757365174,
+            "width": 320.9994785602276,
             "geometry": [
                {
                   "x": 4,
@@ -4444,8 +4803,10 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
-               "Linear scan voltammogram (LSV) curves for the Ag nanoparticle, bulk manganese oxides (BM), polyhedron manganese oxide (PM), silver manganate nanoplate (SMNp), and a commercial Pt/C catalyst at a rotating ring \u2013 disk electrode (1600 r.p.m) in O2-saturated 0.1\u2009M KOH solution with a scan rate of 5 \u2009 mV \u2009 s\u20131 . All data have been calibrated by using Ar-saturated 0.1\u2009M KOH solution."
+               "Linear scan voltammogram (LSV) curves for the Ag nanoparticle, bulk manganese oxides (BM), polyhedron manganese oxide (PM), silver manganate nanoplate (SMNp), and a commercial Pt/C catalyst at a rotating ring\u2013disk electrode (1600 r.p.m) in O2-saturated 0.1\u2009M KOH solution with a scan rate of 5 \u2009 mV \u2009 s\u20131 . All data have been calibrated by using Ar-saturated 0.1\u2009M KOH solution.",
+               "Electrocatalytic activities for oxygen reduction reaction . a."
             ],
             "keywords": [
                "Ag nanoparticle"
@@ -4481,6 +4842,8 @@
          {
             "classification": "graph",
             "confidence": 0.1626,
+            "height": 204.69104917786962,
+            "width": 216.05792889228232,
             "geometry": [
                {
                   "x": 2,
@@ -4520,6 +4883,7 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
                "b Power density curves of flow cells using the pristine air electrode"
             ],
@@ -4531,6 +4895,8 @@
          {
             "classification": "graph",
             "confidence": 0.1626,
+            "height": 201.57060974450417,
+            "width": 208.26190444139337,
             "geometry": [
                {
                   "x": 475,
@@ -4570,8 +4936,9 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
-               "Electrochemical performance of aluminum \u2013 . d Mechanical charge and discharge tests using the SMNp and Pt/C at 25 \u2009 mA \u2009 cm\u22122, where the aluminum and electrolyte were replaced every cycle."
+               "Mechanical charge and discharge tests using the SMNp and Pt/C at 25 \u2009 mA \u2009 cm\u22122, where the aluminum and electrolyte were replaced every cycle."
             ],
             "keywords": [],
             "general": []
@@ -4579,6 +4946,8 @@
          {
             "classification": "graph",
             "confidence": 0.1626,
+            "height": 204.00212009347595,
+            "width": 216.32584370099585,
             "geometry": [
                {
                   "x": 240,
@@ -4618,17 +4987,47 @@
                   }
                ]
             },
+            "scale_bars": [
+               {
+                  "label": null,
+                  "geometry": [
+                     {
+                        "x": 55,
+                        "y": 28
+                     },
+                     {
+                        "x": 55,
+                        "y": 31
+                     },
+                     {
+                        "x": 77,
+                        "y": 31
+                     },
+                     {
+                        "x": 77,
+                        "y": 28
+                     }
+                  ],
+                  "confidence": 0.8750423192977905,
+                  "length": 22,
+                  "label_line_distance": -1
+               }
+            ],
             "caption": [
-               "Electrochemical performance of aluminum \u2013 . c Discharge curves using the pristine air electrode."
+               "Power density curves of flow cells using the pristine air electrode, silver manganate nanoplate (SMNp), and Pt/C with 6 \u2009 M KOH electrolyte (scan rate of 0.1\u2009mA\u2009s\u22121) . c Discharge curves using the pristine air electrode, SMNp, and Pt/C at 100 \u2009 mA\u2009cm\u22122."
             ],
             "keywords": [],
             "general": [
-               "Discharge curves"
+               "Power density curves",
+               "Discharge curves",
+               "Nanoplate"
             ]
          },
          {
             "classification": "illustration",
             "confidence": 0.1626,
+            "height": 210.06675237202816,
+            "width": 619.2956205514761,
             "geometry": [
                {
                   "x": 41,
@@ -4668,8 +5067,9 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
-               "Schematic of the aluminum \u2013 air flow battery (AAFB) system, which includes a single stack cell, one electrolyte tank, and circulation pump . ORR indicates oxygen reduction reaction."
+               "Schematic of the aluminum\u2013air flow battery (AAFB) system, which includes a single stack cell, one electrolyte tank, and circulation pump . ORR indicates oxygen reduction reaction."
             ],
             "keywords": [],
             "general": [
@@ -4702,6 +5102,8 @@
          {
             "classification": "graph",
             "confidence": 0.1626,
+            "height": 297.51004896706684,
+            "width": 236.8940025109511,
             "geometry": [
                {
                   "x": 445,
@@ -4741,9 +5143,9 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
-               "Comparison of the gravimetric energy density.",
-               "gasoline with theoretical and practical value, AAFBs with Pt/C and SMNp (at 50 \u2009 mA \u2009 cm\u22122), and comparison of the gravimetric energy density (d)."
+               "Precious metal dissolution tests in aluminum\u2013air flow batteries (AAFBs) using the SMNp and Pt/C with 6 \u2009 M KOH electrolyte after 6\u2009h of discharging at 50 \u2009 mA \u2009 cm\u22122"
             ],
             "keywords": [],
             "general": []
@@ -4751,6 +5153,8 @@
          {
             "classification": "graph",
             "confidence": 0.1626,
+            "height": 263.9121660061968,
+            "width": 244.5523258355948,
             "geometry": [
                {
                   "x": 438,
@@ -4790,8 +5194,9 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
-               "Precious metal dissolution tests in aluminum \u2013 air flow batteries (AAFBs) using the SMNp and Pt/C with 6 \u2009 M KOH electrolyte after 6\u2009h of discharging at 50 \u2009 mA \u2009 cm\u22122."
+               "Precious metal dissolution tests in aluminum\u2013air flow batteries (AAFBs) using the SMNp and Pt/C with 6 \u2009 M KOH electrolyte after 6\u2009h of discharging at 50 \u2009 mA \u2009 cm\u22122."
             ],
             "keywords": [],
             "general": []
@@ -4799,6 +5204,8 @@
          {
             "classification": "graph",
             "confidence": 0.1625,
+            "height": 275.528838366997,
+            "width": 417.63587016325727,
             "geometry": [
                {
                   "x": 15,
@@ -4838,6 +5245,7 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
                "Electrical conductivity of the Ag nanoparticle, bulk manganese oxides (BM), polyhedron manganese oxide (PM), silver manganate nanoplate (SMNp), and Pt/C-loaded air electrodes."
             ],
@@ -4851,6 +5259,8 @@
          {
             "classification": "graph",
             "confidence": 0.1625,
+            "height": 313.46486831292873,
+            "width": 437.62827469752386,
             "geometry": [
                {
                   "x": 10,
@@ -4890,9 +5300,9 @@
                   }
                ]
             },
+            "scale_bars": [],
             "caption": [
-               "Comparison of the gravimetric energy density.",
-               "Precious metal dissolution tests in aluminum \u2013 (c) among gasoline with theoretical and practical value."
+               "c, d"
             ],
             "keywords": [],
             "general": []
