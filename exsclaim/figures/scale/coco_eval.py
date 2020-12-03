@@ -14,7 +14,7 @@ import pycocotools.mask as mask_util
 
 from collections import defaultdict
 
-import utils
+import exsclaim.figures.scale.utils
 import pathlib
 
 

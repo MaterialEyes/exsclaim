@@ -3,7 +3,7 @@ from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 from dataset import ScaleBarDataset
 from engine import train_one_epoch, evaluate
 from PIL import Image, ImageDraw
-import utils
+import exsclaim.figures.scale.utils
 import torch
 import torchvision.transforms as T
 import skimage as io
