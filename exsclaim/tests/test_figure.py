@@ -53,8 +53,10 @@ class TestScaleDetection(unittest.TestCase):
         for image_name in os.listdir(test_image_directory):
             with self.subTest(test_name = image_name):
                 image_path = test_image_directory / image_name
+                image = Image.open(image_path).convert("RGB")
+                image = T.ToTensor()(image)
                 predicted_scale_bar_info = (
-                    self.figure_separator.detect_scale_objects(image_path))
+                    self.figure_separator.detect_scale_objects(image))
                 self.assertIsInstance(predicted_scale_bar_info,
                     (list, np.ndarray),
                     ("detect_scale_objects() should return a list or "
