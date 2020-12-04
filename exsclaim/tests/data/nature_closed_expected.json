@@ -1,10 +1,1771 @@
 {
+   "s41467-018-06211-3_fig1.jpg": {
+      "title": "Seed-mediated atomic-scale reconstruction of silver manganate nanoplates for oxygen reduction towards high-energy aluminum-air flow batteries | Nature Communications",
+      "article_url": "https://www.nature.com/articles/s41467-018-06211-3",
+      "article_name": "s41467-018-06211-3",
+      "full_caption": "Formation of the stripe pattern and dislocation. a, b Schematic of the synthesis process (a) of the bulk manganese oxides (BM), polyhedron manganese oxide (PM), and silver manganate nanoplate (SMNp), and the summary of the catalytic effects (b) of the SMNp. c\u2013e Scanning electronic microscopy (SEM) images of the BM (c), PM (d), and SMNp (e) showing plate-like structures with silver nanoparticles. f, g High-resolution transmission electron microscopy (HR-TEM) images of the SMNp (f) and high-magnified image (g) of the box in f, which shows zigzag atomic arrangements with intragranular cracking. Fast Fourier transform (FFT) image of g presents the lattice planes of (\u2013100) and (001) along the [010] zone, indicating the orthorhombic structure of Ag2MnO4. h, i Inverse FFT images of applied masks at the blue circle (h) and red circle (i) in g, showing a wide range of dislocations with defects. The dislocations are shown by circles and edge dislocations are represented by a T-shaped symbol. The upper right insets in h and i indicate the applied masks and the lattice spacing of the (101) plane is denoted as the left inset in h. Scale bars, 5\u2009\u03bcm (c), 500\u2009nm (d), 200\u2009nm (e), 100\u2009nm (f), 4\u2009nm (g), and 1\u2009nm (h, i)",
+      "caption_delimiter": "",
+      "figure_name": "s41467-018-06211-3_fig1.jpg",
+      "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fs41467-018-06211-3/MediaObjects/41467_2018_6211_Fig1_HTML.png",
+      "license": "http://creativecommons.org/licenses/by/4.0/",
+      "open": true,
+      "figure_path": "extracted/nature-test/figures/s41467-018-06211-3_fig1.jpg",
+      "master_images": [
+         {
+            "classification": "microscopy",
+            "confidence": 0.1626,
+            "height": 164.56174392700194,
+            "width": 209.99485822824334,
+            "geometry": [
+               {
+                  "x": 13,
+                  "y": 495
+               },
+               {
+                  "x": 13,
+                  "y": 660
+               },
+               {
+                  "x": 223,
+                  "y": 495
+               },
+               {
+                  "x": 223,
+                  "y": 660
+               }
+            ],
+            "subfigure_label": {
+               "text": "g",
+               "geometry": [
+                  {
+                     "x": 0,
+                     "y": 484
+                  },
+                  {
+                     "x": 0,
+                     "y": 509
+                  },
+                  {
+                     "x": 11,
+                     "y": 484
+                  },
+                  {
+                     "x": 11,
+                     "y": 509
+                  }
+               ]
+            },
+            "scale_bars": [
+               {
+                  "label": null,
+                  "geometry": [
+                     {
+                        "x": 159,
+                        "y": 155
+                     },
+                     {
+                        "x": 159,
+                        "y": 159
+                     },
+                     {
+                        "x": 196,
+                        "y": 159
+                     },
+                     {
+                        "x": 196,
+                        "y": 155
+                     }
+                  ],
+                  "confidence": 0.991709291934967,
+                  "length": 36,
+                  "label_line_distance": -1
+               }
+            ],
+            "caption": [],
+            "keywords": [],
+            "general": []
+         },
+         {
+            "classification": "microscopy",
+            "confidence": 0.1626,
+            "height": 96.42179946899415,
+            "width": 209.24484500518207,
+            "geometry": [
+               {
+                  "x": 17,
+                  "y": 287
+               },
+               {
+                  "x": 17,
+                  "y": 384
+               },
+               {
+                  "x": 226,
+                  "y": 287
+               },
+               {
+                  "x": 226,
+                  "y": 384
+               }
+            ],
+            "subfigure_label": {
+               "text": "c",
+               "geometry": [
+                  {
+                     "x": 0,
+                     "y": 290
+                  },
+                  {
+                     "x": 0,
+                     "y": 303
+                  },
+                  {
+                     "x": 10,
+                     "y": 290
+                  },
+                  {
+                     "x": 10,
+                     "y": 303
+                  }
+               ]
+            },
+            "scale_bars": [
+               {
+                  "label": null,
+                  "geometry": [
+                     {
+                        "x": 167,
+                        "y": 85
+                     },
+                     {
+                        "x": 167,
+                        "y": 90
+                     },
+                     {
+                        "x": 190,
+                        "y": 90
+                     },
+                     {
+                        "x": 190,
+                        "y": 85
+                     }
+                  ],
+                  "confidence": 0.9550259709358215,
+                  "length": 23,
+                  "label_line_distance": -1
+               }
+            ],
+            "caption": [],
+            "keywords": [],
+            "general": []
+         },
+         {
+            "classification": "microscopy",
+            "confidence": 0.1626,
+            "height": 90.32446460723878,
+            "width": 219.60021844277017,
+            "geometry": [
+               {
+                  "x": 11,
+                  "y": 387
+               },
+               {
+                  "x": 11,
+                  "y": 477
+               },
+               {
+                  "x": 231,
+                  "y": 387
+               },
+               {
+                  "x": 231,
+                  "y": 477
+               }
+            ],
+            "subfigure_label": {
+               "text": "d",
+               "geometry": [
+                  {
+                     "x": 0,
+                     "y": 385
+                  },
+                  {
+                     "x": 0,
+                     "y": 398
+                  },
+                  {
+                     "x": 10,
+                     "y": 385
+                  },
+                  {
+                     "x": 10,
+                     "y": 398
+                  }
+               ]
+            },
+            "scale_bars": [
+               {
+                  "label": null,
+                  "geometry": [
+                     {
+                        "x": 172,
+                        "y": 75
+                     },
+                     {
+                        "x": 172,
+                        "y": 79
+                     },
+                     {
+                        "x": 197,
+                        "y": 79
+                     },
+                     {
+                        "x": 197,
+                        "y": 75
+                     }
+                  ],
+                  "confidence": 0.9781046509742737,
+                  "length": 24,
+                  "label_line_distance": -1
+               }
+            ],
+            "caption": [],
+            "keywords": [],
+            "general": []
+         },
+         {
+            "classification": "illustration",
+            "confidence": 0.1626,
+            "height": 272.429398727417,
+            "width": 205.05636141850397,
+            "geometry": [
+               {
+                  "x": 458,
+                  "y": 0
+               },
+               {
+                  "x": 458,
+                  "y": 272
+               },
+               {
+                  "x": 663,
+                  "y": 0
+               },
+               {
+                  "x": 663,
+                  "y": 272
+               }
+            ],
+            "subfigure_label": {
+               "text": "b",
+               "geometry": [
+                  {
+                     "x": 443,
+                     "y": 0
+                  },
+                  {
+                     "x": 443,
+                     "y": 12
+                  },
+                  {
+                     "x": 457,
+                     "y": 0
+                  },
+                  {
+                     "x": 457,
+                     "y": 12
+                  }
+               ]
+            },
+            "scale_bars": [],
+            "caption": [],
+            "keywords": [],
+            "general": []
+         },
+         {
+            "classification": "illustration",
+            "confidence": 0.1626,
+            "height": 244.95845718383785,
+            "width": 400.5028651310848,
+            "geometry": [
+               {
+                  "x": 43,
+                  "y": 15
+               },
+               {
+                  "x": 43,
+                  "y": 260
+               },
+               {
+                  "x": 444,
+                  "y": 15
+               },
+               {
+                  "x": 444,
+                  "y": 260
+               }
+            ],
+            "subfigure_label": {
+               "text": "a",
+               "geometry": [
+                  {
+                     "x": 1,
+                     "y": 1
+                  },
+                  {
+                     "x": 1,
+                     "y": 14
+                  },
+                  {
+                     "x": 11,
+                     "y": 1
+                  },
+                  {
+                     "x": 11,
+                     "y": 14
+                  }
+               ]
+            },
+            "scale_bars": [],
+            "caption": [],
+            "keywords": [],
+            "general": []
+         },
+         {
+            "classification": "microscopy",
+            "confidence": 0.1626,
+            "height": 169.7217578887939,
+            "width": 196.7145450298603,
+            "geometry": [
+               {
+                  "x": 251,
+                  "y": 490
+               },
+               {
+                  "x": 251,
+                  "y": 660
+               },
+               {
+                  "x": 447,
+                  "y": 490
+               },
+               {
+                  "x": 447,
+                  "y": 660
+               }
+            ],
+            "subfigure_label": {
+               "text": "h",
+               "geometry": [
+                  {
+                     "x": 235,
+                     "y": 488
+                  },
+                  {
+                     "x": 235,
+                     "y": 505
+                  },
+                  {
+                     "x": 247,
+                     "y": 488
+                  },
+                  {
+                     "x": 247,
+                     "y": 505
+                  }
+               ]
+            },
+            "scale_bars": [
+               {
+                  "label": null,
+                  "geometry": [
+                     {
+                        "x": 166,
+                        "y": 160
+                     },
+                     {
+                        "x": 166,
+                        "y": 165
+                     },
+                     {
+                        "x": 189,
+                        "y": 165
+                     },
+                     {
+                        "x": 189,
+                        "y": 160
+                     }
+                  ],
+                  "confidence": 0.9910735487937927,
+                  "length": 23,
+                  "label_line_distance": -1
+               }
+            ],
+            "caption": [],
+            "keywords": [],
+            "general": []
+         },
+         {
+            "classification": "microscopy",
+            "confidence": 0.1626,
+            "height": 170.3761333465576,
+            "width": 199.6537938484779,
+            "geometry": [
+               {
+                  "x": 483,
+                  "y": 489
+               },
+               {
+                  "x": 483,
+                  "y": 660
+               },
+               {
+                  "x": 682,
+                  "y": 489
+               },
+               {
+                  "x": 682,
+                  "y": 660
+               }
+            ],
+            "subfigure_label": {
+               "text": "i",
+               "geometry": [
+                  {
+                     "x": 472,
+                     "y": 485
+                  },
+                  {
+                     "x": 472,
+                     "y": 503
+                  },
+                  {
+                     "x": 482,
+                     "y": 485
+                  },
+                  {
+                     "x": 482,
+                     "y": 503
+                  }
+               ]
+            },
+            "scale_bars": [
+               {
+                  "label": null,
+                  "geometry": [
+                     {
+                        "x": 165,
+                        "y": 163
+                     },
+                     {
+                        "x": 165,
+                        "y": 167
+                     },
+                     {
+                        "x": 189,
+                        "y": 167
+                     },
+                     {
+                        "x": 189,
+                        "y": 163
+                     }
+                  ],
+                  "confidence": 0.9881309270858765,
+                  "length": 23,
+                  "label_line_distance": -1
+               }
+            ],
+            "caption": [],
+            "keywords": [],
+            "general": []
+         },
+         {
+            "classification": "microscopy",
+            "confidence": 0.1626,
+            "height": 179.12710533142092,
+            "width": 196.28058736140912,
+            "geometry": [
+               {
+                  "x": 484,
+                  "y": 286
+               },
+               {
+                  "x": 484,
+                  "y": 466
+               },
+               {
+                  "x": 680,
+                  "y": 286
+               },
+               {
+                  "x": 680,
+                  "y": 466
+               }
+            ],
+            "subfigure_label": {
+               "text": "f",
+               "geometry": [
+                  {
+                     "x": 472,
+                     "y": 287
+                  },
+                  {
+                     "x": 472,
+                     "y": 303
+                  },
+                  {
+                     "x": 480,
+                     "y": 287
+                  },
+                  {
+                     "x": 480,
+                     "y": 303
+                  }
+               ]
+            },
+            "scale_bars": [
+               {
+                  "label": null,
+                  "geometry": [
+                     {
+                        "x": 163,
+                        "y": 171
+                     },
+                     {
+                        "x": 163,
+                        "y": 176
+                     },
+                     {
+                        "x": 186,
+                        "y": 176
+                     },
+                     {
+                        "x": 186,
+                        "y": 171
+                     }
+                  ],
+                  "confidence": 0.9868260025978088,
+                  "length": 23,
+                  "label_line_distance": -1
+               }
+            ],
+            "caption": [],
+            "keywords": [],
+            "general": []
+         },
+         {
+            "classification": "microscopy",
+            "confidence": 0.1626,
+            "height": 180.7687843322754,
+            "width": 205.52121107394876,
+            "geometry": [
+               {
+                  "x": 255,
+                  "y": 291
+               },
+               {
+                  "x": 255,
+                  "y": 472
+               },
+               {
+                  "x": 461,
+                  "y": 291
+               },
+               {
+                  "x": 461,
+                  "y": 472
+               }
+            ],
+            "subfigure_label": {
+               "text": "e",
+               "geometry": [
+                  {
+                     "x": 236,
+                     "y": 290
+                  },
+                  {
+                     "x": 236,
+                     "y": 301
+                  },
+                  {
+                     "x": 247,
+                     "y": 290
+                  },
+                  {
+                     "x": 247,
+                     "y": 301
+                  }
+               ]
+            },
+            "scale_bars": [
+               {
+                  "label": null,
+                  "geometry": [
+                     {
+                        "x": 152,
+                        "y": 165
+                     },
+                     {
+                        "x": 152,
+                        "y": 169
+                     },
+                     {
+                        "x": 192,
+                        "y": 169
+                     },
+                     {
+                        "x": 192,
+                        "y": 165
+                     }
+                  ],
+                  "confidence": 0.9919663667678833,
+                  "length": 39,
+                  "label_line_distance": -1
+               }
+            ],
+            "caption": [],
+            "keywords": [],
+            "general": []
+         }
+      ],
+      "unassigned": {
+         "master_images": [],
+         "dependent_images": [],
+         "inset_images": [],
+         "subfigure_labels": [],
+         "scale_bar_labels": [],
+         "scale_bar_lines": [],
+         "captions": []
+      }
+   },
+   "s41467-018-06211-3_fig2.jpg": {
+      "title": "Seed-mediated atomic-scale reconstruction of silver manganate nanoplates for oxygen reduction towards high-energy aluminum-air flow batteries | Nature Communications",
+      "article_url": "https://www.nature.com/articles/s41467-018-06211-3",
+      "article_name": "s41467-018-06211-3",
+      "full_caption": "Atomically resolved electron microscopy and electron energy loss spectra. a Filtered high-angle annular dark-field-scanning transmission electron microscopy (HAADF-STEM) and energy-dispersive X-ray spectroscopy (EDX) mapping image of the silver manganate nanoplate (SMNp) along the [010] zone axis with its fast Fourier transform (FFT) pattern, showing continuous arrangements of silver and manganese atoms. b Line-scanning profile showing distinct distributions of silver and manganese elements. c, d Simulated HAADF-STEM image (c), indicating the highest electron density with red color and the lowest with black, and annular bright-field (ABF)\u2013STEM image (d) showing the Ag2MnO4 orthorhombic structure with silver (blue), manganese (red), and oxygen (purple) elements. e Corresponding ABF intensity profiles of the white box in d present the peaks of the silver and manganese atomic columns. f, g A HAADF-STEM image (f) and the corresponding electron energy loss spectroscopy (EELS) profiles (g) at the marked sites, showing Ag M4,5-edge, O K-edge, and Mn L2,3-edge. Scale bars, 1\u2009nm (a), 0.2\u2009nm (c, d), and 50\u2009nm (f)",
+      "caption_delimiter": "",
+      "figure_name": "s41467-018-06211-3_fig2.jpg",
+      "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fs41467-018-06211-3/MediaObjects/41467_2018_6211_Fig2_HTML.png",
+      "license": "http://creativecommons.org/licenses/by/4.0/",
+      "open": true,
+      "figure_path": "extracted/nature-test/figures/s41467-018-06211-3_fig2.jpg",
+      "master_images": [
+         {
+            "classification": "microscopy",
+            "confidence": 0.1626,
+            "height": 186.23293464000415,
+            "width": 296.9396746969972,
+            "geometry": [
+               {
+                  "x": 17,
+                  "y": 552
+               },
+               {
+                  "x": 17,
+                  "y": 738
+               },
+               {
+                  "x": 314,
+                  "y": 552
+               },
+               {
+                  "x": 314,
+                  "y": 738
+               }
+            ],
+            "subfigure_label": {
+               "text": "f",
+               "geometry": [
+                  {
+                     "x": 0,
+                     "y": 549
+                  },
+                  {
+                     "x": 0,
+                     "y": 567
+                  },
+                  {
+                     "x": 8,
+                     "y": 549
+                  },
+                  {
+                     "x": 8,
+                     "y": 567
+                  }
+               ]
+            },
+            "scale_bars": [
+               {
+                  "label": null,
+                  "geometry": [
+                     {
+                        "x": 249,
+                        "y": 173
+                     },
+                     {
+                        "x": 249,
+                        "y": 177
+                     },
+                     {
+                        "x": 282,
+                        "y": 177
+                     },
+                     {
+                        "x": 282,
+                        "y": 173
+                     }
+                  ],
+                  "confidence": 0.9853157997131348,
+                  "length": 33,
+                  "label_line_distance": -1
+               }
+            ],
+            "caption": [],
+            "keywords": [],
+            "general": []
+         },
+         {
+            "classification": "parent",
+            "confidence": 0.1548,
+            "height": 366.04754502956683,
+            "width": 276.0106173610188,
+            "geometry": [
+               {
+                  "x": 408,
+                  "y": 0
+               },
+               {
+                  "x": 408,
+                  "y": 366
+               },
+               {
+                  "x": 685,
+                  "y": 0
+               },
+               {
+                  "x": 685,
+                  "y": 366
+               }
+            ],
+            "subfigure_label": {
+               "text": "c",
+               "geometry": [
+                  {
+                     "x": 407,
+                     "y": 1
+                  },
+                  {
+                     "x": 407,
+                     "y": 13
+                  },
+                  {
+                     "x": 418,
+                     "y": 1
+                  },
+                  {
+                     "x": 418,
+                     "y": 13
+                  }
+               ]
+            },
+            "scale_bars": [
+               {
+                  "label": null,
+                  "geometry": [
+                     {
+                        "x": 216,
+                        "y": 178
+                     },
+                     {
+                        "x": 216,
+                        "y": 184
+                     },
+                     {
+                        "x": 246,
+                        "y": 184
+                     },
+                     {
+                        "x": 246,
+                        "y": 178
+                     }
+                  ],
+                  "confidence": 0.9923386573791504,
+                  "length": 30,
+                  "label_line_distance": -1
+               }
+            ],
+            "caption": [],
+            "keywords": [],
+            "general": []
+         },
+         {
+            "classification": "parent",
+            "confidence": 0.1625,
+            "height": 270.74074763518115,
+            "width": 377.6560750432039,
+            "geometry": [
+               {
+                  "x": 4,
+                  "y": 0
+               },
+               {
+                  "x": 4,
+                  "y": 270
+               },
+               {
+                  "x": 382,
+                  "y": 0
+               },
+               {
+                  "x": 382,
+                  "y": 270
+               }
+            ],
+            "subfigure_label": {
+               "text": "a",
+               "geometry": [
+                  {
+                     "x": 1,
+                     "y": 0
+                  },
+                  {
+                     "x": 1,
+                     "y": 13
+                  },
+                  {
+                     "x": 10,
+                     "y": 0
+                  },
+                  {
+                     "x": 10,
+                     "y": 13
+                  }
+               ]
+            },
+            "scale_bars": [
+               {
+                  "label": null,
+                  "geometry": [
+                     {
+                        "x": 352,
+                        "y": 116
+                     },
+                     {
+                        "x": 352,
+                        "y": 121
+                     },
+                     {
+                        "x": 369,
+                        "y": 121
+                     },
+                     {
+                        "x": 369,
+                        "y": 116
+                     }
+                  ],
+                  "confidence": 0.9893621802330017,
+                  "length": 17,
+                  "label_line_distance": -1
+               },
+               {
+                  "label": null,
+                  "geometry": [
+                     {
+                        "x": 351,
+                        "y": 241
+                     },
+                     {
+                        "x": 351,
+                        "y": 245
+                     },
+                     {
+                        "x": 369,
+                        "y": 245
+                     },
+                     {
+                        "x": 369,
+                        "y": 241
+                     }
+                  ],
+                  "confidence": 0.9883805513381958,
+                  "length": 18,
+                  "label_line_distance": -1
+               },
+               {
+                  "label": null,
+                  "geometry": [
+                     {
+                        "x": 203,
+                        "y": 240
+                     },
+                     {
+                        "x": 203,
+                        "y": 246
+                     },
+                     {
+                        "x": 262,
+                        "y": 246
+                     },
+                     {
+                        "x": 262,
+                        "y": 240
+                     }
+                  ],
+                  "confidence": 0.9867159128189087,
+                  "length": 58,
+                  "label_line_distance": -1
+               }
+            ],
+            "caption": [],
+            "keywords": [],
+            "general": []
+         },
+         {
+            "classification": "graph",
+            "confidence": 0.1626,
+            "height": 246.49596746151263,
+            "width": 368.3423906096613,
+            "geometry": [
+               {
+                  "x": 8,
+                  "y": 286
+               },
+               {
+                  "x": 8,
+                  "y": 532
+               },
+               {
+                  "x": 377,
+                  "y": 286
+               },
+               {
+                  "x": 377,
+                  "y": 532
+               }
+            ],
+            "subfigure_label": {
+               "text": "b",
+               "geometry": [
+                  {
+                     "x": 0,
+                     "y": 285
+                  },
+                  {
+                     "x": 0,
+                     "y": 304
+                  },
+                  {
+                     "x": 12,
+                     "y": 285
+                  },
+                  {
+                     "x": 12,
+                     "y": 304
+                  }
+               ]
+            },
+            "scale_bars": [],
+            "caption": [],
+            "keywords": [],
+            "general": []
+         },
+         {
+            "classification": "graph",
+            "confidence": 0.1626,
+            "height": 185.5664291748634,
+            "width": 328.6954783894005,
+            "geometry": [
+               {
+                  "x": 355,
+                  "y": 559
+               },
+               {
+                  "x": 355,
+                  "y": 745
+               },
+               {
+                  "x": 684,
+                  "y": 559
+               },
+               {
+                  "x": 684,
+                  "y": 745
+               }
+            ],
+            "subfigure_label": {
+               "text": "g",
+               "geometry": [
+                  {
+                     "x": 360,
+                     "y": 551
+                  },
+                  {
+                     "x": 360,
+                     "y": 568
+                  },
+                  {
+                     "x": 375,
+                     "y": 551
+                  },
+                  {
+                     "x": 375,
+                     "y": 568
+                  }
+               ]
+            },
+            "scale_bars": [],
+            "caption": [],
+            "keywords": [],
+            "general": []
+         },
+         {
+            "classification": "graph",
+            "confidence": 0.1626,
+            "height": 114.46254785244287,
+            "width": 255.06834419609993,
+            "geometry": [
+               {
+                  "x": 414,
+                  "y": 421
+               },
+               {
+                  "x": 414,
+                  "y": 536
+               },
+               {
+                  "x": 669,
+                  "y": 421
+               },
+               {
+                  "x": 669,
+                  "y": 536
+               }
+            ],
+            "subfigure_label": {
+               "text": "e",
+               "geometry": [
+                  {
+                     "x": 403,
+                     "y": 413
+                  },
+                  {
+                     "x": 403,
+                     "y": 432
+                  },
+                  {
+                     "x": 426,
+                     "y": 413
+                  },
+                  {
+                     "x": 426,
+                     "y": 432
+                  }
+               ]
+            },
+            "scale_bars": [],
+            "caption": [],
+            "keywords": [],
+            "general": []
+         }
+      ],
+      "unassigned": {
+         "master_images": [],
+         "dependent_images": [],
+         "inset_images": [],
+         "subfigure_labels": [],
+         "scale_bar_labels": [],
+         "scale_bar_lines": [],
+         "captions": []
+      }
+   },
+   "s41467-018-06211-3_fig3.jpg": {
+      "title": "Seed-mediated atomic-scale reconstruction of silver manganate nanoplates for oxygen reduction towards high-energy aluminum-air flow batteries | Nature Communications",
+      "article_url": "https://www.nature.com/articles/s41467-018-06211-3",
+      "article_name": "s41467-018-06211-3",
+      "full_caption": "Electrocatalytic activities for oxygen reduction reaction. a Linear scan voltammogram (LSV) curves for the Ag nanoparticle, bulk manganese oxides (BM), polyhedron manganese oxide (PM), silver manganate nanoplate (SMNp), and a commercial Pt/C catalyst at a rotating ring\u2013disk electrode (1600 r.p.m) in O2-saturated 0.1\u2009M KOH solution with a scan rate of 5\u2009mV\u2009s\u20131. All data have been calibrated by using Ar-saturated 0.1\u2009M KOH solution. b, c The corresponding number of transferred electrons (b) and Tafel plots (c) of the Ag, BM, PM, SMNp, and Pt/C. Id represents the limiting current density obtained at a potential of 0.30\u2009V in a. d Chronoamperometric response of the SMNp and 20\u2009wt% Pt/C in O2-saturated 0.1\u2009M KOH electrolytes at 0.85\u2009V (vs. RHE) with 1600 r.p.m showing good stability of SMNp compared with Pt/C",
+      "caption_delimiter": "",
+      "figure_name": "s41467-018-06211-3_fig3.jpg",
+      "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fs41467-018-06211-3/MediaObjects/41467_2018_6211_Fig3_HTML.png",
+      "license": "http://creativecommons.org/licenses/by/4.0/",
+      "open": true,
+      "figure_path": "extracted/nature-test/figures/s41467-018-06211-3_fig3.jpg",
+      "master_images": [
+         {
+            "classification": "graph",
+            "confidence": 0.1626,
+            "height": 239.4367365635179,
+            "width": 339.7030251759749,
+            "geometry": [
+               {
+                  "x": 345,
+                  "y": 261
+               },
+               {
+                  "x": 345,
+                  "y": 501
+               },
+               {
+                  "x": 685,
+                  "y": 261
+               },
+               {
+                  "x": 685,
+                  "y": 501
+               }
+            ],
+            "subfigure_label": {
+               "text": "d",
+               "geometry": [
+                  {
+                     "x": 336,
+                     "y": 258
+                  },
+                  {
+                     "x": 336,
+                     "y": 280
+                  },
+                  {
+                     "x": 353,
+                     "y": 258
+                  },
+                  {
+                     "x": 353,
+                     "y": 280
+                  }
+               ]
+            },
+            "scale_bars": [],
+            "caption": [],
+            "keywords": [],
+            "general": []
+         },
+         {
+            "classification": "graph",
+            "confidence": 0.1626,
+            "height": 250.23403587714083,
+            "width": 350.2198937306037,
+            "geometry": [
+               {
+                  "x": 334,
+                  "y": 0
+               },
+               {
+                  "x": 334,
+                  "y": 250
+               },
+               {
+                  "x": 685,
+                  "y": 0
+               },
+               {
+                  "x": 685,
+                  "y": 250
+               }
+            ],
+            "subfigure_label": {
+               "text": "b",
+               "geometry": [
+                  {
+                     "x": 334,
+                     "y": 0
+                  },
+                  {
+                     "x": 334,
+                     "y": 15
+                  },
+                  {
+                     "x": 355,
+                     "y": 0
+                  },
+                  {
+                     "x": 355,
+                     "y": 15
+                  }
+               ]
+            },
+            "scale_bars": [],
+            "caption": [],
+            "keywords": [],
+            "general": []
+         },
+         {
+            "classification": "graph",
+            "confidence": 0.1626,
+            "height": 247.54017301180465,
+            "width": 324.0327224364648,
+            "geometry": [
+               {
+                  "x": 2,
+                  "y": 257
+               },
+               {
+                  "x": 2,
+                  "y": 504
+               },
+               {
+                  "x": 326,
+                  "y": 257
+               },
+               {
+                  "x": 326,
+                  "y": 504
+               }
+            ],
+            "subfigure_label": {
+               "text": "c",
+               "geometry": [
+                  {
+                     "x": 0,
+                     "y": 263
+                  },
+                  {
+                     "x": 0,
+                     "y": 279
+                  },
+                  {
+                     "x": 13,
+                     "y": 263
+                  },
+                  {
+                     "x": 13,
+                     "y": 279
+                  }
+               ]
+            },
+            "scale_bars": [],
+            "caption": [],
+            "keywords": [],
+            "general": []
+         },
+         {
+            "classification": "graph",
+            "confidence": 0.1626,
+            "height": 243.0676757365174,
+            "width": 320.9994785602276,
+            "geometry": [
+               {
+                  "x": 4,
+                  "y": 0
+               },
+               {
+                  "x": 4,
+                  "y": 243
+               },
+               {
+                  "x": 325,
+                  "y": 0
+               },
+               {
+                  "x": 325,
+                  "y": 243
+               }
+            ],
+            "subfigure_label": {
+               "text": "a",
+               "geometry": [
+                  {
+                     "x": 0,
+                     "y": 2
+                  },
+                  {
+                     "x": 0,
+                     "y": 17
+                  },
+                  {
+                     "x": 13,
+                     "y": 2
+                  },
+                  {
+                     "x": 13,
+                     "y": 17
+                  }
+               ]
+            },
+            "scale_bars": [],
+            "caption": [],
+            "keywords": [],
+            "general": []
+         }
+      ],
+      "unassigned": {
+         "master_images": [],
+         "dependent_images": [],
+         "inset_images": [],
+         "subfigure_labels": [],
+         "scale_bar_labels": [],
+         "scale_bar_lines": [],
+         "captions": []
+      }
+   },
+   "s41467-018-06211-3_fig4.jpg": {
+      "title": "Seed-mediated atomic-scale reconstruction of silver manganate nanoplates for oxygen reduction towards high-energy aluminum-air flow batteries | Nature Communications",
+      "article_url": "https://www.nature.com/articles/s41467-018-06211-3",
+      "article_name": "s41467-018-06211-3",
+      "full_caption": "Electrochemical performance of aluminum\u2013air flow batteries. a Schematic of the aluminum\u2013air flow battery (AAFB) system, which includes a single stack cell, one electrolyte tank, and circulation pump. ORR indicates oxygen reduction reaction. b Power density curves of flow cells using the pristine air electrode, silver manganate nanoplate (SMNp), and Pt/C with 6\u2009M KOH electrolyte (scan rate of 0.1\u2009mA\u2009s\u22121). c Discharge curves using the pristine air electrode, SMNp, and Pt/C at 100\u2009mA\u2009cm\u22122. d Mechanical charge and discharge tests using the SMNp and Pt/C at 25\u2009mA\u2009cm\u22122, where the aluminum and electrolyte were replaced every cycle",
+      "caption_delimiter": "",
+      "figure_name": "s41467-018-06211-3_fig4.jpg",
+      "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fs41467-018-06211-3/MediaObjects/41467_2018_6211_Fig4_HTML.png",
+      "license": "http://creativecommons.org/licenses/by/4.0/",
+      "open": true,
+      "figure_path": "extracted/nature-test/figures/s41467-018-06211-3_fig4.jpg",
+      "master_images": [
+         {
+            "classification": "graph",
+            "confidence": 0.1626,
+            "height": 204.69104917786962,
+            "width": 216.05792889228232,
+            "geometry": [
+               {
+                  "x": 2,
+                  "y": 253
+               },
+               {
+                  "x": 2,
+                  "y": 458
+               },
+               {
+                  "x": 218,
+                  "y": 253
+               },
+               {
+                  "x": 218,
+                  "y": 458
+               }
+            ],
+            "subfigure_label": {
+               "text": "b",
+               "geometry": [
+                  {
+                     "x": 0,
+                     "y": 254
+                  },
+                  {
+                     "x": 0,
+                     "y": 270
+                  },
+                  {
+                     "x": 13,
+                     "y": 254
+                  },
+                  {
+                     "x": 13,
+                     "y": 270
+                  }
+               ]
+            },
+            "scale_bars": [],
+            "caption": [],
+            "keywords": [],
+            "general": []
+         },
+         {
+            "classification": "graph",
+            "confidence": 0.1626,
+            "height": 201.57060974450417,
+            "width": 208.26190444139337,
+            "geometry": [
+               {
+                  "x": 475,
+                  "y": 256
+               },
+               {
+                  "x": 475,
+                  "y": 458
+               },
+               {
+                  "x": 684,
+                  "y": 256
+               },
+               {
+                  "x": 684,
+                  "y": 458
+               }
+            ],
+            "subfigure_label": {
+               "text": "d",
+               "geometry": [
+                  {
+                     "x": 468,
+                     "y": 251
+                  },
+                  {
+                     "x": 468,
+                     "y": 274
+                  },
+                  {
+                     "x": 483,
+                     "y": 251
+                  },
+                  {
+                     "x": 483,
+                     "y": 274
+                  }
+               ]
+            },
+            "scale_bars": [],
+            "caption": [],
+            "keywords": [],
+            "general": []
+         },
+         {
+            "classification": "graph",
+            "confidence": 0.1626,
+            "height": 204.00212009347595,
+            "width": 216.32584370099585,
+            "geometry": [
+               {
+                  "x": 240,
+                  "y": 253
+               },
+               {
+                  "x": 240,
+                  "y": 457
+               },
+               {
+                  "x": 457,
+                  "y": 253
+               },
+               {
+                  "x": 457,
+                  "y": 457
+               }
+            ],
+            "subfigure_label": {
+               "text": "c",
+               "geometry": [
+                  {
+                     "x": 238,
+                     "y": 257
+                  },
+                  {
+                     "x": 238,
+                     "y": 274
+                  },
+                  {
+                     "x": 252,
+                     "y": 257
+                  },
+                  {
+                     "x": 252,
+                     "y": 274
+                  }
+               ]
+            },
+            "scale_bars": [
+               {
+                  "label": null,
+                  "geometry": [
+                     {
+                        "x": 55,
+                        "y": 28
+                     },
+                     {
+                        "x": 55,
+                        "y": 31
+                     },
+                     {
+                        "x": 77,
+                        "y": 31
+                     },
+                     {
+                        "x": 77,
+                        "y": 28
+                     }
+                  ],
+                  "confidence": 0.8750423192977905,
+                  "length": 22,
+                  "label_line_distance": -1
+               }
+            ],
+            "caption": [],
+            "keywords": [],
+            "general": []
+         },
+         {
+            "classification": "illustration",
+            "confidence": 0.1626,
+            "height": 210.06675237202816,
+            "width": 619.2956205514761,
+            "geometry": [
+               {
+                  "x": 41,
+                  "y": 9
+               },
+               {
+                  "x": 41,
+                  "y": 219
+               },
+               {
+                  "x": 660,
+                  "y": 9
+               },
+               {
+                  "x": 660,
+                  "y": 219
+               }
+            ],
+            "subfigure_label": {
+               "text": "a",
+               "geometry": [
+                  {
+                     "x": 45,
+                     "y": 0
+                  },
+                  {
+                     "x": 45,
+                     "y": 10
+                  },
+                  {
+                     "x": 56,
+                     "y": 0
+                  },
+                  {
+                     "x": 56,
+                     "y": 10
+                  }
+               ]
+            },
+            "scale_bars": [],
+            "caption": [],
+            "keywords": [],
+            "general": []
+         }
+      ],
+      "unassigned": {
+         "master_images": [],
+         "dependent_images": [],
+         "inset_images": [],
+         "subfigure_labels": [],
+         "scale_bar_labels": [],
+         "scale_bar_lines": [],
+         "captions": []
+      }
+   },
+   "s41467-018-06211-3_fig5.jpg": {
+      "title": "Seed-mediated atomic-scale reconstruction of silver manganate nanoplates for oxygen reduction towards high-energy aluminum-air flow batteries | Nature Communications",
+      "article_url": "https://www.nature.com/articles/s41467-018-06211-3",
+      "article_name": "s41467-018-06211-3",
+      "full_caption": "Comparison of electrode properties and battery performance. a Electrical conductivity of the Ag nanoparticle, bulk manganese oxides (BM), polyhedron manganese oxide (PM), silver manganate nanoplate (SMNp), and Pt/C-loaded air electrodes. b Precious metal dissolution tests in aluminum\u2013air flow batteries (AAFBs) using the SMNp and Pt/C with 6\u2009M KOH electrolyte after 6\u2009h of discharging at 50\u2009mA\u2009cm\u22122. c, d Comparison of the gravimetric energy density (c) among gasoline with theoretical and practical value, AAFBs with Pt/C and SMNp (at 50\u2009mA\u2009cm\u22122), and comparison of the gravimetric energy density (d) between zinc\u2013air flow batteries (ZAFBs) and AAFBs with the SMNp at 100\u2009mA\u2009cm\u22122",
+      "caption_delimiter": "",
+      "figure_name": "s41467-018-06211-3_fig5.jpg",
+      "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fs41467-018-06211-3/MediaObjects/41467_2018_6211_Fig5_HTML.png",
+      "license": "http://creativecommons.org/licenses/by/4.0/",
+      "open": true,
+      "figure_path": "extracted/nature-test/figures/s41467-018-06211-3_fig5.jpg",
+      "master_images": [
+         {
+            "classification": "graph",
+            "confidence": 0.1626,
+            "height": 297.51004896706684,
+            "width": 236.8940025109511,
+            "geometry": [
+               {
+                  "x": 445,
+                  "y": 283
+               },
+               {
+                  "x": 445,
+                  "y": 581
+               },
+               {
+                  "x": 682,
+                  "y": 283
+               },
+               {
+                  "x": 682,
+                  "y": 581
+               }
+            ],
+            "subfigure_label": {
+               "text": "d",
+               "geometry": [
+                  {
+                     "x": 441,
+                     "y": 288
+                  },
+                  {
+                     "x": 441,
+                     "y": 307
+                  },
+                  {
+                     "x": 462,
+                     "y": 288
+                  },
+                  {
+                     "x": 462,
+                     "y": 307
+                  }
+               ]
+            },
+            "scale_bars": [],
+            "caption": [],
+            "keywords": [],
+            "general": []
+         },
+         {
+            "classification": "graph",
+            "confidence": 0.1626,
+            "height": 263.9121660061968,
+            "width": 244.5523258355948,
+            "geometry": [
+               {
+                  "x": 438,
+                  "y": 0
+               },
+               {
+                  "x": 438,
+                  "y": 263
+               },
+               {
+                  "x": 682,
+                  "y": 0
+               },
+               {
+                  "x": 682,
+                  "y": 263
+               }
+            ],
+            "subfigure_label": {
+               "text": "b",
+               "geometry": [
+                  {
+                     "x": 441,
+                     "y": 0
+                  },
+                  {
+                     "x": 441,
+                     "y": 17
+                  },
+                  {
+                     "x": 462,
+                     "y": 0
+                  },
+                  {
+                     "x": 462,
+                     "y": 17
+                  }
+               ]
+            },
+            "scale_bars": [],
+            "caption": [],
+            "keywords": [],
+            "general": []
+         },
+         {
+            "classification": "graph",
+            "confidence": 0.1625,
+            "height": 275.528838366997,
+            "width": 417.63587016325727,
+            "geometry": [
+               {
+                  "x": 15,
+                  "y": 2
+               },
+               {
+                  "x": 15,
+                  "y": 277
+               },
+               {
+                  "x": 433,
+                  "y": 2
+               },
+               {
+                  "x": 433,
+                  "y": 277
+               }
+            ],
+            "subfigure_label": {
+               "text": "a",
+               "geometry": [
+                  {
+                     "x": 0,
+                     "y": 3
+                  },
+                  {
+                     "x": 0,
+                     "y": 17
+                  },
+                  {
+                     "x": 13,
+                     "y": 3
+                  },
+                  {
+                     "x": 13,
+                     "y": 17
+                  }
+               ]
+            },
+            "scale_bars": [],
+            "caption": [],
+            "keywords": [],
+            "general": []
+         },
+         {
+            "classification": "graph",
+            "confidence": 0.1625,
+            "height": 313.46486831292873,
+            "width": 437.62827469752386,
+            "geometry": [
+               {
+                  "x": 10,
+                  "y": 295
+               },
+               {
+                  "x": 10,
+                  "y": 609
+               },
+               {
+                  "x": 448,
+                  "y": 295
+               },
+               {
+                  "x": 448,
+                  "y": 609
+               }
+            ],
+            "subfigure_label": {
+               "text": "c",
+               "geometry": [
+                  {
+                     "x": 0,
+                     "y": 287
+                  },
+                  {
+                     "x": 0,
+                     "y": 310
+                  },
+                  {
+                     "x": 12,
+                     "y": 287
+                  },
+                  {
+                     "x": 12,
+                     "y": 310
+                  }
+               ]
+            },
+            "scale_bars": [],
+            "caption": [],
+            "keywords": [],
+            "general": []
+         }
+      ],
+      "unassigned": {
+         "master_images": [],
+         "dependent_images": [],
+         "inset_images": [],
+         "subfigure_labels": [],
+         "scale_bar_labels": [],
+         "scale_bar_lines": [],
+         "captions": []
+      }
+   },
    "ncomms5946_fig1.jpg": {
       "title": "In situ liquid-cell electron microscopy of silver\u2013palladium galvanic replacement reactions on silver nanoparticles | Nature Communications",
       "article_url": "https://www.nature.com/articles/ncomms5946",
       "article_name": "ncomms5946",
       "full_caption": "(a) TEM image of the initial Ag nanoparticles; scale bar, 50\u2009nm. (b) HR-TEM images of three representative Ag nanoparticles; scale bar, 20\u2009nm. (c) TEM image of the Ag\u2013Pd hollow nanostructures formed after 4\u2009h of immersion of the Ag nanoparticles in 50\u2009\u03bcM PdCl2 aqueous solution. For ease of comparison, the image scale is identical to that in a; scale bar, 50\u2009nm. (d,e) EDS spectra of a Ag nanoparticle and a Ag\u2013Pd hollow-shell nanostructure, respectively.",
-      "caption_delimiter": "alpha",
+      "caption_delimiter": "",
       "figure_name": "ncomms5946_fig1.jpg",
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fncomms5946/MediaObjects/41467_2014_Article_BFncomms5946_Fig1_HTML.jpg",
       "license": null,
@@ -81,16 +1842,9 @@
                   "label_line_distance": -1
                }
             ],
-            "caption": [
-               "HR-TEM images of three representative Ag nanoparticles ; scale bar, 20 \u2009 nm . (c) TEM image of the Ag\u2013Pd hollow nanostructures formed after 4\u2009h of immersion of the Ag nanoparticles in 50 \u2009 \u03bcM PdCl2 aqueous solution . For ease of comparison."
-            ],
-            "keywords": [
-               "Ag nanoparticle"
-            ],
-            "general": [
-               "TEM",
-               "Nanoparticle"
-            ]
+            "caption": [],
+            "keywords": [],
+            "general": []
          },
          {
             "classification": "graph",
@@ -162,17 +1916,9 @@
                   "label_line_distance": -1
                }
             ],
-            "caption": [
-               "TEM image of the Ag\u2013Pd hollow nanostructures formed after 4\u2009h of immersion of the Ag nanoparticles in 50 \u2009 \u03bcM PdCl2 aqueous solution . For ease of comparison, the image scale is identical to that in a ; scale bar, 50 \u2009 nm . (d,e) EDS spectra of a Ag nanoparticle and a Ag\u2013Pd hollow-shell nanostructure, respectively."
-            ],
-            "keywords": [
-               "Ag nanoparticle"
-            ],
-            "general": [
-               "TEM",
-               "EDX",
-               "Nanoparticle"
-            ]
+            "caption": [],
+            "keywords": [],
+            "general": []
          },
          {
             "classification": "microscopy",
@@ -219,16 +1965,9 @@
                ]
             },
             "scale_bars": [],
-            "caption": [
-               "TEM image of the initial Ag nanoparticles ; scale bar, 50 \u2009 nm."
-            ],
-            "keywords": [
-               "Ag nanoparticle"
-            ],
-            "general": [
-               "TEM",
-               "Nanoparticle"
-            ]
+            "caption": [],
+            "keywords": [],
+            "general": []
          },
          {
             "classification": "graph",
@@ -275,17 +2014,9 @@
                ]
             },
             "scale_bars": [],
-            "caption": [
-               "TEM image of the Ag\u2013Pd hollow nanostructures formed after 4\u2009h of immersion of the Ag nanoparticles in 50 \u2009 \u03bcM PdCl2 aqueous solution . For ease of comparison, the image scale is identical to that in a ; scale bar, 50 \u2009 nm . (d,e) EDS spectra of a Ag nanoparticle and a Ag\u2013Pd hollow-shell nanostructure, respectively."
-            ],
-            "keywords": [
-               "Ag nanoparticle"
-            ],
-            "general": [
-               "TEM",
-               "EDX",
-               "Nanoparticle"
-            ]
+            "caption": [],
+            "keywords": [],
+            "general": []
          },
          {
             "classification": "parent",
@@ -357,16 +2088,9 @@
                   "label_line_distance": -1
                }
             ],
-            "caption": [
-               "(b) HR-TEM images of three representative Ag nanoparticles ; scale bar, 20 \u2009 nm"
-            ],
-            "keywords": [
-               "Ag nanoparticle"
-            ],
-            "general": [
-               "TEM",
-               "Nanoparticle"
-            ]
+            "caption": [],
+            "keywords": [],
+            "general": []
          }
       ],
       "unassigned": {
@@ -384,7 +2108,7 @@
       "article_url": "https://www.nature.com/articles/ncomms5946",
       "article_name": "ncomms5946",
       "full_caption": "HAADF\u2013STEM images of (a,b)\u2014the initial Ag nanoparticles and (d,e) the Ag\u2013Pd hollow nanostructures formed after 4\u2009h of immersion of the Ag nanoparticles in 50\u2009\u03bcM PdCl2 aqueous solution. To facilitate comparison, the image scales are identical in a,d, (scale bar, 100\u2009nm) and in b,e (scale bar, 20\u2009nm). Distribution of nanoparticle sizes of (c)\u2014the initial Ag nanoparticles and (f)\u2014the Ag\u2013Pd nanostructures.",
-      "caption_delimiter": "alpha",
+      "caption_delimiter": "",
       "figure_name": "ncomms5946_fig2.jpg",
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fncomms5946/MediaObjects/41467_2014_Article_BFncomms5946_Fig2_HTML.jpg",
       "license": null,
@@ -793,22 +2517,7 @@
          "subfigure_labels": [],
          "scale_bar_labels": [],
          "scale_bar_lines": [],
-         "captions": [
-            {
-               "label": "0",
-               "description": [
-                  "HAADF \u2013STEM images of (a,b)\u2014the initial Ag nanoparticles and ( d, e ) the Ag\u2013Pd hollow nanostructures formed after 4\u2009h of immersion of the Ag nanoparticles in 50 \u2009 \u03bcM PdCl2 aqueous solution . To facilitate comparison, the image scales are identical in a,d, (scale bar, 100\u2009nm ) and in b,e (scale bar, 20 \u2009 nm ) . Distribution of nanoparticle sizes of (c)\u2014the initial Ag nanoparticles and ( f)\u2014the Ag\u2013Pd nanostructures."
-               ],
-               "keywords": [
-                  "Ag nanoparticle"
-               ],
-               "general": [
-                  "HAADF-STEM",
-                  "STEM",
-                  "Nanoparticle"
-               ]
-            }
-         ]
+         "captions": []
       }
    },
    "ncomms5946_fig3.jpg": {
@@ -816,7 +2525,7 @@
       "article_url": "https://www.nature.com/articles/ncomms5946",
       "article_name": "ncomms5946",
       "full_caption": "(a) X-ray photoelectron spectra of Ag 3d core levels of the composite Ag\u2013Pd nanoshells compared with (b) the Ag 3d spectra of a silver single crystal standard. (c) X-ray photoelectron spectrum of Pd 3d core levels of the nanoshells. (d) Pd Auger electron spectrum of the composite Ag\u2013Pd nanoshells formed by galvanic replacement.",
-      "caption_delimiter": "alpha",
+      "caption_delimiter": "",
       "figure_name": "ncomms5946_fig3.jpg",
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fncomms5946/MediaObjects/41467_2014_Article_BFncomms5946_Fig3_HTML.jpg",
       "license": null,
@@ -868,9 +2577,7 @@
                ]
             },
             "scale_bars": [],
-            "caption": [
-               "the Ag 3d spectra of a silver single crystal standard."
-            ],
+            "caption": [],
             "keywords": [],
             "general": []
          },
@@ -919,9 +2626,7 @@
                ]
             },
             "scale_bars": [],
-            "caption": [
-               "(d) Pd Auger electron spectrum of the composite Ag\u2013Pd nanoshells formed by galvanic replacement"
-            ],
+            "caption": [],
             "keywords": [],
             "general": []
          },
@@ -970,9 +2675,7 @@
                ]
             },
             "scale_bars": [],
-            "caption": [
-               "X-ray photoelectron spectra of Ag 3d core levels of the composite Ag \u2013 Pd nanoshells compared with."
-            ],
+            "caption": [],
             "keywords": [],
             "general": []
          },
@@ -1021,9 +2724,7 @@
                ]
             },
             "scale_bars": [],
-            "caption": [
-               "(c) X-ray photoelectron spectrum of Pd 3d core levels of the nanoshells"
-            ],
+            "caption": [],
             "keywords": [],
             "general": []
          }
@@ -1043,7 +2744,7 @@
       "article_url": "https://www.nature.com/articles/ncomms5946",
       "article_name": "ncomms5946",
       "full_caption": "(a) Initial TEM image of an ensemble of Ag nanoparticles in the liquid cell (scale bar, 100\u2009nm) and higher magnification images of two of the particles (right of panel, scale bar, 20\u2009nm). (b) The same group of nanoparticles (scale bar, 100\u2009nm), and the same two individual particles (right of panel, scale bar 20\u2009nm) after 52\u2009s. Electron dose rate: 15.6\u2009e\u2212\u2009\u00c5\u22122\u2009s\u22121. Total dose per image: 5.2\u2009e\u2212\u2009\u00c5\u22122. Cumulative electron dose between a and b: 811\u2009e\u2212\u2009\u00c5\u22122. (c) Ex situ high-resolution Z-contrast image of three Ag\u2013Pd nanoparticles formed in the process (scale bar. 20\u2009nm).",
-      "caption_delimiter": "alpha",
+      "caption_delimiter": "",
       "figure_name": "ncomms5946_fig4.jpg",
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fncomms5946/MediaObjects/41467_2014_Article_BFncomms5946_Fig4_HTML.jpg",
       "license": null,
@@ -1144,16 +2845,9 @@
                   "label_line_distance": -1
                }
             ],
-            "caption": [
-               "Initial TEM image of an ensemble of Ag nanoparticles in the liquid cell (scale bar, 100\u2009nm) and higher magnification images of two of the particles (right of panel, scale bar, 20\u2009nm)."
-            ],
-            "keywords": [
-               "Ag nanoparticle"
-            ],
-            "general": [
-               "TEM",
-               "Nanoparticle"
-            ]
+            "caption": [],
+            "keywords": [],
+            "general": []
          },
          {
             "classification": "microscopy",
@@ -1273,16 +2967,9 @@
                   "label_line_distance": -1
                }
             ],
-            "caption": [
-               "The same group of nanoparticles (scale bar, 100\u2009nm), and the same two individual particles (right of panel, scale bar 20 \u2009 nm) after 52 \u2009 s . Electron dose rate : 15.6 \u2009 e\u2212 \u2009 \u00c5\u22122 \u2009 s\u22121 . Total dose per image : 5.2 \u2009 e\u2212 \u2009 \u00c5\u22122 . Cumulative electron dose between.",
-               "Ag nanoparticles in the liquid cell (scale bar, 100\u2009nm) and higher magnification images of two of the particles (right of panel, scale bar, 20\u2009nm) . (b) The same group of nanoparticles (scale bar."
-            ],
-            "keywords": [
-               "Ag nanoparticle"
-            ],
-            "general": [
-               "Nanoparticle"
-            ]
+            "caption": [],
+            "keywords": [],
+            "general": []
          },
          {
             "classification": "microscopy",
@@ -1354,13 +3041,9 @@
                   "label_line_distance": -1
                }
             ],
-            "caption": [
-               "Cumulative electron dose between (c) Ex situ high-resolution Z-contrast image of three Ag\u2013Pd nanoparticles formed in the process (scale bar."
-            ],
+            "caption": [],
             "keywords": [],
-            "general": [
-               "Nanoparticle"
-            ]
+            "general": []
          }
       ],
       "unassigned": {
@@ -1378,7 +3061,7 @@
       "article_url": "https://www.nature.com/articles/ncomms5946",
       "article_name": "ncomms5946",
       "full_caption": "(a\u2013c) High-resolution HAADF\u2013STEM images of representative porous Ag\u2013Pd nanocages; scale bar, 20\u2009nm. Note the arrays of small nanoparticles in the vicinity of the larger nanocages (outlined by a dashed oval). (d) EDS spectrum from a Ag\u2013Pd nanocage.",
-      "caption_delimiter": "alpha",
+      "caption_delimiter": "",
       "figure_name": "ncomms5946_fig5.jpg",
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fncomms5946/MediaObjects/41467_2014_Article_BFncomms5946_Fig5_HTML.jpg",
       "license": null,
@@ -1430,13 +3113,9 @@
                ]
             },
             "scale_bars": [],
-            "caption": [
-               "EDS spectrum from a Ag\u2013Pd nanocage."
-            ],
+            "caption": [],
             "keywords": [],
-            "general": [
-               "EDX"
-            ]
+            "general": []
          },
          {
             "classification": "microscopy",
@@ -1508,15 +3187,9 @@
                   "label_line_distance": -1
                }
             ],
-            "caption": [
-               "High-resolution HAADF \u2013STEM images of representative porous Ag \u2013 Pd nanocages ; scale bar, 20 \u2009 nm . Note the arrays of small nanoparticles in the vicinity of the larger nanocages (outlined by a dashed oval)."
-            ],
+            "caption": [],
             "keywords": [],
-            "general": [
-               "HAADF-STEM",
-               "STEM",
-               "Nanoparticle"
-            ]
+            "general": []
          },
          {
             "classification": "microscopy",
@@ -1588,15 +3261,9 @@
                   "label_line_distance": -1
                }
             ],
-            "caption": [
-               "High-resolution HAADF \u2013STEM images of representative porous Ag \u2013 Pd nanocages ; scale bar, 20 \u2009 nm . Note the arrays of small nanoparticles in the vicinity of the larger nanocages (outlined by a dashed oval)."
-            ],
+            "caption": [],
             "keywords": [],
-            "general": [
-               "HAADF-STEM",
-               "STEM",
-               "Nanoparticle"
-            ]
+            "general": []
          },
          {
             "classification": "microscopy",
@@ -1668,15 +3335,9 @@
                   "label_line_distance": -1
                }
             ],
-            "caption": [
-               "High-resolution HAADF \u2013STEM images of representative porous Ag \u2013 Pd nanocages ; scale bar, 20 \u2009 nm . Note the arrays of small nanoparticles in the vicinity of the larger nanocages (outlined by a dashed oval)."
-            ],
+            "caption": [],
             "keywords": [],
-            "general": [
-               "HAADF-STEM",
-               "STEM",
-               "Nanoparticle"
-            ]
+            "general": []
          }
       ],
       "unassigned": {
@@ -1694,7 +3355,7 @@
       "article_url": "https://www.nature.com/articles/ncomms5946",
       "article_name": "ncomms5946",
       "full_caption": "(a,b) High-resolution BF-STEM and HAADF\u2013STEM images of a representative hollow cage Ag\u2013Pd nanoparticle (inset: FFT of the entire nanocage, Fig. 5b). h, hole in the nanoparticle surface. Scale bar, 5\u2009nm. (c) Higher magnification of the square area marked in a. Scale bar, 5\u2009nm.",
-      "caption_delimiter": "alpha",
+      "caption_delimiter": "",
       "figure_name": "ncomms5946_fig6.jpg",
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fncomms5946/MediaObjects/41467_2014_Article_BFncomms5946_Fig6_HTML.jpg",
       "license": null,
@@ -1771,14 +3432,9 @@
                   "label_line_distance": -1
                }
             ],
-            "caption": [
-               "High-resolution BF-STEM and HAADF \u2013 STEM images of a representative hollow cage Ag\u2013Pd nanoparticle (inset : FFT of the entire nanocage, Fig."
-            ],
+            "caption": [],
             "keywords": [],
-            "general": [
-               "HAADF-STEM",
-               "Nanoparticle"
-            ]
+            "general": []
          },
          {
             "classification": "microscopy",
@@ -1825,14 +3481,9 @@
                ]
             },
             "scale_bars": [],
-            "caption": [
-               "High-resolution BF-STEM and HAADF \u2013 STEM images of a representative hollow cage Ag\u2013Pd nanoparticle (inset : FFT of the entire nanocage, Fig."
-            ],
+            "caption": [],
             "keywords": [],
-            "general": [
-               "HAADF-STEM",
-               "Nanoparticle"
-            ]
+            "general": []
          },
          {
             "classification": "microscopy",
@@ -1904,13 +3555,9 @@
                   "label_line_distance": -1
                }
             ],
-            "caption": [
-               "h, hole in the nanoparticle surface . Scale bar, 5 \u2009 nm . (c) Higher magnification of the square area marked in a . Scale bar, 5 \u2009 nm."
-            ],
+            "caption": [],
             "keywords": [],
-            "general": [
-               "Nanoparticle"
-            ]
+            "general": []
          }
       ],
       "unassigned": {
@@ -2514,7 +4161,7 @@
       "article_url": "https://www.nature.com/articles/ncomms5946",
       "article_name": "ncomms5946",
       "full_caption": "(a\u2013f): Time-lapse series of dark-field STEM images following one Ag particle over 50.4\u2009s in 50\u2009\u03bcM aqueous PdCl2 solution. Electron dose rate: 6.26\u2009e\u2212\u2009\u00c5\u22122\u2009s\u22121, frame time: 8.4\u2009s. Electron dose per image: 52\u2009e\u2212\u2009\u00c5\u22122. Scale bar, 50\u2009nm.",
-      "caption_delimiter": "alpha",
+      "caption_delimiter": "",
       "figure_name": "ncomms5946_fig8.jpg",
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fncomms5946/MediaObjects/41467_2014_Article_BFncomms5946_Fig8_HTML.jpg",
       "license": null,
@@ -2566,13 +4213,9 @@
                ]
             },
             "scale_bars": [],
-            "caption": [
-               ": Time-lapse series of dark-field STEM images following one Ag particle over 50.4 \u2009 s in 50 \u2009 \u03bcM aqueous PdCl2 solution . Electron dose rate : 6.26 \u2009 e\u2212 \u2009 \u00c5\u22122 \u2009 s\u22121."
-            ],
+            "caption": [],
             "keywords": [],
-            "general": [
-               "STEM"
-            ]
+            "general": []
          },
          {
             "classification": "microscopy",
@@ -2619,13 +4262,9 @@
                ]
             },
             "scale_bars": [],
-            "caption": [
-               ": Time-lapse series of dark-field STEM images following one Ag particle over 50.4 \u2009 s in 50 \u2009 \u03bcM aqueous PdCl2 solution . Electron dose rate : 6.26 \u2009 e\u2212 \u2009 \u00c5\u22122 \u2009 s\u22121."
-            ],
+            "caption": [],
             "keywords": [],
-            "general": [
-               "STEM"
-            ]
+            "general": []
          },
          {
             "classification": "microscopy",
@@ -2672,13 +4311,9 @@
                ]
             },
             "scale_bars": [],
-            "caption": [
-               ": Time-lapse series of dark-field STEM images following one Ag particle over 50.4 \u2009 s in 50 \u2009 \u03bcM aqueous PdCl2 solution . Electron dose rate : 6.26 \u2009 e\u2212 \u2009 \u00c5\u22122 \u2009 s\u22121."
-            ],
+            "caption": [],
             "keywords": [],
-            "general": [
-               "STEM"
-            ]
+            "general": []
          },
          {
             "classification": "microscopy",
@@ -2725,13 +4360,9 @@
                ]
             },
             "scale_bars": [],
-            "caption": [
-               ": Time-lapse series of dark-field STEM images following one Ag particle over 50.4 \u2009 s in 50 \u2009 \u03bcM aqueous PdCl2 solution . Electron dose rate : 6.26 \u2009 e\u2212 \u2009 \u00c5\u22122 \u2009 s\u22121."
-            ],
+            "caption": [],
             "keywords": [],
-            "general": [
-               "STEM"
-            ]
+            "general": []
          },
          {
             "classification": "microscopy",
@@ -2778,13 +4409,9 @@
                ]
             },
             "scale_bars": [],
-            "caption": [
-               ": Time-lapse series of dark-field STEM images following one Ag particle over 50.4 \u2009 s in 50 \u2009 \u03bcM aqueous PdCl2 solution . Electron dose rate : 6.26 \u2009 e\u2212 \u2009 \u00c5\u22122 \u2009 s\u22121."
-            ],
+            "caption": [],
             "keywords": [],
-            "general": [
-               "STEM"
-            ]
+            "general": []
          },
          {
             "classification": "microscopy",
@@ -2831,13 +4458,9 @@
                ]
             },
             "scale_bars": [],
-            "caption": [
-               ": Time-lapse series of dark-field STEM images following one Ag particle over 50.4 \u2009 s in 50 \u2009 \u03bcM aqueous PdCl2 solution . Electron dose rate : 6.26 \u2009 e\u2212 \u2009 \u00c5\u22122 \u2009 s\u22121."
-            ],
+            "caption": [],
             "keywords": [],
-            "general": [
-               "STEM"
-            ]
+            "general": []
          }
       ],
       "unassigned": {
@@ -3401,1911 +5024,6 @@
                "HAADF-STEM",
                "STEM"
             ]
-         }
-      ],
-      "unassigned": {
-         "master_images": [],
-         "dependent_images": [],
-         "inset_images": [],
-         "subfigure_labels": [],
-         "scale_bar_labels": [],
-         "scale_bar_lines": [],
-         "captions": []
-      }
-   },
-   "s41467-018-06211-3_fig1.jpg": {
-      "title": "Seed-mediated atomic-scale reconstruction of silver manganate nanoplates for oxygen reduction towards high-energy aluminum-air flow batteries | Nature Communications",
-      "article_url": "https://www.nature.com/articles/s41467-018-06211-3",
-      "article_name": "s41467-018-06211-3",
-      "full_caption": "Formation of the stripe pattern and dislocation. a, b Schematic of the synthesis process (a) of the bulk manganese oxides (BM), polyhedron manganese oxide (PM), and silver manganate nanoplate (SMNp), and the summary of the catalytic effects (b) of the SMNp. c\u2013e Scanning electronic microscopy (SEM) images of the BM (c), PM (d), and SMNp (e) showing plate-like structures with silver nanoparticles. f, g High-resolution transmission electron microscopy (HR-TEM) images of the SMNp (f) and high-magnified image (g) of the box in f, which shows zigzag atomic arrangements with intragranular cracking. Fast Fourier transform (FFT) image of g presents the lattice planes of (\u2013100) and (001) along the [010] zone, indicating the orthorhombic structure of Ag2MnO4. h, i Inverse FFT images of applied masks at the blue circle (h) and red circle (i) in g, showing a wide range of dislocations with defects. The dislocations are shown by circles and edge dislocations are represented by a T-shaped symbol. The upper right insets in h and i indicate the applied masks and the lattice spacing of the (101) plane is denoted as the left inset in h. Scale bars, 5\u2009\u03bcm (c), 500\u2009nm (d), 200\u2009nm (e), 100\u2009nm (f), 4\u2009nm (g), and 1\u2009nm (h, i)",
-      "caption_delimiter": "alpha",
-      "figure_name": "s41467-018-06211-3_fig1.jpg",
-      "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fs41467-018-06211-3/MediaObjects/41467_2018_6211_Fig1_HTML.png",
-      "license": "http://creativecommons.org/licenses/by/4.0/",
-      "open": true,
-      "figure_path": "extracted/nature-test/figures/s41467-018-06211-3_fig1.jpg",
-      "master_images": [
-         {
-            "classification": "microscopy",
-            "confidence": 0.1626,
-            "height": 164.56174392700194,
-            "width": 209.99485822824334,
-            "geometry": [
-               {
-                  "x": 13,
-                  "y": 495
-               },
-               {
-                  "x": 13,
-                  "y": 660
-               },
-               {
-                  "x": 223,
-                  "y": 495
-               },
-               {
-                  "x": 223,
-                  "y": 660
-               }
-            ],
-            "subfigure_label": {
-               "text": "g",
-               "geometry": [
-                  {
-                     "x": 0,
-                     "y": 484
-                  },
-                  {
-                     "x": 0,
-                     "y": 509
-                  },
-                  {
-                     "x": 11,
-                     "y": 484
-                  },
-                  {
-                     "x": 11,
-                     "y": 509
-                  }
-               ]
-            },
-            "scale_bars": [
-               {
-                  "label": null,
-                  "geometry": [
-                     {
-                        "x": 159,
-                        "y": 155
-                     },
-                     {
-                        "x": 159,
-                        "y": 159
-                     },
-                     {
-                        "x": 196,
-                        "y": 159
-                     },
-                     {
-                        "x": 196,
-                        "y": 155
-                     }
-                  ],
-                  "confidence": 0.991709291934967,
-                  "length": 36,
-                  "label_line_distance": -1
-               }
-            ],
-            "caption": [
-               "High - resolution transmission electron microscopy (HR-TEM) images of the SMNp.",
-               "of the box in f, which shows zigzag atomic arrangements with intragranular cracking . Fast Fourier transform (FFT) image of g presents the lattice planes of (\u2013100) and (001) along the [010] zone, indicating the orthorhombic structure of Ag2MnO4."
-            ],
-            "keywords": [],
-            "general": [
-               "TEM"
-            ]
-         },
-         {
-            "classification": "microscopy",
-            "confidence": 0.1626,
-            "height": 96.42179946899415,
-            "width": 209.24484500518207,
-            "geometry": [
-               {
-                  "x": 17,
-                  "y": 287
-               },
-               {
-                  "x": 17,
-                  "y": 384
-               },
-               {
-                  "x": 226,
-                  "y": 287
-               },
-               {
-                  "x": 226,
-                  "y": 384
-               }
-            ],
-            "subfigure_label": {
-               "text": "c",
-               "geometry": [
-                  {
-                     "x": 0,
-                     "y": 290
-                  },
-                  {
-                     "x": 0,
-                     "y": 303
-                  },
-                  {
-                     "x": 10,
-                     "y": 290
-                  },
-                  {
-                     "x": 10,
-                     "y": 303
-                  }
-               ]
-            },
-            "scale_bars": [
-               {
-                  "label": null,
-                  "geometry": [
-                     {
-                        "x": 167,
-                        "y": 85
-                     },
-                     {
-                        "x": 167,
-                        "y": 90
-                     },
-                     {
-                        "x": 190,
-                        "y": 90
-                     },
-                     {
-                        "x": 190,
-                        "y": 85
-                     }
-                  ],
-                  "confidence": 0.9550259709358215,
-                  "length": 23,
-                  "label_line_distance": -1
-               }
-            ],
-            "caption": [
-               "Scanning electronic microscopy (SEM) images of the BM.",
-               "Inverse FFT images of applied masks at the blue circle (c), 500 \u2009 nm."
-            ],
-            "keywords": [],
-            "general": [
-               "SEM"
-            ]
-         },
-         {
-            "classification": "microscopy",
-            "confidence": 0.1626,
-            "height": 90.32446460723878,
-            "width": 219.60021844277017,
-            "geometry": [
-               {
-                  "x": 11,
-                  "y": 387
-               },
-               {
-                  "x": 11,
-                  "y": 477
-               },
-               {
-                  "x": 231,
-                  "y": 387
-               },
-               {
-                  "x": 231,
-                  "y": 477
-               }
-            ],
-            "subfigure_label": {
-               "text": "d",
-               "geometry": [
-                  {
-                     "x": 0,
-                     "y": 385
-                  },
-                  {
-                     "x": 0,
-                     "y": 398
-                  },
-                  {
-                     "x": 10,
-                     "y": 385
-                  },
-                  {
-                     "x": 10,
-                     "y": 398
-                  }
-               ]
-            },
-            "scale_bars": [
-               {
-                  "label": null,
-                  "geometry": [
-                     {
-                        "x": 172,
-                        "y": 75
-                     },
-                     {
-                        "x": 172,
-                        "y": 79
-                     },
-                     {
-                        "x": 197,
-                        "y": 79
-                     },
-                     {
-                        "x": 197,
-                        "y": 75
-                     }
-                  ],
-                  "confidence": 0.9781046509742737,
-                  "length": 24,
-                  "label_line_distance": -1
-               }
-            ],
-            "caption": [
-               "Scanning electronic microscopy (SEM) images of the BM.",
-               "Inverse FFT images of applied masks at the blue circle (d), 200 \u2009 nm.",
-               "a wide range of dislocations with defects . The dislocations are shown by circles and edge dislocations are represented by a T-shaped symbol . The upper right insets in h and i indicate the applied masks and the lattice spacing of the (101) plane is denoted as the left inset in h . Scale bars, 5 \u2009 \u03bcm (d), 200 \u2009 nm."
-            ],
-            "keywords": [],
-            "general": [
-               "SEM",
-               "Dislocation"
-            ]
-         },
-         {
-            "classification": "illustration",
-            "confidence": 0.1626,
-            "height": 272.429398727417,
-            "width": 205.05636141850397,
-            "geometry": [
-               {
-                  "x": 458,
-                  "y": 0
-               },
-               {
-                  "x": 458,
-                  "y": 272
-               },
-               {
-                  "x": 663,
-                  "y": 0
-               },
-               {
-                  "x": 663,
-                  "y": 272
-               }
-            ],
-            "subfigure_label": {
-               "text": "b",
-               "geometry": [
-                  {
-                     "x": 443,
-                     "y": 0
-                  },
-                  {
-                     "x": 443,
-                     "y": 12
-                  },
-                  {
-                     "x": 457,
-                     "y": 0
-                  },
-                  {
-                     "x": 457,
-                     "y": 12
-                  }
-               ]
-            },
-            "scale_bars": [],
-            "caption": [
-               "Schematic of the synthesis process.",
-               "Schematic of the catalytic effects (b)."
-            ],
-            "keywords": [],
-            "general": [
-               "Schematic"
-            ]
-         },
-         {
-            "classification": "illustration",
-            "confidence": 0.1626,
-            "height": 244.95845718383785,
-            "width": 400.5028651310848,
-            "geometry": [
-               {
-                  "x": 43,
-                  "y": 15
-               },
-               {
-                  "x": 43,
-                  "y": 260
-               },
-               {
-                  "x": 444,
-                  "y": 15
-               },
-               {
-                  "x": 444,
-                  "y": 260
-               }
-            ],
-            "subfigure_label": {
-               "text": "a",
-               "geometry": [
-                  {
-                     "x": 1,
-                     "y": 1
-                  },
-                  {
-                     "x": 1,
-                     "y": 14
-                  },
-                  {
-                     "x": 11,
-                     "y": 1
-                  },
-                  {
-                     "x": 11,
-                     "y": 14
-                  }
-               ]
-            },
-            "scale_bars": [],
-            "caption": [
-               "of the bulk manganese oxides (BM), polyhedron manganese oxide (PM), and silver manganate nanoplate (SMNp), and the summary of the catalytic effects.",
-               "Schematic of the synthesis process (a)."
-            ],
-            "keywords": [],
-            "general": [
-               "Schematic",
-               "Nanoplate"
-            ]
-         },
-         {
-            "classification": "microscopy",
-            "confidence": 0.1626,
-            "height": 169.7217578887939,
-            "width": 196.7145450298603,
-            "geometry": [
-               {
-                  "x": 251,
-                  "y": 490
-               },
-               {
-                  "x": 251,
-                  "y": 660
-               },
-               {
-                  "x": 447,
-                  "y": 490
-               },
-               {
-                  "x": 447,
-                  "y": 660
-               }
-            ],
-            "subfigure_label": {
-               "text": "h",
-               "geometry": [
-                  {
-                     "x": 235,
-                     "y": 488
-                  },
-                  {
-                     "x": 235,
-                     "y": 505
-                  },
-                  {
-                     "x": 247,
-                     "y": 488
-                  },
-                  {
-                     "x": 247,
-                     "y": 505
-                  }
-               ]
-            },
-            "scale_bars": [
-               {
-                  "label": null,
-                  "geometry": [
-                     {
-                        "x": 166,
-                        "y": 160
-                     },
-                     {
-                        "x": 166,
-                        "y": 165
-                     },
-                     {
-                        "x": 189,
-                        "y": 165
-                     },
-                     {
-                        "x": 189,
-                        "y": 160
-                     }
-                  ],
-                  "confidence": 0.9910735487937927,
-                  "length": 23,
-                  "label_line_distance": -1
-               }
-            ],
-            "caption": [
-               "Inverse FFT images of applied masks at the blue circle (h) and red circle.",
-               "applied masks at the blue circle (h) and red circle (i) in g, showing a wide range of dislocations with defects . The dislocations are shown by circles and edge dislocations are represented by a T-shaped symbol . The upper right insets in h and i indicate the applied masks and the lattice spacing of the (101) plane is denoted as the left inset in h . Scale bars, 5 \u2009 \u03bcm (c), 500 \u2009 nm (d), 200 \u2009 nm (e), 100\u2009nm (f)."
-            ],
-            "keywords": [],
-            "general": [
-               "Dislocation"
-            ]
-         },
-         {
-            "classification": "microscopy",
-            "confidence": 0.1626,
-            "height": 170.3761333465576,
-            "width": 199.6537938484779,
-            "geometry": [
-               {
-                  "x": 483,
-                  "y": 489
-               },
-               {
-                  "x": 483,
-                  "y": 660
-               },
-               {
-                  "x": 682,
-                  "y": 489
-               },
-               {
-                  "x": 682,
-                  "y": 660
-               }
-            ],
-            "subfigure_label": {
-               "text": "i",
-               "geometry": [
-                  {
-                     "x": 472,
-                     "y": 485
-                  },
-                  {
-                     "x": 472,
-                     "y": 503
-                  },
-                  {
-                     "x": 482,
-                     "y": 485
-                  },
-                  {
-                     "x": 482,
-                     "y": 503
-                  }
-               ]
-            },
-            "scale_bars": [
-               {
-                  "label": null,
-                  "geometry": [
-                     {
-                        "x": 165,
-                        "y": 163
-                     },
-                     {
-                        "x": 165,
-                        "y": 167
-                     },
-                     {
-                        "x": 189,
-                        "y": 167
-                     },
-                     {
-                        "x": 189,
-                        "y": 163
-                     }
-                  ],
-                  "confidence": 0.9881309270858765,
-                  "length": 23,
-                  "label_line_distance": -1
-               }
-            ],
-            "caption": [
-               "Inverse FFT images of applied masks at the blue circle.",
-               "Inverse FFT images of applied masks at the blue circle (i) in g, showing a wide range of dislocations with defects . The dislocations are shown by circles and edge dislocations are represented by a T-shaped symbol . The upper right insets in h and i indicate the applied masks and the lattice spacing of the (101) plane is denoted as the left inset in h . Scale bars, 5 \u2009 \u03bcm."
-            ],
-            "keywords": [],
-            "general": [
-               "Dislocation"
-            ]
-         },
-         {
-            "classification": "microscopy",
-            "confidence": 0.1626,
-            "height": 179.12710533142092,
-            "width": 196.28058736140912,
-            "geometry": [
-               {
-                  "x": 484,
-                  "y": 286
-               },
-               {
-                  "x": 484,
-                  "y": 466
-               },
-               {
-                  "x": 680,
-                  "y": 286
-               },
-               {
-                  "x": 680,
-                  "y": 466
-               }
-            ],
-            "subfigure_label": {
-               "text": "f",
-               "geometry": [
-                  {
-                     "x": 472,
-                     "y": 287
-                  },
-                  {
-                     "x": 472,
-                     "y": 303
-                  },
-                  {
-                     "x": 480,
-                     "y": 287
-                  },
-                  {
-                     "x": 480,
-                     "y": 303
-                  }
-               ]
-            },
-            "scale_bars": [
-               {
-                  "label": null,
-                  "geometry": [
-                     {
-                        "x": 163,
-                        "y": 171
-                     },
-                     {
-                        "x": 163,
-                        "y": 176
-                     },
-                     {
-                        "x": 186,
-                        "y": 176
-                     },
-                     {
-                        "x": 186,
-                        "y": 171
-                     }
-                  ],
-                  "confidence": 0.9868260025978088,
-                  "length": 23,
-                  "label_line_distance": -1
-               }
-            ],
-            "caption": [
-               "High - resolution transmission electron microscopy (HR-TEM) images of the SMNp.",
-               "a wide range of dislocations with defects . The dislocations are shown by circles and edge dislocations are represented by a T-shaped symbol . The upper right insets in h and i indicate the applied masks and the lattice spacing of the (101) plane is denoted as the left inset in h . Scale bars, 5 \u2009 \u03bcm (f), 4 \u2009 nm.",
-               "plate-like structures with the SMNp (f)."
-            ],
-            "keywords": [],
-            "general": [
-               "TEM",
-               "Dislocation"
-            ]
-         },
-         {
-            "classification": "microscopy",
-            "confidence": 0.1626,
-            "height": 180.7687843322754,
-            "width": 205.52121107394876,
-            "geometry": [
-               {
-                  "x": 255,
-                  "y": 291
-               },
-               {
-                  "x": 255,
-                  "y": 472
-               },
-               {
-                  "x": 461,
-                  "y": 291
-               },
-               {
-                  "x": 461,
-                  "y": 472
-               }
-            ],
-            "subfigure_label": {
-               "text": "e",
-               "geometry": [
-                  {
-                     "x": 236,
-                     "y": 290
-                  },
-                  {
-                     "x": 236,
-                     "y": 301
-                  },
-                  {
-                     "x": 247,
-                     "y": 290
-                  },
-                  {
-                     "x": 247,
-                     "y": 301
-                  }
-               ]
-            },
-            "scale_bars": [
-               {
-                  "label": null,
-                  "geometry": [
-                     {
-                        "x": 152,
-                        "y": 165
-                     },
-                     {
-                        "x": 152,
-                        "y": 169
-                     },
-                     {
-                        "x": 192,
-                        "y": 169
-                     },
-                     {
-                        "x": 192,
-                        "y": 165
-                     }
-                  ],
-                  "confidence": 0.9919663667678833,
-                  "length": 39,
-                  "label_line_distance": -1
-               }
-            ],
-            "caption": [
-               "Scanning electronic microscopy (SEM) images of the BM.",
-               "a wide range of dislocations with defects . The dislocations are shown by circles and edge dislocations are represented by a T-shaped symbol . The upper right insets in h and i indicate the applied masks and the lattice spacing of the (101) plane is denoted as the left inset in h . Scale bars, 5 \u2009 \u03bcm (e), 100\u2009nm."
-            ],
-            "keywords": [],
-            "general": [
-               "SEM",
-               "Dislocation"
-            ]
-         }
-      ],
-      "unassigned": {
-         "master_images": [],
-         "dependent_images": [],
-         "inset_images": [],
-         "subfigure_labels": [],
-         "scale_bar_labels": [],
-         "scale_bar_lines": [],
-         "captions": []
-      }
-   },
-   "s41467-018-06211-3_fig2.jpg": {
-      "title": "Seed-mediated atomic-scale reconstruction of silver manganate nanoplates for oxygen reduction towards high-energy aluminum-air flow batteries | Nature Communications",
-      "article_url": "https://www.nature.com/articles/s41467-018-06211-3",
-      "article_name": "s41467-018-06211-3",
-      "full_caption": "Atomically resolved electron microscopy and electron energy loss spectra. a Filtered high-angle annular dark-field-scanning transmission electron microscopy (HAADF-STEM) and energy-dispersive X-ray spectroscopy (EDX) mapping image of the silver manganate nanoplate (SMNp) along the [010] zone axis with its fast Fourier transform (FFT) pattern, showing continuous arrangements of silver and manganese atoms. b Line-scanning profile showing distinct distributions of silver and manganese elements. c, d Simulated HAADF-STEM image (c), indicating the highest electron density with red color and the lowest with black, and annular bright-field (ABF)\u2013STEM image (d) showing the Ag2MnO4 orthorhombic structure with silver (blue), manganese (red), and oxygen (purple) elements. e Corresponding ABF intensity profiles of the white box in d present the peaks of the silver and manganese atomic columns. f, g A HAADF-STEM image (f) and the corresponding electron energy loss spectroscopy (EELS) profiles (g) at the marked sites, showing Ag M4,5-edge, O K-edge, and Mn L2,3-edge. Scale bars, 1\u2009nm (a), 0.2\u2009nm (c, d), and 50\u2009nm (f)",
-      "caption_delimiter": "alpha",
-      "figure_name": "s41467-018-06211-3_fig2.jpg",
-      "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fs41467-018-06211-3/MediaObjects/41467_2018_6211_Fig2_HTML.png",
-      "license": "http://creativecommons.org/licenses/by/4.0/",
-      "open": true,
-      "figure_path": "extracted/nature-test/figures/s41467-018-06211-3_fig2.jpg",
-      "master_images": [
-         {
-            "classification": "microscopy",
-            "confidence": 0.1626,
-            "height": 186.23293464000415,
-            "width": 296.9396746969972,
-            "geometry": [
-               {
-                  "x": 17,
-                  "y": 552
-               },
-               {
-                  "x": 17,
-                  "y": 738
-               },
-               {
-                  "x": 314,
-                  "y": 552
-               },
-               {
-                  "x": 314,
-                  "y": 738
-               }
-            ],
-            "subfigure_label": {
-               "text": "f",
-               "geometry": [
-                  {
-                     "x": 0,
-                     "y": 549
-                  },
-                  {
-                     "x": 0,
-                     "y": 567
-                  },
-                  {
-                     "x": 8,
-                     "y": 549
-                  },
-                  {
-                     "x": 8,
-                     "y": 567
-                  }
-               ]
-            },
-            "scale_bars": [
-               {
-                  "label": null,
-                  "geometry": [
-                     {
-                        "x": 249,
-                        "y": 173
-                     },
-                     {
-                        "x": 249,
-                        "y": 177
-                     },
-                     {
-                        "x": 282,
-                        "y": 177
-                     },
-                     {
-                        "x": 282,
-                        "y": 173
-                     }
-                  ],
-                  "confidence": 0.9853157997131348,
-                  "length": 33,
-                  "label_line_distance": -1
-               }
-            ],
-            "caption": [
-               "intensity profiles of the white box in d present the peaks of the silver and manganese atomic columns . f, g.",
-               "and the corresponding electron energy loss spectroscopy (EELS) profiles (g) at the marked sites, showing Ag M4,5-edge, O K - edge, and Mn L2,3-edge."
-            ],
-            "keywords": [],
-            "general": [
-               "EELS",
-               "Intensity profile"
-            ]
-         },
-         {
-            "classification": "parent",
-            "confidence": 0.1548,
-            "height": 366.04754502956683,
-            "width": 276.0106173610188,
-            "geometry": [
-               {
-                  "x": 408,
-                  "y": 0
-               },
-               {
-                  "x": 408,
-                  "y": 366
-               },
-               {
-                  "x": 685,
-                  "y": 0
-               },
-               {
-                  "x": 685,
-                  "y": 366
-               }
-            ],
-            "subfigure_label": {
-               "text": "c",
-               "geometry": [
-                  {
-                     "x": 407,
-                     "y": 1
-                  },
-                  {
-                     "x": 407,
-                     "y": 13
-                  },
-                  {
-                     "x": 418,
-                     "y": 1
-                  },
-                  {
-                     "x": 418,
-                     "y": 13
-                  }
-               ]
-            },
-            "scale_bars": [
-               {
-                  "label": null,
-                  "geometry": [
-                     {
-                        "x": 216,
-                        "y": 178
-                     },
-                     {
-                        "x": 216,
-                        "y": 184
-                     },
-                     {
-                        "x": 246,
-                        "y": 184
-                     },
-                     {
-                        "x": 246,
-                        "y": 178
-                     }
-                  ],
-                  "confidence": 0.9923386573791504,
-                  "length": 30,
-                  "label_line_distance": -1
-               }
-            ],
-            "caption": [
-               "continuous arrangements of manganese elements . c, d.",
-               "the highest electron density with red color and the lowest with black."
-            ],
-            "keywords": [],
-            "general": [
-               "Electron density"
-            ]
-         },
-         {
-            "classification": "parent",
-            "confidence": 0.1625,
-            "height": 270.74074763518115,
-            "width": 377.6560750432039,
-            "geometry": [
-               {
-                  "x": 4,
-                  "y": 0
-               },
-               {
-                  "x": 4,
-                  "y": 270
-               },
-               {
-                  "x": 382,
-                  "y": 0
-               },
-               {
-                  "x": 382,
-                  "y": 270
-               }
-            ],
-            "subfigure_label": {
-               "text": "a",
-               "geometry": [
-                  {
-                     "x": 1,
-                     "y": 0
-                  },
-                  {
-                     "x": 1,
-                     "y": 13
-                  },
-                  {
-                     "x": 10,
-                     "y": 0
-                  },
-                  {
-                     "x": 10,
-                     "y": 13
-                  }
-               ]
-            },
-            "scale_bars": [
-               {
-                  "label": null,
-                  "geometry": [
-                     {
-                        "x": 352,
-                        "y": 116
-                     },
-                     {
-                        "x": 352,
-                        "y": 121
-                     },
-                     {
-                        "x": 369,
-                        "y": 121
-                     },
-                     {
-                        "x": 369,
-                        "y": 116
-                     }
-                  ],
-                  "confidence": 0.9893621802330017,
-                  "length": 17,
-                  "label_line_distance": -1
-               },
-               {
-                  "label": null,
-                  "geometry": [
-                     {
-                        "x": 351,
-                        "y": 241
-                     },
-                     {
-                        "x": 351,
-                        "y": 245
-                     },
-                     {
-                        "x": 369,
-                        "y": 245
-                     },
-                     {
-                        "x": 369,
-                        "y": 241
-                     }
-                  ],
-                  "confidence": 0.9883805513381958,
-                  "length": 18,
-                  "label_line_distance": -1
-               },
-               {
-                  "label": null,
-                  "geometry": [
-                     {
-                        "x": 203,
-                        "y": 240
-                     },
-                     {
-                        "x": 203,
-                        "y": 246
-                     },
-                     {
-                        "x": 262,
-                        "y": 246
-                     },
-                     {
-                        "x": 262,
-                        "y": 240
-                     }
-                  ],
-                  "confidence": 0.9867159128189087,
-                  "length": 58,
-                  "label_line_distance": -1
-               }
-            ],
-            "caption": [
-               "Filtered high-angle annular dark-field-scanning transmission electron microscopy (HAADF-STEM) and energy-dispersive X-ray spectroscopy (EDX) mapping image of the silver manganate nanoplate (SMNp) along the [010] zone axis with its fast Fourier transform (FFT) pattern, showing continuous arrangements of silver and manganese atoms."
-            ],
-            "keywords": [
-               "HAADF-STEM"
-            ],
-            "general": [
-               "HAADF-STEM",
-               "STEM",
-               "EDX",
-               "Nanoplate"
-            ]
-         },
-         {
-            "classification": "graph",
-            "confidence": 0.1626,
-            "height": 246.49596746151263,
-            "width": 368.3423906096613,
-            "geometry": [
-               {
-                  "x": 8,
-                  "y": 286
-               },
-               {
-                  "x": 8,
-                  "y": 532
-               },
-               {
-                  "x": 377,
-                  "y": 286
-               },
-               {
-                  "x": 377,
-                  "y": 532
-               }
-            ],
-            "subfigure_label": {
-               "text": "b",
-               "geometry": [
-                  {
-                     "x": 0,
-                     "y": 285
-                  },
-                  {
-                     "x": 0,
-                     "y": 304
-                  },
-                  {
-                     "x": 12,
-                     "y": 285
-                  },
-                  {
-                     "x": 12,
-                     "y": 304
-                  }
-               ]
-            },
-            "scale_bars": [],
-            "caption": [
-               "EDX) mapping image of the silver manganate nanoplate (SMNp) along the [010] zone axis with its fast Fourier transform (FFT) pattern, showing continuous arrangements of silver and manganese atoms . b."
-            ],
-            "keywords": [],
-            "general": [
-               "EDX",
-               "Nanoplate"
-            ]
-         },
-         {
-            "classification": "graph",
-            "confidence": 0.1626,
-            "height": 185.5664291748634,
-            "width": 328.6954783894005,
-            "geometry": [
-               {
-                  "x": 355,
-                  "y": 559
-               },
-               {
-                  "x": 355,
-                  "y": 745
-               },
-               {
-                  "x": 684,
-                  "y": 559
-               },
-               {
-                  "x": 684,
-                  "y": 745
-               }
-            ],
-            "subfigure_label": {
-               "text": "g",
-               "geometry": [
-                  {
-                     "x": 360,
-                     "y": 551
-                  },
-                  {
-                     "x": 360,
-                     "y": 568
-                  },
-                  {
-                     "x": 375,
-                     "y": 551
-                  },
-                  {
-                     "x": 375,
-                     "y": 568
-                  }
-               ]
-            },
-            "scale_bars": [],
-            "caption": [
-               "intensity profiles of the white box in d present the peaks of the silver and manganese atomic columns . f, g."
-            ],
-            "keywords": [],
-            "general": [
-               "Intensity profile"
-            ]
-         },
-         {
-            "classification": "graph",
-            "confidence": 0.1626,
-            "height": 114.46254785244287,
-            "width": 255.06834419609993,
-            "geometry": [
-               {
-                  "x": 414,
-                  "y": 421
-               },
-               {
-                  "x": 414,
-                  "y": 536
-               },
-               {
-                  "x": 669,
-                  "y": 421
-               },
-               {
-                  "x": 669,
-                  "y": 536
-               }
-            ],
-            "subfigure_label": {
-               "text": "e",
-               "geometry": [
-                  {
-                     "x": 403,
-                     "y": 413
-                  },
-                  {
-                     "x": 403,
-                     "y": 432
-                  },
-                  {
-                     "x": 426,
-                     "y": 413
-                  },
-                  {
-                     "x": 426,
-                     "y": 432
-                  }
-               ]
-            },
-            "scale_bars": [],
-            "caption": [
-               "Corresponding ABF intensity profiles of the white box in d present the peaks of the silver and manganese atomic columns."
-            ],
-            "keywords": [],
-            "general": [
-               "ABF-STEM",
-               "Intensity profile"
-            ]
-         }
-      ],
-      "unassigned": {
-         "master_images": [],
-         "dependent_images": [],
-         "inset_images": [],
-         "subfigure_labels": [],
-         "scale_bar_labels": [],
-         "scale_bar_lines": [],
-         "captions": [
-            {
-               "label": "d",
-               "description": [
-                  "continuous arrangements of manganese elements . c, d.",
-                  "the highest electron density with red color and the lowest with black, and annular bright-field (ABF)\u2013STEM image (d)."
-               ],
-               "keywords": [],
-               "general": [
-                  "ABF-STEM",
-                  "Electron density"
-               ]
-            }
-         ]
-      }
-   },
-   "s41467-018-06211-3_fig3.jpg": {
-      "title": "Seed-mediated atomic-scale reconstruction of silver manganate nanoplates for oxygen reduction towards high-energy aluminum-air flow batteries | Nature Communications",
-      "article_url": "https://www.nature.com/articles/s41467-018-06211-3",
-      "article_name": "s41467-018-06211-3",
-      "full_caption": "Electrocatalytic activities for oxygen reduction reaction. a Linear scan voltammogram (LSV) curves for the Ag nanoparticle, bulk manganese oxides (BM), polyhedron manganese oxide (PM), silver manganate nanoplate (SMNp), and a commercial Pt/C catalyst at a rotating ring\u2013disk electrode (1600 r.p.m) in O2-saturated 0.1\u2009M KOH solution with a scan rate of 5\u2009mV\u2009s\u20131. All data have been calibrated by using Ar-saturated 0.1\u2009M KOH solution. b, c The corresponding number of transferred electrons (b) and Tafel plots (c) of the Ag, BM, PM, SMNp, and Pt/C. Id represents the limiting current density obtained at a potential of 0.30\u2009V in a. d Chronoamperometric response of the SMNp and 20\u2009wt% Pt/C in O2-saturated 0.1\u2009M KOH electrolytes at 0.85\u2009V (vs. RHE) with 1600 r.p.m showing good stability of SMNp compared with Pt/C",
-      "caption_delimiter": "alpha",
-      "figure_name": "s41467-018-06211-3_fig3.jpg",
-      "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fs41467-018-06211-3/MediaObjects/41467_2018_6211_Fig3_HTML.png",
-      "license": "http://creativecommons.org/licenses/by/4.0/",
-      "open": true,
-      "figure_path": "extracted/nature-test/figures/s41467-018-06211-3_fig3.jpg",
-      "master_images": [
-         {
-            "classification": "graph",
-            "confidence": 0.1626,
-            "height": 239.4367365635179,
-            "width": 339.7030251759749,
-            "geometry": [
-               {
-                  "x": 345,
-                  "y": 261
-               },
-               {
-                  "x": 345,
-                  "y": 501
-               },
-               {
-                  "x": 685,
-                  "y": 261
-               },
-               {
-                  "x": 685,
-                  "y": 501
-               }
-            ],
-            "subfigure_label": {
-               "text": "d",
-               "geometry": [
-                  {
-                     "x": 336,
-                     "y": 258
-                  },
-                  {
-                     "x": 336,
-                     "y": 280
-                  },
-                  {
-                     "x": 353,
-                     "y": 258
-                  },
-                  {
-                     "x": 353,
-                     "y": 280
-                  }
-               ]
-            },
-            "scale_bars": [],
-            "caption": [
-               "a commercial Pt/C catalyst at a rotating ring\u2013disk electrode (1600 r.p.m) in O2-saturated 0.1\u2009M KOH solution with a scan rate of 5 \u2009 mV \u2009 s\u20131 . All data have been calibrated by using Ar-saturated 0.1\u2009M KOH solution . d Chronoamperometric response of the SMNp and 20 \u2009 wt% Pt/C in O2-saturated 0.1 \u2009 M KOH electrolytes at 0.85\u2009V (vs . RHE) with 1600 r.p.m showing good stability of SMNp compared with Pt/C."
-            ],
-            "keywords": [],
-            "general": []
-         },
-         {
-            "classification": "graph",
-            "confidence": 0.1626,
-            "height": 250.23403587714083,
-            "width": 350.2198937306037,
-            "geometry": [
-               {
-                  "x": 334,
-                  "y": 0
-               },
-               {
-                  "x": 334,
-                  "y": 250
-               },
-               {
-                  "x": 685,
-                  "y": 0
-               },
-               {
-                  "x": 685,
-                  "y": 250
-               }
-            ],
-            "subfigure_label": {
-               "text": "b",
-               "geometry": [
-                  {
-                     "x": 334,
-                     "y": 0
-                  },
-                  {
-                     "x": 334,
-                     "y": 15
-                  },
-                  {
-                     "x": 355,
-                     "y": 0
-                  },
-                  {
-                     "x": 355,
-                     "y": 15
-                  }
-               ]
-            },
-            "scale_bars": [],
-            "caption": [
-               "The corresponding number of transferred electrons.",
-               "a commercial Pt/C catalyst at a rotating ring\u2013disk electrode (1600 r.p.m) in O2-saturated 0.1\u2009M KOH solution with a scan rate of 5 \u2009 mV \u2009 s\u20131 . All data have been calibrated by using Ar-saturated 0.1\u2009M KOH solution . b, c.",
-               "O2-saturated 0.1\u2009M KOH solution with transferred electrons (b)."
-            ],
-            "keywords": [],
-            "general": []
-         },
-         {
-            "classification": "graph",
-            "confidence": 0.1626,
-            "height": 247.54017301180465,
-            "width": 324.0327224364648,
-            "geometry": [
-               {
-                  "x": 2,
-                  "y": 257
-               },
-               {
-                  "x": 2,
-                  "y": 504
-               },
-               {
-                  "x": 326,
-                  "y": 257
-               },
-               {
-                  "x": 326,
-                  "y": 504
-               }
-            ],
-            "subfigure_label": {
-               "text": "c",
-               "geometry": [
-                  {
-                     "x": 0,
-                     "y": 263
-                  },
-                  {
-                     "x": 0,
-                     "y": 279
-                  },
-                  {
-                     "x": 13,
-                     "y": 263
-                  },
-                  {
-                     "x": 13,
-                     "y": 279
-                  }
-               ]
-            },
-            "scale_bars": [],
-            "caption": [
-               "The corresponding number of transferred electrons.",
-               "a commercial Pt/C catalyst at a rotating ring\u2013disk electrode (1600 r.p.m) in O2-saturated 0.1\u2009M KOH solution with a scan rate of 5 \u2009 mV \u2009 s\u20131 . All data have been calibrated by using Ar-saturated 0.1\u2009M KOH solution . b, c.",
-               "obtained at a potential of 0.30\u2009V in a."
-            ],
-            "keywords": [],
-            "general": []
-         },
-         {
-            "classification": "graph",
-            "confidence": 0.1626,
-            "height": 243.0676757365174,
-            "width": 320.9994785602276,
-            "geometry": [
-               {
-                  "x": 4,
-                  "y": 0
-               },
-               {
-                  "x": 4,
-                  "y": 243
-               },
-               {
-                  "x": 325,
-                  "y": 0
-               },
-               {
-                  "x": 325,
-                  "y": 243
-               }
-            ],
-            "subfigure_label": {
-               "text": "a",
-               "geometry": [
-                  {
-                     "x": 0,
-                     "y": 2
-                  },
-                  {
-                     "x": 0,
-                     "y": 17
-                  },
-                  {
-                     "x": 13,
-                     "y": 2
-                  },
-                  {
-                     "x": 13,
-                     "y": 17
-                  }
-               ]
-            },
-            "scale_bars": [],
-            "caption": [
-               "Linear scan voltammogram (LSV) curves for the Ag nanoparticle, bulk manganese oxides (BM), polyhedron manganese oxide (PM), silver manganate nanoplate (SMNp), and a commercial Pt/C catalyst at a rotating ring\u2013disk electrode (1600 r.p.m) in O2-saturated 0.1\u2009M KOH solution with a scan rate of 5 \u2009 mV \u2009 s\u20131 . All data have been calibrated by using Ar-saturated 0.1\u2009M KOH solution.",
-               "Electrocatalytic activities for oxygen reduction reaction . a."
-            ],
-            "keywords": [
-               "Ag nanoparticle"
-            ],
-            "general": [
-               "LSV",
-               "Nanoparticle"
-            ]
-         }
-      ],
-      "unassigned": {
-         "master_images": [],
-         "dependent_images": [],
-         "inset_images": [],
-         "subfigure_labels": [],
-         "scale_bar_labels": [],
-         "scale_bar_lines": [],
-         "captions": []
-      }
-   },
-   "s41467-018-06211-3_fig4.jpg": {
-      "title": "Seed-mediated atomic-scale reconstruction of silver manganate nanoplates for oxygen reduction towards high-energy aluminum-air flow batteries | Nature Communications",
-      "article_url": "https://www.nature.com/articles/s41467-018-06211-3",
-      "article_name": "s41467-018-06211-3",
-      "full_caption": "Electrochemical performance of aluminum\u2013air flow batteries. a Schematic of the aluminum\u2013air flow battery (AAFB) system, which includes a single stack cell, one electrolyte tank, and circulation pump. ORR indicates oxygen reduction reaction. b Power density curves of flow cells using the pristine air electrode, silver manganate nanoplate (SMNp), and Pt/C with 6\u2009M KOH electrolyte (scan rate of 0.1\u2009mA\u2009s\u22121). c Discharge curves using the pristine air electrode, SMNp, and Pt/C at 100\u2009mA\u2009cm\u22122. d Mechanical charge and discharge tests using the SMNp and Pt/C at 25\u2009mA\u2009cm\u22122, where the aluminum and electrolyte were replaced every cycle",
-      "caption_delimiter": "alpha",
-      "figure_name": "s41467-018-06211-3_fig4.jpg",
-      "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fs41467-018-06211-3/MediaObjects/41467_2018_6211_Fig4_HTML.png",
-      "license": "http://creativecommons.org/licenses/by/4.0/",
-      "open": true,
-      "figure_path": "extracted/nature-test/figures/s41467-018-06211-3_fig4.jpg",
-      "master_images": [
-         {
-            "classification": "graph",
-            "confidence": 0.1626,
-            "height": 204.69104917786962,
-            "width": 216.05792889228232,
-            "geometry": [
-               {
-                  "x": 2,
-                  "y": 253
-               },
-               {
-                  "x": 2,
-                  "y": 458
-               },
-               {
-                  "x": 218,
-                  "y": 253
-               },
-               {
-                  "x": 218,
-                  "y": 458
-               }
-            ],
-            "subfigure_label": {
-               "text": "b",
-               "geometry": [
-                  {
-                     "x": 0,
-                     "y": 254
-                  },
-                  {
-                     "x": 0,
-                     "y": 270
-                  },
-                  {
-                     "x": 13,
-                     "y": 254
-                  },
-                  {
-                     "x": 13,
-                     "y": 270
-                  }
-               ]
-            },
-            "scale_bars": [],
-            "caption": [
-               "b Power density curves of flow cells using the pristine air electrode"
-            ],
-            "keywords": [],
-            "general": [
-               "Power density curves"
-            ]
-         },
-         {
-            "classification": "graph",
-            "confidence": 0.1626,
-            "height": 201.57060974450417,
-            "width": 208.26190444139337,
-            "geometry": [
-               {
-                  "x": 475,
-                  "y": 256
-               },
-               {
-                  "x": 475,
-                  "y": 458
-               },
-               {
-                  "x": 684,
-                  "y": 256
-               },
-               {
-                  "x": 684,
-                  "y": 458
-               }
-            ],
-            "subfigure_label": {
-               "text": "d",
-               "geometry": [
-                  {
-                     "x": 468,
-                     "y": 251
-                  },
-                  {
-                     "x": 468,
-                     "y": 274
-                  },
-                  {
-                     "x": 483,
-                     "y": 251
-                  },
-                  {
-                     "x": 483,
-                     "y": 274
-                  }
-               ]
-            },
-            "scale_bars": [],
-            "caption": [
-               "Mechanical charge and discharge tests using the SMNp and Pt/C at 25 \u2009 mA \u2009 cm\u22122, where the aluminum and electrolyte were replaced every cycle."
-            ],
-            "keywords": [],
-            "general": []
-         },
-         {
-            "classification": "graph",
-            "confidence": 0.1626,
-            "height": 204.00212009347595,
-            "width": 216.32584370099585,
-            "geometry": [
-               {
-                  "x": 240,
-                  "y": 253
-               },
-               {
-                  "x": 240,
-                  "y": 457
-               },
-               {
-                  "x": 457,
-                  "y": 253
-               },
-               {
-                  "x": 457,
-                  "y": 457
-               }
-            ],
-            "subfigure_label": {
-               "text": "c",
-               "geometry": [
-                  {
-                     "x": 238,
-                     "y": 257
-                  },
-                  {
-                     "x": 238,
-                     "y": 274
-                  },
-                  {
-                     "x": 252,
-                     "y": 257
-                  },
-                  {
-                     "x": 252,
-                     "y": 274
-                  }
-               ]
-            },
-            "scale_bars": [
-               {
-                  "label": null,
-                  "geometry": [
-                     {
-                        "x": 55,
-                        "y": 28
-                     },
-                     {
-                        "x": 55,
-                        "y": 31
-                     },
-                     {
-                        "x": 77,
-                        "y": 31
-                     },
-                     {
-                        "x": 77,
-                        "y": 28
-                     }
-                  ],
-                  "confidence": 0.8750423192977905,
-                  "length": 22,
-                  "label_line_distance": -1
-               }
-            ],
-            "caption": [
-               "Power density curves of flow cells using the pristine air electrode, silver manganate nanoplate (SMNp), and Pt/C with 6 \u2009 M KOH electrolyte (scan rate of 0.1\u2009mA\u2009s\u22121) . c Discharge curves using the pristine air electrode, SMNp, and Pt/C at 100 \u2009 mA\u2009cm\u22122."
-            ],
-            "keywords": [],
-            "general": [
-               "Power density curves",
-               "Discharge curves",
-               "Nanoplate"
-            ]
-         },
-         {
-            "classification": "illustration",
-            "confidence": 0.1626,
-            "height": 210.06675237202816,
-            "width": 619.2956205514761,
-            "geometry": [
-               {
-                  "x": 41,
-                  "y": 9
-               },
-               {
-                  "x": 41,
-                  "y": 219
-               },
-               {
-                  "x": 660,
-                  "y": 9
-               },
-               {
-                  "x": 660,
-                  "y": 219
-               }
-            ],
-            "subfigure_label": {
-               "text": "a",
-               "geometry": [
-                  {
-                     "x": 45,
-                     "y": 0
-                  },
-                  {
-                     "x": 45,
-                     "y": 10
-                  },
-                  {
-                     "x": 56,
-                     "y": 0
-                  },
-                  {
-                     "x": 56,
-                     "y": 10
-                  }
-               ]
-            },
-            "scale_bars": [],
-            "caption": [
-               "Schematic of the aluminum\u2013air flow battery (AAFB) system, which includes a single stack cell, one electrolyte tank, and circulation pump . ORR indicates oxygen reduction reaction."
-            ],
-            "keywords": [],
-            "general": [
-               "Schematic"
-            ]
-         }
-      ],
-      "unassigned": {
-         "master_images": [],
-         "dependent_images": [],
-         "inset_images": [],
-         "subfigure_labels": [],
-         "scale_bar_labels": [],
-         "scale_bar_lines": [],
-         "captions": []
-      }
-   },
-   "s41467-018-06211-3_fig5.jpg": {
-      "title": "Seed-mediated atomic-scale reconstruction of silver manganate nanoplates for oxygen reduction towards high-energy aluminum-air flow batteries | Nature Communications",
-      "article_url": "https://www.nature.com/articles/s41467-018-06211-3",
-      "article_name": "s41467-018-06211-3",
-      "full_caption": "Comparison of electrode properties and battery performance. a Electrical conductivity of the Ag nanoparticle, bulk manganese oxides (BM), polyhedron manganese oxide (PM), silver manganate nanoplate (SMNp), and Pt/C-loaded air electrodes. b Precious metal dissolution tests in aluminum\u2013air flow batteries (AAFBs) using the SMNp and Pt/C with 6\u2009M KOH electrolyte after 6\u2009h of discharging at 50\u2009mA\u2009cm\u22122. c, d Comparison of the gravimetric energy density (c) among gasoline with theoretical and practical value, AAFBs with Pt/C and SMNp (at 50\u2009mA\u2009cm\u22122), and comparison of the gravimetric energy density (d) between zinc\u2013air flow batteries (ZAFBs) and AAFBs with the SMNp at 100\u2009mA\u2009cm\u22122",
-      "caption_delimiter": "alpha",
-      "figure_name": "s41467-018-06211-3_fig5.jpg",
-      "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fs41467-018-06211-3/MediaObjects/41467_2018_6211_Fig5_HTML.png",
-      "license": "http://creativecommons.org/licenses/by/4.0/",
-      "open": true,
-      "figure_path": "extracted/nature-test/figures/s41467-018-06211-3_fig5.jpg",
-      "master_images": [
-         {
-            "classification": "graph",
-            "confidence": 0.1626,
-            "height": 297.51004896706684,
-            "width": 236.8940025109511,
-            "geometry": [
-               {
-                  "x": 445,
-                  "y": 283
-               },
-               {
-                  "x": 445,
-                  "y": 581
-               },
-               {
-                  "x": 682,
-                  "y": 283
-               },
-               {
-                  "x": 682,
-                  "y": 581
-               }
-            ],
-            "subfigure_label": {
-               "text": "d",
-               "geometry": [
-                  {
-                     "x": 441,
-                     "y": 288
-                  },
-                  {
-                     "x": 441,
-                     "y": 307
-                  },
-                  {
-                     "x": 462,
-                     "y": 288
-                  },
-                  {
-                     "x": 462,
-                     "y": 307
-                  }
-               ]
-            },
-            "scale_bars": [],
-            "caption": [
-               "Precious metal dissolution tests in aluminum\u2013air flow batteries (AAFBs) using the SMNp and Pt/C with 6 \u2009 M KOH electrolyte after 6\u2009h of discharging at 50 \u2009 mA \u2009 cm\u22122"
-            ],
-            "keywords": [],
-            "general": []
-         },
-         {
-            "classification": "graph",
-            "confidence": 0.1626,
-            "height": 263.9121660061968,
-            "width": 244.5523258355948,
-            "geometry": [
-               {
-                  "x": 438,
-                  "y": 0
-               },
-               {
-                  "x": 438,
-                  "y": 263
-               },
-               {
-                  "x": 682,
-                  "y": 0
-               },
-               {
-                  "x": 682,
-                  "y": 263
-               }
-            ],
-            "subfigure_label": {
-               "text": "b",
-               "geometry": [
-                  {
-                     "x": 441,
-                     "y": 0
-                  },
-                  {
-                     "x": 441,
-                     "y": 17
-                  },
-                  {
-                     "x": 462,
-                     "y": 0
-                  },
-                  {
-                     "x": 462,
-                     "y": 17
-                  }
-               ]
-            },
-            "scale_bars": [],
-            "caption": [
-               "Precious metal dissolution tests in aluminum\u2013air flow batteries (AAFBs) using the SMNp and Pt/C with 6 \u2009 M KOH electrolyte after 6\u2009h of discharging at 50 \u2009 mA \u2009 cm\u22122."
-            ],
-            "keywords": [],
-            "general": []
-         },
-         {
-            "classification": "graph",
-            "confidence": 0.1625,
-            "height": 275.528838366997,
-            "width": 417.63587016325727,
-            "geometry": [
-               {
-                  "x": 15,
-                  "y": 2
-               },
-               {
-                  "x": 15,
-                  "y": 277
-               },
-               {
-                  "x": 433,
-                  "y": 2
-               },
-               {
-                  "x": 433,
-                  "y": 277
-               }
-            ],
-            "subfigure_label": {
-               "text": "a",
-               "geometry": [
-                  {
-                     "x": 0,
-                     "y": 3
-                  },
-                  {
-                     "x": 0,
-                     "y": 17
-                  },
-                  {
-                     "x": 13,
-                     "y": 3
-                  },
-                  {
-                     "x": 13,
-                     "y": 17
-                  }
-               ]
-            },
-            "scale_bars": [],
-            "caption": [
-               "Electrical conductivity of the Ag nanoparticle, bulk manganese oxides (BM), polyhedron manganese oxide (PM), silver manganate nanoplate (SMNp), and Pt/C-loaded air electrodes."
-            ],
-            "keywords": [
-               "Ag nanoparticle"
-            ],
-            "general": [
-               "Nanoparticle"
-            ]
-         },
-         {
-            "classification": "graph",
-            "confidence": 0.1625,
-            "height": 313.46486831292873,
-            "width": 437.62827469752386,
-            "geometry": [
-               {
-                  "x": 10,
-                  "y": 295
-               },
-               {
-                  "x": 10,
-                  "y": 609
-               },
-               {
-                  "x": 448,
-                  "y": 295
-               },
-               {
-                  "x": 448,
-                  "y": 609
-               }
-            ],
-            "subfigure_label": {
-               "text": "c",
-               "geometry": [
-                  {
-                     "x": 0,
-                     "y": 287
-                  },
-                  {
-                     "x": 0,
-                     "y": 310
-                  },
-                  {
-                     "x": 12,
-                     "y": 287
-                  },
-                  {
-                     "x": 12,
-                     "y": 310
-                  }
-               ]
-            },
-            "scale_bars": [],
-            "caption": [
-               "c, d"
-            ],
-            "keywords": [],
-            "general": []
          }
       ],
       "unassigned": {
