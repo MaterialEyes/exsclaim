@@ -85,7 +85,9 @@ class TestNatureFull(unittest.TestCase):
                 self.assertTrue(figure_json["open"])
 
         # Run comparison of expected and resulting jsons
-        diff = DeepDiff(expected, exsclaim_json, ignore_order=True)
+        diff = DeepDiff(expected, exsclaim_json, ignore_order=True,
+                        significant_digits=1,
+                        ignore_numeric_type_changes=True)
 
         ## Band-aid to handle https://github.com/MaterialEyes/exsclaim/issues/5
         ## in testing. This will call the test a pass if we find either of the 
