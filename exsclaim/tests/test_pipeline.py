@@ -92,7 +92,7 @@ class TestNatureFull(unittest.TestCase):
         ## Band-aid to handle https://github.com/MaterialEyes/exsclaim/issues/5
         ## in testing. This will call the test a pass if we find either of the 
         ## results that appear seemingly nondeterministically. 
-        accepted_difference = {'values_changed': {"root['s41467-018-06211-3_fig2.jpg']['master_images'][4]['caption'][0]": {'new_value': 'Corresponding ABF intensity profiles of the white box in d present the peaks of the silver and manganese atomic columns', 'old_value': 'f, g'}}, 'iterable_item_added': {"root['s41467-018-06211-3_fig2.jpg']['master_images'][4]['general'][0]": 'ABF-STEM', "root['s41467-018-06211-3_fig2.jpg']['master_images'][4]['general'][1]": 'Intensity profile'}}
+        accepted_difference = {'values_changed': {"root['s41467-018-06211-3_fig2.jpg']['master_images'][4]['caption'][0]": {'new_value': 'f, g', 'old_value': 'Corresponding ABF intensity profiles of the white box in d present the peaks of the silver and manganese atomic columns'}}, 'iterable_item_removed': {"root['s41467-018-06211-3_fig2.jpg']['master_images'][4]['general'][0]": 'ABF-STEM', "root['s41467-018-06211-3_fig2.jpg']['master_images'][4]['general'][1]": 'Intensity profile'}}
         success = (diff in ({}, accepted_difference))
         self.assertTrue(success,
             ("The resulting json and the reference json are different. This "
