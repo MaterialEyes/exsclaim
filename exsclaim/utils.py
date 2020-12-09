@@ -113,4 +113,4 @@ def convert_labelbox_to_coords(geometry):
 def find_box_center(geometry):
     """ Returns the center (x, y) coords of the box """
     x1, y1, x2, y2 = convert_labelbox_to_coords(geometry)
-    return (x2 - x1) / 2.0, (y2 - y1) / 2.0
+    return (x2 + x1) / 2.0, (y2 + y1) / 2.0
