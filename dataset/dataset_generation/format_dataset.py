@@ -2,6 +2,7 @@ import json
 import os
 from PIL import Image
 import random
+import requests
 
 def match_scale_bar_to_subfigure(master_images, scale_bars):
     """ Matches scale bars labels and lines to master images """
@@ -86,8 +87,7 @@ def convert_box_format(geometry):
     return x1, y1, x2, y2
 
 def make_scale_detection_dataset(train_test_ratio=4,
-                                 labelbox_json="labelbox.json",
-                                 image_directory="all-figures"):
+                                 labelbox_json="labelbox.json"):
     """ creates a json containing all figures with scale bars """
     with open(labelbox_json, "r") as f:
         labelbox_dict = json.load(f)
@@ -98,18 +98,16 @@ def make_scale_detection_dataset(train_test_ratio=4,
     train_articles = set()
     labels = 0
     for figure in labelbox_dict:
+        download_labelbox_images(figure)
         figure_name = figure["External ID"]
         article_name = "_".join(figure_name.split(".")[0].split("_")[:-1])
         labelbox_name = figure["ID"]
         masters = figure["Label"].get("Master Image", [])
         scale_bars = figure["Label"].get("Scale Bar Line", [])
         scale_labels = figure["Label"].get("Scale Bar Label", [])
-        if not os.path.isfile(os.path.join("all-figures", figure_name)):
-            continue
         if scale_bars == []:
             continue
         labels += len(scale_labels)
-
         figure_path = figure_name
 
         if (article_name in train_articles 
@@ -209,8 +207,17 @@ def make_scale_reader_dataset():
 
             cropped_image.save(os.path.join("scale_label_dataset", text, figure_name.split(".")[0] + "-" + str(i) + ".jpg"))
             i += 1
-            
-    
+
+def download_labelbox_images(image_dictionary):
+    """ Download images from Labelbox to prevent mismatched images """      
+    figure_name = image_dictionary["External ID"]
+    figure_url = image_dictionary["Labeled Data"]
+    labeled_data = "labeled_data"
+    os.makedirs(labeled_data, exist_ok=True)
+    figure_path = os.path.join(labeled_data, figure_name)
+    image_data = requests.get(figure_url).content
+    with open(figure_path, "wb") as f:
+        f.write(image_data)
 
 if __name__ == "__main__":
     make_scale_detection_dataset()
