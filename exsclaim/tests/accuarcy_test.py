@@ -18,7 +18,6 @@ class TestScaleDetection(unittest.TestCase):
     def setUp(self):
         """ Instantiates a test search query and FigureSeparator to test """
         nature_json = pathlib.Path(__file__).parent / 'data' / 'nature_test.json'
-        groundtruth_file = pathlib.Path(__file__).parent / 'data' / 'labelbox_results.json'
         with open(nature_json, "r") as f:
             query = json.load(f)
 
@@ -28,7 +27,7 @@ class TestScaleDetection(unittest.TestCase):
                 
     def test_scale_object_detection_accuracy(self):
         """ Tests the accuracy and validity of scale bar object detection """
-        test_image_directory = self.current_directory / 'data' / 'scale_bar'
+        test_image_directory = self.current_directory / 'data'
         dataset = ScaleBarDataset(test_image_directory, T.ToTensor(), True, 5)
         dataloader = torch.utils.data.DataLoader(dataset, batch_size=32,
                                                  collate_fn=collate_fn, num_workers=0,

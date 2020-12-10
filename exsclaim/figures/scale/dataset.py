@@ -19,7 +19,7 @@ class ScaleBarDataset():
 
         with open(scale_bar_dataset, "r") as f:
             self.data = json.load(f)
-        all_figures = os.path.join(root, "all-figures")
+        all_figures = os.path.join(root, "images", "labeled_data")
         self.images = [figure for figure in self.data 
                        if os.path.isfile(os.path.join(all_figures,
                                                       figure))]

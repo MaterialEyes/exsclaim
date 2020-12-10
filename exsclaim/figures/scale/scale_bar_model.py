@@ -93,7 +93,7 @@ def train_object_detector(train_status):
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
     current_path = pathlib.Path(__file__).resolve(strict=True)
-    root_directory = current_path.parent.parent.parent.parent / 'dataset' / 'dataset_generation' 
+    root_directory = current_path.parent.parent.parent / 'tests' / 'data'
     # use our dataset and defined transformations
     dataset_train = ScaleBarDataset(root_directory, get_transform(train=True), False)
     dataset_test = ScaleBarDataset(root_directory, get_transform(train=False), True)
