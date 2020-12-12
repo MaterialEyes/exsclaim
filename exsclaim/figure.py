@@ -217,7 +217,6 @@ class FigureSeparator(ExsclaimTool):
                 "Extracting images from: "+ figure_name.split("/")[-1])
             try:
                 self.extract_image_objects(figure_name)
-                self.make_visualization(figure_name, search_query['results_dir'])
                 new_figures_separated.add(figure_name)
             except:
                 utils.Printer("<!> ERROR: An exception occurred in FigureSeparator\n")
@@ -626,6 +625,44 @@ class FigureSeparator(ExsclaimTool):
                 unassigned_labels.append(label)
         return scale_bar_jsons, unassigned_labels
 
+    def assign_scale_objects_to_subfigures(self,
+                                           master_image,
+                                           scale_objects):
+        """ Assign scale bar objects to master images 
+
+        Args:
+            master_image (Master Image Json): A Master Image JSON
+            scale_objects (list of Scale Object JSON): candidate scale objects
+        Returns:
+            master_image (Master Image JSON): updated with scale objects
+            scale_objects: updated with assigned objects removed
+        """
+        geomtery = master_image["geometry"]
+        unassigned_scale_objects = []
+        assigned_scale_objects = []
+        for scale_object in scale_objects:
+            if utils.is_contained(scale_object["geometry"], geomtery):
+                assigned_scale_objects.append(scale_object)
+            else:
+                unassigned_scale_objects.append(scale_object)
+        master_image["scale_bars"] = assigned_scale_objects
+        # find if there is one unique scale bar label
+        nm_to_pixel = 0
+        label = ""
+        scale_labels = set()
+        for scale_object in master_image["scale_bars"]:
+            if scale_object["label"]:
+                scale_labels.add(scale_object["label"]["nm"])
+                nm_to_pixel = (scale_object["label"]["nm"]
+                               / float(scale_object["length"]))
+                label = scale_object["label"]["text"]
+        if len(scale_labels) == 1:
+            master_image["nm_height"] = nm_to_pixel * master_image["height"]
+            master_image["nm_width"] = nm_to_pixel * master_image["width"]
+            master_image["scale_label"] = label
+
+        return master_image, unassigned_scale_objects
+
     def detect_scale_objects(self, image):
         """ Detects bounding boxes of scale bars and scale bar labels 
 
@@ -674,134 +711,55 @@ class FigureSeparator(ExsclaimTool):
         unassigned_scale_labels = unassigned.get("scale_bar_labels", [])
         master_images = figure_json.get("master_images", [])
         image = Image.open(figure_path).convert("RGB")
-        # Detect the scale of each individual subfigure (master image)
-        for master_image_json in master_images:
-            x1, y1, x2, y2 = utils.convert_labelbox_to_coords(
-                master_image_json["geometry"])
-            master_image = image.crop((x1, y1, x2, y2))
-            master_image = T.ToTensor()(master_image)
-            # Detect scale bar objects
-            scale_bar_info = self.detect_scale_objects(master_image)
-            label_names = ["background", "scale bar", "scale label"]
-            scale_bars = []
-            scale_labels = []
-            for scale_object in scale_bar_info:
-                x1, y1, x2, y2, confidence, classification = scale_object
-                geometry = utils.convert_coords_to_labelbox([int(x1), int(y1),
-                                                            int(x2), int(y2)])
-                if label_names[int(classification)] == "scale bar":
-                    scale_bar_json = {
-                        "geometry" : geometry,
-                        "confidence" : float(confidence),
-                        "length" : int(x2 - x1)
-                    }
-                    scale_bars.append(scale_bar_json)
-                elif label_names[int(classification)] == "scale label":
-                    scale_bar_label_image = image.crop((int(x1), int(y1),
-                                                       int(x2), int(y2)))
-                    ## Read Scale Text
-                    scale_label_text, label_confidence = self.read_scale_bar_full(
-                        scale_bar_label_image)
-                    magnitude, unit = scale_label_text.split(" ")
-                    magnitude = float(magnitude)
-                    length_in_nm = magnitude * convert_to_nm[unit.strip().lower()]
-                    label_json = {
-                        "geometry" : geometry,
-                        "label" : scale_label_text,
-                        "label_confidence" : float(label_confidence),
-                        "box_confidence" : float(confidence),
-                        "nm" : length_in_nm
-                    }
-                    scale_labels.append(label_json)
-            # Match scale bars to labels and to subfigures (master images)
-            scale_bar_jsons, unassigned_labels = (
-                self.create_scale_bar_objects(scale_bars, scale_labels))
-            unassigned_scale_labels += unassigned_labels
-            master_image_json["scale_bars"] = scale_bar_jsons
-            if scale_bar_jsons == []:
-                continue
-            try:
-                scale_bar = master_image_json["scale_bars"][0]
-                nm_to_pixel = (scale_bar["label"]["nm"]
-                               / float(scale_bar["length"]))
-                master_image_json["nm_height"] = (master_image_json["height"]
-                                                    * nm_to_pixel)
-                master_image_json["nm_width"] = (master_image_json["width"]
-                                                    * nm_to_pixel)
-            except:
-                continue
+        tensor_image = T.ToTensor()(image)
+        # Detect scale bar objects
+        scale_bar_info = self.detect_scale_objects(tensor_image)
+        label_names = ["background", "scale bar", "scale label"]
+        scale_bars = []
+        scale_labels = []
+        for scale_object in scale_bar_info:
+            x1, y1, x2, y2, confidence, classification = scale_object
+            geometry = utils.convert_coords_to_labelbox([int(x1), int(y1),
+                                                        int(x2), int(y2)])
+            if label_names[int(classification)] == "scale bar":
+                scale_bar_json = {
+                    "geometry" : geometry,
+                    "confidence" : float(confidence),
+                    "length" : int(x2 - x1)
+                }
+                scale_bars.append(scale_bar_json)
+            elif label_names[int(classification)] == "scale label":
+
+                scale_bar_label_image = image.crop((int(x1), int(y1),
+                                                    int(x2), int(y2)))
+                ## Read Scale Text
+                scale_label_text, label_confidence = self.read_scale_bar(
+                    scale_bar_label_image)
+                magnitude, unit = scale_label_text.split(" ")
+                magnitude = float(magnitude)
+                length_in_nm = magnitude * convert_to_nm[unit.strip().lower()]
+                label_json = {
+                    "geometry" : geometry,
+                    "text" : scale_label_text,
+                    "label_confidence" : float(label_confidence),
+                    "box_confidence" : float(confidence),
+                    "nm" : length_in_nm
+                }
+                scale_labels.append(label_json)
+        # Match scale bars to labels and to subfigures (master images)
+        scale_bar_jsons, unassigned_labels = (
+            self.create_scale_bar_objects(scale_bars, scale_labels))
+        for master_image in master_images:
+            master_image, scale_bar_jsons = (
+                self.assign_scale_objects_to_subfigures(master_image,
+                                                        scale_bar_jsons))                                                      
+
         # Save info to JSON
         unassigned["scale_bar_labels"] = unassigned_scale_labels
+        unassigned["scale_bar_objects"] = scale_bar_jsons
         figure_json["unassigned"] = unassigned
         figure_json["master_images"] = master_images
         return figure_json
-
-    def make_visualization(self, figure_path, save_path):
-        """ Save subfigures and their labels as images
-
-        Args:
-            figure_path (str): A path to the image (.png, .jpg, or .gif)
-                file containing the article figure
-        Modifies:
-            Creates images and text files in <save_path>/extractions folders
-            showing details about each subfigure
-        """
-        sample_image_name = ".".join(figure_path.split("/")[-1].split(".")[0:-1])
-        figure_name = figure_path.split("/")[-1]
-        ## Make and save images
-        figure_json = self.exsclaim_json[figure_name]
-        result_image = Image.new(mode="RGB",size=(200,(len(figure_json["master_images"])+1)*100-50))
-        draw = ImageDraw.Draw(result_image)
-        font = ImageFont.load_default()
-
-        # headline text
-        text = "labels"
-        draw.text((10,10),text,fill="white",font=font)
-        text = "master image"
-        draw.text((110,10),text,fill="white",font=font)
-        
-        img_raw = Image.open(figure_path).convert("RGB")
-        label_img = img_raw.copy()
-        img_draw = ImageDraw.Draw(label_img)
-
-        # max to handle case where pair info has only 1 (the full figure is the master image)
-        for subfigure_id in range(0, max(len(figure_json["master_images"]), 1)): 
-            # extract relevant data from exsclaim json  
-            subfigure = figure_json["master_images"][subfigure_id]
-            geometry = subfigure["geometry"]
-            x1, y1 = geometry[0]["x"], geometry[0]["y"]
-            x2, y2 = geometry[3]["x"], geometry[3]["y"]
-            master_label = subfigure["classification"]
-            confidence = subfigure["confidence"]
-            subfigure_label = subfigure["subfigure_label"]["text"]
-            
-            patch = img_raw.crop((int(x1),int(y1),int(x2),int(y2)))
-            text = "%s %f %d %d %d %d\n"%(master_label, confidence,
-                                          int(x1), int(y1), int(x2), int(y2))
-
-            os.makedirs(save_path+"/extractions", exist_ok=True)
-            with open(os.path.join(save_path+"/extractions/",sample_image_name+".txt"),"a+") as results_file:
-                results_file.write(text)
-            img_draw.line([(x1,y1),(x1,y2),(x2,y2),(x2,y1),(x1,y1)], fill=(255,0,0), width=3)
-            img_draw.rectangle((x2-100,y2-30,x2,y2),fill=(0,255,0))
-            img_draw.text((x2-100+2,y2-30+2),"{}, {}".format(master_label,subfigure_label),fill=(255,0,0))
-            
-            text = "%s\n%s"%(master_label,subfigure_label)
-            draw.text((10,60+100*subfigure_id),text,fill="white",font=font)
-            
-            pw,ph = patch.size
-            if pw>ph:
-                ph = max(1,ph/pw*80)
-                pw = 80
-            else:
-                pw = max(1,pw/ph*80)
-                ph = 80
-
-            patch = patch.resize((int(pw),int(ph)))
-            result_image.paste(patch,box=(110,60+100*subfigure_id))
-
-        del draw
-        result_image.save(os.path.join(save_path+"/extractions/"+sample_image_name+".png"))
     
     def extract_image_objects(self, figure_path=str) -> "figure_dict":
         """ Separate and classify subfigures in an article figure
