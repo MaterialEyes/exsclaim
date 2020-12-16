@@ -6,9 +6,9 @@ import torch
 
 import torchvision.models.detection.mask_rcnn
 
-from exsclaim.figures.scale.coco_utils import get_coco_api_from_dataset
-from exsclaim.figures.scale.coco_eval import CocoEvaluator
-import exsclaim.figures.scale.utils
+from .coco_utils import get_coco_api_from_dataset
+from .coco_eval import CocoEvaluator
+from . import utils
 import pathlib
 
 def train_one_epoch(model, optimizer, data_loader, device, epoch,
@@ -113,4 +113,4 @@ def evaluate(model, data_loader, device, model_name="unnamed_model"):
     coco_evaluator.accumulate()
     coco_evaluator.summarize(model_name=model_name)
     torch.set_num_threads(n_threads)
-    return coco_evaluator
+    return float(metric_logger.meters["loss"])

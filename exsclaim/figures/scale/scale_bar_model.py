@@ -1,10 +1,11 @@
 import torchvision
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
-from dataset import ScaleBarDataset
-from engine import train_one_epoch, evaluate
+from .dataset import ScaleBarDataset
+from .engine import train_one_epoch, evaluate
 from PIL import Image, ImageDraw
-import exsclaim.figures.scale.utils
+from . import utils
 import torch
+from torch import optim
 import torchvision.transforms as T
 import skimage as io
 import numpy as np
@@ -50,18 +51,18 @@ def get_model(train_status):
  
     # construct an optimizer
     params = [p for p in model.parameters() if p.requires_grad]
-    optimizer = torch.optim.SGD(params, lr=0.005,
-                                momentum=0.9, weight_decay=0.0005)
+    learning_rate = 0.01
+    optimizer = optim.Adam(params, lr=learning_rate)
     # and a learning rate scheduler
-    lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer,
-                                                   step_size=3,
-                                                   gamma=0.1)
+    lr_scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, "min")
     # find if there is a previous checkpoint
+    current_path = pathlib.Path(__file__).resolve(strict=True)
+    checkpoints = current_path.parent / 'checkpoints'
     largest = -1
     best_checkpoint = None
-    for checkpoint in os.listdir('checkpoints'):
+    for checkpoint in os.listdir(checkpoints):
         filename = checkpoint.split(".")[0]
-        if not os.path.isfile(os.path.join('checkpoints', checkpoint)):
+        if not os.path.isfile(os.path.join(checkpoints, checkpoint)):
             continue
         model_name, number = filename.split("-")
         if model_name != current_model:
@@ -73,7 +74,7 @@ def get_model(train_status):
     if best_checkpoint == None:
         return model, lr_scheduler, optimizer, 0
 
-    best_checkpoint = 'checkpoints/' + best_checkpoint
+    best_checkpoint = checkpoints / best_checkpoint
     cuda = torch.cuda.is_available() and (gpu_id >= 0)
     if cuda:
         checkpoint = torch.load(best_checkpoint)
@@ -94,6 +95,7 @@ def train_object_detector(train_status):
 
     current_path = pathlib.Path(__file__).resolve(strict=True)
     root_directory = current_path.parent.parent.parent.parent / 'dataset' / 'dataset_generation' 
+    checkpoints = current_path.parent / "checkpoints"
     # use our dataset and defined transformations
     dataset_train = ScaleBarDataset(root_directory, get_transform(train=True), False)
     dataset_test = ScaleBarDataset(root_directory, get_transform(train=False), True)
@@ -118,10 +120,11 @@ def train_object_detector(train_status):
         # train for one epoch, printing every 10 iterations
         train_one_epoch(model, optimizer, data_loader, device,
                         epoch, print_freq=5, model_name=model_name)
-        # update the learning rate
-        lr_scheduler.step()
         # evaluate on the test dataset
-        evaluate(model, data_loader_test, device=device, model_name=model_name)
+        loss = evaluate(model, data_loader_test, device=device, model_name=model_name)
+        # update the learning rate
+        optimizer.step()
+        lr_scheduler.step(loss)
 
         if epoch % 1 == 0:
             torch.save({
@@ -130,7 +133,7 @@ def train_object_detector(train_status):
                         'optimizer_state_dict': optimizer.state_dict(),
                         'lr_state_dict': lr_scheduler.state_dict()
                        },
-                       "checkpoints/scale_bar_model_{}-{}.pt".format(train_status, epoch))
+                       checkpoints / "scale_bar_model_{}-{}.pt".format(train_status, epoch))
 
 
 def run():
