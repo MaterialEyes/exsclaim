@@ -16,7 +16,7 @@ class ScaleBarDataset():
         else:
             scale_bar_dataset = os.path.join(root, "scale_bars_dataset_train.json")
 
-
+        self.test = test
         with open(scale_bar_dataset, "r") as f:
             self.data = json.load(f)
         all_figures = os.path.join(root, "images", "labeled_data")
@@ -27,8 +27,7 @@ class ScaleBarDataset():
             self.images = random.sample(self.images, size)
     
     def __getitem__(self, idx):
-        image_path = os.path.join(self.root, "all-figures", self.images[idx])
-        
+        image_path = os.path.join(self.root,"images", "labeled_data", self.images[idx])
         with Image.open(image_path).convert("RGB") as image:
             image_name = self.images[idx]
 
