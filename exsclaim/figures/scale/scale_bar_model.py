@@ -43,7 +43,7 @@ def get_model(train_status):
     
     # load an object detection model pre-trained on COCO
     model = torchvision.models.detection.fasterrcnn_resnet50_fpn(
-        pretrained=faster, pretrained_backbone=True)
+        pretrained=faster, pretrained_backbone=resnet)
     # get the number of input features for the classifier
     in_features = model.roi_heads.box_predictor.cls_score.in_features
     # replace the pre-trained head with a new on
@@ -51,10 +51,12 @@ def get_model(train_status):
  
     # construct an optimizer
     params = [p for p in model.parameters() if p.requires_grad]
-    learning_rate = 0.01
+    learning_rate = 0.001
     optimizer = optim.Adam(params, lr=learning_rate)
     # and a learning rate scheduler
-    lr_scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, "min")
+    #lr_scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, "min")
+    #lr_scheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones=[20, 40, 60])
+    lr_scheduler = None
     # find if there is a previous checkpoint
     current_path = pathlib.Path(__file__).resolve(strict=True)
     checkpoints = current_path.parent / 'checkpoints'
@@ -84,7 +86,7 @@ def get_model(train_status):
    
     model.load_state_dict(checkpoint["model_state_dict"])
     optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
-    lr_scheduler.load_state_dict(checkpoint["lr_state_dict"])
+    #lr_scheduler.load_state_dict(checkpoint["lr_state_dict"])
     epoch = checkpoint['epoch']   
 
     return model, lr_scheduler, optimizer, epoch
@@ -94,19 +96,19 @@ def train_object_detector(train_status):
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
     current_path = pathlib.Path(__file__).resolve(strict=True)
-    root_directory = current_path.parent.parent.parent.parent / 'dataset' / 'dataset_generation' 
     checkpoints = current_path.parent / "checkpoints"
+    root_directory = current_path.parent.parent.parent / 'tests' / 'data'
     # use our dataset and defined transformations
     dataset_train = ScaleBarDataset(root_directory, get_transform(train=True), False)
     dataset_test = ScaleBarDataset(root_directory, get_transform(train=False), True)
 
     # define training and validation data loaders
     data_loader = torch.utils.data.DataLoader(
-        dataset_train, batch_size=64, shuffle=True, num_workers=0,
+        dataset_train, batch_size=32, shuffle=True, num_workers=0,
         collate_fn=utils.collate_fn)
 
     data_loader_test = torch.utils.data.DataLoader(
-        dataset_test, batch_size=64, shuffle=False, num_workers=0,
+        dataset_test, batch_size=32, shuffle=True, num_workers=0,
         collate_fn=utils.collate_fn)
 
     # get the model using our helper function
@@ -119,19 +121,16 @@ def train_object_detector(train_status):
     for epoch in range(start_epoch + 1, num_epochs):
         # train for one epoch, printing every 10 iterations
         train_one_epoch(model, optimizer, data_loader, device,
-                        epoch, print_freq=5, model_name=model_name)
+                        epoch, print_freq=5, lr_scheduler=lr_scheduler,  model_name=model_name)
         # evaluate on the test dataset
-        loss = evaluate(model, data_loader_test, device=device, model_name=model_name)
-        # update the learning rate
-        optimizer.step()
-        lr_scheduler.step(loss)
+        evaluate(model, data_loader_test, device=device, model_name=model_name)
 
         if epoch % 1 == 0:
             torch.save({
                         'epoch': epoch,
                         'model_state_dict': model.state_dict(),
                         'optimizer_state_dict': optimizer.state_dict(),
-                        'lr_state_dict': lr_scheduler.state_dict()
+                        #'lr_state_dict': lr_scheduler.state_dict()
                        },
                        checkpoints / "scale_bar_model_{}-{}.pt".format(train_status, epoch))
 

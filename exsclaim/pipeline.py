@@ -4,6 +4,8 @@ import json
 import time
 import numpy as np
 import matplotlib.pyplot as plt
+from PIL import Image, ImageDraw, ImageFont
+import textwrap
 
 from . import utils
 from .figure import FigureSeparator
@@ -94,10 +96,13 @@ class Pipeline:
         if 'csv' in save_methods or 'save_subfigures' in save_methods:
             self.to_file()
 
+        if 'visualization' in save_methods or 'visualize' in save_methods:
+            for figure in self.exsclaim_dict:
+                self.make_visualization(figure)
+
         if 'mongo' in save_methods:
             import pymongo
             db_client = pymongo.MongoClient(self.query_dict["mongo_connection"])
-
             db = db_client["materialeyes"]
             collection = db[self.query_dict["name"]]
             db_push = list(self.exsclaim_dict.values())
@@ -331,3 +336,81 @@ class Pipeline:
             writer.writerows(rows)
 
         utils.Printer(">>> SUCCESS!\n")
+
+    def make_visualization(self, figure_name):
+        """ Save subfigures and their labels as images
+
+        Args:
+            figure_path (str): A path to the image (.png, .jpg, or .gif)
+                file containing the article figure
+        Modifies:
+            Creates images and text files in <save_path>/extractions folders
+            showing details about each subfigure
+        """
+        os.makedirs(os.path.join(self.query_dict["results_dir"], "extractions"), exist_ok=True)
+        figure_json = self.exsclaim_dict[figure_name]
+        master_images = figure_json.get("master_images", [])
+        # to handle older versions that didn't store height and width
+        for master_image in master_images:
+            if 'height' not in master_image or 'width' not in master_image:
+                geometry = master_image["geometry"]
+                x1, y1, x2, y2 = utils.convert_labelbox_to_coords(geometry)
+                master_image['height'] = y2 - y1
+                master_image['width'] = x2 - x1
+        image_buffer = 150
+        height = int(sum([master["height"] + image_buffer for master in master_images]))
+        width = int(max([master["width"] for master in master_images]))
+        image_width = max(width, 500)
+        image_height = height
+
+        ## Make and save images
+        labeled_image = Image.new(mode="RGB",size=(image_width, image_height))
+        draw = ImageDraw.Draw(labeled_image)
+        font = ImageFont.truetype("/usr/share/fonts/dejavu/DejaVuSans.ttf")
+
+        full_figure = Image.open(figure_json["figure_path"]).convert("RGB")
+        draw_full_figure = ImageDraw.Draw(full_figure)
+
+        image_y = 0
+        for subfigure_json in master_images:
+            geometry = subfigure_json["geometry"]
+            x1, y1, x2, y2 = utils.convert_labelbox_to_coords(geometry)
+            classification = subfigure_json["classification"]
+            caption = "\n".join(subfigure_json.get("caption", []))
+            caption = "\n".join(textwrap.wrap(caption, width=100))
+            subfigure_label = subfigure_json["subfigure_label"]["text"]
+            scale_bar_label = subfigure_json.get("scale_label", "None")
+            scale_bars = subfigure_json.get("scale_bars", [])
+            # Draw bounding boxes on detected objects
+            for scale_bar in scale_bars:
+                scale_geometry = scale_bar["geometry"]
+                coords = utils.convert_labelbox_to_coords(scale_geometry)
+                bounding_box = [int(coord) for coord in coords]
+                draw_full_figure.rectangle(bounding_box, width=2, outline="green")
+                if scale_bar["label"]:
+                    label_geometry = scale_bar["label"]["geometry"]
+                    coords = utils.convert_labelbox_to_coords(label_geometry)
+                    bounding_box = [int(coord) for coord in coords]
+                    draw_full_figure.rectangle(bounding_box, width=2, outline="green")
+            label_geometry = subfigure_json["subfigure_label"]["geometry"]
+            if label_geometry != []:
+                coords = utils.convert_labelbox_to_coords(label_geometry)
+                bounding_box = [int(coord) for coord in coords]
+                draw_full_figure.rectangle(bounding_box, width=1, outline="green")
+            # Draw image
+            subfigure = full_figure.crop((int(x1), int(y1), int(x2), int(y2)))
+            text = ("Subfigure Label: {}\n"
+                    "Classification: {}\n"
+                    "Scale Bar Label: {}\n"
+                    "Caption:\n{}".format(subfigure_label,
+                                          classification,
+                                          scale_bar_label,
+                                          caption))
+            text.encode("utf-8")
+            labeled_image.paste(subfigure, box=(0,image_y))
+            image_y += int(subfigure_json["height"])
+            draw.text((0, image_y), text, fill="white", font=font)
+            image_y += image_buffer
+
+        del draw
+        labeled_image.save(os.path.join(self.query_dict["results_dir"], "extractions", figure_name))

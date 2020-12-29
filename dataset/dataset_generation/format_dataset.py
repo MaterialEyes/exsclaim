@@ -170,7 +170,7 @@ def make_scale_reader_dataset():
     labels = 0
     for figure in labelbox_dict:
         figure_name = figure["External ID"]
-        figure_path = os.path.join('all-figures', figure_name)
+        figure_path = os.path.join('labeled_data', figure_name)
         scale_labels = figure["Label"].get("Scale Bar Label", [])
         if not os.path.isfile(figure_path):
             continue
@@ -186,7 +186,7 @@ def make_scale_reader_dataset():
     labels = 0
     for figure in labelbox_dict:
         figure_name = figure["External ID"]
-        figure_path = os.path.join("all-figures", figure_name)
+        figure_path = os.path.join("labeled_data", figure_name)
         labelbox_name = figure["ID"]
         masters = figure["Label"].get("Master Image", [])
         scale_bars = figure["Label"].get("Scale Bar Line", [])
@@ -220,4 +220,4 @@ def download_labelbox_images(image_dictionary):
         f.write(image_data)
 
 if __name__ == "__main__":
-    make_scale_detection_dataset()
+    make_scale_reader_dataset()
