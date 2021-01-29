@@ -14,7 +14,7 @@ import pycocotools.mask as mask_util
 
 from collections import defaultdict
 
-import exsclaim.figures.scale.utils
+from . import utils
 import pathlib
 
 
@@ -56,8 +56,10 @@ class CocoEvaluator(object):
         for coco_eval in self.coco_eval.values():
             coco_eval.accumulate()
 
-    def summarize(self, model_name="unnamed_model"):
+    def summarize(self, model_name="unnamed_model", nms=False):
         current_file = pathlib.Path(__file__).resolve(strict=True)
+        if nms:
+            model_name = model_name + "-nms"
         save_file = current_file.parent / 'results' / '{}.txt'.format(model_name)
         for iou_type, coco_eval in self.coco_eval.items():
             with open(save_file, "a") as f:

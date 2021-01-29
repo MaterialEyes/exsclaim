@@ -258,14 +258,33 @@ def generate_dataset_scale_bar_labels(samples, input_directory, output_directory
     """
     scales = [round((10**scale) * i, 1) for i in range(1, 10) for scale in range(-1, 3)] + [2.5, 25, 250]
     scales = [str(i) for i in scales]
-    units = ["um", "nm", "A", "mm"]
+    units = ["um", "nm", "A", "mm", "cm"]
     train_to_test_ratio = 5
+
+    
+
 
     for i in range(samples):
         # select text
         scale = random.choice(scales)
         unit = random.choice(units)
+        if unit == "A":
+            typed_unit = random.choice(["A", "Å"])
+        elif unit == "u":
+            typed_unit = random.choice(["u", "μ"])
+        else:
+            typed_unit = unit
+        if random.randint(0, 10) == 4:
+            unit = unit.upper()
+            typed_unit = typed_unit.upper()
+        drawn_text = scale + " " + typed_unit
         text = scale + " " + unit
+        # for just digits
+        characters = "0123456789. NnUuMmCcA"
+        length = random.randint(3, 7)
+        text = ""
+        for k in range(length):
+            text += random.choice(characters)
         # open image
         image_name = random.choice(os.listdir(input_directory))
         image_name = os.fsdecode(image_name)
@@ -275,10 +294,9 @@ def generate_dataset_scale_bar_labels(samples, input_directory, output_directory
         
         # save image
         if i % train_to_test_ratio == 0:
-            output_directory = output_directory + "/test"
+            save(cropped_image, os.path.join(output_directory, "test", text, str(i) + ".png"))
         else:
-            output_directory = output_directory + "/train"
-        save(cropped_image, os.path.join(output_directory, unit, str(i) + ".png"))
+            save(cropped_image, os.path.join(output_directory, "train", text, str(i) + ".png"))
 
         if i % 500 == 0:
             print("Created {} samples".format(i))
@@ -289,26 +307,26 @@ def generate_dataset_from_labelbox():
         labelbox_dict = json.load(f)
 
     ## Find how many times each scale bar label appears
-    scale_bar_labels = {}
-    for figure in labelbox_dict:
-        figure_name = figure["External ID"]
-        figure_path = os.path.join('all-figures', figure_name)
-        scale_labels = figure["Label"].get("Scale Bar Label", [])
-        if not os.path.isfile(figure_path):
-            continue
-        if scale_labels == []:
-            continue
-        for label in scale_labels:
-            text = clean_text(label["text"])
-            if not text:
-                continue
-            num = scale_bar_labels.get(text, 0)
-            scale_bar_labels[text] = num + 1
-
+#     scale_bar_labels = {}
+#     for figure in labelbox_dict:
+#         figure_name = figure["External ID"]
+#         figure_path = os.path.join('labeled_data', figure_name)
+#         scale_labels = figure["Label"].get("Scale Bar Label", [])
+#         if not os.path.isfile(figure_path):
+#             continue
+#         if scale_labels == []:
+#             continue
+#         for label in scale_labels:
+#             text = clean_text(label["text"])
+#             if not text:
+#                 continue
+#             num = scale_bar_labels.get(text, 0)
+#             scale_bar_labels[text] = num + 1
+# 
     labels = 0
     for figure in labelbox_dict:
         figure_name = figure["External ID"]
-        figure_path = os.path.join("all-figures", figure_name)
+        figure_path = os.path.join("labeled_data", figure_name)
         labelbox_name = figure["ID"]
         masters = figure["Label"].get("Master Image", [])
         scale_bars = figure["Label"].get("Scale Bar Line", [])
@@ -320,8 +338,7 @@ def generate_dataset_from_labelbox():
         i = 0
         for label in scale_labels:
             text = clean_text(label["text"])
-            # only use labels that appear 10+ times (95% of labels)
-            if not text or scale_bar_labels[text] < 10:
+            if not text:
                 continue
             geometry = label["geometry"]
             os.makedirs(os.path.join("scale_label_dataset", text), exist_ok=True)
@@ -330,6 +347,41 @@ def generate_dataset_from_labelbox():
 
             cropped_image.save(os.path.join("scale_label_dataset", text, figure_name.split(".")[0] + "-" + str(i) + ".jpg"))
             i += 1
+
+def is_number(n):
+    """ returns true if a string n represents a float """
+    try:
+        float(n)
+    except ValueError:
+        return False
+    return True
+
+def convert_box_format(geometry):
+    """ Converts from [{"x": x1, "y": y1}, ...] to (x1, y1, ...) """
+    #print(geometry)
+    x1 = min([point["x"] for point in geometry])
+    y1 = min([point["y"] for point in geometry])
+    x2 = max([point["x"] for point in geometry])
+    y2 = max([point["y"] for point in geometry])
+
+    return x1, y1, x2, y2
+
+
+
+def clean_text(text):
+    """ adds spaces to text, returns false if improper """
+    if is_number(text) or "/" in text:
+        return False
+    if len(text.split(" ")) != 2:
+        i = 1 if text[0] != "." else 2
+        while is_number(text[:i]):
+            i +=1
+        text = text[:i-1] + " " + text[i-1:]
+    
+    if not is_number(text.split(" ")[0]):
+        return False
+    return text
+
 
 
 def create_test_candidates():
@@ -349,5 +401,6 @@ def create_test_candidates():
     return useful_figures
 
 if __name__ == "__main__":
-    generate_dataset_scale_bar_labels(5000, "no_text/", "unit_data")
+    #generate_dataset_from_labelbox()
+    generate_dataset_scale_bar_labels(100000, "no_text/", "number_samples")
 

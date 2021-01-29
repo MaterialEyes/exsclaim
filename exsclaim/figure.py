@@ -213,6 +213,10 @@ class FigureSeparator(ExsclaimTool):
             figures_separated = {f.strip() for f in contents}
         else:
             figures_separated = set()
+
+        with open(search_query["results_dir"] + "_figures", "w") as f:
+            for figure in figures_separated:
+                f.write("%s\n" % figure.split("/")[-1])
         new_figures_separated = set()
 
         counter = 1
@@ -231,6 +235,7 @@ class FigureSeparator(ExsclaimTool):
             # Save to file every N iterations (to accomodate restart scenarios)
             if counter%500 == 0:
                 self._appendJSON(search_query['results_dir'], self.exsclaim_json, new_figures_separated)
+                new_figures_separated = set()
             counter += 1
         
         t1 = time.time()

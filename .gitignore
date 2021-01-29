@@ -1,4 +1,5 @@
 exsclaim/figures/checkpoints
+exsclaim/figures/scale/results/
 exsclaim/text/images
 utils/phase_out/
 __pycache__/
@@ -29,3 +30,4 @@ exsclaim/tests/data/scale_label_dataset/
 cookie
 dist/
 build/
+*.sh
