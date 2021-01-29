@@ -238,6 +238,7 @@ class CaptionSeparator(ExsclaimTool):
             # Save to file every N iterations (to accomodate restart scenarios)
             if counter%1000 == 0:
                 self._appendJSON(search_query['results_dir'], exsclaim_json, new_captions_separated)
+                new_captions_separated = set()
             counter += 1
 
         t1 = time.time()
