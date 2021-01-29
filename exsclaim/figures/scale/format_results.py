@@ -1,9 +1,18 @@
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
+import matplotlib.gridspec as gridspec
 import pandas as pd
 import numpy as np
 import json
 import matplotlib
+from scipy.stats import gaussian_kde
+from sklearn.metrics import confusion_matrix
+from sklearn.metrics import ConfusionMatrixDisplay
+import mpl_scatter_density # adds projection='scatter_density'
+from matplotlib.colors import LinearSegmentedColormap
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+from PIL import Image
+import os
 
 
 def format_classification_results(results_file, ax=None):
@@ -57,29 +66,9 @@ def format_classification_results(results_file, ax=None):
     plt.legend([line_1, line_2, line_3], ["Training Loss", "Testing Loss", "Test Accuracy"])
 
 
-def make_confusion_matrix(model_name, actual, predicted, ax=None, pdf=None):
-    y_actu = pd.Series(actual, name='Actual')
-    y_pred = pd.Series(predicted, name='Predicted')
-    confusion_matrix = pd.crosstab(y_actu, y_pred)
-    idx_to_class = get_idx_to_class(model_name)
-
-    # format subplot
-    ax.title.set_text("Confusion Matrix")
-    cmap = plt.cm.gray_r
-    ax_image = ax.matshow(confusion_matrix, cmap=cmap) # imshow
-    plt.colorbar(ax_image, ax=ax)
-    x_tick_marks = np.arange(len(confusion_matrix.columns))
-    y_tick_marks = np.arange(len(confusion_matrix.index))
-    ax.set_xticks(x_tick_marks)
-    ax.set_xticklabels(confusion_matrix.columns)
-    ax.xaxis.set_tick_params(rotation=45)
-    ax.set_yticks(y_tick_marks)
-    ax.set_yticklabels(confusion_matrix.index)
-    #plt.tight_layout()
-    ax.set_ylabel(confusion_matrix.index.name)
-    ax.set_xlabel(confusion_matrix.columns.name)
-    #plt.show()
-
+def make_confusion_matrix(actual, predicted, labels=None, ax=None, pdf=None):
+    cm = confusion_matrix(actual, predicted, labels = labels)
+    cm_display = ConfusionMatrixDisplay(cm, display_labels=labels).plot(ax=ax)
 
 def get_idx_to_class(model_name):
     ## Code to set up scale label reading model(s)
@@ -125,19 +114,19 @@ def make_metadata_chart(model_name, results_dict, ax=None):
     model, epochs = model_name.split("-")
     dataset = "_".join(model.split("_")[:-1])
     depth = model.split("_")[-1]
-
-    classes_stats = get_accuracy_stats(model_name, results_dict)
-    total_stats = classes_stats["all"]
     accuracy = results_dict["accuracy"]
     ax.text(0, 0, "Dataset: {}\nDepth: {}\nEpochs: {}\nAccuracy: {}".format(dataset, depth, epochs, str(accuracy)))
 
+def make_label_metadata_chart(confidence, accuracy, total_images, mean_pe, median_pe, ax=None):
+    ax.axis("off")
+    ax.text(0, 0, "Confidence Threshold: {}\nAccuracy: {}\nPrecent in Threshold {}\nMean Percent Error {}\nMedian Percent Error {}\n".format(confidence, str(accuracy), str(total_images), mean_pe, median_pe))
 
-def get_accuracy_by_confidence(resutls_dict, ax=None):
-    actual = resutls_dict["actual_idx"]
-    predicted = resutls_dict["predicted_idx"]
-    confidences = resutls_dict["confidence"]
-
-    confidence_thresholds = [0.05*i for i in range(1, 20)]
+def get_accuracy_by_confidence(actual, predicted, confidences, ax=None, max_confidence=.60):
+    max_confidence *= 100
+    max_confidence = int(max_confidence)
+    if ax is None:
+        fig, ax = plt.subplots()
+    confidence_thresholds = [0.01*i for i in range(0, max_confidence)]
     accuracies = []
     valid = []
     for threshold in confidence_thresholds:
@@ -156,15 +145,19 @@ def get_accuracy_by_confidence(resutls_dict, ax=None):
         valid.append(num_valid)
     
     ax.plot(confidence_thresholds, accuracies)
-    ax.title.set_text("Accuracy By Confidence Threshold")
+    ax.title.set_text("Accuracy By Confidence Threshold (min 500 samples)")
     ax.set_xlabel("Confidence Threshold")
     ax.set_ylabel("Accuracy")
-    
+    ax.spines["left"].set_color('blue')
     ax2 = ax.twinx()
     ax2.set_ylabel("# of Images")
-    #ax2.set_ylim([0.0, 1.0])
-    line_3 = ax2.bar(confidence_thresholds, valid, width=0.01, align='center', label="Test Accuracy", color="tab:green")
-
+    ax2.spines["right"].set_color("green")
+    ax2.spines["left"].set_color("blue")
+    ax2.yaxis.label.set_color('green')
+    ax.yaxis.label.set_color('blue')
+    ax2.tick_params(axis='y', colors='green')
+    ax.tick_params(axis='y', colors='blue')
+    line_3 = ax2.bar(confidence_thresholds, valid, width=0.004, align='center', label="Test Accuracy", color="tab:green")
 
 
 def generate_report(results_file, training_results_directory):
@@ -175,7 +168,7 @@ def generate_report(results_file, training_results_directory):
     font = {'size'   : 4}
     matplotlib.rc('font', **font)
 
-    with PdfPages('multipage_pdf.pdf') as pdf:
+    with PdfPages('scale_bar.pdf') as pdf:
         for model_name in results_dict:
                 #fig = plt.figure()
                 plt.title(model_name)
@@ -184,7 +177,7 @@ def generate_report(results_file, training_results_directory):
                 model_dict = results_dict[model_name]
                 make_confusion_matrix(model_name, model_dict["actual_class"],
                              model_dict["predicted_class"], ax=ax1)
-                get_accuracy_by_confidence(model_dict, ax=ax2)
+                #get_accuracy_by_confidence(model_dict, ax=ax2)
 
                 results_file = training_results_directory + model_name
                 format_classification_results(results_file, ax=ax3)
@@ -194,7 +187,6 @@ def generate_report(results_file, training_results_directory):
 
                 pdf.savefig()
                 plt.close()
-
 
 
 def format_object_detection_results(results_file):
@@ -228,7 +220,220 @@ def format_object_detection_results(results_file):
     plt.show()
 
 
+def make_scatter_plot(predicted, correct, log=False,ax=None):
+    correct_nm = np.array(correct)
+    predicted_nm = np.array(predicted)
+    if log:
+        correct_nm = np.log(correct_nm)
+        predicted_nm = np.log(predicted_nm)
+
+    xy = np.vstack([correct_nm, predicted_nm])
+    z = gaussian_kde(xy)(xy)
+
+    ax.scatter(correct_nm, predicted_nm, c=z, s=5, edgecolor='')
+    if log:
+        ax.set_xlabel("Actual Label in Nanometers (in ln scale)", fontsize="x-small")
+        ax.set_ylabel("Predicted Label in Nanometers (in ln scale)", fontsize="xx-small")
+
+def crnn_stats(results_json, save_figs=False, save_pdf=True, size_threshold=500):
+    """ Create PDF of PNG graphs reporting accuracy of crnn 
+    
+    Args:
+        results_json (str): path to results json
+        save_figs (bool): True to save figures as images
+        save_pdf (bool): True to save figures in pdf
+        size_threshold (int): Minimum number of samples to be included in
+            accuracy graph 
+    """
+    with open(results_json, "r") as f:
+        results = json.load(f)
+
+    all_actual = results["correct_nms"]
+    all_predicted = results["predicted_nms"]
+    confidences = results["confidences"]
+    sconf = sorted(confidences)
+    max_confidence = sconf[-size_threshold]
+
+
+    total_images = len(confidences)
+    with PdfPages(results_json.split(".")[0] + '.pdf') as pdf:
+        get_accuracy_by_confidence(all_actual, all_predicted, confidences, max_confidence)
+        if save_figs:
+            plt.savefig("accuracy")
+        if save_pdf:
+            pdf.savefig()
+        plt.close()
+        for confidence in [0.02*i for i in range(0,20)]:
+            correct = 0
+            total = 0
+            actual = []
+            predicted = []
+            predicted_units = []
+            actual_units = []
+            percent_error = []
+            correct_numbers = []
+            predicted_numbers = []
+            for a, p, c, au, pu, cn, pn in zip(all_actual,
+                                               all_predicted,
+                                               confidences,
+                                               results["correct_units"],
+                                               results["predicted_units"],
+                                               results["correct_numbers"],
+                                               results["predicted_numbers"]):
+                if c < confidence:
+                    continue
+                actual.append(a)
+                predicted.append(p)
+                if pu.lower() == "um":
+                    pu = "μm"
+                if au.lower() == "um":
+                    au = "μm"
+                predicted_units.append(pu.lower())
+                actual_units.append(au.lower())
+                percent_error.append(abs(p-a)/a)
+                if a == p:
+                    correct += 1
+                if (cn in [5.0, 2.0, 100.0, 50.0, 20.0, 1.0, 10.0, 200.0, 500.0]
+                    and pn in [5.0, 2.0, 100.0, 50.0, 20.0, 1.0, 10.0, 200.0, 500.0]):
+                    correct_numbers.append(cn)
+                    predicted_numbers.append(pn)
+                    
+                total += 1
+            
+            number_labels = sorted([5.0, 2.0, 100.0, 50.0, 20.0, 1.0, 10.0, 200.0, 500.0])
+            number_labels = [int(n) for n in number_labels]
+            if save_pdf:
+                percent_error = sorted(percent_error)
+                mean_pe = sum(percent_error) / len(percent_error)
+                median_pe = percent_error[len(percent_error)//2]
+                fig = plt.figure()
+                ax1 = fig.add_subplot(221)
+                ax2 = fig.add_subplot(222)
+                ax3 = fig.add_subplot(223)
+                ax4 = fig.add_subplot(224)
+                make_label_metadata_chart(confidence, correct / total, total / total_images, mean_pe, median_pe, ax=ax4)
+
+                unit_labels = ["μm", "nm", "mm"]
+                make_confusion_matrix(actual_units, predicted_units, labels=unit_labels, ax=ax1)
+                unit_labels = ["μm", "nm"]
+                make_confusion_matrix(actual_units, predicted_units, labels=unit_labels, ax=ax2)
+                make_confusion_matrix(correct_numbers, predicted_numbers, labels=number_labels, ax=ax3)
+                pdf.savefig()
+                plt.close()
+            
+            if save_figs:
+                fig = plt.figure()
+                ax = fig.add_subplot(111)
+                make_confusion_matrix(correct_numbers, predicted_numbers, labels=number_labels, ax=ax)
+                plt.tight_layout(pad=2)
+                plt.title("Confusion Matrix for Numbers at {} Confidence".format(confidence))
+                plt.savefig("confusion_matrix-{}-conf-{}.png".format("numbers", confidence))
+                plt.close()
+                
+                unit_labels = ["μm", "nm"]
+                fig = plt.figure()
+                ax = fig.add_subplot(111)
+                make_confusion_matrix(actual_units, predicted_units, labels=unit_labels, ax=ax)
+                plt.tight_layout(pad=2)
+                plt.title("Confusion Matrix for Units at {} Confidence".format(confidence))
+                plt.savefig("confusion_matrix-{}-conf-{}.png".format("units", confidence))
+                plt.close()
+
+def concatenate_images(directory, 
+                       desired_height=14,
+                       buffer=2,
+                       output_name="result.png"):
+    """ Horizontally concatenate images from directory with height 14 """
+    images = []
+    total_width = 0
+    for image_file in os.listdir(directory):
+        image = Image.open(os.path.join(directory, image_file)).convert("RGB")
+        width, height = image.size
+        resize_ratio = desired_height / height
+        new_width = int(width*resize_ratio)
+        total_width += new_width + buffer
+        image = image.resize((new_width, desired_height))
+        images.append(image)
+
+    final_image = Image.new('RGB', (total_width-buffer, desired_height), (255,255,255))
+    x_offset = 0
+    for image in images:
+        final_image.paste(image, (x_offset, 0))
+        x_offset += image.size[0] + buffer
+    final_image.save(output_name)
+    
+def create_final_exsclaim_figure(results_json):
+    with open(results_json, "r") as f:
+        results = json.load(f)
+
+
+    all_actual = results["correct_nms"]
+    all_predicted = results["predicted_nms"]
+    confidences = results["confidences"]
+
+    fig = plt.figure(figsize=[18.4, 5.6], constrained_layout=False)
+    gs = fig.add_gridspec(7, 24)
+
+    ax1 = fig.add_subplot(gs[0:5, 0:7])
+    get_accuracy_by_confidence(all_actual, all_predicted, confidences, ax=ax1)
+
+    confidence = 0.2
+    correct = 0
+    total = 0
+    actual = []
+    predicted = []
+    predicted_units = []
+    actual_units = []
+    percent_error = []
+    correct_numbers = []
+    predicted_numbers = []
+    for a, p, c, au, pu, cn, pn in zip(all_actual, all_predicted, confidences, results["correct_units"], results["predicted_units"], results["correct_numbers"], results["predicted_numbers"]):
+        if c < confidence:
+            continue
+        actual.append(a)
+        predicted.append(p)
+        if pu.lower() == "um":
+            pu = "μm"
+        if au.lower() == "um":
+            au = "μm"
+        predicted_units.append(pu.lower())
+        actual_units.append(au.lower())
+        percent_error.append(abs(p-a)/a)
+        if a == p:
+            correct += 1
+        if cn in [5.0, 2.0, 100.0, 50.0, 20.0, 1.0, 10.0, 200.0, 500.0] and pn in [5.0, 2.0, 100.0, 50.0, 20.0, 1.0, 10.0, 200.0, 500.0]:
+            correct_numbers.append(str(int(cn)))
+            predicted_numbers.append(str(int(pn)))
+
+            
+        total += 1
+    
+    number_labels = sorted([5.0, 2.0, 100.0, 50.0, 20.0, 1.0, 10.0, 200.0, 500.0])
+    number_labels = [str(int(n)) for n in number_labels]
+
+    ax2 = fig.add_subplot(gs[0:5, 8:15])
+    make_confusion_matrix(correct_numbers, predicted_numbers, labels=number_labels, ax=ax2)
+    ax2.title.set_text("Confusion Matrix for Numbers at {} Confidence".format(confidence))
+    
+    unit_labels = ["μm", "nm"]
+    ax3 = fig.add_subplot(gs[0:5, 16:23])
+    make_confusion_matrix(actual_units, predicted_units, labels=unit_labels, ax=ax3)
+    ax3.title.set_text("Confusion Matrix for Units at {} Confidence".format(confidence))
+    plt.figtext(0,0.95,"(a)", fontsize = 20)
+    plt.figtext(1/3,0.95,"(b)", fontsize = 20)
+    plt.figtext(2/3,0.95,"(c)", fontsize = 20)
+
+    ax4 = fig.add_subplot(gs[5:, 0:23])
+    image = Image.open("bad_labels.png").convert("RGB")
+    ax4.imshow(image)
+    ax4.axes.get_xaxis().set_visible(False)
+    ax4.axes.get_yaxis().set_visible(False)
+    plt.figtext(0,1/7+0.05,"(d)", fontsize = 20)
+    plt.tight_layout(pad=0.5)
+
+    plt.savefig("final-3")
+    plt.close()
+
+
 if __name__ == "__main__":
-    #format_classification_results("/home/trevor/Documents/argonne/exsclaim/results/pretrained/scale_all_50.txt")
-    #format_object_detection_results("scale_bar_detector.txt")
-    generate_report("results.txt", "/home/tspread/exsclaim/exsclaim/figures/scale/results/pretrained/")
+    pass
