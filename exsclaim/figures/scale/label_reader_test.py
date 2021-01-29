@@ -145,12 +145,15 @@ class ScaleBarReaderTest():
         actual_classes = []
         actual_idxs = []
         confidences = []
+        skipped = 0
         for label_dir in os.listdir(scale_label_data):
             label = str(label_dir)
             actual_text = self.get_actual_text(label)
-            if actual_text not in self.class_to_idx:
-                continue
-            actual_idx = self.class_to_idx[actual_text]
+            if actual_text in self.class_to_idx:
+                actual_idx = self.class_to_idx[actual_text]
+            else:
+                skipped += 1
+                actual_idx = -1
             for image_file in os.listdir(scale_label_data / label):
                 scale_label_image = Image.open(scale_label_data / label / image_file).convert("RGB")
                 predicted_idx, predicted_text, confidence = self.run_model(scale_label_image)
@@ -177,11 +180,13 @@ class ScaleBarReaderTest():
         results_dict = {}
         for filename in os.listdir(checkpoint_dir):
             model_name, filetype = str(filename).split(".")
+            if model_name not in {"some_18-120", "all_18-148", "scale_all_18-124", "scale_some_18-127", "unit_data_18-250"}:
+                continue
             if filetype == "pt":
                 checkpoint_path = checkpoint_dir / filename
                 single_result_dict = self.test_single_model(str(checkpoint_path))
                 results_dict[filename] = single_result_dict
-                with open("results.txt", "w") as f:
+                with open("results_breif.txt", "w") as f:
                     json.dump(results_dict, f)
 
 
