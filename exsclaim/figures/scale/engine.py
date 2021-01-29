@@ -73,7 +73,8 @@ def run_nms_on_outputs(outputs):
         scale_bar_info = []
         for i, box in enumerate(image_outputs["boxes"]):
             confidence = image_outputs["scores"][i]
-            if confidence > 0.5:
+            if True:
+                #print("confidence is over 0.5")
                 x1, y1, x2, y2 = box
                 label = image_outputs['labels'][i]
                 scale_bar_info.append([x1, y1, x2, y2, confidence, label])
@@ -81,11 +82,14 @@ def run_nms_on_outputs(outputs):
         boxes = torch.empty((0, 4))
         labels = []
         scores = []
+        boxes_temp = []
         for scale_object in scale_bar_info:
             x1, y1, x2, y2, confidence, label = scale_object
-            boxes.add(torch.tensor([x1, y1, x2, y2]))
+            boxes_temp.append([x1, y1, x2, y2])
             labels.append(label)
             scores.append(confidence)
+        boxes_temp = torch.tensor(boxes_temp)
+        boxes = torch.cat((boxes, boxes_temp))
         image_dict = {
             "boxes": boxes,
             "labels": torch.tensor(labels, dtype=torch.int64),
