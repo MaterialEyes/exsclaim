@@ -4,78 +4,6 @@ from PIL import Image
 import random
 import requests
 
-def match_scale_bar_to_subfigure(master_images, scale_bars):
-    """ Matches scale bars labels and lines to master images """
-    unmatched = len(scale_bars)
-    i = 0
-    unmatched_scale_bars = scale_bars
-    new_master_images = []
-    while unmatched > 0:
-        new_unmatched_scale_bars = []
-        for scale_bar in unmatched_scale_bars:
-            matched = False
-            for subfigure in master_images:
-                if is_contained(scale_bar["geometry"], subfigure["geometry"], i):
-                    matched = True
-                    unmatched -= 1
-                    ## Add to json
-                    subfigure.setdefault("scale_bar", {})
-                    subfigure["scale_bar"].setdefault("geometry", scale_bar["geometry"])
-                    #subfigure["scale_bar"]["geometry"] = scale_bar
-                    new_master_images.append(subfigure)
-
-            if not matched:
-                new_unmatched_scale_bars.append(scale_bar)
-        unmatched_scale_bars = new_unmatched_scale_bars
-        if i > 25:
-            print("uh oh... no match")
-            break
-        i += 1
-    
-    return master_images
-
-def match_scale_label_to_subfigure(master_images, scale_labels):
-    """ Matches scale bars labels and lines to master images """
-    unmatched = len(scale_labels)
-    i = 0
-    unmatched_scale_labels = scale_labels
-    new_master_images = []
-    while unmatched > 0:
-        new_unmatched_scale_labels = []
-        for scale_label in unmatched_scale_labels:
-            matched = False
-            for subfigure in master_images:
-                if is_contained(scale_label["geometry"], subfigure["geometry"], i):
-                    matched = True
-                    unmatched -= 1
-                    ## Add to json
-                    subfigure.setdefault("scale_bar", {})
-                    subfigure["scale_bar"].setdefault("label", scale_label)
-                    new_master_images.append(subfigure)
-
-            if not matched:
-                new_unmatched_scale_labels.append(scale_label)
-        unmatched_scale_labels = new_unmatched_scale_labels
-        if i > 50:
-            print("uh oh... no match")
-            break
-        i += 5
-    
-    return master_images
-
-def is_contained(inner, outer, padding=0):
-    """ tests whether one bounding box is within another """
-    inner_x1, inner_y1, inner_x2, inner_y2 = convert_box_format(inner)
-    outer_x1, outer_y1, outer_x2, outer_y2 = convert_box_format(outer)
-    outer_x1, outer_y1 = outer_x1 - padding, outer_y1 - padding
-    outer_x2, outer_y2 = outer_x2 + padding, outer_y2 + padding
-
-    if (inner_x1 > outer_x1 and inner_x2 < outer_x2 and
-        inner_y1 > outer_y1 and inner_y2 < outer_y2):
-        return True
-    else:
-        return False
-
 def convert_box_format(geometry):
     """ Converts from [{"x": x1, "y": y1}, ...] to (x1, y1, ...) """
     #print(geometry)
@@ -220,4 +148,4 @@ def download_labelbox_images(image_dictionary):
         f.write(image_data)
 
 if __name__ == "__main__":
-    make_scale_reader_dataset()
+    make_scale_detection_dataset()
