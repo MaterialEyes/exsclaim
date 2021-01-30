@@ -25,6 +25,12 @@ from .figures.utils import *
 from .figures.models.network import *
 from .tool import ExsclaimTool
 from . import utils
+from .figures.scale import ctc
+from .figures.scale.crnn import CRNN
+
+def convert_to_rgb(image):
+    return image.convert("RGB")
+
 
 class FigureSeparator(ExsclaimTool):
     """ 
@@ -105,73 +111,24 @@ class FigureSeparator(ExsclaimTool):
             scale_bar_detection_model.load_state_dict(torch.load(scale_bar_detection_checkpoint, map_location='cpu'))
         self.scale_bar_detection_model = scale_bar_detection_model
 
-        ## Code to set up scale label reading model(s)
-        full_scale_bar_reader = os.path.join(model_path, "checkpoints", "all_18-120.pt")
-        unit_scale_bar_reader = os.path.join(model_path, "checkpoints", "unit_data_18-335.pt")
-        number_scale_bar_reader = os.path.join(model_path, "checkpoints", "scale_all_18-124.pt")
+        ## Load scale label recognition model
+        scale_label_recognition_checkpoint = model_path + "checkpoints/scale_label_recognition_model.pt"
+        # load an object detection model pre-trained on COCO
+        scale_label_recognition_model = CRNN(3, 22)
+        if self.cuda:
+            scale_label_recognition_model.load_state_dict(torch.load(scale_label_recognition_checkpoint)["model_state_dict"])
+            scale_label_recognition_model = scale_label_recognition_model.cuda()
+        else:
+            scale_label_recognition_model.load_state_dict(torch.load(scale_label_recognition_checkpoint, map_location='cpu')["model_state_dict"])
+        self.scale_label_recognition_model = scale_label_recognition_model
 
-        # load models of choice
-        self.full_scale_bar_reader = self.get_classification_model(full_scale_bar_reader)
-        self.unit_scale_bar_reader = self.get_classification_model(unit_scale_bar_reader)
-        self.number_scale_bar_reader = self.get_classification_model(number_scale_bar_reader)
+
+
+
 
         ## Save scale laber reader transforms
         self.label_reader_transforms = T.Compose([T.Resize((224, 224)),
                                         T.ToTensor(),])
-
-
-    def get_classification_model(self, scale_label_recognition_checkpoint, pretrained=True):
-        """ """
-        all = {0: '0.1 A', 1: '0.1 nm', 2: '0.1 um', 3: '0.2 A', 4: '0.2 nm', 5: '0.2 um', 6: '0.3 A', 7: '0.3 nm', 8: '0.3 um', 9: '0.4 A', 10: '0.4 nm', 11: '0.4 um', 12: '0.5 A', 13: '0.5 nm', 14: '0.5 um', 15: '0.6 A', 16: '0.6 nm', 17: '0.6 um', 18: '0.7 A', 19: '0.7 nm', 20: '0.7 um', 21: '0.8 A', 22: '0.8 nm', 23: '0.8 um', 24: '0.9 A', 25: '0.9 nm', 26: '0.9 um', 27: '1 A', 28: '1 nm', 29: '1 um', 30: '10 A', 31: '10 nm', 32: '10 um', 33: '100 A', 34: '100 nm', 35: '100 um', 36: '2 A', 37: '2 nm', 38: '2 um', 39: '2.5 A', 40: '2.5 nm', 41: '2.5 um', 42: '20 A', 43: '20 nm', 44: '20 um', 45: '200 A', 46: '200 nm', 47: '200 um', 48: '25 A', 49: '25 nm', 50: '25 um', 51: '250 A', 52: '250 nm', 53: '250 um', 54: '3 A', 55: '3 nm', 56: '3 um', 57: '30 A', 58: '30 nm', 59: '30 um', 60: '300 A', 61: '300 nm', 62: '300 um', 63: '4 A', 64: '4 nm', 65: '4 um', 66: '40 A', 67: '40 nm', 68: '40 um', 69: '400 A', 70: '400 nm', 71: '400 um', 72: '5 A', 73: '5 nm', 74: '5 um', 75: '50 A', 76: '50 nm', 77: '50 um', 78: '500 A', 79: '500 nm', 80: '500 um', 81: '6 A', 82: '6 nm', 83: '6 um', 84: '60 A', 85: '60 nm', 86: '60 um', 87: '600 A', 88: '600 nm', 89: '600 um', 90: '7 A', 91: '7 nm', 92: '7 um', 93: '70 A', 94: '70 nm', 95: '70 um', 96: '700 A', 97: '700 nm', 98: '700 um', 99: '8 A', 100: '8 nm', 101: '8 um', 102: '80 A', 103: '80 nm', 104: '80 um', 105: '800 A', 106: '800 nm', 107: '800 um', 108: '9 A', 109: '9 nm', 110: '9 um', 111: '90 A', 112: '90 nm', 113: '90 um', 114: '900 A', 115: '900 nm', 116: '900 um'}
-        some = {0: '0.1 A', 1: '0.1 nm', 2: '0.1 um', 3: '0.2 A', 4: '0.2 nm', 5: '0.2 um', 6: '0.3 A', 7: '0.3 nm', 8: '0.3 um', 9: '0.4 A', 10: '0.4 nm', 11: '0.4 um', 12: '0.5 A', 13: '0.5 nm', 14: '0.5 um', 15: '1 A', 16: '1 nm', 17: '1 um', 18: '10 A', 19: '10 nm', 20: '10 um', 21: '100 A', 22: '100 nm', 23: '100 um', 24: '2 A', 25: '2 nm', 26: '2 um', 27: '2.5 A', 28: '2.5 nm', 29: '2.5 um', 30: '20 A', 31: '20 nm', 32: '20 um', 33: '200 A', 34: '200 nm', 35: '200 um', 36: '25 A', 37: '25 nm', 38: '25 um', 39: '250 A', 40: '250 nm', 41: '250 um', 42: '3 A', 43: '3 nm', 44: '3 um', 45: '30 A', 46: '30 nm', 47: '30 um', 48: '300 A', 49: '300 nm', 50: '300 um', 51: '4 A', 52: '4 nm', 53: '4 um', 54: '40 A', 55: '40 nm', 56: '40 um', 57: '400 A', 58: '400 nm', 59: '400 um', 60: '5 A', 61: '5 nm', 62: '5 um', 63: '50 A', 64: '50 nm', 65: '50 um', 66: '500 A', 67: '500 nm', 68: '500 um'}        
-        scale_some = {0: '0.1', 1: '0.2', 2: '0.3', 3: '0.4', 4: '0.5', 5: '1', 6: '10', 7: '100', 8: '2', 9: '2.5', 10: '20', 11: '200', 12: '25', 13: '250', 14: '3', 15: '30', 16: '300', 17: '4', 18: '40', 19: '400', 20: '5', 21: '50', 22: '500'}
-        scale_all = {0: '0.1', 1: '0.2', 2: '0.3', 3: '0.4', 4: '0.5', 5: '0.6', 6: '0.7', 7: '0.8', 8: '0.9', 9: '1', 10: '10', 11: '100', 12: '2', 13: '2.5', 14: '20', 15: '200', 16: '25', 17: '250', 18: '3', 19: '30', 20: '300', 21: '4', 22: '40', 23: '400', 24: '5', 25: '50', 26: '500', 27: '6', 28: '60', 29: '600', 30: '7', 31: '70', 32: '700', 33: '8', 34: '80', 35: '800', 36: '9', 37: '90', 38: '900'}
-        unit_data = {0: 'A', 1: 'mm', 2: 'nm', 3: 'um'}
-        dataset_to_label_dict = {
-            "all": all,
-            "some" : some,
-            "scale_some": scale_some,
-            "scale_all": scale_all,
-            "unit_data": unit_data
-        }
-        filename = scale_label_recognition_checkpoint.split(".")[0].split("/")[-1]
-        model_name, epoch = filename.split("-")
-        tokens = model_name.split("_")
-        dataset = "_".join(tokens[:-1])
-        depth = int(tokens[-1])
-        self.id_to_class_full = all if dataset == 'all' else some
-        self.id_to_class_number = scale_all if dataset == 'scale_all' else scale_some
-        self.id_to_class_unit = unit_data
-        classes = len(dataset_to_label_dict[dataset])
-        # load an object detection model pre-trained on COCO
-        if depth == 18:
-            model = models.resnet18(pretrained=pretrained)
-        elif depth == 50:
-            model = models.resnet50(pretrained=pretrained)
-        elif depth == 152:
-            model = models.resnet152(pretrained=pretrained)
-        
-        if depth == 18:
-            model.fc = nn.Sequential(nn.ReLU(),
-                                    nn.Dropout(0.2),
-                                    nn.Linear(512, classes),
-                                    nn.LogSoftmax(dim=1))
-        else:
-            model.fc = nn.Sequential(nn.Linear(2048, 512),
-                                    nn.ReLU(),
-                                    nn.Dropout(0.2),
-                                    nn.Linear(512, classes),
-                                    nn.LogSoftmax(dim=1))
-        model.to(self.device)
-        
-        if self.cuda:
-            model.load_state_dict(torch.load(scale_label_recognition_checkpoint))
-            model = model.cuda()
-        else:
-            model.load_state_dict(torch.load(scale_label_recognition_checkpoint, map_location='cpu')["model_state_dict"])
-        
-        model.eval()
-        return model
 
 
     def _update_exsclaim(self, exsclaim_dict, figure_name, figure_dict):
@@ -226,10 +183,10 @@ class FigureSeparator(ExsclaimTool):
             utils.Printer(">>> ({0} of {1}) ".format(counter,+\
                 len(figures))+\
                 "Extracting images from: "+ figure_name.split("/")[-1])
-            try:
+            if True:#try:
                 self.extract_image_objects(figure_name)
                 new_figures_separated.add(figure_name)
-            except:
+            else:#except:
                 utils.Printer("<!> ERROR: An exception occurred in FigureSeparator\n")
             
             # Save to file every N iterations (to accomodate restart scenarios)
@@ -535,58 +492,20 @@ class FigureSeparator(ExsclaimTool):
         Returns:
             label_text (string): The text of the scale bar label
         """
-        return self.read_scale_bar_parts(cropped_image)
-
-    def read_scale_bar_full(self, cropped_image):
-        """ Outputs the text of an image cropped to a scale bar label bbox 
-
-        Args:
-            cropped_image (Image): An PIL RGB image cropped to the bounding box
-                of a scale bar label. 
-        Returns:
-            label_text (string): The text of the scale bar label
-        """
-        cropped_image = self.label_reader_transforms(cropped_image)
-        cropped_image =  cropped_image.unsqueeze(0)
-
-        with torch.no_grad():
-            log_probabilities = self.full_scale_bar_reader(cropped_image)
-        probabilities = torch.exp(log_probabilities)
-        probabilities = list(probabilities.numpy()[0])
-        predicted_idx = probabilities.index(max(probabilities))
-        label_text = self.id_to_class_full[predicted_idx]
-        return label_text, probabilities[predicted_idx]
-
-    def read_scale_bar_parts(self, cropped_image):
-        """ Outputs the text of an image cropped to a scale bar label bbox 
-
-        Args:
-            cropped_image (Image): An image cropped to the bounding box
-                of a scale bar label. 
-        Returns:
-            label_text (string): The text of the scale bar label
-        """
-        cropped_image = self.label_reader_transforms(cropped_image)
-        cropped_image = cropped_image.unsqueeze(0)
-
-        ## Find predicted scale unit
-        with torch.no_grad():
-            log_probabilities = self.unit_scale_bar_reader(cropped_image)
-        probabilities = torch.exp(log_probabilities)
-        probabilities = list(probabilities.numpy()[0])
-        predicted_idx = probabilities.index(max(probabilities))
-        unit_confidence = probabilities[predicted_idx]
-        unit_text = self.id_to_class_unit[predicted_idx]
-
-        ## Find predicted scale number
-        with torch.no_grad():
-            log_probabilities = self.number_scale_bar_reader(cropped_image)
-        probabilities = torch.exp(log_probabilities)
-        probabilities = list(probabilities.numpy()[0])
-        predicted_idx = probabilities.index(max(probabilities))
-        number_text = self.id_to_class_number[predicted_idx]
-
-        return number_text + " " + unit_text, probabilities[predicted_idx] * unit_confidence
+        resize_transform = T.Compose([T.Resize((32, 128)),
+                                            T.Lambda(convert_to_rgb),
+                                            T.ToTensor()])       
+        
+        classes = "0123456789mMcCuUnN .A"
+        idx_to_class = classes + "-"
+        image = resize_transform(cropped_image)
+        image = image.unsqueeze(0)
+        # run image on model
+        logps = self.scale_label_recognition_model(image)
+        probs = torch.exp(logps)
+        probs = probs.squeeze(0)
+        word, confidence = ctc.run_ctc(probs, classes)
+        return word, float(confidence)
 
     def create_scale_bar_objects(self, scale_bar_lines, scale_bar_labels):
         """ Match scale bar lines with labels to create scale bar jsons
