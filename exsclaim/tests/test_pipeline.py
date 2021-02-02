@@ -30,7 +30,7 @@ class TestNatureFull(unittest.TestCase):
           self.expected = json.load(f)
 
     def tearDown(self):
-        shutil.rmtree(self.exsclaim_pipeline.query_dict["results_dir"])
+        pass#shutil.rmtree(self.exsclaim_pipeline.query_dict["results_dir"])
 
     @responses.activate
     def test_full_run(self):

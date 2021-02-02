@@ -5,21 +5,26 @@ import itertools
 import numpy as np
 from itertools import chain
 
+def load_chrz():
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + '/models/characterization.yml', 'r') as stream:
+        try:
+            chrz = yaml.safe_load(stream)
+        except yaml.YAMLError as exc:
+            print(exc)
+    return chrz
 
-dir_path = os.path.dirname(os.path.realpath(__file__))
-with open(dir_path + '/models/reference.yml', 'r') as stream:
-    try:
-        ref = yaml.safe_load(stream)
-    except yaml.YAMLError as exc:
-        print(exc)
-
-with open(dir_path + '/models/characterization.yml', 'r') as stream:
-    try:
-        chrz = yaml.safe_load(stream)
-    except yaml.YAMLError as exc:
-        print(exc)
+def load_ref():
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + '/models/reference.yml', 'r') as stream:
+        try:
+            ref = yaml.safe_load(stream)
+        except yaml.YAMLError as exc:
+            print(exc)
+    return ref
 
 def experiment_synonyms():
+    chrz = load_chrz()
     return chrz
 
 def greek_letters():
@@ -44,6 +49,7 @@ def implied_chars(str_text: str, char_type: str) -> str:
     Returns:
         implied_char_list: A list containing the chars implied by string syntax
     """
+    ref = load_ref()
     str_text = (str_text.strip("(").strip(")").strip(" "))
     str_text = str_text.strip(".")
     str_text = str_text.replace("and"," , ").replace(" ","").replace("-","–").replace(":","")
@@ -100,6 +106,7 @@ def char_range(start: str, stop: str, char_type: str) -> str:
     Returns:
         char_list: A list containing evenly spaced values within a given interval.
     """
+    ref = load_ref()
     if "" == start or "" == stop:
         return [""]
 
@@ -168,6 +175,7 @@ def is_likely_subfigure(label: str, suggested_labels: list, caption_text: str) -
     Returns:
         A decision on whether the label is likely a true subfigure label
     """
+    ref = load_ref()
     # Ensure the label to compare is of "alpha/ALPHA" type
     try:
         label_id = ref['alphabet'].index(label.lower())
@@ -352,6 +360,7 @@ def false_negative_subfigure_labels(char_delim: str) -> list:
     Returns: 
         fp_labels: List of possible FN labels
     """
+    ref = load_ref()
     if char_delim != 'ALPHA':
         elements = [a for a in ref['chemical elements']] + \
                    [a.upper() for a in ref['chemical elements']]
@@ -365,4 +374,5 @@ def false_negative_subfigure_labels(char_delim: str) -> list:
 def common_molecules() -> list:
     """
     """
+    ref = load_ref()
     return [a for a in ref["common molecules"]]

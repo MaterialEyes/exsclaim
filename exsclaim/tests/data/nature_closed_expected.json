@@ -15,7 +15,7 @@
             "classification": "microscopy",
             "confidence": 0.1626,
             "height": 164.56174392700194,
-            "width": 209.99485822824334,
+            "width": 209.99483310259305,
             "geometry": [
                {
                   "x": 13,
@@ -60,24 +60,24 @@
                   "label": null,
                   "geometry": [
                      {
-                        "x": 159,
-                        "y": 155
+                        "x": 171,
+                        "y": 649
                      },
                      {
-                        "x": 159,
-                        "y": 159
+                        "x": 171,
+                        "y": 655
                      },
                      {
-                        "x": 196,
-                        "y": 159
+                        "x": 210,
+                        "y": 655
                      },
                      {
-                        "x": 196,
-                        "y": 155
+                        "x": 210,
+                        "y": 649
                      }
                   ],
-                  "confidence": 0.991709291934967,
-                  "length": 36,
+                  "confidence": 0.9761148691177368,
+                  "length": 38,
                   "label_line_distance": -1
                }
             ],
@@ -95,7 +95,7 @@
             "classification": "microscopy",
             "confidence": 0.1626,
             "height": 96.42179946899415,
-            "width": 209.24484500518207,
+            "width": 209.24481987953186,
             "geometry": [
                {
                   "x": 17,
@@ -140,23 +140,23 @@
                   "label": null,
                   "geometry": [
                      {
-                        "x": 167,
-                        "y": 85
+                        "x": 183,
+                        "y": 372
                      },
                      {
-                        "x": 167,
-                        "y": 90
+                        "x": 183,
+                        "y": 377
                      },
                      {
-                        "x": 190,
-                        "y": 90
+                        "x": 206,
+                        "y": 377
                      },
                      {
-                        "x": 190,
-                        "y": 85
+                        "x": 206,
+                        "y": 372
                      }
                   ],
-                  "confidence": 0.9550259709358215,
+                  "confidence": 0.9287104606628418,
                   "length": 23,
                   "label_line_distance": -1
                }
@@ -174,8 +174,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
-            "height": 90.32446460723878,
-            "width": 219.60021844277017,
+            "height": 90.32445831298827,
+            "width": 219.6002435684204,
             "geometry": [
                {
                   "x": 11,
@@ -220,24 +220,24 @@
                   "label": null,
                   "geometry": [
                      {
-                        "x": 172,
-                        "y": 75
+                        "x": 185,
+                        "y": 462
                      },
                      {
-                        "x": 172,
-                        "y": 79
+                        "x": 185,
+                        "y": 465
                      },
                      {
-                        "x": 197,
-                        "y": 79
+                        "x": 208,
+                        "y": 465
                      },
                      {
-                        "x": 197,
-                        "y": 75
+                        "x": 208,
+                        "y": 462
                      }
                   ],
-                  "confidence": 0.9781046509742737,
-                  "length": 24,
+                  "confidence": 0.9069585800170898,
+                  "length": 23,
                   "label_line_distance": -1
                }
             ],
@@ -254,8 +254,8 @@
          {
             "classification": "illustration",
             "confidence": 0.1626,
-            "height": 272.429398727417,
-            "width": 205.05636141850397,
+            "height": 272.42937355041505,
+            "width": 205.05632373002862,
             "geometry": [
                {
                   "x": 458,
@@ -308,8 +308,8 @@
          {
             "classification": "illustration",
             "confidence": 0.1626,
-            "height": 244.95845718383785,
-            "width": 400.5028651310848,
+            "height": 244.9585075378418,
+            "width": 400.5028148797842,
             "geometry": [
                {
                   "x": 43,
@@ -407,24 +407,24 @@
                   "label": null,
                   "geometry": [
                      {
-                        "x": 166,
-                        "y": 160
+                        "x": 416,
+                        "y": 650
                      },
                      {
-                        "x": 166,
-                        "y": 165
+                        "x": 416,
+                        "y": 655
                      },
                      {
-                        "x": 189,
-                        "y": 165
+                        "x": 443,
+                        "y": 655
                      },
                      {
-                        "x": 189,
-                        "y": 160
+                        "x": 443,
+                        "y": 650
                      }
                   ],
-                  "confidence": 0.9910735487937927,
-                  "length": 23,
+                  "confidence": 0.8909587860107422,
+                  "length": 26,
                   "label_line_distance": -1
                }
             ],
@@ -442,7 +442,7 @@
             "classification": "microscopy",
             "confidence": 0.1626,
             "height": 170.3761333465576,
-            "width": 199.6537938484779,
+            "width": 199.65381897412817,
             "geometry": [
                {
                   "x": 483,
@@ -487,24 +487,24 @@
                   "label": null,
                   "geometry": [
                      {
-                        "x": 165,
-                        "y": 163
+                        "x": 647,
+                        "y": 652
                      },
                      {
-                        "x": 165,
-                        "y": 167
+                        "x": 647,
+                        "y": 656
                      },
                      {
-                        "x": 189,
-                        "y": 167
+                        "x": 673,
+                        "y": 656
                      },
                      {
-                        "x": 189,
-                        "y": 163
+                        "x": 673,
+                        "y": 652
                      }
                   ],
-                  "confidence": 0.9881309270858765,
-                  "length": 23,
+                  "confidence": 0.8070952892303467,
+                  "length": 25,
                   "label_line_distance": -1
                }
             ],
@@ -521,7 +521,7 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
-            "height": 179.12710533142092,
+            "height": 179.1271179199219,
             "width": 196.28058736140912,
             "geometry": [
                {
@@ -567,24 +567,24 @@
                   "label": null,
                   "geometry": [
                      {
-                        "x": 163,
-                        "y": 171
+                        "x": 647,
+                        "y": 457
                      },
                      {
-                        "x": 163,
-                        "y": 176
+                        "x": 647,
+                        "y": 462
                      },
                      {
-                        "x": 186,
-                        "y": 176
+                        "x": 670,
+                        "y": 462
                      },
                      {
-                        "x": 186,
-                        "y": 171
+                        "x": 670,
+                        "y": 457
                      }
                   ],
-                  "confidence": 0.9868260025978088,
-                  "length": 23,
+                  "confidence": 0.9692590832710266,
+                  "length": 22,
                   "label_line_distance": -1
                }
             ],
@@ -602,8 +602,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
-            "height": 180.7687843322754,
-            "width": 205.52121107394876,
+            "height": 180.7688220977783,
+            "width": 205.5212487624242,
             "geometry": [
                {
                   "x": 255,
@@ -648,24 +648,24 @@
                   "label": null,
                   "geometry": [
                      {
-                        "x": 152,
-                        "y": 165
+                        "x": 406,
+                        "y": 455
                      },
                      {
-                        "x": 152,
-                        "y": 169
+                        "x": 406,
+                        "y": 460
                      },
                      {
-                        "x": 192,
-                        "y": 169
+                        "x": 447,
+                        "y": 460
                      },
                      {
-                        "x": 192,
-                        "y": 165
+                        "x": 447,
+                        "y": 455
                      }
                   ],
-                  "confidence": 0.9919663667678833,
-                  "length": 39,
+                  "confidence": 0.9617395997047424,
+                  "length": 41,
                   "label_line_distance": -1
                }
             ],
@@ -686,7 +686,8 @@
          "subfigure_labels": [],
          "scale_bar_labels": [],
          "scale_bar_lines": [],
-         "captions": []
+         "captions": [],
+         "scale_bar_objects": []
       }
    },
    "s41467-018-06211-3_fig2.jpg": {
@@ -704,7 +705,7 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
-            "height": 186.23293464000415,
+            "height": 186.23294830322266,
             "width": 296.9396746969972,
             "geometry": [
                {
@@ -750,24 +751,24 @@
                   "label": null,
                   "geometry": [
                      {
-                        "x": 249,
-                        "y": 173
+                        "x": 265,
+                        "y": 724
                      },
                      {
-                        "x": 249,
-                        "y": 177
+                        "x": 265,
+                        "y": 729
                      },
                      {
-                        "x": 282,
-                        "y": 177
+                        "x": 300,
+                        "y": 729
                      },
                      {
-                        "x": 282,
-                        "y": 173
+                        "x": 300,
+                        "y": 724
                      }
                   ],
-                  "confidence": 0.9853157997131348,
-                  "length": 33,
+                  "confidence": 0.9573639631271362,
+                  "length": 34,
                   "label_line_distance": -1
                }
             ],
@@ -780,8 +781,8 @@
          {
             "classification": "parent",
             "confidence": 0.1548,
-            "height": 366.04754502956683,
-            "width": 276.0106173610188,
+            "height": 366.04747671347394,
+            "width": 276.0106036800364,
             "geometry": [
                {
                   "x": 408,
@@ -826,23 +827,23 @@
                   "label": null,
                   "geometry": [
                      {
-                        "x": 216,
+                        "x": 624,
                         "y": 178
                      },
                      {
-                        "x": 216,
+                        "x": 624,
                         "y": 184
                      },
                      {
-                        "x": 246,
+                        "x": 655,
                         "y": 184
                      },
                      {
-                        "x": 246,
+                        "x": 655,
                         "y": 178
                      }
                   ],
-                  "confidence": 0.9923386573791504,
+                  "confidence": 0.9700747728347778,
                   "length": 30,
                   "label_line_distance": -1
                }
@@ -860,7 +861,7 @@
             "classification": "parent",
             "confidence": 0.1625,
             "height": 270.74074763518115,
-            "width": 377.6560750432039,
+            "width": 377.6560203192746,
             "geometry": [
                {
                   "x": 4,
@@ -905,47 +906,23 @@
                   "label": null,
                   "geometry": [
                      {
-                        "x": 352,
+                        "x": 355,
                         "y": 116
                      },
                      {
-                        "x": 352,
+                        "x": 355,
                         "y": 121
                      },
                      {
-                        "x": 369,
+                        "x": 373,
                         "y": 121
                      },
                      {
-                        "x": 369,
+                        "x": 373,
                         "y": 116
                      }
                   ],
-                  "confidence": 0.9893621802330017,
-                  "length": 17,
-                  "label_line_distance": -1
-               },
-               {
-                  "label": null,
-                  "geometry": [
-                     {
-                        "x": 351,
-                        "y": 241
-                     },
-                     {
-                        "x": 351,
-                        "y": 245
-                     },
-                     {
-                        "x": 369,
-                        "y": 245
-                     },
-                     {
-                        "x": 369,
-                        "y": 241
-                     }
-                  ],
-                  "confidence": 0.9883805513381958,
+                  "confidence": 0.9623231291770935,
                   "length": 18,
                   "label_line_distance": -1
                },
@@ -953,24 +930,48 @@
                   "label": null,
                   "geometry": [
                      {
-                        "x": 203,
+                        "x": 355,
                         "y": 240
                      },
                      {
-                        "x": 203,
-                        "y": 246
+                        "x": 355,
+                        "y": 245
                      },
                      {
-                        "x": 262,
-                        "y": 246
+                        "x": 374,
+                        "y": 245
                      },
                      {
-                        "x": 262,
+                        "x": 374,
                         "y": 240
                      }
                   ],
-                  "confidence": 0.9867159128189087,
-                  "length": 58,
+                  "confidence": 0.9616720676422119,
+                  "length": 19,
+                  "label_line_distance": -1
+               },
+               {
+                  "label": null,
+                  "geometry": [
+                     {
+                        "x": 207,
+                        "y": 240
+                     },
+                     {
+                        "x": 207,
+                        "y": 245
+                     },
+                     {
+                        "x": 265,
+                        "y": 245
+                     },
+                     {
+                        "x": 265,
+                        "y": 240
+                     }
+                  ],
+                  "confidence": 0.9614169597625732,
+                  "length": 57,
                   "label_line_distance": -1
                }
             ],
@@ -988,8 +989,8 @@
          {
             "classification": "graph",
             "confidence": 0.1626,
-            "height": 246.49596746151263,
-            "width": 368.3423906096613,
+            "height": 246.49594013507544,
+            "width": 368.3424453335907,
             "geometry": [
                {
                   "x": 8,
@@ -1042,8 +1043,8 @@
          {
             "classification": "graph",
             "confidence": 0.1626,
-            "height": 185.5664291748634,
-            "width": 328.6954783894005,
+            "height": 185.5664223432541,
+            "width": 328.69547838940053,
             "geometry": [
                {
                   "x": 355,
@@ -1096,8 +1097,8 @@
          {
             "classification": "graph",
             "confidence": 0.1626,
-            "height": 114.46254785244287,
-            "width": 255.06834419609993,
+            "height": 114.46253418922424,
+            "width": 255.06828947217048,
             "geometry": [
                {
                   "x": 414,
@@ -1168,6 +1169,32 @@
                   "Electron density"
                ]
             }
+         ],
+         "scale_bar_objects": [
+            {
+               "label": null,
+               "geometry": [
+                  {
+                     "x": 628,
+                     "y": 389
+                  },
+                  {
+                     "x": 628,
+                     "y": 394
+                  },
+                  {
+                     "x": 656,
+                     "y": 394
+                  },
+                  {
+                     "x": 656,
+                     "y": 389
+                  }
+               ],
+               "confidence": 0.9502091407775879,
+               "length": 27,
+               "label_line_distance": -1
+            }
          ]
       }
    },
@@ -1186,7 +1213,7 @@
          {
             "classification": "graph",
             "confidence": 0.1626,
-            "height": 239.4367365635179,
+            "height": 239.4367617628862,
             "width": 339.7030251759749,
             "geometry": [
                {
@@ -1238,7 +1265,7 @@
             "classification": "graph",
             "confidence": 0.1626,
             "height": 250.23403587714083,
-            "width": 350.2198937306037,
+            "width": 350.2199062934289,
             "geometry": [
                {
                   "x": 334,
@@ -1290,8 +1317,8 @@
          {
             "classification": "graph",
             "confidence": 0.1626,
-            "height": 247.54017301180465,
-            "width": 324.0327224364648,
+            "height": 247.54019821117294,
+            "width": 324.03269731081446,
             "geometry": [
                {
                   "x": 2,
@@ -1343,8 +1370,8 @@
          {
             "classification": "graph",
             "confidence": 0.1626,
-            "height": 243.0676757365174,
-            "width": 320.9994785602276,
+            "height": 243.06768833620154,
+            "width": 320.9994534345774,
             "geometry": [
                {
                   "x": 4,
@@ -1404,7 +1431,8 @@
          "subfigure_labels": [],
          "scale_bar_labels": [],
          "scale_bar_lines": [],
-         "captions": []
+         "captions": [],
+         "scale_bar_objects": []
       }
    },
    "s41467-018-06211-3_fig4.jpg": {
@@ -1476,7 +1504,7 @@
             "classification": "graph",
             "confidence": 0.1626,
             "height": 201.57060974450417,
-            "width": 208.26190444139337,
+            "width": 208.2618793157431,
             "geometry": [
                {
                   "x": 475,
@@ -1526,8 +1554,8 @@
          {
             "classification": "graph",
             "confidence": 0.1626,
-            "height": 204.00212009347595,
-            "width": 216.32584370099585,
+            "height": 204.0021326627663,
+            "width": 216.32584370099582,
             "geometry": [
                {
                   "x": 240,
@@ -1567,32 +1595,7 @@
                   }
                ]
             },
-            "scale_bars": [
-               {
-                  "label": null,
-                  "geometry": [
-                     {
-                        "x": 55,
-                        "y": 28
-                     },
-                     {
-                        "x": 55,
-                        "y": 31
-                     },
-                     {
-                        "x": 77,
-                        "y": 31
-                     },
-                     {
-                        "x": 77,
-                        "y": 28
-                     }
-                  ],
-                  "confidence": 0.8750423192977905,
-                  "length": 22,
-                  "label_line_distance": -1
-               }
-            ],
+            "scale_bars": [],
             "caption": [
                "Electrochemical performance of aluminum \u2013 . c Discharge curves using the pristine air electrode."
             ],
@@ -1662,7 +1665,8 @@
          "subfigure_labels": [],
          "scale_bar_labels": [],
          "scale_bar_lines": [],
-         "captions": []
+         "captions": [],
+         "scale_bar_objects": []
       }
    },
    "s41467-018-06211-3_fig5.jpg": {
@@ -1732,8 +1736,8 @@
          {
             "classification": "graph",
             "confidence": 0.1626,
-            "height": 263.9121660061968,
-            "width": 244.5523258355948,
+            "height": 263.91215341459446,
+            "width": 244.552350961245,
             "geometry": [
                {
                   "x": 438,
@@ -1783,8 +1787,8 @@
          {
             "classification": "graph",
             "confidence": 0.1625,
-            "height": 275.528838366997,
-            "width": 417.63587016325727,
+            "height": 275.52886355020166,
+            "width": 417.63589528890753,
             "geometry": [
                {
                   "x": 15,
@@ -1895,7 +1899,8 @@
          "subfigure_labels": [],
          "scale_bar_labels": [],
          "scale_bar_lines": [],
-         "captions": []
+         "captions": [],
+         "scale_bar_objects": []
       }
    },
    "ncomms5946_fig1.jpg": {
@@ -1914,7 +1919,7 @@
             "classification": "microscopy",
             "confidence": 0.1626,
             "height": 301.27526981314435,
-            "width": 241.14805148198056,
+            "width": 241.14800123068002,
             "geometry": [
                {
                   "x": 249,
@@ -1959,24 +1964,24 @@
                   "label": null,
                   "geometry": [
                      {
-                        "x": 186,
+                        "x": 435,
                         "y": 289
                      },
                      {
-                        "x": 186,
+                        "x": 435,
                         "y": 293
                      },
                      {
-                        "x": 213,
+                        "x": 462,
                         "y": 293
                      },
                      {
-                        "x": 213,
+                        "x": 462,
                         "y": 289
                      }
                   ],
-                  "confidence": 0.986860454082489,
-                  "length": 26,
+                  "confidence": 0.9830439686775208,
+                  "length": 27,
                   "label_line_distance": -1
                }
             ],
@@ -1994,7 +1999,7 @@
          {
             "classification": "graph",
             "confidence": 0.1626,
-            "height": 136.67695664867912,
+            "height": 136.67696923324743,
             "width": 165.79922886995166,
             "geometry": [
                {
@@ -2035,32 +2040,7 @@
                   }
                ]
             },
-            "scale_bars": [
-               {
-                  "label": null,
-                  "geometry": [
-                     {
-                        "x": 2,
-                        "y": 110
-                     },
-                     {
-                        "x": 2,
-                        "y": 112
-                     },
-                     {
-                        "x": 14,
-                        "y": 112
-                     },
-                     {
-                        "x": 14,
-                        "y": 110
-                     }
-                  ],
-                  "confidence": 0.6104662418365479,
-                  "length": 11,
-                  "label_line_distance": -1
-               }
-            ],
+            "scale_bars": [],
             "caption": [
                "TEM image of the Ag\u2013Pd hollow nanostructures formed after 4\u2009h of immersion of the Ag nanoparticles in 50 \u2009 \u03bcM PdCl2 aqueous solution . For ease of comparison, the image scale is identical to that in a ; scale bar, 50\u2009nm . (d,e) EDS spectra of a Ag nanoparticle and a Ag\u2013Pd hollow-shell nanostructure, respectively."
             ],
@@ -2077,7 +2057,7 @@
             "classification": "microscopy",
             "confidence": 0.1626,
             "height": 231.18146444104383,
-            "width": 183.91563929044284,
+            "width": 183.91565185326795,
             "geometry": [
                {
                   "x": 23,
@@ -2132,7 +2112,7 @@
          {
             "classification": "graph",
             "confidence": 0.1626,
-            "height": 171.12659572326035,
+            "height": 171.126583138692,
             "width": 161.80922535749585,
             "geometry": [
                {
@@ -2189,7 +2169,7 @@
          {
             "classification": "parent",
             "confidence": 0.1625,
-            "height": 63.05531924532863,
+            "height": 63.055331829896886,
             "width": 214.07516332773062,
             "geometry": [
                {
@@ -2235,24 +2215,24 @@
                   "label": null,
                   "geometry": [
                      {
-                        "x": 153,
-                        "y": 41
+                        "x": 173,
+                        "y": 295
                      },
                      {
-                        "x": 153,
-                        "y": 45
+                        "x": 173,
+                        "y": 299
                      },
                      {
-                        "x": 180,
-                        "y": 45
+                        "x": 200,
+                        "y": 299
                      },
                      {
-                        "x": 180,
-                        "y": 41
+                        "x": 200,
+                        "y": 295
                      }
                   ],
-                  "confidence": 0.9865854978561401,
-                  "length": 26,
+                  "confidence": 0.9760657548904419,
+                  "length": 27,
                   "label_line_distance": -1
                }
             ],
@@ -2275,7 +2255,33 @@
          "subfigure_labels": [],
          "scale_bar_labels": [],
          "scale_bar_lines": [],
-         "captions": []
+         "captions": [],
+         "scale_bar_objects": [
+            {
+               "label": null,
+               "geometry": [
+                  {
+                     "x": 172,
+                     "y": 234
+                  },
+                  {
+                     "x": 172,
+                     "y": 238
+                  },
+                  {
+                     "x": 199,
+                     "y": 238
+                  },
+                  {
+                     "x": 199,
+                     "y": 234
+                  }
+               ],
+               "confidence": 0.9784234166145325,
+               "length": 27,
+               "label_line_distance": -1
+            }
+         ]
       }
    },
    "ncomms5946_fig2.jpg": {
@@ -2293,7 +2299,7 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
-            "height": 192.73245292486146,
+            "height": 192.73242773011674,
             "width": 200.8267597051767,
             "geometry": [
                {
@@ -2339,24 +2345,24 @@
                   "label": null,
                   "geometry": [
                      {
-                        "x": 146,
-                        "y": 176
+                        "x": 160,
+                        "y": 397
                      },
                      {
-                        "x": 146,
-                        "y": 180
+                        "x": 160,
+                        "y": 400
                      },
                      {
-                        "x": 172,
-                        "y": 180
+                        "x": 188,
+                        "y": 400
                      },
                      {
-                        "x": 172,
-                        "y": 176
+                        "x": 188,
+                        "y": 397
                      }
                   ],
-                  "confidence": 0.9859064817428589,
-                  "length": 26,
+                  "confidence": 0.9607186317443848,
+                  "length": 28,
                   "label_line_distance": -1
                }
             ],
@@ -2367,7 +2373,7 @@
          {
             "classification": "graph",
             "confidence": 0.1626,
-            "height": 192.19080370525984,
+            "height": 192.19081630263216,
             "width": 223.78760906366205,
             "geometry": [
                {
@@ -2466,7 +2472,7 @@
             "classification": "microscopy",
             "confidence": 0.1626,
             "height": 185.8524232021598,
-            "width": 201.29717469215393,
+            "width": 201.29719981780417,
             "geometry": [
                {
                   "x": 16,
@@ -2511,24 +2517,24 @@
                   "label": null,
                   "geometry": [
                      {
-                        "x": 144,
-                        "y": 174
+                        "x": 160,
+                        "y": 189
                      },
                      {
-                        "x": 144,
-                        "y": 178
+                        "x": 160,
+                        "y": 193
                      },
                      {
-                        "x": 171,
-                        "y": 178
+                        "x": 188,
+                        "y": 193
                      },
                      {
-                        "x": 171,
-                        "y": 174
+                        "x": 188,
+                        "y": 189
                      }
                   ],
-                  "confidence": 0.9841406345367432,
-                  "length": 26,
+                  "confidence": 0.9798388481140137,
+                  "length": 27,
                   "label_line_distance": -1
                }
             ],
@@ -2540,7 +2546,7 @@
             "classification": "microscopy",
             "confidence": 0.1626,
             "height": 195.27784019292787,
-            "width": 193.79156506978546,
+            "width": 193.79160275826086,
             "geometry": [
                {
                   "x": 238,
@@ -2585,24 +2591,24 @@
                   "label": null,
                   "geometry": [
                      {
-                        "x": 26,
-                        "y": 182
+                        "x": 263,
+                        "y": 189
                      },
                      {
-                        "x": 26,
-                        "y": 186
+                        "x": 263,
+                        "y": 193
                      },
                      {
-                        "x": 58,
-                        "y": 186
+                        "x": 297,
+                        "y": 193
                      },
                      {
-                        "x": 58,
-                        "y": 182
+                        "x": 297,
+                        "y": 189
                      }
                   ],
-                  "confidence": 0.9824851155281067,
-                  "length": 32,
+                  "confidence": 0.97576504945755,
+                  "length": 33,
                   "label_line_distance": -1
                }
             ],
@@ -2613,8 +2619,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
-            "height": 195.69071907220885,
-            "width": 191.23383668752817,
+            "height": 195.6907064748365,
+            "width": 191.23387437600357,
             "geometry": [
                {
                   "x": 246,
@@ -2659,23 +2665,23 @@
                   "label": null,
                   "geometry": [
                      {
-                        "x": 18,
-                        "y": 177
+                        "x": 264,
+                        "y": 396
                      },
                      {
-                        "x": 18,
-                        "y": 181
+                        "x": 264,
+                        "y": 400
                      },
                      {
-                        "x": 50,
-                        "y": 181
+                        "x": 296,
+                        "y": 400
                      },
                      {
-                        "x": 50,
-                        "y": 177
+                        "x": 296,
+                        "y": 396
                      }
                   ],
-                  "confidence": 0.990023672580719,
+                  "confidence": 0.9722179770469666,
                   "length": 32,
                   "label_line_distance": -1
                }
@@ -2707,7 +2713,8 @@
                   "Nanoparticle"
                ]
             }
-         ]
+         ],
+         "scale_bar_objects": []
       }
    },
    "ncomms5946_fig3.jpg": {
@@ -2725,8 +2732,8 @@
          {
             "classification": "graph",
             "confidence": 0.1626,
-            "height": 235.45144846598308,
-            "width": 326.46104115706225,
+            "height": 235.45147359212237,
+            "width": 326.461016031412,
             "geometry": [
                {
                   "x": 5,
@@ -2828,7 +2835,7 @@
             "classification": "graph",
             "confidence": 0.1626,
             "height": 226.6049368286133,
-            "width": 331.3628796430734,
+            "width": 331.3629047687237,
             "geometry": [
                {
                   "x": 0,
@@ -2934,7 +2941,8 @@
          "subfigure_labels": [],
          "scale_bar_labels": [],
          "scale_bar_lines": [],
-         "captions": []
+         "captions": [],
+         "scale_bar_objects": []
       }
    },
    "ncomms5946_fig4.jpg": {
@@ -2952,7 +2960,7 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
-            "height": 145.2394440544976,
+            "height": 145.2394314236111,
             "width": 211.56475910773642,
             "geometry": [
                {
@@ -2998,48 +3006,48 @@
                   "label": null,
                   "geometry": [
                      {
-                        "x": 9,
-                        "y": 136
+                        "x": 195,
+                        "y": 138
                      },
                      {
-                        "x": 9,
-                        "y": 141
+                        "x": 195,
+                        "y": 142
                      },
                      {
-                        "x": 32,
-                        "y": 141
+                        "x": 210,
+                        "y": 142
                      },
                      {
-                        "x": 32,
-                        "y": 136
+                        "x": 210,
+                        "y": 138
                      }
                   ],
-                  "confidence": 0.9725247025489807,
-                  "length": 23,
+                  "confidence": 0.9769078493118286,
+                  "length": 14,
                   "label_line_distance": -1
                },
                {
                   "label": null,
                   "geometry": [
                      {
-                        "x": 179,
-                        "y": 136
+                        "x": 25,
+                        "y": 138
                      },
                      {
-                        "x": 179,
-                        "y": 140
+                        "x": 25,
+                        "y": 142
                      },
                      {
-                        "x": 194,
-                        "y": 140
+                        "x": 49,
+                        "y": 142
                      },
                      {
-                        "x": 194,
-                        "y": 136
+                        "x": 49,
+                        "y": 138
                      }
                   ],
-                  "confidence": 0.9615978002548218,
-                  "length": 14,
+                  "confidence": 0.9743531942367554,
+                  "length": 24,
                   "label_line_distance": -1
                }
             ],
@@ -3057,8 +3065,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
-            "height": 144.48361180623374,
-            "width": 203.67583256501416,
+            "height": 144.48359917534722,
+            "width": 203.6758074393639,
             "geometry": [
                {
                   "x": 257,
@@ -3103,72 +3111,48 @@
                   "label": null,
                   "geometry": [
                      {
-                        "x": 9,
+                        "x": 434,
                         "y": 138
                      },
                      {
-                        "x": 9,
+                        "x": 434,
                         "y": 142
                      },
                      {
-                        "x": 33,
+                        "x": 449,
                         "y": 142
                      },
                      {
-                        "x": 33,
+                        "x": 449,
                         "y": 138
                      }
                   ],
-                  "confidence": 0.9842368364334106,
-                  "length": 23,
+                  "confidence": 0.9836887121200562,
+                  "length": 15,
                   "label_line_distance": -1
                },
                {
                   "label": null,
                   "geometry": [
                      {
-                        "x": 177,
-                        "y": 137
+                        "x": 267,
+                        "y": 139
                      },
                      {
-                        "x": 177,
-                        "y": 141
+                        "x": 267,
+                        "y": 144
                      },
                      {
-                        "x": 192,
-                        "y": 141
+                        "x": 291,
+                        "y": 144
                      },
                      {
-                        "x": 192,
-                        "y": 137
+                        "x": 291,
+                        "y": 139
                      }
                   ],
-                  "confidence": 0.9503254294395447,
-                  "length": 14,
-                  "label_line_distance": -1
-               },
-               {
-                  "label": null,
-                  "geometry": [
-                     {
-                        "x": 195,
-                        "y": 129
-                     },
-                     {
-                        "x": 195,
-                        "y": 131
-                     },
-                     {
-                        "x": 202,
-                        "y": 131
-                     },
-                     {
-                        "x": 202,
-                        "y": 129
-                     }
-                  ],
-                  "confidence": 0.6607740521430969,
-                  "length": 6,
+                  "confidence": 0.9732248187065125,
+                  "length": 24,
                   "label_line_distance": -1
                }
             ],
@@ -3187,7 +3171,7 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
-            "height": 140.418714650472,
+            "height": 140.4187272813585,
             "width": 189.26007866859436,
             "geometry": [
                {
@@ -3233,24 +3217,24 @@
                   "label": null,
                   "geometry": [
                      {
-                        "x": 8,
-                        "y": 132
+                        "x": 502,
+                        "y": 138
                      },
                      {
-                        "x": 8,
-                        "y": 136
+                        "x": 502,
+                        "y": 142
                      },
                      {
-                        "x": 29,
-                        "y": 136
+                        "x": 523,
+                        "y": 142
                      },
                      {
-                        "x": 29,
-                        "y": 132
+                        "x": 523,
+                        "y": 138
                      }
                   ],
-                  "confidence": 0.9810567498207092,
-                  "length": 21,
+                  "confidence": 0.9732133746147156,
+                  "length": 20,
                   "label_line_distance": -1
                }
             ],
@@ -3270,7 +3254,8 @@
          "subfigure_labels": [],
          "scale_bar_labels": [],
          "scale_bar_lines": [],
-         "captions": []
+         "captions": [],
+         "scale_bar_objects": []
       }
    },
    "ncomms5946_fig5.jpg": {
@@ -3288,8 +3273,8 @@
          {
             "classification": "graph",
             "confidence": 0.1626,
-            "height": 152.97217409661476,
-            "width": 167.76106476783752,
+            "height": 152.97214264565324,
+            "width": 167.7610459235998,
             "geometry": [
                {
                   "x": 517,
@@ -3341,8 +3326,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
-            "height": 139.93594555144614,
-            "width": 160.32365872309757,
+            "height": 139.93595813183074,
+            "width": 160.32367128592273,
             "geometry": [
                {
                   "x": 8,
@@ -3382,32 +3367,7 @@
                   }
                ]
             },
-            "scale_bars": [
-               {
-                  "label": null,
-                  "geometry": [
-                     {
-                        "x": 20,
-                        "y": 136
-                     },
-                     {
-                        "x": 20,
-                        "y": 139
-                     },
-                     {
-                        "x": 45,
-                        "y": 139
-                     },
-                     {
-                        "x": 45,
-                        "y": 136
-                     }
-                  ],
-                  "confidence": 0.9759583473205566,
-                  "length": 25,
-                  "label_line_distance": -1
-               }
-            ],
+            "scale_bars": [],
             "caption": [
                "High-resolution HAADF \u2013 STEM images of representative porous Ag \u2013 Pd nanocages ; scale bar, 20\u2009nm . Note the arrays of small nanoparticles in the vicinity of the larger nanocages (outlined by a dashed oval)."
             ],
@@ -3421,8 +3381,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
-            "height": 150.33851461207612,
-            "width": 143.12320388280426,
+            "height": 150.33852719246073,
+            "width": 143.12319131997913,
             "geometry": [
                {
                   "x": 368,
@@ -3467,24 +3427,24 @@
                   "label": null,
                   "geometry": [
                      {
-                        "x": 17,
-                        "y": 134
+                        "x": 385,
+                        "y": 138
                      },
                      {
-                        "x": 17,
-                        "y": 139
+                        "x": 385,
+                        "y": 142
                      },
                      {
-                        "x": 42,
-                        "y": 139
+                        "x": 410,
+                        "y": 142
                      },
                      {
-                        "x": 42,
-                        "y": 134
+                        "x": 410,
+                        "y": 138
                      }
                   ],
-                  "confidence": 0.9849226474761963,
-                  "length": 25,
+                  "confidence": 0.9764090180397034,
+                  "length": 24,
                   "label_line_distance": -1
                }
             ],
@@ -3547,23 +3507,23 @@
                   "label": null,
                   "geometry": [
                      {
-                        "x": 23,
-                        "y": 137
+                        "x": 209,
+                        "y": 139
                      },
                      {
-                        "x": 23,
-                        "y": 141
+                        "x": 209,
+                        "y": 143
                      },
                      {
-                        "x": 49,
-                        "y": 141
+                        "x": 235,
+                        "y": 143
                      },
                      {
-                        "x": 49,
-                        "y": 137
+                        "x": 235,
+                        "y": 139
                      }
                   ],
-                  "confidence": 0.9833431243896484,
+                  "confidence": 0.9778450727462769,
                   "length": 25,
                   "label_line_distance": -1
                }
@@ -3586,7 +3546,33 @@
          "subfigure_labels": [],
          "scale_bar_labels": [],
          "scale_bar_lines": [],
-         "captions": []
+         "captions": [],
+         "scale_bar_objects": [
+            {
+               "label": null,
+               "geometry": [
+                  {
+                     "x": 28,
+                     "y": 139
+                  },
+                  {
+                     "x": 28,
+                     "y": 144
+                  },
+                  {
+                     "x": 53,
+                     "y": 144
+                  },
+                  {
+                     "x": 53,
+                     "y": 139
+                  }
+               ],
+               "confidence": 0.981778621673584,
+               "length": 25,
+               "label_line_distance": -1
+            }
+         ]
       }
    },
    "ncomms5946_fig6.jpg": {
@@ -3604,8 +3590,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
-            "height": 251.8347742650416,
-            "width": 208.5994675526252,
+            "height": 251.83476168149477,
+            "width": 208.5994926782755,
             "geometry": [
                {
                   "x": 10,
@@ -3650,24 +3636,24 @@
                   "label": null,
                   "geometry": [
                      {
-                        "x": 21,
-                        "y": 240
+                        "x": 32,
+                        "y": 242
                      },
                      {
-                        "x": 21,
-                        "y": 246
+                        "x": 32,
+                        "y": 247
                      },
                      {
-                        "x": 53,
-                        "y": 246
+                        "x": 63,
+                        "y": 247
                      },
                      {
-                        "x": 53,
-                        "y": 240
+                        "x": 63,
+                        "y": 242
                      }
                   ],
-                  "confidence": 0.9888880848884583,
-                  "length": 31,
+                  "confidence": 0.9833219051361084,
+                  "length": 30,
                   "label_line_distance": -1
                }
             ],
@@ -3738,7 +3724,7 @@
             "classification": "microscopy",
             "confidence": 0.1626,
             "height": 251.34829434481534,
-            "width": 183.1271461340097,
+            "width": 183.12714613400976,
             "geometry": [
                {
                   "x": 497,
@@ -3783,24 +3769,24 @@
                   "label": null,
                   "geometry": [
                      {
-                        "x": 9,
-                        "y": 241
+                        "x": 507,
+                        "y": 242
                      },
                      {
-                        "x": 9,
-                        "y": 245
+                        "x": 507,
+                        "y": 247
                      },
                      {
-                        "x": 77,
-                        "y": 245
+                        "x": 575,
+                        "y": 247
                      },
                      {
-                        "x": 77,
-                        "y": 241
+                        "x": 575,
+                        "y": 242
                      }
                   ],
-                  "confidence": 0.9163011908531189,
-                  "length": 67,
+                  "confidence": 0.986028254032135,
+                  "length": 68,
                   "label_line_distance": -1
                }
             ],
@@ -3818,7 +3804,8 @@
          "subfigure_labels": [],
          "scale_bar_labels": [],
          "scale_bar_lines": [],
-         "captions": []
+         "captions": [],
+         "scale_bar_objects": []
       }
    },
    "ncomms5946_fig7.jpg": {
@@ -3836,8 +3823,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
-            "height": 89.33020175298054,
-            "width": 100.22509451095875,
+            "height": 89.3302144050598,
+            "width": 100.22510707378387,
             "geometry": [
                {
                   "x": 11,
@@ -3944,7 +3931,7 @@
          {
             "classification": "microscopy",
             "confidence": 0.1524,
-            "height": 88.88346316019694,
+            "height": 88.88344418207805,
             "width": 208.63241984294012,
             "geometry": [
                {
@@ -4052,8 +4039,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
-            "height": 89.62392609914144,
-            "width": 102.09594414784358,
+            "height": 89.6239197731018,
+            "width": 102.0959567106687,
             "geometry": [
                {
                   "x": 114,
@@ -4161,7 +4148,7 @@
             "classification": "microscopy",
             "confidence": 0.1626,
             "height": 95.28628193537395,
-            "width": 95.01863264120544,
+            "width": 95.01865776685565,
             "geometry": [
                {
                   "x": 243,
@@ -4268,7 +4255,7 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
-            "height": 82.50977579752605,
+            "height": 82.50976314544675,
             "width": 106.65593559925378,
             "geometry": [
                {
@@ -4322,8 +4309,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
-            "height": 82.8054801940918,
-            "width": 108.61543481166547,
+            "height": 82.80547386805216,
+            "width": 108.6154473744906,
             "geometry": [
                {
                   "x": 348,
@@ -4404,6 +4391,32 @@
                   "STEM"
                ]
             }
+         ],
+         "scale_bar_objects": [
+            {
+               "label": null,
+               "geometry": [
+                  {
+                     "x": 639,
+                     "y": 191
+                  },
+                  {
+                     "x": 639,
+                     "y": 195
+                  },
+                  {
+                     "x": 673,
+                     "y": 195
+                  },
+                  {
+                     "x": 673,
+                     "y": 191
+                  }
+               ],
+               "confidence": 0.9755748510360718,
+               "length": 34,
+               "label_line_distance": -1
+            }
          ]
       }
    },
@@ -4422,7 +4435,7 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
-            "height": 92.89551417032878,
+            "height": 92.8955078125,
             "width": 100.8966466096731,
             "geometry": [
                {
@@ -4475,8 +4488,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1625,
-            "height": 92.78649012247722,
-            "width": 91.93474173545837,
+            "height": 92.78649648030598,
+            "width": 91.9347731425212,
             "geometry": [
                {
                   "x": 16,
@@ -4516,7 +4529,32 @@
                   }
                ]
             },
-            "scale_bars": [],
+            "scale_bars": [
+               {
+                  "label": null,
+                  "geometry": [
+                     {
+                        "x": 22,
+                        "y": 89
+                     },
+                     {
+                        "x": 22,
+                        "y": 93
+                     },
+                     {
+                        "x": 49,
+                        "y": 93
+                     },
+                     {
+                        "x": 49,
+                        "y": 89
+                     }
+                  ],
+                  "confidence": 0.9803196787834167,
+                  "length": 27,
+                  "label_line_distance": -1
+               }
+            ],
             "caption": [
                "Time-lapse series of dark-field STEM images following one Ag particle over 50.4 \u2009 s in 50 \u2009 \u03bcM aqueous PdCl2 solution . Electron dose rate : 6.26\u2009e\u2212 \u2009 \u00c5\u22122 \u2009 s\u22121, frame time: 8.4\u2009s . Electron dose per image : 52\u2009e\u2212 \u2009 \u00c5\u22122 . Scale bar."
             ],
@@ -4528,8 +4566,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
-            "height": 84.788818359375,
-            "width": 100.07258809529822,
+            "height": 84.78881200154622,
+            "width": 100.07256925106049,
             "geometry": [
                {
                   "x": 581,
@@ -4581,7 +4619,7 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
-            "height": 94.85582987467448,
+            "height": 94.85583623250325,
             "width": 96.66202604770659,
             "geometry": [
                {
@@ -4635,7 +4673,7 @@
             "classification": "microscopy",
             "confidence": 0.1626,
             "height": 97.4200407663981,
-            "width": 98.82013096259192,
+            "width": 98.82014980682959,
             "geometry": [
                {
                   "x": 354,
@@ -4687,8 +4725,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
-            "height": 95.77053705851237,
-            "width": 99.45531996396869,
+            "height": 95.7705561319987,
+            "width": 99.45535765244412,
             "geometry": [
                {
                   "x": 238,
@@ -4745,7 +4783,8 @@
          "subfigure_labels": [],
          "scale_bar_labels": [],
          "scale_bar_lines": [],
-         "captions": []
+         "captions": [],
+         "scale_bar_objects": []
       }
    },
    "ncomms5946_fig9.jpg": {
@@ -4763,7 +4802,7 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
-            "height": 105.97865453259698,
+            "height": 105.9786419046336,
             "width": 111.17913053585933,
             "geometry": [
                {
@@ -4871,7 +4910,7 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
-            "height": 102.59745420258622,
+            "height": 102.59744157462285,
             "width": 120.29771896509021,
             "geometry": [
                {
@@ -4925,8 +4964,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1625,
-            "height": 98.2102092874461,
-            "width": 111.78977177693292,
+            "height": 98.21020297346445,
+            "width": 111.78975921410782,
             "geometry": [
                {
                   "x": 153,
@@ -4980,7 +5019,7 @@
             "classification": "microscopy",
             "confidence": 0.1626,
             "height": 108.521484375,
-            "width": 111.89091508205115,
+            "width": 111.89090251922607,
             "geometry": [
                {
                   "x": 432,
@@ -5034,7 +5073,7 @@
             "classification": "microscopy",
             "confidence": 0.1626,
             "height": 108.33081475619612,
-            "width": 115.59898367294898,
+            "width": 115.59897111012384,
             "geometry": [
                {
                   "x": 292,
@@ -5087,8 +5126,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
-            "height": 111.16708058324353,
-            "width": 118.27029255720288,
+            "height": 111.16709321120689,
+            "width": 118.27031768285315,
             "geometry": [
                {
                   "x": 564,
@@ -5141,8 +5180,8 @@
          {
             "classification": "microscopy",
             "confidence": 0.1626,
-            "height": 112.65869561557113,
-            "width": 112.02756093098569,
+            "height": 112.65872087149785,
+            "width": 112.02756093098566,
             "geometry": [
                {
                   "x": 149,
@@ -5196,7 +5235,7 @@
             "classification": "microscopy",
             "confidence": 0.1626,
             "height": 106.7464599609375,
-            "width": 118.57571996175324,
+            "width": 118.5757073989281,
             "geometry": [
                {
                   "x": 288,
@@ -5290,7 +5329,32 @@
                   }
                ]
             },
-            "scale_bars": [],
+            "scale_bars": [
+               {
+                  "label": null,
+                  "geometry": [
+                     {
+                        "x": 635,
+                        "y": 222
+                     },
+                     {
+                        "x": 635,
+                        "y": 227
+                     },
+                     {
+                        "x": 675,
+                        "y": 227
+                     },
+                     {
+                        "x": 675,
+                        "y": 222
+                     }
+                  ],
+                  "confidence": 0.9889917373657227,
+                  "length": 40,
+                  "label_line_distance": -1
+               }
+            ],
             "caption": [
                "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution with added isopropanol."
             ],
@@ -5308,7 +5372,8 @@
          "subfigure_labels": [],
          "scale_bar_labels": [],
          "scale_bar_lines": [],
-         "captions": []
+         "captions": [],
+         "scale_bar_objects": []
       }
    }
 }

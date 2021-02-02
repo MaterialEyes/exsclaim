@@ -57,6 +57,12 @@ class JournalScraper(ExsclaimTool):
     Parameters: 
     None
     """
+    journals = {
+        'acs':      journal.ACS,
+        'nature':   journal.Nature,
+        'rsc':      journal.RSC,
+    }
+
     def __init__(self, search_query):
         self.initialize_query(search_query)
         self.new_articles_visited = set()
@@ -124,9 +130,9 @@ class JournalScraper(ExsclaimTool):
         ## Checks that user inputted journal family has been defined and
         ## grabs instantiates an instance of the journal family object
         journal_family = search_query['journal_family']
-        if journal_family not in journal.journals:
+        if journal_family not in self.journals:
             raise NameError('journal family {0} is not defined'.format(journal_family))
-        j_instance = journal.journals[journal_family](search_query)
+        j_instance = self.journals[journal_family](search_query)
 
         os.makedirs(search_query['results_dir'], exist_ok=True)
         t0 = time.time()

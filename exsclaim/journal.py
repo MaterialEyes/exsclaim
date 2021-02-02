@@ -13,7 +13,6 @@ import time
 
 
 from bs4 import BeautifulSoup
-from collections import OrderedDict
 
 
 class JournalFamily():
@@ -473,10 +472,3 @@ class RSC(JournalFamily):
     def save_figure(self, save_path, figure_name, image_url):
         out_file = save_path + "/figures/" + figure_name
         urllib.request.urlretrieve(image_url, out_file)
-
-
-journals = {
-    'acs':      ACS,
-    'nature':   Nature,
-    'rsc':      RSC,
-}

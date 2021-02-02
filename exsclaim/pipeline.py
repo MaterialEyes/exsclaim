@@ -6,27 +6,35 @@ import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image, ImageDraw, ImageFont
 import textwrap
+import pathlib
 
 from . import utils
 from .figure import FigureSeparator
 from .tool import CaptionSeparator, JournalScraper
 
 class Pipeline:
-    def __init__(self , query_path):
+    def __init__(self , query_path, test=False):
         """ initialize a Pipeline to run on query path and save to exsclaim path
 
         Args:
             query_path (dict or path to json): An EXSCLAIM user query JSON
-            exsclaim_path (dict or path to json): EXSCLAIM JSON
+            test (boolean): if True, initialize with test query json
         """
-        self.query_path = query_path
-        try:
-            with open(self.query_path) as f:
-                # Load query file to dict
+        if test:
+            current_path = pathlib.Path(__file__).resolve().parent
+            self.query_path = current_path / 'tests' / 'data' / 'nature_test.json'
+            with open(self.query_path, "r") as f:
                 self.query_dict = json.load(f)
-        except: 
-            self.query_dict = query_path
-            self.query_path = ""
+        
+        else:
+            self.query_path = query_path
+            try:
+                with open(self.query_path) as f:
+                    # Load query file to dict
+                    self.query_dict = json.load(f)
+            except: 
+                self.query_dict = query_path
+                self.query_path = ""
 
         
         try:
@@ -39,7 +47,7 @@ class Pipeline:
             self.exsclaim_dict = {}
 
 
-    def run(self, tools = None):
+    def run(self, tools=None, figure_separator=True, caption_separator=True, journal_scraper=True):
         """ Run EXSCLAIM pipeline on Pipeline instance's query path
 
         Args:
@@ -47,6 +55,12 @@ class Pipeline:
                 to run on query path in the order they will run. Default
                 argument is JournalScraper, CaptionSeparator, 
                 FigureSeparator
+            journal_scraper (boolean): true if JournalScraper should
+                be included in tools list. Overriden by a tools argument
+            caption_separator (boolean): true if CaptionSeparator should
+                be included in tools list. Overriden by a tools argument
+            figure_separator (boolean): true if FigureSeparator should
+                be included in tools list. Overriden by a tools argument
         Returns:
             exsclaim_dict (dict): an exsclaim json
         Modifies:
@@ -81,9 +95,14 @@ class Pipeline:
         @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
         """)
         # set default values
-        if tools is None: tools = [JournalScraper(self.query_dict),
-                                   CaptionSeparator(self.query_dict),
-                                   FigureSeparator(self.query_dict)]
+        if tools is None:
+            tools = []
+            if journal_scraper:
+                tools.append(JournalScraper(self.query_dict))
+            if caption_separator:
+                tools.append(CaptionSeparator(self.query_dict))
+            if figure_separator:
+                tools.append(FigureSeparator(self.query_dict))
         # run each ExsclaimTool on search query
         for tool in tools:
             self.exsclaim_dict = tool.run(self.query_dict,self.exsclaim_dict)
