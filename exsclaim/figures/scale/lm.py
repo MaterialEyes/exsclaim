@@ -15,7 +15,8 @@ class LanguageModel:
 
     def initWordList(self, fn):
         "internal init of word list"
-        txt = open(fn).read().lower()
+        with open(fn, "r") as f:
+            txt = f.read().lower()
         words = re.findall(r'\w+', txt)
         self.words = list(filter(lambda x: x.isalpha(), words))
 
@@ -27,7 +28,9 @@ class LanguageModel:
         self.bigram = {c: {d: 0 for d in classes} for c in classes}
 
         # go through text and add each char bigram
-        txt = codecs.open(fn, 'r', 'utf8').read()
+        codec = codecs.open(fn, 'r', 'utf8')
+        txt = codec.read()
+        codec.close()
         for i in range(len(txt)-1):
             first = txt[i]
             second = txt[i+1]
