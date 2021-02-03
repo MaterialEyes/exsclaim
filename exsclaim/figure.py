@@ -8,6 +8,7 @@ import shutil
 import pathlib
 import time
 import requests
+import warnings
 
 import numpy as np
 import torch.nn.functional as F
@@ -56,7 +57,6 @@ class FigureSeparator(ExsclaimTool):
         self._load_model()
         self.exsclaim_json = {}
 
-
     def _load_model(self):
         """ Load relevant models for the object detection tasks """
         ## Set configuration variables
@@ -69,7 +69,13 @@ class FigureSeparator(ExsclaimTool):
         self.nms_threshold         = configuration['TEST']['NMSTHRE']
         self.confidence_threshold  = 0.0001
         self.gpu_id                = 1
-        self.cuda = torch.cuda.is_available() and (gpu_id >= 0)
+        # This suppresses warning if user has no CUDA device initialized,
+        # which is unneccessary as we are explicitly checking. This may not
+        # be necessary in the future, described in:
+        # https://github.com/pytorch/pytorch/issues/47038
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            self.cuda = torch.cuda.is_available() and (gpu_id >= 0)
         self.dtype = torch.cuda.FloatTensor if self.cuda else torch.FloatTensor
         if self.cuda:
             print("using cuda: ", args.gpu_id) 
