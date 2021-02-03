@@ -4,6 +4,7 @@ import numpy as np
 from ..utils import *
 from .network import resnet152
 import cv2
+import warnings
 
 class YOLOLayer(nn.Module):
     """
@@ -84,10 +85,14 @@ class YOLOLayer(nn.Module):
         output[..., np.r_[:2, 4:n_ch]] = torch.sigmoid(
             output[..., np.r_[:2, 4:n_ch]])
 
-        # calculate pred - xywh obj cls
-
-        x_shift = dtype(np.broadcast_to(
-            np.arange(fsize, dtype=np.float32), output.shape[:4]))
+        # Suppresses incorrect UserWarning about a non-writeable Numpy array
+        # PR with fix accepted shortly after torch 1.7.1 release
+        # https://github.com/pytorch/pytorch/pull/47271
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            # calculate pred - xywh obj cls
+            x_shift = dtype(np.broadcast_to(
+                np.arange(fsize, dtype=np.float32), output.shape[:4]))
         y_shift = dtype(np.broadcast_to(
             np.arange(fsize, dtype=np.float32).reshape(fsize, 1), output.shape[:4]))
 
