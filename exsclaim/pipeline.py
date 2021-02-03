@@ -10,7 +10,7 @@ import pathlib
 
 from . import utils
 from .figure import FigureSeparator
-from .tool import CaptionSeparator, JournalScraper
+from .tool import CaptionDistributor, JournalScraper
 
 class Pipeline:
     def __init__(self , query_path, test=False):
@@ -47,17 +47,17 @@ class Pipeline:
             self.exsclaim_dict = {}
 
 
-    def run(self, tools=None, figure_separator=True, caption_separator=True, journal_scraper=True):
+    def run(self, tools=None, figure_separator=True, caption_distributor=True, journal_scraper=True):
         """ Run EXSCLAIM pipeline on Pipeline instance's query path
 
         Args:
             tools (list of ExsclaimTools): list of ExsclaimTool objects
                 to run on query path in the order they will run. Default
-                argument is JournalScraper, CaptionSeparator, 
+                argument is JournalScraper, CaptionDistributor, 
                 FigureSeparator
             journal_scraper (boolean): true if JournalScraper should
                 be included in tools list. Overriden by a tools argument
-            caption_separator (boolean): true if CaptionSeparator should
+            caption_distributor (boolean): true if CaptionDistributor should
                 be included in tools list. Overriden by a tools argument
             figure_separator (boolean): true if FigureSeparator should
                 be included in tools list. Overriden by a tools argument
@@ -99,8 +99,8 @@ class Pipeline:
             tools = []
             if journal_scraper:
                 tools.append(JournalScraper(self.query_dict))
-            if caption_separator:
-                tools.append(CaptionSeparator(self.query_dict))
+            if caption_distributor:
+                tools.append(CaptionDistributor(self.query_dict))
             if figure_separator:
                 tools.append(FigureSeparator(self.query_dict))
         # run each ExsclaimTool on search query

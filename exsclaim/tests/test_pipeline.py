@@ -8,7 +8,7 @@ import responses
 from deepdiff import DeepDiff
 
 from ..pipeline import Pipeline
-from ..tool import JournalScraper, CaptionSeparator
+from ..tool import JournalScraper, CaptionDistributor
 from ..figure import FigureSeparator
 
 class TestNatureFull(unittest.TestCase):
@@ -30,7 +30,7 @@ class TestNatureFull(unittest.TestCase):
           self.expected = json.load(f)
 
     def tearDown(self):
-        pass#shutil.rmtree(self.exsclaim_pipeline.query_dict["results_dir"])
+        shutil.rmtree(self.exsclaim_pipeline.query_dict["results_dir"])
 
     @responses.activate
     def test_full_run(self):

@@ -162,10 +162,10 @@ class JournalScraper(ExsclaimTool):
         return exsclaim_json
 
 
-class CaptionSeparator(ExsclaimTool):
+class CaptionDistributor(ExsclaimTool):
     """ 
-    CaptionSeparator object.
-    Separate subfigure caption chunks from full figure captions 
+    CaptionDistributor object.
+    Distribute subfigure caption chunks from full figure captions 
     in an exsclaim_dict using custom caption nlp tools
     Parameters:
     model_path: str 
@@ -187,8 +187,8 @@ class CaptionSeparator(ExsclaimTool):
             exsclaim_dict[figure_name]['unassigned']['captions'].append(master_image)
         return exsclaim_dict
 
-    def _appendJSON(self, results_directory, exsclaim_json, captions_separated):
-        """ Commit updates to EXSCLAIM JSON and updates list of separated figures
+    def _appendJSON(self, results_directory, exsclaim_json, captions_distributed):
+        """ Commit updates to EXSCLAIM JSON and updates list of ed figures
 
         Args:
             results_directory (string): Path to results directory
@@ -198,12 +198,12 @@ class CaptionSeparator(ExsclaimTool):
         with open(results_directory + "exsclaim.json",'w') as f: 
             json.dump(exsclaim_json, f, indent=3)
         with open(results_directory + "_captions", "a+") as f:
-            for figure in captions_separated:
+            for figure in captions_distributed:
                 f.write("%s\n" % figure.split("/")[-1])
 
 
     def run(self, search_query, exsclaim_json):
-        """ Run the CaptionSeparator to separate subfigure captions
+        """ Run the CaptionDistributor to distribute subfigure captions
 
         Args:
             search_query (dict): A Search Query JSON to guide search
@@ -211,22 +211,22 @@ class CaptionSeparator(ExsclaimTool):
         Returns:
             exsclaim_json (dict): Updated with results of search
         """
-        utils.Printer("Running Caption Separator\n")
+        utils.Printer("Running Caption Distributor\n")
         os.makedirs(search_query['results_dir'], exist_ok=True)
         t0 = time.time()
         model = self._load_model()
 
-        ## List captions that have already been separated
+        ## List captions that have already been distributed
         if os.path.isfile(search_query["results_dir"] + "_captions"):
             with open(search_query["results_dir"] + "_captions", "r") as f:
                 contents = f.readlines()
-            captions_separated = {f.strip() for f in contents}
+            captions_distributed = {f.strip() for f in contents}
         else:
-            captions_separated = set()
-        new_captions_separated = set()
+            captions_distributed = set()
+        new_captions_distributed = set()
 
         figures = ([exsclaim_json[figure]["figure_name"] for figure in exsclaim_json 
-                    if exsclaim_json[figure]["figure_name"] not in captions_separated])
+                    if exsclaim_json[figure]["figure_name"] not in captions_distributed])
         counter = 1
         for figure_name in figures:
             utils.Printer(">>> ({0} of {1}) ".format(counter,+\
@@ -237,18 +237,18 @@ class CaptionSeparator(ExsclaimTool):
                 delimiter = caption.find_subfigure_delimiter(model, caption_text)
                 caption_dict  = caption.associate_caption_text(model, caption_text, search_query['query'])
                 exsclaim_json = self._update_exsclaim(exsclaim_json, figure_name, delimiter, caption_dict) 
-                new_captions_separated.add(figure_name)
+                new_captions_distributed.add(figure_name)
             except:
-                utils.Printer("<!> ERROR: An exception occurred in CaptionSeparator\n")
+                utils.Printer("<!> ERROR: An exception occurred in CaptionDistributor\n")
         
             # Save to file every N iterations (to accomodate restart scenarios)
             if counter%1000 == 0:
-                self._appendJSON(search_query['results_dir'], exsclaim_json, new_captions_separated)
-                new_captions_separated = set()
+                self._appendJSON(search_query['results_dir'], exsclaim_json, new_captions_distributed)
+                new_captions_distributed = set()
             counter += 1
 
         t1 = time.time()
         utils.Printer(">>> Time Elapsed: {0:.2f} sec ({1} captions)\n".format(t1-t0,int(counter-1)))
 
-        self._appendJSON(search_query['results_dir'], exsclaim_json, new_captions_separated)
+        self._appendJSON(search_query['results_dir'], exsclaim_json, new_captions_distributed)
         return exsclaim_json

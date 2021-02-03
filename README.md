@@ -86,7 +86,7 @@ exsclaim_pipeline = Pipeline(query_path)
 # specified in the Query JSON. 
 # using run() with no arguments runs all three phases of the pipeline.
 exsclaim_pipeline.run(journal_scraper=True,      # Runs JournalScraper module
-                      caption_separator=True,    # Runs CaptionSeparator module    
+                      caption_distributor=True,    # Runs CaptionDistributor module    
                       figure_separator=True)     # Runs FigureSeparator module
 
 ```
@@ -95,8 +95,8 @@ Successful execution of the code will result in the creation of a directory popu
 ### Results
 
 After successful completion of the pipeline, results will be saved in the results directory written in the query JSON 'results_dir' field. This will include:
- - n exsclaim.json file: This is a json that maps each extracted figure name to its respective Figure JSON. The Figure JSON contains information about the article the figure appears in and, if CaptionSeparator and FigureSeparator were run, information on each of the figure's subfigures. The whole exsclaim JSON schema is described [here](https://github.com/MaterialEyes/exsclaim/wiki/JSON-Schema#exsclaim-json-).
- - _articles, _captions, _figures files: Used to keep track of the articles, figure captions and figures that have already been processed by JournalScraper, CaptionSeparator, and FigureSeparator, resepectively. 
+ - n exsclaim.json file: This is a json that maps each extracted figure name to its respective Figure JSON. The Figure JSON contains information about the article the figure appears in and, if CaptionDistributor and FigureSeparator were run, information on each of the figure's subfigures. The whole exsclaim JSON schema is described [here](https://github.com/MaterialEyes/exsclaim/wiki/JSON-Schema#exsclaim-json-).
+ - _articles, _captions, _figures files: Used to keep track of the articles, figure captions and figures that have already been processed by JournalScraper, CaptionDistributor, and FigureSeparator, resepectively. 
  - figures/: stores all figures downloaded by JournalScraper
  - html/: stores full html of each article scraped by JournalScraper
  - extractions/: contains a .txt and .png files for each image listing and displaying FigureSeparator results. 
