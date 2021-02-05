@@ -26,7 +26,7 @@ from .figures.models.yolov3 import *
 from .figures.utils import *
 from .figures.models.network import *
 from .tool import ExsclaimTool
-from . import utils
+from .utilities import logging, boxes, download
 from .figures.scale import ctc
 from .figures.scale.crnn import CRNN
 
@@ -125,7 +125,7 @@ class FigureSeparator(ExsclaimTool):
             file_id = FigureSeparator.model_names_to_googleids[model_name]
             print(("Downloading: https://drive.google.com/uc?export=download&id={}"
                    " to {}".format(file_id, checkpoint)))
-            utils.download_file_from_google_drive(file_id, checkpoint)  
+            download.download_file_from_google_drive(file_id, checkpoint)  
         if self.cuda:
             model.load_state_dict(torch.load(checkpoint))
             model = model.cuda()
@@ -161,7 +161,7 @@ class FigureSeparator(ExsclaimTool):
     def run(self, search_query, exsclaim_dict):
         """ Run the models relevant to manipulating article figures
         """
-        utils.Printer("Running Figure Separator\n")
+        logging.Printer("Running Figure Separator\n")
         os.makedirs(search_query['results_dir'], exist_ok=True)
         self.exsclaim_json = exsclaim_dict
         t0 = time.time()
@@ -182,14 +182,14 @@ class FigureSeparator(ExsclaimTool):
         figures = ([self.exsclaim_json[figure]["figure_path"] for figure in self.exsclaim_json 
                     if self.exsclaim_json[figure]["figure_name"] not in figures_separated])
         for figure_name in figures:
-            utils.Printer(">>> ({0} of {1}) ".format(counter,+\
+            logging.Printer(">>> ({0} of {1}) ".format(counter,+\
                 len(figures))+\
                 "Extracting images from: "+ figure_name.split("/")[-1])
             if True:#try:
                 self.extract_image_objects(figure_name)
                 new_figures_separated.add(figure_name)
             else:#except:
-                utils.Printer("<!> ERROR: An exception occurred in FigureSeparator\n")
+                logging.Printer("<!> ERROR: An exception occurred in FigureSeparator\n")
             
             # Save to file every N iterations (to accomodate restart scenarios)
             if counter%500 == 0:
@@ -198,7 +198,7 @@ class FigureSeparator(ExsclaimTool):
             counter += 1
         
         t1 = time.time()
-        utils.Printer(">>> Time Elapsed: {0:.2f} sec ({1} figures)\n".format(t1-t0,int(counter-1)))
+        logging.Printer(">>> Time Elapsed: {0:.2f} sec ({1} figures)\n".format(t1-t0,int(counter-1)))
         self._appendJSON(search_query["results_dir"], self.exsclaim_json, new_figures_separated)
         return self.exsclaim_json
 
@@ -528,11 +528,11 @@ class FigureSeparator(ExsclaimTool):
         scale_bar_jsons = []
         paired_labels = set()
         for line in scale_bar_lines:
-            x_line, y_line = utils.find_box_center(line["geometry"])
+            x_line, y_line = boxes.find_box_center(line["geometry"])
             best_distance = 1000000
             best_label = None
             for label_index, label in enumerate(scale_bar_labels):
-                x_label, y_label = utils.find_box_center(label["geometry"])
+                x_label, y_label = boxes.find_box_center(label["geometry"])
                 distance = (x_label - x_line)**2 + (y_label - y_line)**2
                 if distance < best_distance:
                     best_distance = distance
@@ -575,7 +575,7 @@ class FigureSeparator(ExsclaimTool):
         unassigned_scale_objects = []
         assigned_scale_objects = []
         for scale_object in scale_objects:
-            if utils.is_contained(scale_object["geometry"], geomtery):
+            if boxes.is_contained(scale_object["geometry"], geomtery):
                 assigned_scale_objects.append(scale_object)
             else:
                 unassigned_scale_objects.append(scale_object)
@@ -653,7 +653,7 @@ class FigureSeparator(ExsclaimTool):
         scale_labels = []
         for scale_object in scale_bar_info:
             x1, y1, x2, y2, confidence, classification = scale_object
-            geometry = utils.convert_coords_to_labelbox([int(x1), int(y1),
+            geometry = boxes.convert_coords_to_labelbox([int(x1), int(y1),
                                                         int(x2), int(y2)])
             if label_names[int(classification)] == "scale bar":
                 scale_bar_json = {

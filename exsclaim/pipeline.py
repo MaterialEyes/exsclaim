@@ -8,7 +8,7 @@ from PIL import Image, ImageDraw, ImageFont
 import textwrap
 import pathlib
 
-from . import utils
+from .utilities import boxes, logging
 from .figure import FigureSeparator
 from .tool import CaptionDistributor, JournalScraper
 
@@ -191,10 +191,10 @@ class Pipeline:
     def group_objects(self):
         """ Pair captions with subfigures for each figure in exsclaim json """
         search_query = self.query_dict
-        utils.Printer("Matching Image Objects to Caption Text\n")
+        logging.Printer("Matching Image Objects to Caption Text\n")
         counter = 1
         for figure in self.exsclaim_dict:
-            utils.Printer(">>> ({0} of {1}) ".format(counter,+\
+            logging.Printer(">>> ({0} of {1}) ".format(counter,+\
                 len(self.exsclaim_dict))+\
                 "Matching objects from figure: "+figure)
     
@@ -205,7 +205,7 @@ class Pipeline:
             figure_json["unassigned"] = unassigned
 
             counter +=1 
-        utils.Printer(">>> SUCCESS!\n")
+        logging.Printer(">>> SUCCESS!\n")
 
         with open(search_query['results_dir'] + 'exsclaim.json', 'w') as f:
             json.dump(self.exsclaim_dict, f, indent=3)
@@ -222,7 +222,7 @@ class Pipeline:
             Creates directories to save each subfigure and a csv file to save data
         """
         search_query = self.query_dict
-        utils.Printer("".join(["Printing Master Image Objects to: ",
+        logging.Printer("".join(["Printing Master Image Objects to: ",
                               search_query['results_dir'].strip("/"),"/images","\n"]))
         # Rows for output csv file
         rows = [['article_url', 'figure_path','figure_num', 'image_path',
@@ -259,7 +259,7 @@ class Pipeline:
                                               master_class
                                             ]) + figure_extension
                 # save master image to file
-                master_patch = utils.crop_from_geometry(master_image['geometry'], figure)
+                master_patch = boxes.crop_from_geometry(master_image['geometry'], figure)
                 master_patch = master_patch.copy(order='C')
                 try:
                     plt.imsave(directory + master_name, master_patch)  
@@ -286,7 +286,7 @@ class Pipeline:
                                               dependent_class
                                               ]) + figure_extension
                     # save dependent image to file
-                    dpatch = utils.crop_from_geometry(dependent_image['geometry'], figure)
+                    dpatch = boxes.crop_from_geometry(dependent_image['geometry'], figure)
                     try:
                         plt.imsave(dependent_root_name+dependent_name,dpatch) 
                     except Exception as err:
@@ -310,7 +310,7 @@ class Pipeline:
                                                "ins" + str(inset_id),
                                                inset_classification]) + figure_extension
                         
-                        ipatch = utils.crop_from_geometry(inset_image['geometry'],figure)
+                        ipatch = boxes.crop_from_geometry(inset_image['geometry'],figure)
                         # save inset image to file
                         try:
                             plt.imsave(inset_root_name+inset_name,ipatch)
@@ -334,7 +334,7 @@ class Pipeline:
                     inset_name = "_".join([master_name.split(figure_extension)[0][0:-3] +
                                            "ins" + str(inset_id),
                                            inset_classification]) + figure_extension
-                    ipatch = utils.crop_from_geometry(inset_image['geometry'], figure)
+                    ipatch = boxes.crop_from_geometry(inset_image['geometry'], figure)
                     # save inset image to file
                     try:
                         plt.imsave(inset_root_name+inset_name,ipatch)
@@ -354,7 +354,7 @@ class Pipeline:
             writer = csv.writer(csvFile)
             writer.writerows(rows)
 
-        utils.Printer(">>> SUCCESS!\n")
+        logging.Printer(">>> SUCCESS!\n")
 
     def make_visualization(self, figure_name):
         """ Save subfigures and their labels as images
@@ -373,7 +373,7 @@ class Pipeline:
         for master_image in master_images:
             if 'height' not in master_image or 'width' not in master_image:
                 geometry = master_image["geometry"]
-                x1, y1, x2, y2 = utils.convert_labelbox_to_coords(geometry)
+                x1, y1, x2, y2 = boxes.convert_labelbox_to_coords(geometry)
                 master_image['height'] = y2 - y1
                 master_image['width'] = x2 - x1
         image_buffer = 150
@@ -393,7 +393,7 @@ class Pipeline:
         image_y = 0
         for subfigure_json in master_images:
             geometry = subfigure_json["geometry"]
-            x1, y1, x2, y2 = utils.convert_labelbox_to_coords(geometry)
+            x1, y1, x2, y2 = boxes.convert_labelbox_to_coords(geometry)
             classification = subfigure_json["classification"]
             caption = "\n".join(subfigure_json.get("caption", []))
             caption = "\n".join(textwrap.wrap(caption, width=100))
@@ -403,17 +403,17 @@ class Pipeline:
             # Draw bounding boxes on detected objects
             for scale_bar in scale_bars:
                 scale_geometry = scale_bar["geometry"]
-                coords = utils.convert_labelbox_to_coords(scale_geometry)
+                coords = boxes.convert_labelbox_to_coords(scale_geometry)
                 bounding_box = [int(coord) for coord in coords]
                 draw_full_figure.rectangle(bounding_box, width=2, outline="green")
                 if scale_bar["label"]:
                     label_geometry = scale_bar["label"]["geometry"]
-                    coords = utils.convert_labelbox_to_coords(label_geometry)
+                    coords = boxes.convert_labelbox_to_coords(label_geometry)
                     bounding_box = [int(coord) for coord in coords]
                     draw_full_figure.rectangle(bounding_box, width=2, outline="green")
             label_geometry = subfigure_json["subfigure_label"]["geometry"]
             if label_geometry != []:
-                coords = utils.convert_labelbox_to_coords(label_geometry)
+                coords = boxes.convert_labelbox_to_coords(label_geometry)
                 bounding_box = [int(coord) for coord in coords]
                 draw_full_figure.rectangle(bounding_box, width=1, outline="green")
             # Draw image

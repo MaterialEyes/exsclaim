@@ -9,7 +9,8 @@ from spacy import load
 from spacy.matcher import Matcher
 from spacy.pipeline import EntityRuler
 
-from . import utils
+from .captions import lists
+from .utilities import files
 from .captions import interpret as interpret
 from .captions import regex as regex
 
@@ -27,7 +28,7 @@ def load_models(models_path=str) -> "caption_nlp_model":
     matcher = Matcher(nlp.vocab)
 
     # Get list of caption-spectific spaCy rules (contains label + pattern)
-    caption_rules = utils.load_yaml(models_path+'rules.yml')
+    caption_rules = files.load_yaml(models_path+'rules.yml')
 
     # Add custom caption rules to spaCy matcher
     for rule in caption_rules:
@@ -130,7 +131,7 @@ def get_subfigure_tokens(caption_nlp_model=tuple, caption=str) -> list:
     ss = [[]]+ss+[[]] # Pad with empty lists to trigger no intersection events at boundaries
 
     # Find starting points for consecutive slices that do not intersect
-    start_idxs = [i for i in range(len(ss)-1) if utils.intersection(ss[i],ss[i+1]) == []]
+    start_idxs = [i for i in range(len(ss)-1) if lists.intersection(ss[i],ss[i+1]) == []]
 
     # Find idx of max consecutive tokens list between non-intersecting slices
     critical_idxs = list(np.array(start_idxs[0:-1])+\
@@ -141,7 +142,7 @@ def get_subfigure_tokens(caption_nlp_model=tuple, caption=str) -> list:
     # Filter out ambiguous tokens (i.e. parenthesis before but not after), and false 
     # positive chemical elements to get collection of "critical" tokens to further inspect
     critical_tokens = [a for a in [matches[i] for i in critical_idxs]\
-                         if utils.is_disjoint(doc[a[1]:a[2]].text.split(" "),\
+                         if lists.is_disjoint(doc[a[1]:a[2]].text.split(" "),\
                             interpret.false_negative_subfigure_labels(delimiter))]
 
     # Filter out any remaining tokens that resemble molecules
@@ -149,7 +150,7 @@ def get_subfigure_tokens(caption_nlp_model=tuple, caption=str) -> list:
 
 
     # Find all labels suggested by syntax (i.e. the label a–d suggests that in actuality, images a, b, c, d exist).
-    suggested_labels = sorted(np.unique(list(utils.flatten([list(a) \
+    suggested_labels = sorted(np.unique(list(lists.flatten([list(a) \
                    for a in [interpret.implied_chars(doc[entry[1]:entry[2]].text,delimiter)
                    for entry in critical_tokens]]))))
 
