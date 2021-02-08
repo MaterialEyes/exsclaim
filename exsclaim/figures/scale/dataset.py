@@ -4,7 +4,7 @@ import numpy as np
 import os
 from PIL import Image
 import random
-from .utils import convert_box_format
+from ...utilities.boxes import convert_labelbox_to_coords
 
 class ScaleBarDataset():
     def __init__(self, root, transforms, test=True, size=None):
@@ -34,10 +34,10 @@ class ScaleBarDataset():
             boxes = []
             labels = []
             for scale_bar in self.data[image_name].setdefault("scale_bars", []):
-                boxes.append(convert_box_format(scale_bar["geometry"]))
+                boxes.append(convert_labelbox_to_coords(scale_bar["geometry"]))
                 labels.append(1)
             for scale_label in self.data[image_name].setdefault("scale_labels", []):
-                boxes.append(convert_box_format(scale_label["geometry"]))
+                boxes.append(convert_labelbox_to_coords(scale_label["geometry"]))
                 labels.append(2)
             
             num_objs = len(boxes)
@@ -61,6 +61,5 @@ class ScaleBarDataset():
 
         return new_image, target
         
-
     def __len__(self):
         return len(self.images)

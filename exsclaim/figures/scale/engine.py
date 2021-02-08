@@ -7,8 +7,9 @@ import numpy as np
 import torchvision.models.detection.mask_rcnn
 
 from .coco_utils import get_coco_api_from_dataset
-from .coco_eval import CocoEvaluator
 from . import utils
+from .coco_eval import CocoEvaluator
+from . import process
 import pathlib
 
 def train_one_epoch(model, optimizer, data_loader, device, epoch,
@@ -78,7 +79,7 @@ def run_nms_on_outputs(outputs):
                 x1, y1, x2, y2 = box
                 label = image_outputs['labels'][i]
                 scale_bar_info.append([x1, y1, x2, y2, confidence, label])
-        scale_bar_info = utils.non_max_suppression_malisiewicz(np.asarray(scale_bar_info), 0.4)
+        scale_bar_info = process.non_max_suppression_malisiewicz(np.asarray(scale_bar_info), 0.4)
         boxes = torch.empty((0, 4))
         labels = []
         scores = []

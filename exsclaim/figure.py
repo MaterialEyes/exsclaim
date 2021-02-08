@@ -23,7 +23,8 @@ from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 from torchvision import models
 
 from .figures.models.yolov3 import *
-from .figures.utils import *
+from .figures.separator import process
+from .figures.scale.process import non_max_suppression_malisiewicz
 from .figures.models.network import *
 from .tool import ExsclaimTool
 from .utilities import logging, boxes, download
@@ -235,7 +236,7 @@ class FigureSeparator(ExsclaimTool):
             img = cv2.cvtColor(img,cv2.COLOR_GRAY2RGB)
         else:
             img = cv2.cvtColor(img,cv2.COLOR_RGBA2RGB)
-        img, info_img = preprocess(img, self.image_size, jitter=0)
+        img, info_img = process.preprocess(img, self.image_size, jitter=0)
         img = np.transpose(img / 255., (2, 0, 1))
         img = np.copy(img)
         img = torch.from_numpy(img).float().unsqueeze(0)
@@ -247,7 +248,7 @@ class FigureSeparator(ExsclaimTool):
         ## Run model on figure
         with torch.no_grad():
             outputs = self.object_detection_model(img)
-            outputs = postprocess(outputs, dtype=self.dtype, 
+            outputs = process.postprocess(outputs, dtype=self.dtype, 
                         conf_thre=self.confidence_threshold, nms_thre=self.nms_threshold)
 
         ## Reformat model outputs to display bounding boxes in our desired format
@@ -259,7 +260,7 @@ class FigureSeparator(ExsclaimTool):
             return subfigure_info
 
         for x1, y1, x2, y2, conf, cls_conf, cls_pred in outputs[0]:
-            box = yolobox2label([y1.data.cpu().numpy(), x1.data.cpu().numpy(), y2.data.cpu().numpy(), x2.data.cpu().numpy()], info_img)
+            box = process.yolobox2label([y1.data.cpu().numpy(), x1.data.cpu().numpy(), y2.data.cpu().numpy(), x2.data.cpu().numpy()], info_img)
             box[0] = int(min(max(box[0],0),width-1))
             box[1] = int(min(max(box[1],0),height-1))
             box[2] = int(min(max(box[2],0),width))
@@ -309,7 +310,7 @@ class FigureSeparator(ExsclaimTool):
             bbox = tuple(subfigure[:4])
             img_patch = img_raw.crop(bbox)
             img_patch = np.array(img_patch)[:,:,::-1]
-            img_patch, _ = preprocess(img_patch, 28, jitter=0)
+            img_patch, _ = process.preprocess(img_patch, 28, jitter=0)
             img_patch = np.transpose(img_patch / 255., (2, 0, 1))
             img_patch = torch.from_numpy(img_patch).type(self.dtype).unsqueeze(0)
 
@@ -378,9 +379,9 @@ class FigureSeparator(ExsclaimTool):
         img = concate_img[...,:3].copy()
         mask = concate_img[...,3:].copy()
 
-        img, info_img = preprocess(img, self.image_size, jitter=0)
+        img, info_img = process.preprocess(img, self.image_size, jitter=0)
         img = np.transpose(img / 255., (2, 0, 1))
-        mask = preprocess_mask(mask, self.image_size, info_img)
+        mask = process.preprocess_mask(mask, self.image_size, info_img)
         mask = np.transpose(mask / 255., (2, 0, 1))
         new_concate_img = np.concatenate((img,mask),axis=0)
         img = torch.from_numpy(new_concate_img).float().unsqueeze(0)
@@ -392,7 +393,7 @@ class FigureSeparator(ExsclaimTool):
         if len(subfigure_labels) > 0:
             subfigure_labels = np.stack(subfigure_labels)
             # convert coco labels to yolo
-            subfigure_labels = label2yolobox(subfigure_labels, info_img, self.image_size, lrflip=False)
+            subfigure_labels = process.label2yolobox(subfigure_labels, info_img, self.image_size, lrflip=False)
             # make the beginning of subfigure_padded_labels subfigure_labels
             subfigure_padded_labels[:len(subfigure_labels)] = subfigure_labels[:80]
         # conver labels to tensor and add dimension
@@ -448,7 +449,7 @@ class FigureSeparator(ExsclaimTool):
                 y1 = (y-h/2)
                 y2 = (y+h/2)
     
-                x1,y1,x2,y2 = yolobox2label([y1,x1,y2,x2], info_img)
+                x1,y1,x2,y2 = process.yolobox2label([y1,x1,y2,x2], info_img)
 
             ## Saving the data into a json. Eventually it would be good to make the json
             ## be updated in each model's function. This could eliminate the need to pass
