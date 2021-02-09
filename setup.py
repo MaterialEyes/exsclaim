@@ -7,10 +7,10 @@ with open(here / "README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="exsclaim-tspread",
-    version="0.0.14",
+    name="exsclaim-materialeyes",
+    version="0.0.15",
     author=('Eric Schwenker','Trevor Spreadbury','Weixin Jiang','Maria Chan'),
-    author_email="developers@materialeyes.org",
+    author_email="developer@materialeyes.org",
     description="EXSCLAIM! is a library for the automatic EXtraction, Separation, and Caption-based natural Language Annotation of IMages from scientific figures.",
     long_description=long_description,
     long_description_content_type="text/markdown",

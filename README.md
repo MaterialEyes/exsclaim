@@ -13,7 +13,7 @@ You need a working python 3.x installation to be able to use EXSCLAIM! We recomm
 
 To install test version:
 ```
-pip install --extra-index-url https://test.pypi.org/simple/ exsclaim-tspread
+pip install --extra-index-url https://test.pypi.org/simple/ exsclaim-materialeyes
 python -m spacy download en_core_web_sm
 ```
 To test that it has been installed correctly, you can run the following python code:
@@ -33,7 +33,7 @@ When complete the results should be in extracted/nature-test/ and the json will 
 ## Usage
 
 ### REQUIRED: Formulate a JSON search query
-A JSON search query is the singular point-of-entry for using the EXSCLAIM! search and retrieval tools.
+A search query JSON is the singular point-of-entry for using the EXSCLAIM! search and retrieval tools.
 
 Here we query open access [Nature](https://www.nature.com) journals to find figures related to HAADF-STEM images of exfoliated MoS<sub>2</sub> flakes. Limiting the results to the top 5 most relevant hits, the query might look something like:
 
@@ -67,9 +67,13 @@ Here we query open access [Nature](https://www.nature.com) journals to find figu
     "save_format": [""]
 }
 ```
-Saving the query avoids having to completely reformulate the structure with each new search entry and establishes provenance for the extraction results. Additional JSON search query examples can be found in the [test](https://github.com/eschwenk/exsclaim-prerelease/tree/master/test) folder in the root directory. A full specification of the Query JSON schema can be found [here](https://github.com/MaterialEyes/exsclaim/wiki/JSON-Schema#query-json-).
+Saving the query avoids having to completely reformulate the structure with each new search entry and establishes provenance for the extraction results. Additional JSON search query examples can be found in the [query](https://github.com/eschwenk/exsclaim-prerelease/tree/master/query) folder in the root directory. A full specification of the Query JSON schema can be found [here](https://github.com/MaterialEyes/exsclaim/wiki/JSON-Schema#query-json-).
 
 ### REQUIRED: Use the Pipeline class to conduct a search based on the desired Query JSON
+
+There are several ways to access the Pipeline class. 
+
+#### Option One: Direct Python Import
 With the [nature-exfoliated-MoS2-flakes.json](https://github.com/eschwenk/exsclaim-prerelease/tree/master/test/query/nature-exfoliated-MoS2-flakes.json) search query from above, extract relevant figures by running a <code>JournalScraper</code> through an EXSCLAIM! <code>Pipeline</code>:
 
 ```python
@@ -92,26 +96,40 @@ exsclaim_pipeline.run(journal_scraper=True,      # Runs JournalScraper module
 ```
 Successful execution of the code will result in the creation of a directory populated with figures extracted from journals returned as search hits from the main [Nature](https://www.nature.com) homepage.
 
+#### Option Two: Using pre-built run.py
+The run.py file provides an easy method to quickly access the Pipeline class with limited Python knowledge. You only have to supply two parameters: the tools you wish to run and the query you wish to run them on. You can use the command line: 
+```
+python run.py --query nature-exfoliated-MoS2-flakes --tools jcf
+```
+Or edit the QUERY and TOOLS variables at the top of the run.py file and running:
+```
+python run.py
+```
+In either case, if the query JSON you supply is in the query/ folder, you only need to supply the name (without the .json). Otherwise, supply the whole path. For tools, supply a string with the first letter of each tool you wish to run:
+ - j: JournalScraper
+ - c: CaptionDistributor
+ - f: FigureSeparator
+
 ### Results
 
 After successful completion of the pipeline, results will be saved in the results directory written in the query JSON 'results_dir' field. This will include:
- - n exsclaim.json file: This is a json that maps each extracted figure name to its respective Figure JSON. The Figure JSON contains information about the article the figure appears in and, if CaptionDistributor and FigureSeparator were run, information on each of the figure's subfigures. The whole exsclaim JSON schema is described [here](https://github.com/MaterialEyes/exsclaim/wiki/JSON-Schema#exsclaim-json-).
+ - exsclaim.json file: This is a json that maps each extracted figure name to its respective Figure JSON. The Figure JSON contains information about the article the figure appears in and, if CaptionDistributor and FigureSeparator were run, information on each of the figure's subfigures. The whole exsclaim JSON schema is described [here](https://github.com/MaterialEyes/exsclaim/wiki/JSON-Schema#exsclaim-json-).
  - _articles, _captions, _figures files: Used to keep track of the articles, figure captions and figures that have already been processed by JournalScraper, CaptionDistributor, and FigureSeparator, resepectively. 
  - figures/: stores all figures downloaded by JournalScraper
  - html/: stores full html of each article scraped by JournalScraper
- - extractions/: contains a .txt and .png files for each image listing and displaying FigureSeparator results. 
+ - extractions/ (optional): present if "visualize" present in Query JSON "save_format" list. Contains .png files for each figure, displaying FigureSeparator and CaptionDistributor results. 
  - images/ (optional): present if "save_subfigures" present in Query JSON "save_format" list. A directory contianing each subfigure extracted as a separate file. 
 
  ## Uninstall
  ```
- pip uninstall exsclaim-tspread
+ pip uninstall exsclaim-materialeyes
  ```
  The screen should then show something like:
  ```
- Uninstalling exsclaim-tspread-0.0.10:
+ Uninstalling exsclaim-materiealeyes-0.0.10:
   Would remove:
     /path/to/site-packages/exsclaim/*
-    /path/to/site-packages/exsclaim_tspread-0.0.10.dist-info/*
+    /path/to/site-packages/exsclaim_materialeyes-0.0.10.dist-info/*
   Would not remove (might be manually added):
     /path/to/site-packages/exsclaim/figures/checkpoints/classifier_model.pt
     /path/to/site-packages/exsclaim/figures/checkpoints/object_detection_model.pt
