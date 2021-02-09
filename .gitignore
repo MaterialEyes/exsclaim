@@ -15,7 +15,6 @@ extracted/*
 .vscode
 cookie
 reference_extracted/
-query/
 dataset/dataset_generation/all/
 dataset/dataset_generation/unit_data/
 dataset/dataset_generation/scale_all/

@@ -1,0 +1,24 @@
+{   
+    "name": "acs-haadf-ag-nanoparticles",
+
+    "journal_family": "acs",
+
+    "maximum_scraped": 10,
+
+    "sortby": "relevant",
+
+    "query":
+    {
+        "search_field_1":
+        {
+            "term":"nano",
+            "synonyms":["nanoparticle"]
+        }
+    },
+    
+    "results_dir": "extracted/acs-nanoparticles/", 
+
+    "save_format": [""], 
+
+    "open" : false
+}
