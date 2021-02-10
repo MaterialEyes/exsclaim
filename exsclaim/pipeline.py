@@ -119,6 +119,10 @@ class Pipeline:
             for figure in self.exsclaim_dict:
                 self.make_visualization(figure)
 
+        if 'boxes' in save_methods:
+            for figure in self.exsclaim_dict:
+                self.draw_bounding_boxes(figure)
+
         if 'mongo' in save_methods:
             import pymongo
             db_client = pymongo.MongoClient(self.query_dict["mongo_connection"])
@@ -128,7 +132,6 @@ class Pipeline:
             collection.insert_many(db_push)
 
         return self.exsclaim_dict
-
 
     def assign_captions(self, figure):
         """ Assigns all captions to master_images JSONs for single figure
@@ -187,7 +190,6 @@ class Pipeline:
         unassigned["captions"] = new_unassigned_captions
         return masters, unassigned
 
-
     def group_objects(self):
         """ Pair captions with subfigures for each figure in exsclaim json """
         search_query = self.query_dict
@@ -211,7 +213,6 @@ class Pipeline:
             json.dump(self.exsclaim_dict, f, indent=3)
         
         return self.exsclaim_dict
-
 
     def to_file(self):
         """ Saves data to a csv and saves subfigures as individual images
@@ -433,3 +434,78 @@ class Pipeline:
 
         del draw
         labeled_image.save(os.path.join(self.query_dict["results_dir"], "extractions", figure_name))
+
+    def draw_bounding_boxes(self, figure_name,
+                            draw_scale=True,
+                            draw_labels=False,
+                            draw_subfigures=False):
+        """ Save figures with bounding boxes drawn
+
+        Args:
+            figure_path (str): A path to the image (.png, .jpg, or .gif)
+                file containing the article figure
+            draw_scale (bool): If True, draws scale object bounding boxes
+            draw_labels (bool): If True, draws subfigure label bounding boxes
+            draw_subfigures (bool): If True, draws subfigure bounding boxes
+        Modifies:
+            Creates images and text files in <save_path>/boxes folders
+            showing details about each subfigure
+        """
+        os.makedirs(os.path.join(self.query_dict["results_dir"], "boxes"), exist_ok=True)
+        figure_json = self.exsclaim_dict[figure_name]
+        master_images = figure_json.get("master_images", [])
+
+
+        full_figure = Image.open(figure_json["figure_path"]).convert("RGB")
+        draw_full_figure = ImageDraw.Draw(full_figure)
+        
+        scale_objects = []
+        subfigure_labels = []
+        subfigures = []
+        for subfigure_json in master_images:
+            # collect subfigures
+            geometry = subfigure_json["geometry"]
+            x1, y1, x2, y2 = boxes.convert_labelbox_to_coords(geometry)
+            subfigures.append((x1, y1, x2, y2))
+            # Collect scale bar objects
+            scale_bars = subfigure_json.get("scale_bars", [])
+            for scale_bar in scale_bars:
+                scale_geometry = scale_bar["geometry"]
+                coords = boxes.convert_labelbox_to_coords(scale_geometry)
+                bounding_box = [int(coord) for coord in coords]
+                scale_objects.append(bounding_box)
+                if scale_bar["label"]:
+                    label_geometry = scale_bar["label"]["geometry"]
+                    coords = boxes.convert_labelbox_to_coords(label_geometry)
+                    bounding_box = [int(coord) for coord in coords]
+                    scale_objects.append(bounding_box)
+            # Collect subfigure labels
+            label_geometry = subfigure_json["subfigure_label"]["geometry"]
+            if label_geometry != []:
+                coords = boxes.convert_labelbox_to_coords(label_geometry)
+                bounding_box = [int(coord) for coord in coords]
+                subfigure_labels.append(bounding_box)
+        unassigned_scale = figure_json.get("unassigned", {}).get("scale_bar_objects", [])
+        for scale_object in unassigned_scale:
+            if "geometry" in scale_object:
+                scale_geometry = scale_object["geometry"]
+                coords = boxes.convert_labelbox_to_coords(scale_geometry)
+                bounding_box = [int(coord) for coord in coords]
+                scale_objects.append(bounding_box)
+            if scale_object.get("label") is not None:
+                label_geometry = scale_object["label"]["geometry"]
+                coords = boxes.convert_labelbox_to_coords(label_geometry)
+                bounding_box = [int(coord) for coord in coords]
+                scale_objects.append(bounding_box)
+        # Draw desired bounding boxes
+        if draw_scale:
+            for bounding_box in scale_objects:
+                draw_full_figure.rectangle(bounding_box, width=2, outline="green")
+        if draw_labels:
+            for bounding_box in subfigure_labels:
+                draw_full_figure.rectangle(bounding_box, width=2, outline="green")
+        if draw_subfigures:
+            for bounding_box in subfigures:
+                draw_full_figure.rectangle(bounding_box, width=2, outline="red")
+        del draw_full_figure
+        full_figure.save(os.path.join(self.query_dict["results_dir"], "boxes", figure_name))
