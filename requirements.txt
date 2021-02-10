@@ -7,7 +7,7 @@ scikit-image
 torch>=1.6
 opencv-python
 requests
-torchvision
+torchvision>=0.7
 urllib3
 spacy
 lxml
