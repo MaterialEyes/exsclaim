@@ -23,7 +23,7 @@
     
     "results_dir": "extracted/nature-test/",
     
-    "save_format": ["visualize"],
+    "save_format": ["visualize", "boxes"],
 
     "open": false
 }
