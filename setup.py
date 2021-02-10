@@ -6,6 +6,9 @@ here = pathlib.Path(__file__).parent.resolve()
 with open(here / "README.md", "r") as fh:
     long_description = fh.read()
 
+with open(here / "requirements.txt", "r") as f:
+    install_requires = list(f.read().splitlines())
+
 setuptools.setup(
     name="exsclaim-materialeyes",
     version="0.0.15",
@@ -16,21 +19,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/MaterialEyes/exsclaim",
     packages=setuptools.find_packages(),
-    install_requires= [
-        "numpy",
-        "pillow",
-        "beautifulsoup4",
-        "pyyaml>=5.1",
-        "scipy",
-        "scikit-image",
-        "torch>=1.6",
-        "opencv-python",
-        "requests",
-        "torchvision",
-        "urllib3",
-        "spacy",
-        "lxml"
-    ],
+    install_requires= install_requires,
     package_data={
         'exsclaim': ['figures/config/yolov3_default_master.cfg',
                      'figures/config/yolov3_default_subfig.cfg',

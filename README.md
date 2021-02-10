@@ -11,24 +11,37 @@ You need a working python 3.x installation to be able to use EXSCLAIM! We recomm
 
 ### Installation
 
+#### Pip
 To install test version:
 ```
 pip install --extra-index-url https://test.pypi.org/simple/ exsclaim-materialeyes
 python -m spacy download en_core_web_sm
 ```
-To test that it has been installed correctly, you can run the following python code:
+To check that it installed correctly, run the following python code (it may take a few minutes the first time as it will download model checkpoints):
 ```
 from exsclaim.pipeline import Pipeline
-test_pipeline = Pipeline("", test=True)
+test_pipeline = Pipeline("test")
 results = test_pipeline.run()
 ```
-This will run the pipeline with a sample query JSON. You should then see something like:
+You should see something like this, and then results in the extracted/nature-test/ directory
 ```
 Running Journal Scraper
 GET request: https://www.nature.com/.....
->>>> (1 of 10) ....
+>>>> (1 of 2) ....
 ```
-When complete the results should be in extracted/nature-test/ and the json will be stored in the 'results' variable.
+
+#### Git Clone
+To install for development, run the following commands (it is recommended to run in a conda or python virtual environment):
+```
+git clone https://github.com/MaterialEyes/exsclaim.git
+pip install -r requirements.txt
+python -m spacy download en_core_web_sm
+```
+To test that it has been installed correctly, you can run the following code from the root exsclaim directory:
+```
+python -m unittest discover
+```
+This will run a series of unit tests that should take a few minutes. If successful, when complete the terminal should print <code>OK</code>.
 
 ## Usage
 
@@ -117,7 +130,8 @@ After successful completion of the pipeline, results will be saved in the result
  - _articles, _captions, _figures files: Used to keep track of the articles, figure captions and figures that have already been processed by JournalScraper, CaptionDistributor, and FigureSeparator, resepectively. 
  - figures/: stores all figures downloaded by JournalScraper
  - html/: stores full html of each article scraped by JournalScraper
- - extractions/ (optional): present if "visualize" present in Query JSON "save_format" list. Contains .png files for each figure, displaying FigureSeparator and CaptionDistributor results. 
+ - extractions/ (optional): present if "visualize" present in Query JSON "save_format" list. Contains .png files for each figure, displaying FigureSeparator and CaptionDistributor results.
+ - boxes/ (optional): present if "boxes" present in Query JSON "save_format" list. Contains .png files for each figure, with bounding boxes drawn on each figure.
  - images/ (optional): present if "save_subfigures" present in Query JSON "save_format" list. A directory contianing each subfigure extracted as a separate file. 
 
  ## Uninstall

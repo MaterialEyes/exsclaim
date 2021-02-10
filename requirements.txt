@@ -1,0 +1,13 @@
+numpy
+pillow
+beautifulsoup4
+pyyaml>=5.1
+scipy
+scikit-image
+torch>=1.6
+opencv-python
+requests
+torchvision
+urllib3
+spacy
+lxml

@@ -13,30 +13,23 @@ from .figure import FigureSeparator
 from .tool import CaptionDistributor, JournalScraper
 
 class Pipeline:
-    def __init__(self , query_path, test=False):
+    def __init__(self , query_path):
         """ initialize a Pipeline to run on query path and save to exsclaim path
 
         Args:
             query_path (dict or path to json): An EXSCLAIM user query JSON
-            test (boolean): if True, initialize with test query json
         """
-        if test:
-            current_path = pathlib.Path(__file__).resolve().parent
-            self.query_path = current_path / 'tests' / 'data' / 'nature_test.json'
-            with open(self.query_path, "r") as f:
-                self.query_dict = json.load(f)
-        
-        else:
-            self.query_path = query_path
-            try:
-                with open(self.query_path) as f:
-                    # Load query file to dict
-                    self.query_dict = json.load(f)
-            except: 
-                self.query_dict = query_path
-                self.query_path = ""
-
-        
+        if isinstance(query_path, dict):
+            self.query_dict = query_path
+            self.query_path = ""
+        assert isinstance(query_path, str), "query path must be dict or string"
+        self.query_path = query_path
+        self.current_path = pathlib.Path(__file__).resolve().parent
+        if "test" == query_path:
+            self.query_path = self.current_path / 'tests' / 'data' / 'nature_test.json'
+        with open(self.query_path) as f:
+            # Load query file to dict
+            self.query_dict = json.load(f)
         try:
             self.exsclaim_path = self.query_dict["results_dir"] + "exsclaim.json"
             with open(self.exsclaim_path, 'r') as f:
@@ -45,7 +38,6 @@ class Pipeline:
         except:
             # Keep preset values
             self.exsclaim_dict = {}
-
 
     def run(self, tools=None, figure_separator=True, caption_distributor=True, journal_scraper=True):
         """ Run EXSCLAIM pipeline on Pipeline instance's query path
