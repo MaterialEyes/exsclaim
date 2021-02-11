@@ -22,7 +22,8 @@ class Pipeline:
         if isinstance(query_path, dict):
             self.query_dict = query_path
             self.query_path = ""
-        assert isinstance(query_path, str), "query path must be dict or string"
+        else:
+            assert os.path.isfile(query_path), "query path must be dict or path"
         self.query_path = query_path
         self.current_path = pathlib.Path(__file__).resolve().parent
         if "test" == query_path:

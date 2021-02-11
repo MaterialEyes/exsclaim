@@ -5,7 +5,7 @@ from exsclaim.pipeline import Pipeline
 # Path to/ Name of Query JSON, used if no command line argument is supplied
 # If no file extension (.json) is supplied, path will be assumed to be:
 # path/to/exsclaim/query/<QUERY>.json
-QUERY = "nature-test"
+QUERY = "nature-haadf-ag-nanoparticles"
 
 # First letter of tools to be run, if no command line argument is supplied
 TOOLS = "jcf"
