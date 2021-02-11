@@ -47,11 +47,11 @@ class FigureSeparator(ExsclaimTool):
     ## stores the google drive file IDs of default neural network checkpoints
     ## replace these if you wish to change a model
     model_names_to_googleids = {
-        "classifier_model.pt":              "1W0k2DOzRFEyp03aO0TqUqlQSXcCS0VHP",
-        "object_detection_model.pt":        "1Fp5ZPi6k3xzP84EOv6DJ14xnit0ojZ8u",
-        "text_recognition_model.pt":        "1tEcSAVdMWCI57E5zaJFKopeiYlEOmeGz",
-        "scale_bar_detection_model.pt":     "1no8Gxd3JWazBxitYJ9y-onAMyrB9mIMt",
-        "scale_label_recognition_model.pt": "1Ad5KVQR7Hq4IMhAL2j1fbet9xRC-d7OK"
+        "classifier_model.pt":              "1ZodeH37Nd4ZbA0_1G_MkLKuuiyk7VUXR",
+        "object_detection_model.pt":        "1Hh7IPTEc-oTWDGAxI9o0lKrv9MBgP4rm",
+        "text_recognition_model.pt":        "1rZaxCPEWKGwvwYYa8jLINpUt20h0jo8y",
+        "scale_bar_detection_model.pt":     "1B4_rMbP3a1XguHHX4EnJ6tSlyCCRIiy4",
+        "scale_label_recognition_model.pt": "1oGjPG698LdSGvv3FhrLYh_1FhcmYYKpu"
     }
 
     def __init__(self , search_query):
