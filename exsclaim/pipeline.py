@@ -19,15 +19,15 @@ class Pipeline:
         Args:
             query_path (dict or path to json): An EXSCLAIM user query JSON
         """
+        self.current_path = pathlib.Path(__file__).resolve().parent
         if "test" == query_path:
             self.query_path = self.current_path / 'tests' / 'data' / 'nature_test.json'
-        if isinstance(query_path, dict):
+        elif isinstance(query_path, dict):
             self.query_dict = query_path
             self.query_path = ""
         else:
             assert os.path.isfile(query_path), "query path must be a dict, query path, or 'test'"
-        self.query_path = query_path
-        self.current_path = pathlib.Path(__file__).resolve().parent
+            self.query_path = query_path
         with open(self.query_path) as f:
             # Load query file to dict
             self.query_dict = json.load(f)
