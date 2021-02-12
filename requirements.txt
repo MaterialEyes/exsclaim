@@ -11,3 +11,4 @@ torchvision>=0.7
 urllib3
 spacy
 lxml
+pytorch-model-summary
