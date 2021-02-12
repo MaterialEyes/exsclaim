@@ -9,6 +9,6 @@ opencv-python
 requests
 torchvision>=0.7
 urllib3
-spacy
+spacy>=3.0
 lxml
 pytorch-model-summary

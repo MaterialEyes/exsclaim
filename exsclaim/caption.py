@@ -32,11 +32,11 @@ def load_models(models_path=str) -> "caption_nlp_model":
 
     # Add custom caption rules to spaCy matcher
     for rule in caption_rules:
-        matcher.add(rule['label'],None,rule['pattern'])
+        matcher.add(rule['label'], [rule['pattern']])
 
     # Add new spans to the Doc.ents and then to the processing pipeline.
-    ruler = EntityRuler(nlp, patterns=caption_rules)
-    nlp.add_pipe(ruler, before="ner")
+    ruler = EntityRuler(nlp, name="entity_ruler", patterns=caption_rules)
+    nlp.add_pipe("entity_ruler", before="ner")
     
     return (nlp, matcher) 
 
