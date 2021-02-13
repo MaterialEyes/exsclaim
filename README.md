@@ -50,7 +50,7 @@ A search query JSON is the singular point-of-entry for using the EXSCLAIM! searc
 
 Here we query open access [Nature](https://www.nature.com) journals to find figures related to HAADF-STEM images of exfoliated MoS<sub>2</sub> flakes. Limiting the results to the top 5 most relevant hits, the query might look something like:
 
-> [nature-exfoliated-MoS2-flakes.json](https://github.com/eschwenk/exsclaim-prerelease/tree/master/test/query/nature-exfoliated-MoS2-flakes.json) 
+> [nature-exfoliated-MoS2-flakes.json](https://github.com/MaterialEyes/exsclaim/blob/master/query/nature-exfoliated-MoS2-flakes.json) 
 ```
 {   
     "name": "nature-exfoliated-MoS2-flakes",
@@ -80,14 +80,14 @@ Here we query open access [Nature](https://www.nature.com) journals to find figu
     "save_format": [""]
 }
 ```
-Saving the query avoids having to completely reformulate the structure with each new search entry and establishes provenance for the extraction results. Additional JSON search query examples can be found in the [query](https://github.com/eschwenk/exsclaim-prerelease/tree/master/query) folder in the root directory. A full specification of the Query JSON schema can be found [here](https://github.com/MaterialEyes/exsclaim/wiki/JSON-Schema#query-json-).
+Saving the query avoids having to completely reformulate the structure with each new search entry and establishes provenance for the extraction results. Additional JSON search query examples can be found in the [query](https://github.com/MaterialEyes/exsclaim/blob/master/query) folder in the root directory. A full specification of the Query JSON schema can be found [here](https://github.com/MaterialEyes/exsclaim/wiki/JSON-Schema#query-json-).
 
 ### REQUIRED: Use the Pipeline class to conduct a search based on the desired Query JSON
 
 There are several ways to access the Pipeline class. 
 
 #### Option One: Direct Python Import
-With the [nature-exfoliated-MoS2-flakes.json](https://github.com/eschwenk/exsclaim-prerelease/tree/master/test/query/nature-exfoliated-MoS2-flakes.json) search query from above, extract relevant figures by running a <code>JournalScraper</code> through an EXSCLAIM! <code>Pipeline</code>:
+With the [nature-exfoliated-MoS2-flakes.json](https://github.com/MaterialEyes/exsclaim/blob/master/query/nature-exfoliated-MoS2-flakes.json) search query from above, extract relevant figures by running a <code>JournalScraper</code> through an EXSCLAIM! <code>Pipeline</code>:
 
 ```python
 from exsclaim.pipeline import Pipeline # will always use
@@ -134,6 +134,11 @@ After successful completion of the pipeline, results will be saved in the result
  - boxes/ (optional): present if "boxes" present in Query JSON "save_format" list. Contains .png files for each figure, with bounding boxes drawn on each figure.
  - images/ (optional): present if "save_subfigures" present in Query JSON "save_format" list. A directory contianing each subfigure extracted as a separate file. 
 
+## Example Datasets
+Checkout EXSCLAIM!-generated datasets published in the [Materials Data Facility](https://materialsdatafacility.org/):
+ - EXSCLAIM! Exploratory Dataset - Nanostructure Images from Nature Journals ([10.18126/v7bl-lj1n](https://doi.org/10.18126/v7bl-lj1n))
+ - EXSCLAIM! Validation Dataset - Selections from Amazon Mechanical Turk Benchmark ([10.18126/a6jr-yfoq](https://doi.org/10.18126/a6jr-yfoq))
+
  ## Uninstall
  ```
  pip uninstall exsclaim-materialeyes
@@ -154,7 +159,6 @@ To completely remove the installation, run:
 ```
 rm /path/to/site-packages/exsclaim/figures/checkpoints/*pt
 ```
-
 
 ## Citation
 If you find this code useful, please consider citing our [paper](#paper)
