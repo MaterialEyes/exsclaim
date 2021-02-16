@@ -30,6 +30,8 @@ GET request: https://www.nature.com/.....
 >>>> (1 of 2) ....
 ```
 
+If you run into errors, please check [Troubleshooting](#troubleshooting)
+
 #### Git Clone
 To install for development, run the following commands (it is recommended to run in a conda or python virtual environment):
 ```
@@ -151,10 +153,33 @@ After successful completion of the pipeline, results will be saved in the result
     /path/to/site-packages/exsclaim/figures/checkpoints/text_recognition_model.pt
 ```
 To completely remove the installation, run:
+Linux/OSX:
 ```
 rm /path/to/site-packages/exsclaim/figures/checkpoints/*pt
 ```
+Windows:
+```
+del "\path\to\site-packages\exsclaim\figures/checkpoints\*pt"
+```
 
+## Troubleshooting
+
+### Downloading models
+If you run into trouble downloading the models programmatically, just download them from [here](https://anl.box.com/s/b8snw0uk242velopy1t6zm56i4rvy7ct) and place them in the /path/to/exsclaim/figures/checkpoints/ folder.
+
+### Installing opencv
+There are some issues installing opencv-python with wheels. You can try:
+```
+pip install --upgrade pip setuptools wheel
+```
+and then trying to install again. Or try installing without pip, with:
+```
+sudo apt-get install python-opencv
+```
+or:
+```
+conda install -c menpo opencv
+```
 
 ## Citation
 If you find this code useful, please consider citing our [paper](#paper)
