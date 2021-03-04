@@ -105,7 +105,7 @@ class Pipeline:
 
         # Save results as specified
         save_methods = self.query_dict.get("save_format", [])
-        if 'csv' in save_methods or 'save_subfigures' in save_methods:
+        if 'save_subfigures' in save_methods:
             self.to_file()
 
         if 'visualization' in save_methods or 'visualize' in save_methods:
@@ -115,6 +115,10 @@ class Pipeline:
         if 'boxes' in save_methods:
             for figure in self.exsclaim_dict:
                 self.draw_bounding_boxes(figure)
+
+        if 'csv' in save_methods:
+            self.to_csv()
+            self.to_postgres()
 
         if 'mongo' in save_methods:
             import pymongo
@@ -502,3 +506,143 @@ class Pipeline:
                 draw_full_figure.rectangle(bounding_box, width=2, outline="red")
         del draw_full_figure
         full_figure.save(os.path.join(self.query_dict["results_dir"], "boxes", figure_name))
+
+    def to_csv(self):
+        """ Places data in a set of csv's ready for database upload """
+        exsclaim_json = self.exsclaim_dict
+        csv_dir = os.path.join(self.query_dict["results_dir"], "csv")
+        os.makedirs(csv_dir, exist_ok=True)
+        articles = set()
+        classification_codes = {
+            'microscopy': "MC",
+            "diffraction": "DF",
+            "graph": "GR", 
+            "basic_photo": "PH",
+            "illustration": "IL",
+            "unclear": "UN",
+            "parent": "PT"
+        }
+        article_rows = []
+        figure_rows = []
+        subfigure_rows = []
+        subfigure_label_rows = []
+        scale_label_rows = []
+        scale_rows = []
+        for figure_name in exsclaim_json:
+            figure_json = exsclaim_json[figure_name]
+            # create row for unique articles 
+            article_id = figure_json["article_name"]
+            if article_id not in articles:
+                article_row = [
+                    article_id,
+                    figure_json["title"],
+                    figure_json["article_url"],
+                    figure_json["license"],
+                    figure_json["open"],
+                    figure_json.get("authors", "")
+                ]
+                article_rows.append(article_row)
+                articles.add(article_id)
+            base_name = ".".join(figure_name.split(".")[:-1])
+            figure_id = "-fig".join(base_name.split("_fig"))
+            # create row for figure.csv
+            figure_row = [
+                figure_id,
+                figure_json["full_caption"],
+                figure_json["caption_delimiter"],
+                figure_json["image_url"],
+                figure_json["figure_path"],
+                figure_json["article_name"]
+            ]
+            figure_rows.append(figure_row)
+            # loop through subfigures
+            for master_image in figure_json.get("master_images", []):
+                subfigure_label = master_image["subfigure_label"]["text"]
+                subfigure_coords = boxes.convert_labelbox_to_coords(master_image["geometry"])
+                subfigure_id = figure_id + "-" + subfigure_label
+                subfigure_row = [
+                    subfigure_id,
+                    classification_codes[master_image["classification"]],
+                    master_image.get("height", None),
+                    master_image.get("width", None),
+                    master_image.get("nm_height", None),
+                    master_image.get("nm_width", None),
+                    *subfigure_coords,
+                    "\t".join(master_image["caption"]),
+                    str(master_image["keywords"]).replace("[", "{").replace("]","}"),
+                    str(master_image["general"]).replace("[", "{").replace("]","}"),
+                    figure_id
+                ]
+                subfigure_rows.append(subfigure_row)
+                if master_image["subfigure_label"].get("geometry", None):
+                    subfigure_label_coords = boxes.convert_labelbox_to_coords(master_image["subfigure_label"]["geometry"])
+                    subfigure_label_rows.append([
+                        master_image["subfigure_label"]["text"],
+                        *subfigure_label_coords,
+                        master_image["subfigure_label"].get("label_confidence", None),
+                        master_image["subfigure_label"].get("box_confidence", None),
+                        subfigure_id
+                ])
+                for i, scale_bar in enumerate(master_image.get("scale_bars", [])):
+                    scale_bar_id = subfigure_id + "-" + str(i)
+                    scale_bar_coords = boxes.convert_labelbox_to_coords(scale_bar["geometry"])
+                    scale_rows.append([
+                        scale_bar_id,
+                        *scale_bar_coords,
+                        scale_bar.get("length", None),
+                        scale_bar.get("line_label_distance", None),
+                        scale_bar.get("confidence", None),
+                        subfigure_id
+                    ])
+                    if scale_bar.get("label", None) is None:
+                        continue
+                    scale_label = scale_bar["label"]
+                    scale_label_coords = boxes.convert_labelbox_to_coords(scale_label["geometry"])
+                    scale_label_rows.append([
+                        scale_label["text"],
+                        *scale_label_coords,
+                        scale_label.get("label_confidence", None),
+                        scale_label.get("box_confidence", None),
+                        scale_label.get("nm", None),
+                        scale_bar_id
+                    ])
+
+        with open(os.path.join(csv_dir, "article.csv"), "w") as article_file:
+            article_writer = csv.writer(article_file)
+            article_writer.writerows(article_rows)
+        with open(os.path.join(csv_dir, "figure.csv"), "w") as figure_file:
+            figure_writer = csv.writer(figure_file)
+            figure_writer.writerows(figure_rows)
+        with open(os.path.join(csv_dir, "subfigure.csv"), "w") as subfigure_file:
+            subfigure_writer = csv.writer(subfigure_file)
+            subfigure_writer.writerows(subfigure_rows)
+        with open(os.path.join(csv_dir, "scalebar.csv"), "w") as scale_bar_file:
+            scale_writer = csv.writer(scale_bar_file)
+            scale_writer.writerows(scale_rows)
+        with open(os.path.join(csv_dir, "scalebarlabel.csv"), "w") as scale_label_file:
+            scale_label_writer = csv.writer(scale_label_file)
+            scale_label_writer.writerows(scale_label_rows)
+        with open(os.path.join(csv_dir, "subfigurelabel.csv"), "w") as subfigure_label_file:
+            subfigure_label_writer = csv.writer(subfigure_label_file)
+            subfigure_label_writer.writerows(subfigure_label_rows)
+
+
+    def to_postgres(self):
+        if True:
+            from .postgres import Database
+        else:#except:
+            print("You must installl pyscopg2")
+        csv_dir = os.path.join(self.query_dict["results_dir"], "csv")
+        db = Database("exsclaim")
+        for csv_file in ["article.csv", "figure.csv", "subfigure.csv", "scalebar.csv", "scalebarlabel.csv", "subfigurelabel.csv"]:
+            table_name = csv_file.replace(".csv", "")
+            table_name = "exsclaim_app_" + table_name
+            db.copy_from(os.path.join(csv_dir, csv_file), table_name)
+            db.commit()
+        db.close()
+        # db.query_many("""
+        #     INSERT INTO exsclaim_app_article (title, url, license, open, authors)
+        #     VALUES (%(title)s, %(url)s, %(license)s, %(open)s, %(authors)s);
+        #     """, {})
+
+        
