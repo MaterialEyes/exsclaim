@@ -107,7 +107,7 @@ def train_one_epoch(model,
             }, checkpoint_directory / (model_name + "-{}.pt".format(epoch)))
     return best_loss
 
-def train(batch_size=32,
+def train_crnn(batch_size=32,
           epochs=600,
           learning_rate=0.001,
           optimizer="adam",
@@ -198,7 +198,7 @@ def train(batch_size=32,
                         best_loss)
 
 
-def run_model(model_name="test",
+def run_crnn(model_name="test",
               language_model_file=None,
               decoder=0,
               search_width=100):
@@ -476,37 +476,3 @@ def create_rules():
     legal_next_chars[21] = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]
     legal_next_chars[22] = [0,1,2,3,4,5,6,7,8,9,18,21]
     return legal_next_chars
- 
-if __name__ == "__main__":
-    current_file = pathlib.Path(__file__).resolve(strict=True)
-    parent_directory = current_file.parent
-    ap = argparse.ArgumentParser()
-    ap.add_argument("-t", "--test", default=True, action="store_false")
-    ap.add_argument("-m", "--model_name", type=str)
-    ap.add_argument("-d", "--decoder", type=str, default="")
-    args = ap.parse_args()
-    if not args.test:
-        if args.decoder != "":
-            with open(parent_directory / "decoder_configurations.json", "r") as f:
-                all_configs = json.load(f)
-            config = all_configs[args.model_name]
-            run_model(model_name=args.model_name,
-                  language_model_file = config["language_model_file"],
-                  decoder=config["decoder"],
-                  search_width=config["search_width"])
-        else:
-            run_model(model_name=args.model_name)
-    else:
-        with open(parent_directory / "label_reader_configurations.json", "r") as f:
-            all_configs = json.load(f)
-            config = all_configs[args.model_name]
-        train(batch_size = config["batch_size"],
-              learning_rate = config["learning_rate"],
-              cnn_to_rnn = config["cnn_to_rnn"],
-              model_name = args.model_name,
-              input_height = config["input_height"],
-              input_width = config["input_width"],
-              sequence_length = config["sequence_length"],
-              recurrent_type = config["recurrent_type"],
-              cnn_kernel_size = config["cnn_kernel_size"],
-              convolution_layers = config["convolution_layers"])
