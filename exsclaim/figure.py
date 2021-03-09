@@ -29,7 +29,7 @@ from .figures.models.network import *
 from .tool import ExsclaimTool
 from .utilities import logging, boxes, download
 from .figures.scale import ctc
-from .figures.scale.crnn import CRNN
+from .figures.models.crnn import CRNN
 
 def convert_to_rgb(image):
     return image.convert("RGB")
