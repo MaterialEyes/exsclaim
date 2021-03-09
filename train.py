@@ -22,17 +22,17 @@ ap.add_argument("-t", "--test", default=True, action="store_false",
 args = ap.parse_args()
 
 # Load configuration
-with open(args["model"] + ".json", "r") as f:
+with open(args.model + ".json", "r") as f:
     configuration_dict = json.load(f)
-config = configuration_dict[args["name"]]
+config = configuration_dict[args.name]
 
 
 
-if args["model"] == "scale_label_reader":
+if args.model == "scale_label_reader":
     train_crnn(batch_size = config["batch_size"],
             learning_rate = config["learning_rate"],
             cnn_to_rnn = config["cnn_to_rnn"],
-            model_name = args["name"],
+            model_name = args.name,
             input_height = config["input_height"],
             input_width = config["input_width"],
             sequence_length = config["sequence_length"],

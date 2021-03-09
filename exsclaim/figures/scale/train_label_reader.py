@@ -128,8 +128,8 @@ def train_crnn(batch_size=32,
     """ trains model """
     current_file = pathlib.Path(__file__).resolve(strict=True)
     exsclaim_root = current_file.parent.parent.parent.parent
-    label_directory = exsclaim_root / 'dataset' / 'dataset_generation' / 'samples'
-    character_directory = exsclaim_root / 'dataset' / 'dataset_generation' / 'number_samples'
+    label_directory = exsclaim_root / 'exsclaim' / 'figures' / 'datasets' /'samples'
+    character_directory = exsclaim_root / 'exsclaim' / 'figures' / 'datasets' / 'number_samples'
     checkpoint_directory = current_file.parent / "checkpoints" / "label"
     results_file = current_file.parent / "results" / "label" / (model_name + ".txt")
     # Load CRNN model and assign optimizer, lr_scheduler
