@@ -116,9 +116,11 @@ class Pipeline:
             for figure in self.exsclaim_dict:
                 self.draw_bounding_boxes(figure)
 
-        if 'csv' in save_methods:
+        if 'postgres' in save_methods:
             self.to_csv()
             self.to_postgres()
+        elif 'csv' in save_methods:
+            self.to_csv()
 
         if 'mongo' in save_methods:
             import pymongo
@@ -539,7 +541,8 @@ class Pipeline:
                     figure_json["article_url"],
                     figure_json["license"],
                     figure_json["open"],
-                    figure_json.get("authors", "")
+                    figure_json.get("authors", ""),
+                    figure_json.get("abstract", "")
                 ]
                 article_rows.append(article_row)
                 articles.add(article_id)
@@ -626,12 +629,9 @@ class Pipeline:
             subfigure_label_writer = csv.writer(subfigure_label_file)
             subfigure_label_writer.writerows(subfigure_label_rows)
 
-
     def to_postgres(self):
-        if True:
-            from .postgres import Database
-        else:#except:
-            print("You must installl pyscopg2")
+        """ Send csv files to a postgres database """
+        from .postgres import Database
         csv_dir = os.path.join(self.query_dict["results_dir"], "csv")
         db = Database("exsclaim")
         for csv_file in ["article.csv", "figure.csv", "subfigure.csv", "scalebar.csv", "scalebarlabel.csv", "subfigurelabel.csv"]:
@@ -639,10 +639,4 @@ class Pipeline:
             table_name = "exsclaim_app_" + table_name
             db.copy_from(os.path.join(csv_dir, csv_file), table_name)
             db.commit()
-        db.close()
-        # db.query_many("""
-        #     INSERT INTO exsclaim_app_article (title, url, license, open, authors)
-        #     VALUES (%(title)s, %(url)s, %(license)s, %(open)s, %(authors)s);
-        #     """, {})
-
-        
+        db.close()        
