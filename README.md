@@ -1,7 +1,7 @@
 ![image](https://drive.google.com/uc?export=view&id=142XkACsDxT9r9VgVg0RUsVvjJhaBqRIs)
 
 Automatic **EX**traction, **S**eparation, and **C**aption-based natural **L**anguage **A**nnotation of **IM**ages from scientific figures 
-[[wiki](https://gitlab.com/MaterialEyes/exsclaim/wikis/home)] [[paper](https://)]
+[[wiki](https://github.com/MaterialEyes/exsclaim/wiki)] [[paper](https://)]
 
 
 ## Getting started
