@@ -82,13 +82,13 @@
                }
             ],
             "caption": [
-               "High - resolution transmission electron microscopy (HR-TEM) images of the SMNp and high-magnified image the box in f, which shows zigzag atomic arrangements with intragranular cracking.",
-               "the box in f.",
+               "High-resolution transmission electron microscopy (HR-TEM) images of the SMNp.",
+               "the box in f, which shows zigzag atomic arrangements with intragranular cracking.",
                "images of high-magnified image (g)."
             ],
             "keywords": [],
             "general": [
-               "TEM"
+               "HRTEM"
             ]
          },
          {
@@ -163,8 +163,8 @@
             ],
             "caption": [
                "the summary of the SMNp . c\u2013e.",
-               "Inverse FFT images of applied masks at the blue circle (c), 500\u2009nm.",
-               "a wide range of dislocations with defects . The dislocations are shown by circles and edge dislocations are represented by a T-shaped symbol . The upper right insets in h and i indicate the applied masks and the lattice spacing of the (101) plane is denoted as the left inset in h . Scale bars, 5\u2009\u03bcm (c), 500\u2009nm."
+               "Inverse FFT images of applied masks at the blue circle (c), 500 \u2009 nm.",
+               "a wide range of dislocations with defects . The dislocations are shown by circles and edge dislocations are represented by a T-shaped symbol . The upper right insets in h and i indicate the applied masks and the lattice spacing of the (101) plane is denoted as the left inset in h . Scale bars, 5\u2009\u03bcm (c), 500 \u2009 nm."
             ],
             "keywords": [],
             "general": [
@@ -430,13 +430,10 @@
             ],
             "caption": [
                "the box in f, which shows zigzag atomic arrangements with intragranular cracking . Fast Fourier transform (FFT) image of g presents the lattice planes of (\u2013 100) and (001) along the [010] zone, indicating the orthorhombic structure of Ag2MnO4 . h, i.",
-               "Inverse FFT images of applied masks at the blue circle (h) and red circle.",
-               "applied masks at the blue circle (h) and red circle (i) in g, showing a wide range of dislocations with defects . The dislocations are shown by circles and edge dislocations are represented by a T-shaped symbol . The upper right insets in h and i indicate the applied masks and the lattice spacing of the (101) plane is denoted as the left inset in h . Scale bars, 5\u2009\u03bcm (c)."
+               "Inverse FFT images of applied masks at the blue circle (h) and red circle."
             ],
             "keywords": [],
-            "general": [
-               "Dislocation"
-            ]
+            "general": []
          },
          {
             "classification": "microscopy",
@@ -589,13 +586,12 @@
                }
             ],
             "caption": [
-               "High - resolution transmission electron microscopy (HR-TEM) images of the SMNp and high-magnified image the box in f, which shows zigzag atomic arrangements with intragranular cracking.",
-               "a wide range of dislocations with defects . The dislocations are shown by circles and edge dislocations are represented by a T-shaped symbol . The upper right insets in h and i indicate the applied masks and the lattice spacing of the (101) plane is denoted as the left inset in h . Scale bars, 5\u2009\u03bcm (f), 4 \u2009 nm.",
-               "plate-like structures with the SMNp (f)."
+               "High-resolution transmission electron microscopy (HR-TEM) images of the SMNp.",
+               "a wide range of dislocations with defects . The dislocations are shown by circles and edge dislocations are represented by a T-shaped symbol . The upper right insets in h and i indicate the applied masks and the lattice spacing of the (101) plane is denoted as the left inset in h . Scale bars, 5\u2009\u03bcm (f), 4 \u2009 nm."
             ],
             "keywords": [],
             "general": [
-               "TEM",
+               "HRTEM",
                "Dislocation"
             ]
          },
@@ -671,7 +667,8 @@
             ],
             "caption": [
                "the summary of the SMNp . c\u2013e.",
-               "a wide range of dislocations with defects . The dislocations are shown by circles and edge dislocations are represented by a T-shaped symbol . The upper right insets in h and i indicate the applied masks and the lattice spacing of the (101) plane is denoted as the left inset in h . Scale bars, 5\u2009\u03bcm (e), 100\u2009nm."
+               "The upper right insets in 200\u2009nm (e).",
+               "a wide range of dislocations with defects . The dislocations are shown by circles and edge dislocations are represented by a T-shaped symbol . The upper right insets in h and i indicate the applied masks and the lattice spacing of the (101) plane is denoted as the left inset in h . Scale bars, 5\u2009\u03bcm (e), 100 \u2009 nm."
             ],
             "keywords": [],
             "general": [
@@ -773,10 +770,14 @@
                }
             ],
             "caption": [
-               "f, g"
+               "(f) and the corresponding electron energy loss spectroscopy (EELS) profiles"
             ],
-            "keywords": [],
-            "general": []
+            "keywords": [
+               "HAADF-STEM"
+            ],
+            "general": [
+               "EELS"
+            ]
          },
          {
             "classification": "parent",
@@ -976,13 +977,16 @@
                }
             ],
             "caption": [
-               "Filtered high - angle annular dark - field - scanning transmission electron microscopy (HAADF -STEM) and energy-dispersive X-ray spectroscopy (EDX) mapping image of the silver manganate nanoplate (SMNp) along the [010] zone axis with its fast Fourier transform (FFT) pattern, showing continuous arrangements of silver and manganese atoms."
+               "Filtered high-angle annular dark-field-scanning transmission electron microscopy (HAADF-STEM) and energy-dispersive X-ray spectroscopy (EDX) mapping image of the silver manganate nanoplate (SMNp) along the [010] zone axis with its fast Fourier transform (FFT) pattern, showing continuous arrangements of silver and manganese atoms.",
+               "Corresponding ABF intensity profiles of the white box in d present the peaks of the silver and manganese atomic columns (a), 0.2 \u2009 nm."
             ],
-            "keywords": [],
+            "keywords": [
+               "HAADF-STEM"
+            ],
             "general": [
                "HAADF-STEM",
-               "STEM",
                "EDX",
+               "Intensity profile",
                "Nanoplate"
             ]
          },
@@ -1032,7 +1036,7 @@
             },
             "scale_bars": [],
             "caption": [
-               "(EDX) mapping image of the silver manganate nanoplate (SMNp) along the [010] zone axis with its fast Fourier transform (FFT) pattern, showing continuous arrangements of silver and manganese atoms . b."
+               "EDX) mapping image of the silver manganate nanoplate (SMNp) along the [010] zone axis with its fast Fourier transform (FFT) pattern, showing continuous arrangements of silver and manganese atoms . b."
             ],
             "keywords": [],
             "general": [
@@ -1086,13 +1090,12 @@
             },
             "scale_bars": [],
             "caption": [
-               "Corresponding ABF intensity profiles of the white box in d present the peaks of the silver and manganese atomic columns"
+               "(g) at the marked sites, showing Ag M4,5-edge, O K-edge, and Mn L2,3-edge  Scale bars, 1 \u2009 nm"
             ],
-            "keywords": [],
-            "general": [
-               "ABF-STEM",
-               "Intensity profile"
-            ]
+            "keywords": [
+               "HAADF-STEM"
+            ],
+            "general": []
          },
          {
             "classification": "graph",
@@ -1256,7 +1259,7 @@
             },
             "scale_bars": [],
             "caption": [
-               "a commercial Pt/C catalyst at a rotating ring \u2013 disk electrode (1600 r.p.m) in O2-saturated 0.1\u2009M KOH solution with a scan rate of 5 \u2009 mV \u2009 s\u20131 . All data have been calibrated by using Ar-saturated 0.1\u2009M KOH solution . d Chronoamperometric response of the SMNp and 20 \u2009 wt% Pt/C in O2-saturated 0.1 \u2009 M KOH electrolytes at 0.85\u2009V (vs . RHE) with 1600 r.p.m showing good stability of SMNp compared with Pt/C."
+               "a commercial Pt/C catalyst at a rotating ring \u2013 disk electrode (1600 r.p.m) in O2-saturated 0.1\u2009M KOH solution with a scan rate of 5\u2009mV\u2009s\u20131 . All data have been calibrated by using Ar-saturated 0.1\u2009M KOH solution . d Chronoamperometric response of the SMNp and 20\u2009wt% Pt/C in O2-saturated 0.1\u2009M KOH electrolytes at 0.85\u2009V (vs . RHE) with 1600 r.p.m showing good stability of SMNp compared with Pt/C."
             ],
             "keywords": [],
             "general": []
@@ -1307,9 +1310,7 @@
             },
             "scale_bars": [],
             "caption": [
-               "The corresponding number of transferred electrons.",
-               "a commercial Pt/C catalyst at a rotating ring \u2013 disk electrode (1600 r.p.m) in O2-saturated 0.1\u2009M KOH solution with a scan rate of 5 \u2009 mV \u2009 s\u20131 . All data have been calibrated by using Ar-saturated 0.1\u2009M KOH solution . b, c.",
-               "a commercial Pt/C catalyst at transferred electrons (b)."
+               "a commercial Pt/C catalyst at a rotating ring \u2013 disk electrode (1600 r.p.m) in O2-saturated 0.1\u2009M KOH solution with a scan rate of 5\u2009mV\u2009s\u20131 . All data have been calibrated by using Ar-saturated 0.1\u2009M KOH solution . b, c."
             ],
             "keywords": [],
             "general": []
@@ -1360,9 +1361,8 @@
             },
             "scale_bars": [],
             "caption": [
-               "The corresponding number of transferred electrons.",
-               "a commercial Pt/C catalyst at a rotating ring \u2013 disk electrode (1600 r.p.m) in O2-saturated 0.1\u2009M KOH solution with a scan rate of 5 \u2009 mV \u2009 s\u20131 . All data have been calibrated by using Ar-saturated 0.1\u2009M KOH solution . b, c.",
-               "a commercial Pt/C catalyst at a rotating ring \u2013 (c) of the Ag."
+               "a commercial Pt/C catalyst at a rotating ring \u2013 disk electrode (1600 r.p.m) in O2-saturated 0.1\u2009M KOH solution with a scan rate of 5\u2009mV\u2009s\u20131 . All data have been calibrated by using Ar-saturated 0.1\u2009M KOH solution . b, c.",
+               "O2-saturated 0.1\u2009M KOH solution with a scan rate of 5\u2009mV\u2009s\u20131 . All data have been calibrated by using Ar-saturated 0.1\u2009M KOH solution (c) of the Ag, BM, PM, SMNp, and Pt/C . I d represents the limiting current density obtained at a potential of 0.30\u2009V in a."
             ],
             "keywords": [],
             "general": []
@@ -1413,7 +1413,8 @@
             },
             "scale_bars": [],
             "caption": [
-               "Linear scan voltammogram (LSV) curves for the Ag nanoparticle, bulk manganese oxides (BM), polyhedron manganese oxide (PM), silver manganate nanoplate (SMNp), and a commercial Pt/C catalyst at a rotating ring \u2013 disk electrode (1600 r.p.m) in O2-saturated 0.1\u2009M KOH solution with a scan rate of 5 \u2009 mV \u2009 s\u20131 . All data have been calibrated by using Ar-saturated 0.1\u2009M KOH solution."
+               "Linear scan voltammogram (LSV) curves for the Ag nanoparticle, bulk manganese oxides (BM), polyhedron manganese oxide (PM), silver manganate nanoplate (SMNp), and a commercial Pt/C catalyst at a rotating ring \u2013 disk electrode (1600 r.p.m) in O2-saturated 0.1\u2009M KOH solution with a scan rate of 5\u2009mV\u2009s\u20131 . All data have been calibrated by using Ar-saturated 0.1\u2009M KOH solution.",
+               "Electrocatalytic activities for oxygen reduction reaction . a."
             ],
             "keywords": [
                "Ag nanoparticle"
@@ -1493,11 +1494,13 @@
             },
             "scale_bars": [],
             "caption": [
-               "b Power density curves of flow cells using the pristine air electrode"
+               "Power density curves of flow cells using the pristine air electrode, silver manganate nanoplate (SMNp), and Pt/C with 6\u2009M KOH electrolyte (scan rate of 0.1\u2009mA\u2009s\u22121).",
+               "Electrochemical performance of oxygen reduction reaction . b."
             ],
             "keywords": [],
             "general": [
-               "Power density curves"
+               "Power density curves",
+               "Nanoplate"
             ]
          },
          {
@@ -1546,7 +1549,7 @@
             },
             "scale_bars": [],
             "caption": [
-               "Electrochemical performance of aluminum \u2013 . d Mechanical charge and discharge tests using the SMNp and Pt/C at 25 \u2009 mA \u2009 cm\u22122, where the aluminum and electrolyte were replaced every cycle."
+               "Mechanical charge and discharge tests using the SMNp and Pt/C at 25\u2009mA\u2009cm\u22122, where the aluminum and electrolyte were replaced every cycle."
             ],
             "keywords": [],
             "general": []
@@ -1597,7 +1600,7 @@
             },
             "scale_bars": [],
             "caption": [
-               "Electrochemical performance of aluminum \u2013 . c Discharge curves using the pristine air electrode."
+               "c Discharge curves using the pristine air electrode, SMNp, and Pt/C at 100\u2009mA\u2009cm\u22122"
             ],
             "keywords": [],
             "general": [
@@ -1650,7 +1653,7 @@
             },
             "scale_bars": [],
             "caption": [
-               "Schematic of the aluminum \u2013 air flow battery (AAFB) system, which includes a single stack cell, one electrolyte tank, and circulation pump . ORR indicates oxygen reduction reaction."
+               "Schematic of the aluminum \u2013 air flow battery (AAFB) system, which includes a single stack cell, one electrolyte tank, and circulation pump."
             ],
             "keywords": [],
             "general": [
@@ -1727,8 +1730,7 @@
             },
             "scale_bars": [],
             "caption": [
-               "Comparison of the gravimetric energy density.",
-               "gasoline with theoretical and practical value, AAFBs with Pt/C and SMNp (at 50 \u2009 mA \u2009 cm\u22122), and comparison of the gravimetric energy density (d)."
+               "c, d"
             ],
             "keywords": [],
             "general": []
@@ -1779,7 +1781,7 @@
             },
             "scale_bars": [],
             "caption": [
-               "Precious metal dissolution tests in aluminum \u2013 air flow batteries (AAFBs) using the SMNp and Pt/C with 6 \u2009 M KOH electrolyte after 6\u2009h of discharging at 50 \u2009 mA \u2009 cm\u22122."
+               "Precious metal dissolution tests in aluminum \u2013 air flow batteries (AAFBs) using the SMNp and Pt/C with 6\u2009M KOH electrolyte after 6 \u2009 h of discharging at 50\u2009mA\u2009cm\u22122."
             ],
             "keywords": [],
             "general": []
@@ -1885,8 +1887,7 @@
             },
             "scale_bars": [],
             "caption": [
-               "Comparison of the gravimetric energy density.",
-               "Precious metal dissolution tests in aluminum \u2013 (c) among gasoline with theoretical and practical value."
+               "c, d"
             ],
             "keywords": [],
             "general": []
@@ -1986,7 +1987,7 @@
                }
             ],
             "caption": [
-               "HR-TEM images of three representative Ag nanoparticles ; scale bar, 20\u2009nm . (c) TEM image of the Ag\u2013Pd hollow nanostructures formed after 4\u2009h of immersion of the Ag nanoparticles in 50 \u2009 \u03bcM PdCl2 aqueous solution . For ease of comparison."
+               "HR-TEM images of three representative Ag nanoparticles ; scale bar, 20 \u2009 nm . (c) TEM image of the Ag \u2013 Pd hollow nanostructures formed after 4\u2009h of immersion of the Ag nanoparticles in 50\u2009\u03bcM PdCl2 aqueous solution . For ease of comparison."
             ],
             "keywords": [
                "Ag nanoparticle"
@@ -2042,7 +2043,7 @@
             },
             "scale_bars": [],
             "caption": [
-               "TEM image of the Ag\u2013Pd hollow nanostructures formed after 4\u2009h of immersion of the Ag nanoparticles in 50 \u2009 \u03bcM PdCl2 aqueous solution . For ease of comparison, the image scale is identical to that in a ; scale bar, 50\u2009nm . (d,e) EDS spectra of a Ag nanoparticle and a Ag\u2013Pd hollow-shell nanostructure, respectively."
+               "TEM image of the Ag \u2013 Pd hollow nanostructures formed after 4\u2009h of immersion of the Ag nanoparticles in 50\u2009\u03bcM PdCl2 aqueous solution . For ease of comparison, the image scale is identical to that in a ; scale bar, 50 \u2009 nm . (d,e) EDS spectra of a Ag nanoparticle and a Ag\u2013Pd hollow-shell nanostructure, respectively."
             ],
             "keywords": [
                "Ag nanoparticle"
@@ -2099,7 +2100,7 @@
             },
             "scale_bars": [],
             "caption": [
-               "TEM image of the initial Ag nanoparticles ; scale bar, 50\u2009nm."
+               "TEM image of the initial Ag nanoparticles ; scale bar, 50 \u2009 nm."
             ],
             "keywords": [
                "Ag nanoparticle"
@@ -2155,7 +2156,7 @@
             },
             "scale_bars": [],
             "caption": [
-               "TEM image of the Ag\u2013Pd hollow nanostructures formed after 4\u2009h of immersion of the Ag nanoparticles in 50 \u2009 \u03bcM PdCl2 aqueous solution . For ease of comparison, the image scale is identical to that in a ; scale bar, 50\u2009nm . (d,e) EDS spectra of a Ag nanoparticle and a Ag\u2013Pd hollow-shell nanostructure, respectively."
+               "TEM image of the Ag \u2013 Pd hollow nanostructures formed after 4\u2009h of immersion of the Ag nanoparticles in 50\u2009\u03bcM PdCl2 aqueous solution . For ease of comparison, the image scale is identical to that in a ; scale bar, 50 \u2009 nm . (d,e) EDS spectra of a Ag nanoparticle and a Ag\u2013Pd hollow-shell nanostructure, respectively."
             ],
             "keywords": [
                "Ag nanoparticle"
@@ -2237,7 +2238,7 @@
                }
             ],
             "caption": [
-               "(b) HR-TEM images of three representative Ag nanoparticles ; scale bar"
+               "(b) HR-TEM images of three representative Ag nanoparticles ; scale bar, 20 \u2009 nm"
             ],
             "keywords": [
                "Ag nanoparticle"
@@ -2702,7 +2703,7 @@
             {
                "label": "0",
                "description": [
-                  "HAADF \u2013 STEM images of ( a, b)\u2014the initial Ag nanoparticles and (d, e ) the Ag\u2013Pd hollow nanostructures formed after 4\u2009h of immersion of the Ag nanoparticles in 50 \u2009 \u03bcM PdCl2 aqueous solution . To facilitate comparison, the image scales are identical in a, d, ( scale bar, 100\u2009nm ) and in b, e (scale bar, 20 \u2009 nm ) . Distribution of nanoparticle sizes of (c)\u2014the initial Ag nanoparticles and (f)\u2014the Ag\u2013Pd nanostructures."
+                  "HAADF \u2013 STEM images of (a,b)\u2014the initial Ag nanoparticles and (d, e ) the Ag \u2013 Pd hollow nanostructures formed after 4\u2009h of immersion of the Ag nanoparticles in 50\u2009\u03bcM PdCl2 aqueous solution . To facilitate comparison, the image scales are identical in a,d, (scale bar, 100 \u2009 nm ) and in b, e (scale bar, 20 \u2009 nm ) . Distribution of nanoparticle sizes of ( c)\u2014the initial Ag nanoparticles and (f)\u2014the Ag\u2013Pd nanostructures."
                ],
                "keywords": [
                   "Ag nanoparticle"
@@ -2775,7 +2776,7 @@
             },
             "scale_bars": [],
             "caption": [
-               "the Ag 3d spectra of a silver single crystal standard."
+               "(b) the Ag 3d spectra of a silver single crystal standard"
             ],
             "keywords": [],
             "general": []
@@ -2826,7 +2827,7 @@
             },
             "scale_bars": [],
             "caption": [
-               "(d) Pd Auger electron spectrum of the composite Ag \u2013 Pd nanoshells formed by galvanic replacement"
+               "the Ag 3d spectra of a silver single crystal standard . (d) Pd Auger electron spectrum of the composite Ag \u2013 Pd nanoshells formed by galvanic replacement."
             ],
             "keywords": [],
             "general": []
@@ -3052,7 +3053,7 @@
                }
             ],
             "caption": [
-               "Initial TEM image of an ensemble of Ag nanoparticles in the liquid cell (scale bar, 100\u2009nm) and higher magnification images of two of the particles (right of panel, scale bar, 20 \u2009 nm) . a and b: 811 \u2009 e\u2212 \u2009 \u00c5\u22122."
+               "Initial TEM image of an ensemble of Ag nanoparticles in the liquid cell (scale bar, 100 \u2009 nm) and higher magnification images of two of the particles (right of panel, scale bar, 20 \u2009 nm) . a and b: 811 \u2009e\u2212\u2009\u00c5\u22122."
             ],
             "keywords": [
                "Ag nanoparticle"
@@ -3157,8 +3158,8 @@
                }
             ],
             "caption": [
-               "The same group of nanoparticles (scale bar, 100\u2009nm), and the same two individual particles (right of panel, scale bar 20 \u2009 nm) after 52\u2009s . Electron dose rate : 15.6\u2009e\u2212 \u2009 \u00c5\u22122 \u2009 s\u22121 . Total dose per image : 5.2\u2009e\u2212 \u2009 \u00c5\u22122 . Cumulative electron dose between.",
-               "Initial TEM image of an ensemble of Ag nanoparticles in the liquid cell (scale bar, 100\u2009nm) and higher magnification images of two of the particles (right of panel, scale bar, 20 \u2009 nm) . (b) The same group of nanoparticles (scale bar."
+               "The same group of nanoparticles (scale bar, 100 \u2009 nm), and the same two individual particles (right of panel, scale bar 20 \u2009 nm) after 52\u2009s . Electron dose rate : 15.6\u2009e\u2212\u2009\u00c5\u22122\u2009s\u22121 . Total dose per image : 5.2\u2009e\u2212\u2009\u00c5\u22122 . Cumulative electron dose between.",
+               "Initial TEM image of an ensemble of Ag nanoparticles in the liquid cell (scale bar, 100 \u2009 nm) and higher magnification images of two of the particles (right of panel, scale bar, 20 \u2009 nm) . (b) The same group of nanoparticles (scale bar."
             ],
             "keywords": [
                "Ag nanoparticle"
@@ -3239,7 +3240,7 @@
                }
             ],
             "caption": [
-               "Ex situ high-resolution Z-contrast image of three Ag \u2013 Pd nanoparticles formed in the process (scale bar."
+               "Cumulative electron dose between (c) Ex situ high-resolution Z-contrast image of three Ag\u2013Pd nanoparticles formed in the process (scale bar."
             ],
             "keywords": [],
             "general": [
@@ -3316,7 +3317,7 @@
             },
             "scale_bars": [],
             "caption": [
-               "EDS spectrum from a Ag \u2013 Pd nanocage."
+               "EDS spectrum from a Ag\u2013Pd nanocage."
             ],
             "keywords": [],
             "general": [
@@ -3369,7 +3370,7 @@
             },
             "scale_bars": [],
             "caption": [
-               "High-resolution HAADF \u2013 STEM images of representative porous Ag \u2013 Pd nanocages ; scale bar, 20\u2009nm . Note the arrays of small nanoparticles in the vicinity of the larger nanocages (outlined by a dashed oval)."
+               "High-resolution HAADF \u2013 STEM images of representative porous Ag\u2013Pd nanocages ; scale bar, 20 \u2009 nm . Note the arrays of small nanoparticles in the vicinity of the larger nanocages (outlined by a dashed oval)."
             ],
             "keywords": [],
             "general": [
@@ -3449,7 +3450,7 @@
                }
             ],
             "caption": [
-               "High-resolution HAADF \u2013 STEM images of representative porous Ag \u2013 Pd nanocages ; scale bar, 20\u2009nm . Note the arrays of small nanoparticles in the vicinity of the larger nanocages (outlined by a dashed oval)."
+               "High-resolution HAADF \u2013 STEM images of representative porous Ag\u2013Pd nanocages ; scale bar, 20 \u2009 nm . Note the arrays of small nanoparticles in the vicinity of the larger nanocages (outlined by a dashed oval)."
             ],
             "keywords": [],
             "general": [
@@ -3529,7 +3530,7 @@
                }
             ],
             "caption": [
-               "High-resolution HAADF \u2013 STEM images of representative porous Ag \u2013 Pd nanocages ; scale bar, 20\u2009nm . Note the arrays of small nanoparticles in the vicinity of the larger nanocages (outlined by a dashed oval)."
+               "High-resolution HAADF \u2013 STEM images of representative porous Ag\u2013Pd nanocages ; scale bar, 20 \u2009 nm . Note the arrays of small nanoparticles in the vicinity of the larger nanocages (outlined by a dashed oval)."
             ],
             "keywords": [],
             "general": [
@@ -3658,7 +3659,7 @@
                }
             ],
             "caption": [
-               "High-resolution BF-STEM and HAADF \u2013 STEM images of a representative hollow cage Ag \u2013 Pd nanoparticle (inset : FFT of the entire nanocage, Fig."
+               "High-resolution BF-STEM and HAADF \u2013 STEM images of a representative hollow cage Ag\u2013Pd nanoparticle (inset: FFT of the entire nanocage, Fig."
             ],
             "keywords": [],
             "general": [
@@ -3712,7 +3713,7 @@
             },
             "scale_bars": [],
             "caption": [
-               "High-resolution BF-STEM and HAADF \u2013 STEM images of a representative hollow cage Ag \u2013 Pd nanoparticle (inset : FFT of the entire nanocage, Fig."
+               "High-resolution BF-STEM and HAADF \u2013 STEM images of a representative hollow cage Ag\u2013Pd nanoparticle (inset: FFT of the entire nanocage, Fig."
             ],
             "keywords": [],
             "general": [
@@ -3791,10 +3792,12 @@
                }
             ],
             "caption": [
-               "Higher magnification of the square area marked in a."
+               "h, hole in the nanoparticle surface . Scale bar, 5 \u2009 nm . (c) Higher magnification of the square area marked in a . Scale bar, 5 \u2009 nm."
             ],
             "keywords": [],
-            "general": []
+            "general": [
+               "Nanoparticle"
+            ]
          }
       ],
       "unassigned": {
@@ -3866,7 +3869,7 @@
             },
             "scale_bars": [],
             "caption": [
-               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution."
+               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10\u2009\u03bcM aqueous PdCl2 solution . Electron dose rate : 48\u2009e\u2212\u2009\u00c5\u22122\u2009s\u22121 ; frame time : 2.1\u2009s . Electron dose per image : 102\u2009e\u2212\u2009\u00c5\u22122 . Scale bar."
             ],
             "keywords": [],
             "general": [
@@ -3920,7 +3923,7 @@
             },
             "scale_bars": [],
             "caption": [
-               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution."
+               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10\u2009\u03bcM aqueous PdCl2 solution . Electron dose rate : 48\u2009e\u2212\u2009\u00c5\u22122\u2009s\u22121 ; frame time : 2.1\u2009s . Electron dose per image : 102\u2009e\u2212\u2009\u00c5\u22122 . Scale bar."
             ],
             "keywords": [],
             "general": [
@@ -3974,7 +3977,7 @@
             },
             "scale_bars": [],
             "caption": [
-               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution."
+               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10\u2009\u03bcM aqueous PdCl2 solution . Electron dose rate : 48\u2009e\u2212\u2009\u00c5\u22122\u2009s\u22121 ; frame time : 2.1\u2009s . Electron dose per image : 102\u2009e\u2212\u2009\u00c5\u22122 . Scale bar."
             ],
             "keywords": [],
             "general": [
@@ -4028,7 +4031,7 @@
             },
             "scale_bars": [],
             "caption": [
-               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution."
+               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10\u2009\u03bcM aqueous PdCl2 solution . Electron dose rate : 48\u2009e\u2212\u2009\u00c5\u22122\u2009s\u22121 ; frame time : 2.1\u2009s . Electron dose per image : 102\u2009e\u2212\u2009\u00c5\u22122 . Scale bar."
             ],
             "keywords": [],
             "general": [
@@ -4082,7 +4085,7 @@
             },
             "scale_bars": [],
             "caption": [
-               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution."
+               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10\u2009\u03bcM aqueous PdCl2 solution . Electron dose rate : 48\u2009e\u2212\u2009\u00c5\u22122\u2009s\u22121 ; frame time : 2.1\u2009s . Electron dose per image : 102\u2009e\u2212\u2009\u00c5\u22122 . Scale bar."
             ],
             "keywords": [],
             "general": [
@@ -4136,7 +4139,7 @@
             },
             "scale_bars": [],
             "caption": [
-               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution."
+               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10\u2009\u03bcM aqueous PdCl2 solution . Electron dose rate : 48\u2009e\u2212\u2009\u00c5\u22122\u2009s\u22121 ; frame time : 2.1\u2009s . Electron dose per image : 102\u2009e\u2212\u2009\u00c5\u22122 . Scale bar."
             ],
             "keywords": [],
             "general": [
@@ -4190,7 +4193,7 @@
             },
             "scale_bars": [],
             "caption": [
-               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution."
+               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10\u2009\u03bcM aqueous PdCl2 solution . Electron dose rate : 48\u2009e\u2212\u2009\u00c5\u22122\u2009s\u22121 ; frame time : 2.1\u2009s . Electron dose per image : 102\u2009e\u2212\u2009\u00c5\u22122 . Scale bar."
             ],
             "keywords": [],
             "general": [
@@ -4244,7 +4247,7 @@
             },
             "scale_bars": [],
             "caption": [
-               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution."
+               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10\u2009\u03bcM aqueous PdCl2 solution . Electron dose rate : 48\u2009e\u2212\u2009\u00c5\u22122\u2009s\u22121 ; frame time : 2.1\u2009s . Electron dose per image : 102\u2009e\u2212\u2009\u00c5\u22122 . Scale bar."
             ],
             "keywords": [],
             "general": [
@@ -4298,7 +4301,7 @@
             },
             "scale_bars": [],
             "caption": [
-               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution."
+               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10\u2009\u03bcM aqueous PdCl2 solution . Electron dose rate : 48\u2009e\u2212\u2009\u00c5\u22122\u2009s\u22121 ; frame time : 2.1\u2009s . Electron dose per image : 102\u2009e\u2212\u2009\u00c5\u22122 . Scale bar."
             ],
             "keywords": [],
             "general": [
@@ -4352,7 +4355,7 @@
             },
             "scale_bars": [],
             "caption": [
-               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution."
+               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10\u2009\u03bcM aqueous PdCl2 solution . Electron dose rate : 48\u2009e\u2212\u2009\u00c5\u22122\u2009s\u22121 ; frame time : 2.1\u2009s . Electron dose per image : 102\u2009e\u2212\u2009\u00c5\u22122 . Scale bar."
             ],
             "keywords": [],
             "general": [
@@ -4372,7 +4375,7 @@
             {
                "label": "f",
                "description": [
-                  "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution."
+                  "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10\u2009\u03bcM aqueous PdCl2 solution . Electron dose rate : 48\u2009e\u2212\u2009\u00c5\u22122\u2009s\u22121 ; frame time : 2.1\u2009s . Electron dose per image : 102\u2009e\u2212\u2009\u00c5\u22122 . Scale bar."
                ],
                "keywords": [],
                "general": [
@@ -4383,7 +4386,7 @@
             {
                "label": "h",
                "description": [
-                  "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution."
+                  "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10\u2009\u03bcM aqueous PdCl2 solution . Electron dose rate : 48\u2009e\u2212\u2009\u00c5\u22122\u2009s\u22121 ; frame time : 2.1\u2009s . Electron dose per image : 102\u2009e\u2212\u2009\u00c5\u22122 . Scale bar."
                ],
                "keywords": [],
                "general": [
@@ -4478,7 +4481,7 @@
             },
             "scale_bars": [],
             "caption": [
-               "Time-lapse series of dark-field STEM images following one Ag particle over 50.4 \u2009 s in 50 \u2009 \u03bcM aqueous PdCl2 solution . Electron dose rate : 6.26\u2009e\u2212 \u2009 \u00c5\u22122 \u2009 s\u22121, frame time: 8.4\u2009s . Electron dose per image : 52\u2009e\u2212 \u2009 \u00c5\u22122 . Scale bar."
+               ": Time-lapse series of dark-field STEM images following one Ag particle over 50.4 \u2009 s in 50\u2009\u03bcM aqueous PdCl2 solution . Electron dose rate : 6.26\u2009e\u2212\u2009\u00c5\u22122\u2009s\u22121, frame time : 8.4\u2009s . Electron dose per image : 52\u2009e\u2212\u2009\u00c5\u22122."
             ],
             "keywords": [],
             "general": [
@@ -4556,7 +4559,7 @@
                }
             ],
             "caption": [
-               "Time-lapse series of dark-field STEM images following one Ag particle over 50.4 \u2009 s in 50 \u2009 \u03bcM aqueous PdCl2 solution . Electron dose rate : 6.26\u2009e\u2212 \u2009 \u00c5\u22122 \u2009 s\u22121, frame time: 8.4\u2009s . Electron dose per image : 52\u2009e\u2212 \u2009 \u00c5\u22122 . Scale bar."
+               ": Time-lapse series of dark-field STEM images following one Ag particle over 50.4 \u2009 s in 50\u2009\u03bcM aqueous PdCl2 solution . Electron dose rate : 6.26\u2009e\u2212\u2009\u00c5\u22122\u2009s\u22121, frame time : 8.4\u2009s . Electron dose per image : 52\u2009e\u2212\u2009\u00c5\u22122."
             ],
             "keywords": [],
             "general": [
@@ -4609,7 +4612,7 @@
             },
             "scale_bars": [],
             "caption": [
-               "Time-lapse series of dark-field STEM images following one Ag particle over 50.4 \u2009 s in 50 \u2009 \u03bcM aqueous PdCl2 solution . Electron dose rate : 6.26\u2009e\u2212 \u2009 \u00c5\u22122 \u2009 s\u22121, frame time: 8.4\u2009s . Electron dose per image : 52\u2009e\u2212 \u2009 \u00c5\u22122 . Scale bar."
+               ": Time-lapse series of dark-field STEM images following one Ag particle over 50.4 \u2009 s in 50\u2009\u03bcM aqueous PdCl2 solution . Electron dose rate : 6.26\u2009e\u2212\u2009\u00c5\u22122\u2009s\u22121, frame time : 8.4\u2009s . Electron dose per image : 52\u2009e\u2212\u2009\u00c5\u22122."
             ],
             "keywords": [],
             "general": [
@@ -4662,7 +4665,7 @@
             },
             "scale_bars": [],
             "caption": [
-               "Time-lapse series of dark-field STEM images following one Ag particle over 50.4 \u2009 s in 50 \u2009 \u03bcM aqueous PdCl2 solution . Electron dose rate : 6.26\u2009e\u2212 \u2009 \u00c5\u22122 \u2009 s\u22121, frame time: 8.4\u2009s . Electron dose per image : 52\u2009e\u2212 \u2009 \u00c5\u22122 . Scale bar."
+               ": Time-lapse series of dark-field STEM images following one Ag particle over 50.4 \u2009 s in 50\u2009\u03bcM aqueous PdCl2 solution . Electron dose rate : 6.26\u2009e\u2212\u2009\u00c5\u22122\u2009s\u22121, frame time : 8.4\u2009s . Electron dose per image : 52\u2009e\u2212\u2009\u00c5\u22122."
             ],
             "keywords": [],
             "general": [
@@ -4715,7 +4718,7 @@
             },
             "scale_bars": [],
             "caption": [
-               "Time-lapse series of dark-field STEM images following one Ag particle over 50.4 \u2009 s in 50 \u2009 \u03bcM aqueous PdCl2 solution . Electron dose rate : 6.26\u2009e\u2212 \u2009 \u00c5\u22122 \u2009 s\u22121, frame time: 8.4\u2009s . Electron dose per image : 52\u2009e\u2212 \u2009 \u00c5\u22122 . Scale bar."
+               ": Time-lapse series of dark-field STEM images following one Ag particle over 50.4 \u2009 s in 50\u2009\u03bcM aqueous PdCl2 solution . Electron dose rate : 6.26\u2009e\u2212\u2009\u00c5\u22122\u2009s\u22121, frame time : 8.4\u2009s . Electron dose per image : 52\u2009e\u2212\u2009\u00c5\u22122."
             ],
             "keywords": [],
             "general": [
@@ -4768,7 +4771,7 @@
             },
             "scale_bars": [],
             "caption": [
-               "Time-lapse series of dark-field STEM images following one Ag particle over 50.4 \u2009 s in 50 \u2009 \u03bcM aqueous PdCl2 solution . Electron dose rate : 6.26\u2009e\u2212 \u2009 \u00c5\u22122 \u2009 s\u22121, frame time: 8.4\u2009s . Electron dose per image : 52\u2009e\u2212 \u2009 \u00c5\u22122 . Scale bar."
+               ": Time-lapse series of dark-field STEM images following one Ag particle over 50.4 \u2009 s in 50\u2009\u03bcM aqueous PdCl2 solution . Electron dose rate : 6.26\u2009e\u2212\u2009\u00c5\u22122\u2009s\u22121, frame time : 8.4\u2009s . Electron dose per image : 52\u2009e\u2212\u2009\u00c5\u22122."
             ],
             "keywords": [],
             "general": [
@@ -4845,7 +4848,7 @@
             },
             "scale_bars": [],
             "caption": [
-               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution with added isopropanol."
+               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10\u2009\u03bcM aqueous PdCl2 solution with added isopropanol . Electron dose rate : 48\u2009e\u2212\u2009\u00c5\u22122\u2009s\u22121 ; frame time : 2.1\u2009s . Electron dose per image : 102\u2009e\u2212\u2009\u00c5\u22122 . Scale bar."
             ],
             "keywords": [],
             "general": [
@@ -4899,7 +4902,7 @@
             },
             "scale_bars": [],
             "caption": [
-               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution with added isopropanol."
+               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10\u2009\u03bcM aqueous PdCl2 solution with added isopropanol . Electron dose rate : 48\u2009e\u2212\u2009\u00c5\u22122\u2009s\u22121 ; frame time : 2.1\u2009s . Electron dose per image : 102\u2009e\u2212\u2009\u00c5\u22122 . Scale bar."
             ],
             "keywords": [],
             "general": [
@@ -4953,7 +4956,7 @@
             },
             "scale_bars": [],
             "caption": [
-               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution with added isopropanol."
+               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10\u2009\u03bcM aqueous PdCl2 solution with added isopropanol . Electron dose rate : 48\u2009e\u2212\u2009\u00c5\u22122\u2009s\u22121 ; frame time : 2.1\u2009s . Electron dose per image : 102\u2009e\u2212\u2009\u00c5\u22122 . Scale bar."
             ],
             "keywords": [],
             "general": [
@@ -5007,7 +5010,7 @@
             },
             "scale_bars": [],
             "caption": [
-               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution with added isopropanol."
+               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10\u2009\u03bcM aqueous PdCl2 solution with added isopropanol . Electron dose rate : 48\u2009e\u2212\u2009\u00c5\u22122\u2009s\u22121 ; frame time : 2.1\u2009s . Electron dose per image : 102\u2009e\u2212\u2009\u00c5\u22122 . Scale bar."
             ],
             "keywords": [],
             "general": [
@@ -5061,7 +5064,7 @@
             },
             "scale_bars": [],
             "caption": [
-               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution with added isopropanol."
+               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10\u2009\u03bcM aqueous PdCl2 solution with added isopropanol . Electron dose rate : 48\u2009e\u2212\u2009\u00c5\u22122\u2009s\u22121 ; frame time : 2.1\u2009s . Electron dose per image : 102\u2009e\u2212\u2009\u00c5\u22122 . Scale bar."
             ],
             "keywords": [],
             "general": [
@@ -5115,7 +5118,7 @@
             },
             "scale_bars": [],
             "caption": [
-               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution with added isopropanol."
+               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10\u2009\u03bcM aqueous PdCl2 solution with added isopropanol . Electron dose rate : 48\u2009e\u2212\u2009\u00c5\u22122\u2009s\u22121 ; frame time : 2.1\u2009s . Electron dose per image : 102\u2009e\u2212\u2009\u00c5\u22122 . Scale bar."
             ],
             "keywords": [],
             "general": [
@@ -5169,7 +5172,7 @@
             },
             "scale_bars": [],
             "caption": [
-               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution with added isopropanol."
+               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10\u2009\u03bcM aqueous PdCl2 solution with added isopropanol . Electron dose rate : 48\u2009e\u2212\u2009\u00c5\u22122\u2009s\u22121 ; frame time : 2.1\u2009s . Electron dose per image : 102\u2009e\u2212\u2009\u00c5\u22122 . Scale bar."
             ],
             "keywords": [],
             "general": [
@@ -5223,7 +5226,7 @@
             },
             "scale_bars": [],
             "caption": [
-               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution with added isopropanol."
+               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10\u2009\u03bcM aqueous PdCl2 solution with added isopropanol . Electron dose rate : 48\u2009e\u2212\u2009\u00c5\u22122\u2009s\u22121 ; frame time : 2.1\u2009s . Electron dose per image : 102\u2009e\u2212\u2009\u00c5\u22122 . Scale bar."
             ],
             "keywords": [],
             "general": [
@@ -5277,7 +5280,7 @@
             },
             "scale_bars": [],
             "caption": [
-               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution with added isopropanol."
+               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10\u2009\u03bcM aqueous PdCl2 solution with added isopropanol . Electron dose rate : 48\u2009e\u2212\u2009\u00c5\u22122\u2009s\u22121 ; frame time : 2.1\u2009s . Electron dose per image : 102\u2009e\u2212\u2009\u00c5\u22122 . Scale bar."
             ],
             "keywords": [],
             "general": [
@@ -5356,7 +5359,7 @@
                }
             ],
             "caption": [
-               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10 \u2009 \u03bcM aqueous PdCl2 solution with added isopropanol."
+               "Sequence of HAADF \u2013 STEM images following the evolution of a Ag particle in 10\u2009\u03bcM aqueous PdCl2 solution with added isopropanol . Electron dose rate : 48\u2009e\u2212\u2009\u00c5\u22122\u2009s\u22121 ; frame time : 2.1\u2009s . Electron dose per image : 102\u2009e\u2212\u2009\u00c5\u22122 . Scale bar."
             ],
             "keywords": [],
             "general": [
