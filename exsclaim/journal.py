@@ -10,6 +10,7 @@ import numpy as np
 import json
 import random
 import time
+import logging
 
 
 from bs4 import BeautifulSoup
@@ -51,6 +52,7 @@ class JournalFamily():
         """
         self.search_query = search_query
         self.open = search_query.get("open", False)
+        self.logger = logging.getLogger(__name__)
 
     def get_domain_name(self) -> str:
         """
@@ -167,7 +169,7 @@ class JournalFamily():
         search_query_urls = self.get_search_query_urls()
         article_paths = set()
         for page1 in search_query_urls:
-            print("GET request: ", page1)
+            self.logger.info("GET request: {}".format(page1))
             soup = self.get_soup_from_request(page1, fast_load=True)
             start_page, stop_page, total_articles = self.get_page_info(soup)
             for page_number in range(start_page, stop_page + 1):

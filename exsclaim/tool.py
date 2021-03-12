@@ -12,15 +12,17 @@ import json
 import glob
 import copy
 import time
+import logging
 
-from .utilities import logging
 from . import journal
 from . import caption
+from .utilities.logging import Printer
 
 from abc import ABC, abstractmethod
 
 class ExsclaimTool(ABC):
     def __init__(self, search_query):
+        self.logger = logging.getLogger(__name__)
         self.initialize_query(search_query)
 
     def initialize_query(self, search_query):
@@ -33,8 +35,12 @@ class ExsclaimTool(ABC):
             with open(search_query) as f:
                 # Load query file to dict
                 self.search_query = json.load(f)
-        except: 
+        except Exception as e:
+            self.logger.debug(("Search Query path {} not found. Using it as"
+                " dictionary instead"))
             self.search_query = search_query
+        # set up logging / printing
+        self.print = "print" in self.search_query["logging"]
 
     @abstractmethod
     def _load_model(self):
@@ -48,6 +54,15 @@ class ExsclaimTool(ABC):
     def run(self):
         pass
 
+    def display_info(self, info):
+        """ Display information to the user as the specified in the query
+
+        Args:
+            info (str): A string to display (either to stdout, a log file)
+        """
+        if self.print: 
+            Printer(info)
+        self.logger.info(info)
 
 class JournalScraper(ExsclaimTool):
     """ 
@@ -64,6 +79,7 @@ class JournalScraper(ExsclaimTool):
     }
 
     def __init__(self, search_query):
+        self.logger = logging.getLogger(__name__ + ".JournalScraper")
         self.initialize_query(search_query)
         self.new_articles_visited = set()
 
@@ -125,8 +141,7 @@ class JournalScraper(ExsclaimTool):
         Returns:
             exsclaim_json (dict): Updated with results of search
         """
-        logging.Printer("Running Journal Scraper\n")
-        
+        self.display_info("Running Journal Scraper\n")
         ## Checks that user inputted journal family has been defined and
         ## grabs instantiates an instance of the journal family object
         journal_family = search_query['journal_family']
@@ -140,16 +155,19 @@ class JournalScraper(ExsclaimTool):
         articles = self._get_articles(j_instance)
         ## Extract figures, captions, and metadata from each article
         for article in articles:
-            logging.Printer(">>> ({0} of {1}) Extracting figures from: ".format(counter, len(articles))+\
+            self.display_info(">>> ({0} of {1}) Extracting figures from: ".format(counter, len(articles))+\
                 article.split("/")[-1])
-
             try:
                 request = j_instance.get_domain_name() + article
                 article_dict = j_instance.get_article_figures(request)
                 exsclaim_json = self._update_exsclaim(exsclaim_json, article_dict)
                 self.new_articles_visited.add(article)
-            except:
-                logging.Printer("<!> ERROR: An exception occurred in JournalScraper\n")
+            except Exception as e:
+                exception_string = ("<!> ERROR: An exception occurred in"
+                    " JournalScraper on article: {}".format(article))
+                if self.print:
+                    Printer(exception_string + "\n")
+                self.logger.exception(exception_string)
             
             # Save to file every N iterations (to accomodate restart scenarios)
             if counter%1000 == 0:
@@ -157,7 +175,7 @@ class JournalScraper(ExsclaimTool):
             counter += 1
 
         t1 = time.time()
-        logging.Printer(">>> Time Elapsed: {0:.2f} sec ({1} articles)\n".format(t1-t0,int(counter-1)))
+        self.display_info(">>> Time Elapsed: {0:.2f} sec ({1} articles)\n".format(t1-t0,int(counter-1)))
         self._appendJSON(search_query['results_dir'] + "exsclaim.json", exsclaim_json)
         return exsclaim_json
 
@@ -173,6 +191,7 @@ class CaptionDistributor(ExsclaimTool):
     """
     def __init__(self , search_query={}):
         super().__init__(search_query)
+        self.logger = logging.getLogger(__name__ + ".CaptionDistributor")
         self.model_path = ""
 
     def _load_model(self):
@@ -211,7 +230,7 @@ class CaptionDistributor(ExsclaimTool):
         Returns:
             exsclaim_json (dict): Updated with results of search
         """
-        logging.Printer("Running Caption Distributor\n")
+        self.display_info("Running Caption Distributor\n")
         os.makedirs(search_query['results_dir'], exist_ok=True)
         t0 = time.time()
         model = self._load_model()
@@ -229,7 +248,7 @@ class CaptionDistributor(ExsclaimTool):
                     if exsclaim_json[figure]["figure_name"] not in captions_distributed])
         counter = 1
         for figure_name in figures:
-            logging.Printer(">>> ({0} of {1}) ".format(counter,+\
+            self.display_info(">>> ({0} of {1}) ".format(counter,+\
                 len(figures))+\
                 "Parsing captions from: "+figure_name)
             try:
@@ -238,9 +257,12 @@ class CaptionDistributor(ExsclaimTool):
                 caption_dict  = caption.associate_caption_text(model, caption_text, search_query['query'])
                 exsclaim_json = self._update_exsclaim(exsclaim_json, figure_name, delimiter, caption_dict) 
                 new_captions_distributed.add(figure_name)
-            except:
-                logging.Printer("<!> ERROR: An exception occurred in CaptionDistributor\n")
-        
+            except Exception as e:
+                if self.print:
+                    Printer(("<!> ERROR: An exception occurred in"
+                        " CaptionDistributor on figue: {}".format(figure_name)))
+                self.logger.exception(("<!> ERROR: An exception occurred in"
+                    " CaptionDistributor on figue: {}".format(figure_name)))        
             # Save to file every N iterations (to accomodate restart scenarios)
             if counter%1000 == 0:
                 self._appendJSON(search_query['results_dir'], exsclaim_json, new_captions_distributed)
@@ -248,7 +270,6 @@ class CaptionDistributor(ExsclaimTool):
             counter += 1
 
         t1 = time.time()
-        logging.Printer(">>> Time Elapsed: {0:.2f} sec ({1} captions)\n".format(t1-t0,int(counter-1)))
-
+        self.display_info(">>> Time Elapsed: {0:.2f} sec ({1} captions)\n".format(t1-t0,int(counter-1)))
         self._appendJSON(search_query['results_dir'], exsclaim_json, new_captions_distributed)
         return exsclaim_json

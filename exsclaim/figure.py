@@ -9,6 +9,7 @@ import pathlib
 import time
 import requests
 import warnings
+import logging
 
 import numpy as np
 import torch.nn.functional as F
@@ -27,7 +28,8 @@ from .figures.separator import process
 from .figures.scale.process import non_max_suppression_malisiewicz
 from .figures.models.network import *
 from .tool import ExsclaimTool
-from .utilities import logging, boxes, download
+from .utilities import boxes, download
+from .utilities.logging import Printer
 from .figures.scale import ctc
 from .figures.models.crnn import CRNN
 
@@ -55,6 +57,8 @@ class FigureSeparator(ExsclaimTool):
     }
 
     def __init__(self , search_query):
+        self.logger = logging.getLogger(__name__)
+        self.initialize_query(search_query)
         self._load_model()
         self.exsclaim_json = {}
 
@@ -79,7 +83,7 @@ class FigureSeparator(ExsclaimTool):
             self.cuda = torch.cuda.is_available() and (gpu_id >= 0)
         self.dtype = torch.cuda.FloatTensor if self.cuda else torch.FloatTensor
         if self.cuda:
-            print("using cuda: ", args.gpu_id) 
+            self.logger.info("using cuda: ", args.gpu_id) 
             torch.cuda.set_device(device=args.gpu_id)
         self.device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
@@ -124,7 +128,7 @@ class FigureSeparator(ExsclaimTool):
         if not os.path.isfile(checkpoint):
             os.makedirs(checkpoints_path, exist_ok=True)
             file_id = FigureSeparator.model_names_to_googleids[model_name]
-            print(("Downloading: https://drive.google.com/uc?export=download&id={}"
+            self.display_info(("Downloading: https://drive.google.com/uc?export=download&id={}"
                    " to {}".format(file_id, checkpoint)))
             download.download_file_from_google_drive(file_id, checkpoint)  
         if self.cuda:
@@ -162,7 +166,7 @@ class FigureSeparator(ExsclaimTool):
     def run(self, search_query, exsclaim_dict):
         """ Run the models relevant to manipulating article figures
         """
-        logging.Printer("Running Figure Separator\n")
+        self.display_info("Running Figure Separator\n")
         os.makedirs(search_query['results_dir'], exist_ok=True)
         self.exsclaim_json = exsclaim_dict
         t0 = time.time()
@@ -183,14 +187,18 @@ class FigureSeparator(ExsclaimTool):
         figures = ([self.exsclaim_json[figure]["figure_path"] for figure in self.exsclaim_json 
                     if self.exsclaim_json[figure]["figure_name"] not in figures_separated])
         for figure_name in figures:
-            logging.Printer(">>> ({0} of {1}) ".format(counter,+\
+            self.display_info(">>> ({0} of {1}) ".format(counter,+\
                 len(figures))+\
                 "Extracting images from: "+ figure_name.split("/")[-1])
-            if True:#try:
+            try:
                 self.extract_image_objects(figure_name)
                 new_figures_separated.add(figure_name)
-            else:#except:
-                logging.Printer("<!> ERROR: An exception occurred in FigureSeparator\n")
+            except Exception as e:
+                if self.print:
+                    Printer(("<!> ERROR: An exception occurred in"
+                    " FigureSeparator on figure: {}".format(figure_name)))
+                self.logger.exception(("<!> ERROR: An exception occurred in"
+                    " FigureSeparator on figure: {}".format(figure_name)))
             
             # Save to file every N iterations (to accomodate restart scenarios)
             if counter%500 == 0:
@@ -199,7 +207,7 @@ class FigureSeparator(ExsclaimTool):
             counter += 1
         
         t1 = time.time()
-        logging.Printer(">>> Time Elapsed: {0:.2f} sec ({1} figures)\n".format(t1-t0,int(counter-1)))
+        self.display_info(">>> Time Elapsed: {0:.2f} sec ({1} figures)\n".format(t1-t0,int(counter-1)))
         self._appendJSON(search_query["results_dir"], self.exsclaim_json, new_figures_separated)
         return self.exsclaim_json
 
@@ -256,7 +264,7 @@ class FigureSeparator(ExsclaimTool):
         subfigure_info = list()
 
         if outputs[0] is None:
-            print("No Objects Detected!!")
+            self.display_info("No Objects Detected! in {}".format(figure_path))
             return subfigure_info
 
         for x1, y1, x2, y2, conf, cls_conf, cls_pred in outputs[0]:
