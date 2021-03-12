@@ -30,5 +30,7 @@
 
     "open": false,
 
-    "save_format": ["visualize"]
+    "save_format": ["visualize"],
+
+    "logging": ["print"]
 }

@@ -25,5 +25,7 @@
 
     "open": false,
 
-    "save_format": ["visualize"]
+    "save_format": ["csv"],
+
+    "logging": ["print"]
 }

@@ -25,5 +25,7 @@
 
     "open": true,
 
-    "save_format": ["visualize"]
+    "save_format": ["csv"],
+
+    "logging": ["print", "exsclaim.log"]
 }

@@ -20,5 +20,7 @@
 
     "save_format": [""], 
 
-    "open" : false
+    "open" : false,
+
+    "logging": ["print"]
 }
