@@ -33,12 +33,12 @@ class Pipeline:
         else:
             assert os.path.isfile(query_path), "query path must be a dict, query path, or 'test'"
             self.query_path = query_path
-        with open(self.query_path) as f:
-            # Load query file to dict
-            self.query_dict = json.load(f)
+            with open(self.query_path) as f:
+                # Load query file to dict
+                self.query_dict = json.load(f)
         # Set up logging
         self.print = False
-        for log_output in self.query_dict.get("logging"):
+        for log_output in self.query_dict.get("logging", []):
             if log_output.lower() == "print":
                 self.print = True
             else:

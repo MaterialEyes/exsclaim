@@ -40,7 +40,7 @@ class ExsclaimTool(ABC):
                 " dictionary instead"))
             self.search_query = search_query
         # set up logging / printing
-        self.print = "print" in self.search_query["logging"]
+        self.print = "print" in self.search_query.get("logging", [])
 
     @abstractmethod
     def _load_model(self):
