@@ -3,7 +3,7 @@
 
     "journal_family": "nature",
 
-    "maximum_scraped": 2,
+    "maximum_scraped": 50,
 
     "sortby": "relevant",
 
@@ -21,11 +21,11 @@
         }
     },
     
-    "results_dir": "extracted/nature-haadf-ag-nanoparticles/", 
+    "results_dir": "extracted/nature-haadf-ag-nanoparticles", 
 
     "open": true,
 
-    "save_format": ["csv"],
+    "save_format": ["postgres"],
 
     "logging": ["print", "exsclaim.log"]
 }
