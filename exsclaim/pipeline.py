@@ -633,7 +633,7 @@ class Pipeline:
         db = Database("exsclaim")
         for csv_file in ["article.csv", "figure.csv", "subfigure.csv", "scalebar.csv", "scalebarlabel.csv", "subfigurelabel.csv"]:
             table_name = csv_file.replace(".csv", "")
-            table_name = "exsclaim_app_" + table_name
+            table_name = "results_" + table_name
             db.copy_from(os.path.join(csv_dir, csv_file), table_name)
             db.commit()
         db.close()        

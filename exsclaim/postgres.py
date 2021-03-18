@@ -26,13 +26,14 @@ class Database():
         psycopg2.execute_values(self.cursor, sql, data)
 
     def copy_from(self, file, table):
+        app_name = "results"
         table_to_copy_command = {
-            "exsclaim_app_article": "exsclaim_app_article",
-            "exsclaim_app_figure": "exsclaim_app_figure",
-            "exsclaim_app_subfigure": "exsclaim_app_subfigure",
-            "exsclaim_app_scalebar": "exsclaim_app_scalebar",
-            "exsclaim_app_scalebarlabel": "exsclaim_app_scalebarlabel(text,x1,y1,x2,y2,label_confidence,box_confidence,nm,scale_bar_id)",
-            "exsclaim_app_subfigurelabel": "exsclaim_app_subfigurelabel(text,x1,y1,x2,y2,label_confidence,box_confidence,subfigure_id)"
+            app_name + "_article": app_name + "_article",
+            app_name + "_figure": app_name + "_figure",
+            app_name + "_subfigure": app_name + "_subfigure",
+            app_name + "_scalebar": app_name + "_scalebar",
+            app_name + "_scalebarlabel": app_name + "_scalebarlabel(text,x1,y1,x2,y2,label_confidence,box_confidence,nm,scale_bar_id)",
+            app_name + "_subfigurelabel": app_name + "_subfigurelabel(text,x1,y1,x2,y2,label_confidence,box_confidence,subfigure_id)"
         }
 
 
