@@ -86,8 +86,9 @@ class JournalScraper(ExsclaimTool):
         ## Check if any articles have already been scraped by checking
         ##   results_dir/_articles
         articles_visited = {}
-        if os.path.isfile(self.search_query['results_dir'] + "_articles"):
-            with open(self.search_query['results_dir']+'_articles','r') as f:
+        articles_file = os.path.join(self.search_query["results_dir"], "_articles")
+        if os.path.isfile(articles_file):
+            with open(articles_file,'r') as f:
                 contents = f.readlines()
             articles_visited ={a.strip() for a in contents}
         self.articles_visited = articles_visited
@@ -117,7 +118,8 @@ class JournalScraper(ExsclaimTool):
         """
         with open(filename,'w') as f: 
             json.dump(exsclaim_json, f, indent=3)
-        with open(self.search_query["results_dir"] + "_articles", "a") as f:
+        articles_file = os.path.join(self.search_query["results_dir"], "_articles")
+        with open(articles_file, "a") as f:
             for article in self.new_articles_visited:
                 f.write('%s\n' % article.split("/")[-1])
 
@@ -171,12 +173,12 @@ class JournalScraper(ExsclaimTool):
             
             # Save to file every N iterations (to accomodate restart scenarios)
             if counter%1000 == 0:
-                self._appendJSON(search_query['results_dir'] + "exsclaim.json", exsclaim_json)
+                self._appendJSON(os.path.join(search_query['results_dir'], "exsclaim.json"), exsclaim_json)
             counter += 1
 
         t1 = time.time()
         self.display_info(">>> Time Elapsed: {0:.2f} sec ({1} articles)\n".format(t1-t0,int(counter-1)))
-        self._appendJSON(search_query['results_dir'] + "exsclaim.json", exsclaim_json)
+        self._appendJSON(os.path.join(search_query['results_dir'], "exsclaim.json"), exsclaim_json)
         return exsclaim_json
 
 
@@ -214,9 +216,9 @@ class CaptionDistributor(ExsclaimTool):
             exsclaim_json (dict): Updated EXSCLAIM JSON
             figures_separated (set): Figures which have already been separated
         """
-        with open(results_directory + "exsclaim.json",'w') as f: 
+        with open(os.path.join(results_directory, "exsclaim.json"),'w') as f: 
             json.dump(exsclaim_json, f, indent=3)
-        with open(results_directory + "_captions", "a+") as f:
+        with open(os.path.join(results_directory, "_captions"), "a+") as f:
             for figure in captions_distributed:
                 f.write("%s\n" % figure.split("/")[-1])
 
@@ -236,8 +238,9 @@ class CaptionDistributor(ExsclaimTool):
         model = self._load_model()
 
         ## List captions that have already been distributed
-        if os.path.isfile(search_query["results_dir"] + "_captions"):
-            with open(search_query["results_dir"] + "_captions", "r") as f:
+        captions_file = os.path.join(search_query["results_dir"], "_captions")
+        if os.path.isfile(captions_file):
+            with open(captions_file, "r") as f:
                 contents = f.readlines()
             captions_distributed = {f.strip() for f in contents}
         else:

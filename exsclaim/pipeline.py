@@ -236,7 +236,7 @@ class Pipeline:
 
             counter +=1 
         self.display_info(">>> SUCCESS!\n")
-        with open(search_query['results_dir'] + 'exsclaim.json', 'w') as f:
+        with open(os.path.join(search_query['results_dir'],'exsclaim.json'), 'w') as f:
             json.dump(self.exsclaim_dict, f, indent=3)
         
         return self.exsclaim_dict

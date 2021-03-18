@@ -244,7 +244,8 @@ class JournalFamily():
             img_url: url to image
         """
         response = requests.get(image_url, stream=True)
-        with open(save_path + "/figures/" + figure_name, 'wb') as out_file:
+        figure_path = os.path.join(save_path, "figures", figure_name)
+        with open(figure_path, 'wb') as out_file:
             shutil.copyfileobj(response.raw, out_file)
         del response 
 
@@ -263,8 +264,9 @@ class JournalFamily():
         save_path = self.search_query['results_dir']
 
         # Uncomment to save html
-        os.makedirs(save_path+ "/html/", exist_ok=True)
-        with open(save_path+ "/html/" + url.split("/")[-1]+'.html', "w", encoding='utf-8') as file:
+        html_directory = os.path.join(save_path, "html")
+        os.makedirs(html_directory, exist_ok=True)
+        with open(os.path.join(html_directory, url.split("/")[-1]+'.html'), "w", encoding='utf-8') as file:
             file.write(str(soup))
 
         figure_list = self.get_figure_list(url)
@@ -318,7 +320,8 @@ class JournalFamily():
             if save_path:
                 os.makedirs(save_path+ "/figures/", exist_ok=True)
                 self.save_figure(save_path, figure_name, image_url)
-                figure_json["figure_path"] = save_path + "figures/" + figure_name
+                figure_path = os.path.join(save_path, "figures", figure_name)
+                figure_json["figure_path"] = figure_path
             else:
                 figure_json["figure_path"] = "" 
 

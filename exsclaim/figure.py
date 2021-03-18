@@ -156,9 +156,9 @@ class FigureSeparator(ExsclaimTool):
             exsclaim_json (dict): Updated EXSCLAIM JSON
             figures_separated (set): Figures which have already been separated
         """
-        with open(results_directory + "exsclaim.json", 'w') as f: 
+        with open(os.path.join(results_directory, "exsclaim.json"), 'w') as f:
             json.dump(exsclaim_json, f, indent=3)
-        with open(results_directory + "_figures", "a+") as f:
+        with open(os.path.join(results_directory, "_figures"), "a+") as f:
             for figure in figures_separated:
                 f.write("%s\n" % figure.split("/")[-1])
 
@@ -171,14 +171,15 @@ class FigureSeparator(ExsclaimTool):
         self.exsclaim_json = exsclaim_dict
         t0 = time.time()
         ## List figures that have already been separated
-        if os.path.isfile(search_query["results_dir"] + "_figures"):
-            with open(search_query["results_dir"] + "_figures", "r") as f:
+        figures_file = os.path.join(search_query["results_dir"], "_figures")
+        if os.path.isfile(figures_file):
+            with open(figures_file, "r") as f:
                 contents = f.readlines()
             figures_separated = {f.strip() for f in contents}
         else:
             figures_separated = set()
 
-        with open(search_query["results_dir"] + "_figures", "w") as f:
+        with open(figures_file, "w") as f:
             for figure in figures_separated:
                 f.write("%s\n" % figure.split("/")[-1])
         new_figures_separated = set()
@@ -224,8 +225,8 @@ class FigureSeparator(ExsclaimTool):
         extensions = ['.png','jpg','.gif']
         paths = []
         for ext in extensions:
-            paths+=glob.glob(search_query['results_dir']+'figures/*'+ext)
-        return paths
+            paths+=glob.glob(os.path.join(search_query['results_dir'],'figures','*'+ext))
+        return paths,
 
 
     def detect_subfigure_boundaries(self, figure_path):
@@ -600,8 +601,8 @@ class FigureSeparator(ExsclaimTool):
                                / float(scale_object["length"]))
                 label = scale_object["label"]["text"]
         if len(scale_labels) == 1:
-            master_image["nm_height"] = nm_to_pixel * master_image["height"]
-            master_image["nm_width"] = nm_to_pixel * master_image["width"]
+            master_image["nm_height"] = int(nm_to_pixel * master_image["height"] * 10) / 10
+            master_image["nm_width"] = int(nm_to_pixel * master_image["width"] * 10) / 10
             master_image["scale_label"] = label
 
         return master_image, unassigned_scale_objects
