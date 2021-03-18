@@ -1,0 +1,89 @@
+
+/* body {
+    display: flex;
+} */
+
+.search_form {
+    float: left;
+    position: fixed;
+    top: 0%;
+    bottom: 0%;
+    left: 0%;
+    height: 100%;
+    width: 20%;
+}
+
+.results {
+    float: left;
+    left: 20%;
+    position: absolute;
+}
+
+
+
+
+/* Styling for Form */
+
+
+
+/* Styling for the Results */
+.results_list {
+    padding: 0%;
+    margin: 0%;
+}
+
+
+li {
+    list-style-type: none;
+    display: list-item;
+    /* height: 15vh; */
+    border-style: solid;
+}
+
+ul {
+    list-style-type: none;
+}
+
+figcaption {
+    display: inline-block;
+    /* width: auto; */
+}
+
+canvas {
+    display: inline-block;
+    width: 15vw;
+}
+
+figure {
+    margin: 0%;
+    display: flex;
+    /* height: 100px;
+    width: 100px; */
+}
+
+.image_details {
+    display: inline-block;
+    width: 30vw;
+    flex-basis: 15vw;
+    max-width: 20vw;
+    min-width: 15vw;
+}
+
+
+/* grid view css */
+.results {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0%;
+}
+
+.column {
+    flex: 25%;
+    max-width: 25%;
+    padding: 0%;
+}
+
+.subfigure_image {
+    vertical-align: middle;
+    width: 100%;
+}
