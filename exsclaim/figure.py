@@ -680,17 +680,18 @@ class FigureSeparator(ExsclaimTool):
                 ## Read Scale Text
                 scale_label_text, label_confidence = self.read_scale_bar(
                     scale_bar_label_image)
-                magnitude, unit = scale_label_text.split(" ")
-                magnitude = float(magnitude)
-                length_in_nm = magnitude * convert_to_nm[unit.strip().lower()]
-                label_json = {
-                    "geometry" : geometry,
-                    "text" : scale_label_text,
-                    "label_confidence" : float(label_confidence),
-                    "box_confidence" : float(confidence),
-                    "nm" : length_in_nm
-                }
-                scale_labels.append(label_json)
+                if scale_label_text is not None:
+                    magnitude, unit = scale_label_text.split(" ")
+                    magnitude = float(magnitude)
+                    length_in_nm = magnitude * convert_to_nm[unit.strip().lower()]
+                    label_json = {
+                        "geometry" : geometry,
+                        "text" : scale_label_text,
+                        "label_confidence" : float(label_confidence),
+                        "box_confidence" : float(confidence),
+                        "nm" : length_in_nm
+                    }
+                    scale_labels.append(label_json)
         # Match scale bars to labels and to subfigures (master images)
         scale_bar_jsons, unassigned_labels = (
             self.create_scale_bar_objects(scale_bars, scale_labels))
