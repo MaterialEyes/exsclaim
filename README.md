@@ -4,7 +4,11 @@ Automatic **EX**traction, **S**eparation, and **C**aption-based natural **L**ang
 [[wiki](https://github.com/MaterialEyes/exsclaim/wiki)] [[paper](https://)]
 
 
-## Getting started
+
+#### 🤔 Consider Collaboration ...
+If you find this tool or any of its derived capabilities useful, please consider registering as a user of Center for Nanoscale Materials. We will keep you posted of latest developments, as well as opportunities for computational resources, relevant data, and collaboration. Please contact Maria Chan (mchan@anl.gov) for details.
+
+## Getting Started
 
 ### Requirements
 You need a working python 3.x installation to be able to use EXSCLAIM! We recommend using a conda or virtualenv environment to install dependencies. 
