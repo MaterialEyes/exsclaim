@@ -8,7 +8,7 @@ try:
 except:
     current_file = pathlib.Path(__file__).resolve(strict=True)
     base_dir = current_file.parent.parent.parent
-    sys.path.append(base_dir)
+    sys.path.append(str(base_dir))
     from exsclaim.pipeline import Pipeline
 
 def query_view(request):
