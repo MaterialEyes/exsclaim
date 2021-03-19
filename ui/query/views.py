@@ -33,17 +33,18 @@ def query_view(request):
                 }
             },
             "open": query.get("open", False) == "true",
-            "results_dir": os.path.join("extracted", query_name),
-            "save_format": ["csv"],
+            "results_dir":  query_name,
+            "save_format": ["postgres"],
             "logging": ["exsclaim.log"]
         }
 
-        pipeline = Pipeline(search_query)
-        p = mp.Process(target=pipeline.run)
-        #pipeline.run()
+        def run_pipeline(search_query):
+            pipeline = Pipeline(search_query)
+            pipeline.run()
+        p = mp.Process(target=run_pipeline, args=(search_query,))
         p.start()
         minutes = int(query["max_scraped"]) * (150/60)
-        results_log = os.path.join(query_name, "exsclaim.log") 
+        results_log = os.path.join(search_query["results_dir"], "exsclaim.log") 
         return render(request,
             "exsclaim/submission.html",
             context={
