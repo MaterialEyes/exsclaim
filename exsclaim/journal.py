@@ -11,6 +11,7 @@ import json
 import random
 import time
 import logging
+import pathlib
 
 
 from bs4 import BeautifulSoup
@@ -53,6 +54,11 @@ class JournalFamily():
         self.search_query = search_query
         self.open = search_query.get("open", False)
         self.logger = logging.getLogger(__name__)
+        # Set up file structure
+        base_dir = pathlib.Path(__file__).resolve(strict=True).parent.parent
+        self.results_directory = (
+            base_dir / 'extracted' / self.search_query["results_dir"]
+        )
 
     def get_domain_name(self) -> str:
         """
@@ -244,7 +250,7 @@ class JournalFamily():
             img_url: url to image
         """
         response = requests.get(image_url, stream=True)
-        figure_path = os.path.join(save_path, "figures", figure_name)
+        figure_path = save_path / figure_name
         with open(figure_path, 'wb') as out_file:
             shutil.copyfileobj(response.raw, out_file)
         del response 
@@ -264,9 +270,9 @@ class JournalFamily():
         save_path = self.search_query['results_dir']
 
         # Uncomment to save html
-        html_directory = os.path.join(save_path, "html")
+        html_directory = self.results_directory / "html"
         os.makedirs(html_directory, exist_ok=True)
-        with open(os.path.join(html_directory, url.split("/")[-1]+'.html'), "w", encoding='utf-8') as file:
+        with open(html_directory / (url.split("/")[-1]+'.html'), "w", encoding='utf-8') as file:
             file.write(str(soup))
 
         figure_list = self.get_figure_list(url)
@@ -318,8 +324,9 @@ class JournalFamily():
 
             # save figure as image
             if save_path:
-                os.makedirs(save_path+ "/figures/", exist_ok=True)
-                self.save_figure(save_path, figure_name, image_url)
+                figures_directory = self.results_directory / "figures"
+                os.makedirs(figures_directory, exist_ok=True)
+                self.save_figure(figures_directory, figure_name, image_url)
                 figure_path = os.path.join(save_path, "figures", figure_name)
                 figure_json["figure_path"] = figure_path
             else:

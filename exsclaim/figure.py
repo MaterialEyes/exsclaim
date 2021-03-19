@@ -148,7 +148,7 @@ class FigureSeparator(ExsclaimTool):
         return exsclaim_dict
 
 
-    def _appendJSON(self, results_directory, exsclaim_json, figures_separated):
+    def _appendJSON(self, exsclaim_json, figures_separated):
         """ Commit updates to EXSCLAIM JSON and updates list of separated figures
 
         Args:
@@ -156,22 +156,22 @@ class FigureSeparator(ExsclaimTool):
             exsclaim_json (dict): Updated EXSCLAIM JSON
             figures_separated (set): Figures which have already been separated
         """
-        with open(os.path.join(results_directory, "exsclaim.json"), 'w') as f:
+        with open(self.results_directory / "exsclaim.json", 'w') as f:
             json.dump(exsclaim_json, f, indent=3)
-        with open(os.path.join(results_directory, "_figures"), "a+") as f:
+        with open(self.results_directory / "_figures", "a+") as f:
             for figure in figures_separated:
-                f.write("%s\n" % figure.split("/")[-1])
+                f.write("%s\n" % str(figure).split("/")[-1])
 
 
     def run(self, search_query, exsclaim_dict):
         """ Run the models relevant to manipulating article figures
         """
         self.display_info("Running Figure Separator\n")
-        os.makedirs(search_query['results_dir'], exist_ok=True)
+        os.makedirs(self.results_directory, exist_ok=True)
         self.exsclaim_json = exsclaim_dict
         t0 = time.time()
         ## List figures that have already been separated
-        figures_file = os.path.join(search_query["results_dir"], "_figures")
+        figures_file = self.results_directory / "_figures"
         if os.path.isfile(figures_file):
             with open(figures_file, "r") as f:
                 contents = f.readlines()
@@ -185,31 +185,32 @@ class FigureSeparator(ExsclaimTool):
         new_figures_separated = set()
 
         counter = 1
-        figures = ([self.exsclaim_json[figure]["figure_path"] for figure in self.exsclaim_json 
+        figures_path = self.results_directory / 'figures'
+        figures = ([figures_path / self.exsclaim_json[figure]["figure_name"] for figure in self.exsclaim_json 
                     if self.exsclaim_json[figure]["figure_name"] not in figures_separated])
-        for figure_name in figures:
+        for figure_path in figures:
             self.display_info(">>> ({0} of {1}) ".format(counter,+\
                 len(figures))+\
-                "Extracting images from: "+ figure_name.split("/")[-1])
+                "Extracting images from: "+ str(figure_path).split("/")[-1])
             try:
-                self.extract_image_objects(figure_name)
-                new_figures_separated.add(figure_name)
+                self.extract_image_objects(figure_path)
+                new_figures_separated.add(figure_path)
             except Exception as e:
                 if self.print:
                     Printer(("<!> ERROR: An exception occurred in"
-                    " FigureSeparator on figure: {}".format(figure_name)))
+                    " FigureSeparator on figure: {}".format(figure_path)))
                 self.logger.exception(("<!> ERROR: An exception occurred in"
-                    " FigureSeparator on figure: {}".format(figure_name)))
+                    " FigureSeparator on figure: {}".format(figure_path)))
             
             # Save to file every N iterations (to accomodate restart scenarios)
             if counter%500 == 0:
-                self._appendJSON(search_query['results_dir'], self.exsclaim_json, new_figures_separated)
+                self._appendJSON(self.exsclaim_json, new_figures_separated)
                 new_figures_separated = set()
             counter += 1
         
         t1 = time.time()
         self.display_info(">>> Time Elapsed: {0:.2f} sec ({1} figures)\n".format(t1-t0,int(counter-1)))
-        self._appendJSON(search_query["results_dir"], self.exsclaim_json, new_figures_separated)
+        self._appendJSON(self.exsclaim_json, new_figures_separated)
         return self.exsclaim_json
 
 
@@ -422,7 +423,7 @@ class FigureSeparator(ExsclaimTool):
         preds = preds[0].data.cpu().numpy()
 
         ## Documentation
-        figure_name = figure_path.split("/")[-1]
+        figure_name = str(figure_path).split("/")[-1]
         figure_json = self.exsclaim_json.get(figure_name, {})
         figure_json["figure_name"] = figure_name
         figure_json.get("master_images", [])

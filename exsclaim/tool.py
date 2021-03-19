@@ -13,6 +13,7 @@ import glob
 import copy
 import time
 import logging
+import pathlib
 
 from . import journal
 from . import caption
@@ -39,6 +40,11 @@ class ExsclaimTool(ABC):
             self.logger.debug(("Search Query path {} not found. Using it as"
                 " dictionary instead"))
             self.search_query = search_query
+        # Set up file structure
+        base_dir = pathlib.Path(__file__).resolve(strict=True).parent.parent
+        self.results_directory = (
+            base_dir / 'extracted' / self.search_query["results_dir"]
+        )
         # set up logging / printing
         self.print = "print" in self.search_query.get("logging", [])
 
@@ -86,7 +92,7 @@ class JournalScraper(ExsclaimTool):
         ## Check if any articles have already been scraped by checking
         ##   results_dir/_articles
         articles_visited = {}
-        articles_file = os.path.join(self.search_query["results_dir"], "_articles")
+        articles_file = self.results_directory / "_articles"
         if os.path.isfile(articles_file):
             with open(articles_file,'r') as f:
                 contents = f.readlines()
@@ -118,7 +124,7 @@ class JournalScraper(ExsclaimTool):
         """
         with open(filename,'w') as f: 
             json.dump(exsclaim_json, f, indent=3)
-        articles_file = os.path.join(self.search_query["results_dir"], "_articles")
+        articles_file = self.results_directory / "_articles"
         with open(articles_file, "a") as f:
             for article in self.new_articles_visited:
                 f.write('%s\n' % article.split("/")[-1])
@@ -151,7 +157,7 @@ class JournalScraper(ExsclaimTool):
             raise NameError('journal family {0} is not defined'.format(journal_family))
         j_instance = self.journals[journal_family](search_query)
 
-        os.makedirs(search_query['results_dir'], exist_ok=True)
+        os.makedirs(self.results_directory, exist_ok=True)
         t0 = time.time()
         counter = 1
         articles = self._get_articles(j_instance)
@@ -173,12 +179,12 @@ class JournalScraper(ExsclaimTool):
             
             # Save to file every N iterations (to accomodate restart scenarios)
             if counter%1000 == 0:
-                self._appendJSON(os.path.join(search_query['results_dir'], "exsclaim.json"), exsclaim_json)
+                self._appendJSON(self.results_directory / "exsclaim.json", exsclaim_json)
             counter += 1
 
         t1 = time.time()
         self.display_info(">>> Time Elapsed: {0:.2f} sec ({1} articles)\n".format(t1-t0,int(counter-1)))
-        self._appendJSON(os.path.join(search_query['results_dir'], "exsclaim.json"), exsclaim_json)
+        self._appendJSON(self.results_directory / "exsclaim.json", exsclaim_json)
         return exsclaim_json
 
 
@@ -208,7 +214,7 @@ class CaptionDistributor(ExsclaimTool):
             exsclaim_dict[figure_name]['unassigned']['captions'].append(master_image)
         return exsclaim_dict
 
-    def _appendJSON(self, results_directory, exsclaim_json, captions_distributed):
+    def _appendJSON(self, exsclaim_json, captions_distributed):
         """ Commit updates to EXSCLAIM JSON and updates list of ed figures
 
         Args:
@@ -216,9 +222,9 @@ class CaptionDistributor(ExsclaimTool):
             exsclaim_json (dict): Updated EXSCLAIM JSON
             figures_separated (set): Figures which have already been separated
         """
-        with open(os.path.join(results_directory, "exsclaim.json"),'w') as f: 
+        with open(self.results_directory / "exsclaim.json",'w') as f: 
             json.dump(exsclaim_json, f, indent=3)
-        with open(os.path.join(results_directory, "_captions"), "a+") as f:
+        with open(self.results_directory / "_captions", "a+") as f:
             for figure in captions_distributed:
                 f.write("%s\n" % figure.split("/")[-1])
 
@@ -233,12 +239,12 @@ class CaptionDistributor(ExsclaimTool):
             exsclaim_json (dict): Updated with results of search
         """
         self.display_info("Running Caption Distributor\n")
-        os.makedirs(search_query['results_dir'], exist_ok=True)
+        os.makedirs(self.results_directory, exist_ok=True)
         t0 = time.time()
         model = self._load_model()
 
         ## List captions that have already been distributed
-        captions_file = os.path.join(search_query["results_dir"], "_captions")
+        captions_file = self.results_directory / "_captions"
         if os.path.isfile(captions_file):
             with open(captions_file, "r") as f:
                 contents = f.readlines()
@@ -268,11 +274,11 @@ class CaptionDistributor(ExsclaimTool):
                     " CaptionDistributor on figue: {}".format(figure_name)))        
             # Save to file every N iterations (to accomodate restart scenarios)
             if counter%1000 == 0:
-                self._appendJSON(search_query['results_dir'], exsclaim_json, new_captions_distributed)
+                self._appendJSON(exsclaim_json, new_captions_distributed)
                 new_captions_distributed = set()
             counter += 1
 
         t1 = time.time()
         self.display_info(">>> Time Elapsed: {0:.2f} sec ({1} captions)\n".format(t1-t0,int(counter-1)))
-        self._appendJSON(search_query['results_dir'], exsclaim_json, new_captions_distributed)
+        self._appendJSON(exsclaim_json, new_captions_distributed)
         return exsclaim_json

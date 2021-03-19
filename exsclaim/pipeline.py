@@ -15,7 +15,9 @@ from .utilities import boxes
 from .figure import FigureSeparator
 from .tool import CaptionDistributor, JournalScraper
 
+
 class Pipeline:
+
     def __init__(self , query_path):
         """ initialize a Pipeline to run on query path and save to exsclaim path
 
@@ -36,20 +38,23 @@ class Pipeline:
             with open(self.query_path) as f:
                 # Load query file to dict
                 self.query_dict = json.load(f)
+        # Set up file structure
+        base_dir = pathlib.Path(__file__).resolve(strict=True).parent.parent
+        self.results_directory = (
+            base_dir / 'extracted' / self.query_dict["results_dir"]
+        )
+        os.makedirs(self.results_directory, exist_ok=True)
         # Set up logging
         self.print = False
         for log_output in self.query_dict.get("logging", []):
             if log_output.lower() == "print":
                 self.print = True
             else:
-                os.makedirs(self.query_dict["results_dir"], exist_ok=True)
-                log_output = os.path.join(self.query_dict["results_dir"], log_output)
+                log_output = self.results_directory / log_output
                 logging.basicConfig(filename=log_output, filemode="w+", level=logging.INFO, style="{")
         # Check for an existing exsclaim json
         try:
-            self.exsclaim_path = (
-                os.path.join(self.query_dict["results_dir"], "exsclaim.json")
-            )
+            self.exsclaim_path = self.results_directory / "exsclaim.json"
             with open(self.exsclaim_path, 'r') as f:
                 # Load configuration file values
                 self.exsclaim_dict = json.load(f)
@@ -236,7 +241,7 @@ class Pipeline:
 
             counter +=1 
         self.display_info(">>> SUCCESS!\n")
-        with open(os.path.join(search_query['results_dir'],'exsclaim.json'), 'w') as f:
+        with open(self.results_directory / 'exsclaim.json', 'w') as f:
             json.dump(self.exsclaim_dict, f, indent=3)
         
         return self.exsclaim_dict
@@ -257,9 +262,9 @@ class Pipeline:
             # figure_name is <figure_root_name>.<figure_extension>
             figure_root_name, figure_extension = os.path.splitext(figure_name)
             try:
-                figure = plt.imread(os.path.join(search_query['results_dir'],
-                                                 "figures",
-                                                 figure_name))
+                figure = plt.imread(
+                    self.results_directory / "figures" / figure_name
+                )
             except Exception as e:
                 self.logger.exception(("Error printing {0} to file."
                     " It may be damaged!".format(figure_name)))
@@ -354,7 +359,7 @@ class Pipeline:
             Creates images and text files in <save_path>/extractions folders
             showing details about each subfigure
         """
-        os.makedirs(os.path.join(self.query_dict["results_dir"], "extractions"), exist_ok=True)
+        os.makedirs(self.results_directory / "extractions", exist_ok=True)
         figure_json = self.exsclaim_dict[figure_name]
         master_images = figure_json.get("master_images", [])
         # to handle older versions that didn't store height and width
@@ -375,7 +380,8 @@ class Pipeline:
         draw = ImageDraw.Draw(labeled_image)
         font = ImageFont.truetype("/usr/share/fonts/dejavu/DejaVuSans.ttf")
 
-        full_figure = Image.open(figure_json["figure_path"]).convert("RGB")
+        figures_path = self.results_directory / 'figures'
+        full_figure = Image.open(figures_path / figure_json["figure_name"]).convert("RGB")
         draw_full_figure = ImageDraw.Draw(full_figure)
 
         image_y = 0
@@ -420,7 +426,7 @@ class Pipeline:
             image_y += image_buffer
 
         del draw
-        labeled_image.save(os.path.join(self.query_dict["results_dir"], "extractions", figure_name))
+        labeled_image.save(self.results_directory / "extractions" / figure_name)
 
     def draw_bounding_boxes(self, figure_name,
                             draw_scale=True,
@@ -438,12 +444,14 @@ class Pipeline:
             Creates images and text files in <save_path>/boxes folders
             showing details about each subfigure
         """
-        os.makedirs(os.path.join(self.query_dict["results_dir"], "boxes"), exist_ok=True)
+        os.makedirs(self.results_directory / "boxes", exist_ok=True)
         figure_json = self.exsclaim_dict[figure_name]
         master_images = figure_json.get("master_images", [])
 
 
-        full_figure = Image.open(figure_json["figure_path"]).convert("RGB")
+
+        figures_path = self.results_directory / 'figures'
+        full_figure = Image.open(figures_path / figure_json["figure_name"]).convert("RGB")       
         draw_full_figure = ImageDraw.Draw(full_figure)
         
         scale_objects = []
@@ -495,7 +503,7 @@ class Pipeline:
             for bounding_box in subfigures:
                 draw_full_figure.rectangle(bounding_box, width=2, outline="red")
         del draw_full_figure
-        full_figure.save(os.path.join(self.query_dict["results_dir"], "boxes", figure_name))
+        full_figure.save(self.results_directory / "boxes" / figure_name)
 
     def to_csv(self):
         """ Places data in a set of csv's ready for database upload 
@@ -505,7 +513,7 @@ class Pipeline:
             subfigure, and subfigurelabel csvs.
         """
         exsclaim_json = self.exsclaim_dict
-        csv_dir = os.path.join(self.query_dict["results_dir"], "csv")
+        csv_dir = self.results_directory / "csv"
         os.makedirs(csv_dir, exist_ok=True)
         articles = set()
         classification_codes = {
@@ -603,22 +611,22 @@ class Pipeline:
                         scale_bar_id
                     ])
         ## Save lists of rows to csvs
-        with open(os.path.join(csv_dir, "article.csv"), "w") as article_file:
+        with open(csv_dir / "article.csv", "w") as article_file:
             article_writer = csv.writer(article_file)
             article_writer.writerows(article_rows)
-        with open(os.path.join(csv_dir, "figure.csv"), "w") as figure_file:
+        with open(csv_dir / "figure.csv", "w") as figure_file:
             figure_writer = csv.writer(figure_file)
             figure_writer.writerows(figure_rows)
-        with open(os.path.join(csv_dir, "subfigure.csv"), "w") as subfigure_file:
+        with open(csv_dir / "subfigure.csv", "w") as subfigure_file:
             subfigure_writer = csv.writer(subfigure_file)
             subfigure_writer.writerows(subfigure_rows)
-        with open(os.path.join(csv_dir, "scalebar.csv"), "w") as scale_bar_file:
+        with open(csv_dir / "scalebar.csv", "w") as scale_bar_file:
             scale_writer = csv.writer(scale_bar_file)
             scale_writer.writerows(scale_rows)
-        with open(os.path.join(csv_dir, "scalebarlabel.csv"), "w") as scale_label_file:
+        with open(csv_dir / "scalebarlabel.csv", "w") as scale_label_file:
             scale_label_writer = csv.writer(scale_label_file)
             scale_label_writer.writerows(scale_label_rows)
-        with open(os.path.join(csv_dir, "subfigurelabel.csv"), "w") as subfigure_label_file:
+        with open(csv_dir / "subfigurelabel.csv", "w") as subfigure_label_file:
             subfigure_label_writer = csv.writer(subfigure_label_file)
             subfigure_label_writer.writerows(subfigure_label_rows)
 
@@ -629,11 +637,11 @@ class Pipeline:
             Fills an existing postgres database with data from csv/ dir
         """
         from .postgres import Database
-        csv_dir = os.path.join(self.query_dict["results_dir"], "csv")
+        csv_dir = self.results_directory / "csv"
         db = Database("exsclaim")
         for csv_file in ["article.csv", "figure.csv", "subfigure.csv", "scalebar.csv", "scalebarlabel.csv", "subfigurelabel.csv"]:
             table_name = csv_file.replace(".csv", "")
             table_name = "results_" + table_name
-            db.copy_from(os.path.join(csv_dir, csv_file), table_name)
+            db.copy_from(csv_dir / csv_file, table_name)
             db.commit()
         db.close()        
