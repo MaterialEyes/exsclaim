@@ -16,7 +16,7 @@
         }
     },
     
-    "results_dir": "extracted/acs-nanoparticles/", 
+    "results_dir": "acs-nanoparticles/", 
 
     "save_format": [""], 
 

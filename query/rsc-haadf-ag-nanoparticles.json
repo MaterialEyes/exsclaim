@@ -21,7 +21,7 @@
         }
     },
     
-    "results_dir": "extracted/rsc-haadf-ag-nanoparticles/",
+    "results_dir": "rsc-haadf-ag-nanoparticles",
 
     "open": false,
 

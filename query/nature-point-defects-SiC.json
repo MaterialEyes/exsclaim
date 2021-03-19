@@ -31,7 +31,7 @@
         }
     },
     
-    "results_dir": "extracted/nature-point-defects-SiC/",
+    "results_dir": "nature-point-defects-SiC",
 
     "open": false,
 
