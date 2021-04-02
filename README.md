@@ -191,7 +191,7 @@ conda install -c menpo opencv
 ```
 
 ## Citation
-If you find EXSCLAIM! useful, please encourage its development by citing the following paper in your research:
+If you find EXSCLAIM! useful, please encourage its development by citing the following [paper](https://arxiv.org/abs/2103.10631) in your research:
 ```
 Schwenker, E., Jiang, W. Spreadbury, T., Ferrier N., Cossairt, O., Chan M.K.Y., EXSCLAIM! - An automated pipeline for the construction and
 labeling of materials imaging datasets from scientific literature. arXiv e-prints (2021): arXiv-2103
