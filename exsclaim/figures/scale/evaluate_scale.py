@@ -12,7 +12,7 @@ from PIL import Image
 from pytorch_model_summary import summary
 import argparse
 from operator import itemgetter
-from exsclaim.figures.scale.ctc import ctcBeamSearch, ctcBeamSearchOld
+from exsclaim.figures.scale.ctc import ctcBeamSearch
 from exsclaim.figures.scale.lm import LanguageModel
 from exsclaim.figures.scale.process import non_max_suppression_malisiewicz
 from exsclaim.figures.models.crnn import CRNN
