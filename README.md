@@ -192,22 +192,19 @@ conda install -c menpo opencv
 
 ## Citation
 If you find EXSCLAIM! useful, please encourage its development by citing the following paper in your research:
-```sh
-Schwenker, E., Jiang, W. Spreadbury, T., Ferrier N., Cossairt, O., Chan M.K.Y., EXSCLAIM! – An automated pipeline for the construction and
-labeling of materials imaging datasets from scientific literature. **in preparation** (2021)
+```
+Schwenker, E., Jiang, W. Spreadbury, T., Ferrier N., Cossairt, O., Chan M.K.Y., EXSCLAIM! - An automated pipeline for the construction and
+labeling of materials imaging datasets from scientific literature. arXiv e-prints (2021): arXiv-2103
 ```
 
 #### Bibtex
-```sh
-@article{,
-  title={},
-  author={},
-  journal={},
-  volume={},
-  number={},
-  pages={},
-  year={},
-  publisher={}
+```
+@article{schwenker2021exsclaim,
+  title={EXSCLAIM! - An automated pipeline for the construction of labeled materials imaging datasets from literature},
+  author={Schwenker, Eric and Jiang, Weixin and Spreadbury, Trevor and Ferrier, Nicola and Cossairt, Oliver and Chan, Maria KY},
+  journal={arXiv e-prints},
+  pages={arXiv--2103},
+  year={2021}
 }
 ```
 
@@ -218,4 +215,3 @@ This work was performed at the Center for Nanoscale Materials, a U.S. Department
 
 We gratefully acknowledge the computing resources provided on Bebop, a high-performance computing cluster operated by the Laboratory Computing Resource Center at Argonne National Laboratory.
 
-## License <a name="license"></a>
