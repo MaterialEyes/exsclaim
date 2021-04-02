@@ -6,22 +6,38 @@ Automatic **EX**traction, **S**eparation, and **C**aption-based natural **L**ang
 
 ## Getting started
 
-### Requirements
-You need a working python 3.x installation to be able to use EXSCLAIM! We recommend using a conda or virtualenv environment to install dependencies. 
+There are multiple ways to use EXSCLAIM. If you wish to develop or modify the source code, see [Git Clone](#gitclone) installation instructions. If you simply wish to utilize the package, see the [Pip](#pip) installation instructions. For utilizing EXSCLAIM's User Interface (which is useful if you want to avoid writing any code or want an easy to way to view results), see [UI](#ui) instructions. 
 
-### Installation
+If you run into errors, please check [Troubleshooting](#troubleshooting)
+
+## Installing EXSCLAIM
+
+### Requirements
+You need a working python 3.6+ installation to be able to use EXSCLAIM! We recommend using a conda or virtualenv environment to install dependencies. 
+
+### Methods
 
 #### Pip
-To install test version:
+To install the latest stable release:
 ```
 pip install --extra-index-url https://test.pypi.org/simple/ exsclaim-materialeyes
 python -m spacy download en_core_web_sm
 ```
-To check that it installed correctly, run the following python code (it may take a few minutes the first time as it will download model checkpoints):
+
+#### Git Clone
+To install for development, run the following commands (it is recommended to run in a conda or python virtual environment):
 ```
-from exsclaim.pipeline import Pipeline
-test_pipeline = Pipeline("test")
-results = test_pipeline.run()
+git clone https://github.com/MaterialEyes/exsclaim.git
+cd exsclaim
+pip setup.py install
+python -m spacy download en_core_web_sm
+```
+
+### Testing the installation
+
+To test the installation was successful, run the following command:
+```
+$ exsclaim test
 ```
 You should see something like this, and then results in the extracted/nature-test/ directory
 ```
@@ -29,25 +45,69 @@ Running Journal Scraper
 GET request: https://www.nature.com/.....
 >>>> (1 of 2) ....
 ```
+The first time you run the pipeline may take a long time, as you must download model checkpoints.
 
-If you run into errors, please check [Troubleshooting](#troubleshooting)
+## Using EXSCLAIM
 
-#### Git Clone
-To install for development, run the following commands (it is recommended to run in a conda or python virtual environment):
+Using EXSCLAIM requires a user-generated query. These tell the pipeline how to run and what to look for. In a query, you specify which keywords to look for, which journals to look for them in, how many to articles to look at, and how to log and store results. The full query schema is available [in the wiki](https://github.com/MaterialEyes/exsclaim/wiki/JSON-Schema#query-json-) and examples can be found [in the query directory](https://github.com/MaterialEyes/exsclaim/tree/master/query).
+
+Once you have a query, you can choose what tools to run. The options are JournalScraper, CaptionDistributor, and FigureSeparator. For most cases you will want to run all three, which is the default behavoir. 
+
+The result of running the exsclaim pipeline is a dataset of images from published journal articles labeled with their captions and other extracted metadata. For more information, see [Results](#results).
+
+Depending on your use case and experience with Python, you can use EXSCLAIM as a Python import, a command-line tool, or (easiest) use its user interface.
+
+### Importing EXSCLAIM
+
+You can import EXSCLAIM to run in Python scripts (or modules):
 ```
-git clone https://github.com/MaterialEyes/exsclaim.git
-pip install -r requirements.txt
-python -m spacy download en_core_web_sm
+from exsclaim.pipeline import Pipeline
+test_pipeline = Pipeline(query)
+results = test_pipeline.run()
 ```
+<code>query</code> can either be a Python dictionary or the path to a JSON file. Either must have the parameters(/keys/attributes) defined in the [Query JSON schema](https://github.com/MaterialEyes/exsclaim/wiki/JSON-Schema#query-json-) and examples can be found [in the query directory](https://github.com/MaterialEyes/exsclaim/tree/master/query).
+
+If you wish to run only a subset of tools, you can use the keyword arguments like this:
+```
+results = test_pipeline.run(figure_separator=True, caption_distributor=True, journal_scraper=True)
+```
+settting those you wish not to use to False. 
+
+### Command-Line Tool
+
+You can utilize EXSCLAIM from the command line:
+```
+$ exsclaim /path/to/query.json
+```
+To specify which tools to run, use the <code>--tools</code> flag. The default is to run all tools. For example:
+```
+$ exsclaim --tools jc /path/to/query.json
+```
+After the <code>--tools</code> flag, provide the first letter of each tool you wish to run. The above command will run the JournalScraper and CaptionDistributor.
+
+
+### User Interface
+
+To use the UI, you must have PostgreSQL installed. To download, check [the official instructions](https://www.postgresql.org/download/).
+
+Then in the command-line, type:
+```
+$ exsclaim_ui
+```
+Do not close your command line window while using the UI. Navigate to http://127.0.0.1:8000/ to use the UI. From here you can naviaget to the query page to submit a query using a simple web form, or to the results page to explore and filter results.
+
+
 To test that it has been installed correctly, you can run the following code from the root exsclaim directory:
 ```
 python -m unittest discover
 ```
 This will run a series of unit tests that should take a few minutes. If successful, when complete the terminal should print <code>OK</code>.
 
-## Usage
 
-### REQUIRED: Formulate a JSON search query
+
+### Walkthrough
+
+#### Making a query
 A search query JSON is the singular point-of-entry for using the EXSCLAIM! search and retrieval tools.
 
 Here we query open access [Nature](https://www.nature.com) journals to find figures related to HAADF-STEM images of exfoliated MoS<sub>2</sub> flakes. Limiting the results to the top 5 most relevant hits, the query might look something like:
@@ -84,11 +144,10 @@ Here we query open access [Nature](https://www.nature.com) journals to find figu
 ```
 Saving the query avoids having to completely reformulate the structure with each new search entry and establishes provenance for the extraction results. Additional JSON search query examples can be found in the [query](https://github.com/MaterialEyes/exsclaim/blob/master/query) folder in the root directory. A full specification of the Query JSON schema can be found [here](https://github.com/MaterialEyes/exsclaim/wiki/JSON-Schema#query-json-).
 
-### REQUIRED: Use the Pipeline class to conduct a search based on the desired Query JSON
 
 There are several ways to access the Pipeline class. 
 
-#### Option One: Direct Python Import
+#### Direct Python Import
 With the [nature-exfoliated-MoS2-flakes.json](https://github.com/MaterialEyes/exsclaim/blob/master/query/nature-exfoliated-MoS2-flakes.json) search query from above, extract relevant figures by running a <code>JournalScraper</code> through an EXSCLAIM! <code>Pipeline</code>:
 
 ```python
@@ -111,19 +170,6 @@ exsclaim_pipeline.run(journal_scraper=True,      # Runs JournalScraper module
 ```
 Successful execution of the code will result in the creation of a directory populated with figures extracted from journals returned as search hits from the main [Nature](https://www.nature.com) homepage.
 
-#### Option Two: Using pre-built run.py
-The run.py file provides an easy method to quickly access the Pipeline class with limited Python knowledge. You only have to supply two parameters: the tools you wish to run and the query you wish to run them on. You can use the command line: 
-```
-python run.py --query nature-exfoliated-MoS2-flakes --tools jcf
-```
-Or edit the QUERY and TOOLS variables at the top of the run.py file and running:
-```
-python run.py
-```
-In either case, if the query JSON you supply is in the query/ folder, you only need to supply the name (without the .json). Otherwise, supply the whole path. For tools, supply a string with the first letter of each tool you wish to run:
- - j: JournalScraper
- - c: CaptionDistributor
- - f: FigureSeparator
 
 ### Results
 
@@ -189,7 +235,7 @@ conda install -c menpo opencv
 ## Citation
 If you find EXSCLAIM! useful, please encourage its development by citing the following paper in your research:
 ```sh
-Schwenker, E., Jiang, W. Spreadbury, T., Ferrier N., Cossairt, O., Chan M.K.Y., EXSCLAIM! – An automated pipeline for the construction and
+Schwenker, E., Jiang, W., Spreadbury, T., Ferrier N., Cossairt, O., Chan M.K.Y., EXSCLAIM! – An automated pipeline for the construction and
 labeling of materials imaging datasets from scientific literature. **in preparation** (2021)
 ```
 

@@ -1,6 +1,9 @@
 import setuptools
 import pathlib
 
+## build with  python setup.py bdist_wheel
+## upload to testpypi w/  python3 -m twine upload --repository testpypi dist/*
+
 here = pathlib.Path(__file__).parent.resolve()
 
 with open(here / "README.md", "r") as fh:
@@ -10,8 +13,8 @@ with open(here / "requirements.txt", "r") as f:
     install_requires = list(f.read().splitlines())
 
 setuptools.setup(
-    name="exsclaim-materialeyes",
-    version="0.0.15",
+    name="exsclaim-tspread",
+    version="0.0.18",
     author=('Eric Schwenker','Trevor Spreadbury','Weixin Jiang','Maria Chan'),
     author_email="developer@materialeyes.org",
     description="EXSCLAIM! is a library for the automatic EXtraction, Separation, and Caption-based natural Language Annotation of IMages from scientific figures.",
@@ -35,6 +38,13 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
+    entry_points = {
+        'console_scripts': [
+            'exsclaim=exsclaim.command_line:run_pipeline',
+            'exsclaim_ui=exsclaim.command_line:activate_ui',
+            'exsclaim_train=exsclaim.command_line:train',
+        ],
+    },
     python_requires='>=3.6',
     project_urls={
         'Documentation': 'https://github.com/MaterialEyes/exsclaim/wiki',
