@@ -3,7 +3,8 @@ import numpy as np
 
 class CRNN(nn.Module):
 
-    def __init__(self, 
+    def __init__(self,
+                 configuration=None,
                  input_channels=3,
                  output_classes=22,
                  convolution_layers=4,
@@ -15,12 +16,15 @@ class CRNN(nn.Module):
                  activation_type="relu",
                  recurrent_layers=2,
                  recurrent_type="bi-lstm",
-                 input_height=32,
-                 input_width=128,
-                 sequence_length=8):
+                 input_height=128,
+                 input_width=512,
+                 sequence_length=32):
         """ Initialize a Convolutional Recurrent Neural Network
 
         Args:
+            configuration (dict): dictionary containing configuration
+                parameters. If not provided, values from keyword arguments will be
+                used. If both provided, keyword arguments take precedence.
             input (int): Number of input channels. Default: 3 (for RGB images)
             output (int): Number of output channels/classes. Default: 22
             convolution_layers (int): Number of Conv2d layers in architecture
@@ -52,6 +56,32 @@ class CRNN(nn.Module):
                 length to RNN (time steps). Default: 8.
         """
         super(CRNN, self).__init__()
+        # load parameters from configuration file if provided
+        if configuration is not None:
+            # with open(configureation_file, "r") as f:
+            #     config = json.load(f)
+            config = configuration
+            input_channels = config.get("input_channels", input_channels)
+            output_classes = config.get("output_classes", output_classes)
+            convolution_layers = (
+                config.get("convolution_layers", convolution_layers)
+            )
+            cnn_kernel_size = config.get("cnn_kernel_size", cnn_kernel_size)
+            in_channels = config.get("in_channels", in_channels)
+            max_pooling = config.get("max_pooling", max_pooling)
+            batch_normalization = (
+                config.get("batch_normalization", batch_normalization)
+            )
+            dropout = config.get("dropout", dropout)
+            activation_type = config.get("activation_type", activation_type)
+            recurrent_layers = (
+                config.get("recurrent_layers", recurrent_layers)
+            )
+            recurrent_type = config.get("recurrent_type", recurrent_type)
+            input_height = config.get("input_height", input_height)
+            input_width = config.get("input_width", input_width)
+            sequence_length = config.get("sequence_length", sequence_length)
+
         activation_functions = {
             "relu":         nn.ReLU(),
             "leaky_relu":   nn.LeakyReLU(),
@@ -63,10 +93,10 @@ class CRNN(nn.Module):
         current_dims = (input_height, input_width)
         activation_function = activation_functions[activation_type.lower()]
         if in_channels is None:
-            if convolution_layers < 6:
+            if convolution_layers < 8:
                 in_channels = [64, 128, 256, 256, 512, 512, 512]
             else:
-                in_channels = [max(2**(i // 3 + 5), 2014)
+                in_channels = [min(2**(i // 3 + 6), 2014)
                                for i in range(convolution_layers)]
         if batch_normalization is None:
             batch_normalization = [i for i in range(0, convolution_layers, 2)]
