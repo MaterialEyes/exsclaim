@@ -20,19 +20,20 @@ from .lm import LanguageModel
 def convert_to_rgb(image):
     return image.convert("RGB")
 
-def load_data(datadir, batch_size):
-    normalize_transform = transforms.Compose([transforms.Resize((32, 128)),
-                                           transforms.Lambda(convert_to_rgb),
-                                           transforms.ToTensor(),
-                                           transforms.Normalize(mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225]),])
+def load_data(batch_size, input_height, input_width):
+    normalize_transform = transforms.Compose([
+        transforms.GaussianBlur((3,3), sigma=(0.1, 2.0)),
+        transforms.Resize((input_height, input_width)),
+        transforms.Lambda(convert_to_rgb),
+        transforms.ToTensor(),
+        transforms.Normalize(mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225]),
+    ])
     resize_transform = transforms.Compose([transforms.Resize((32, 128)),
                                            transforms.Lambda(convert_to_rgb),
                                            transforms.ToTensor()])       
-    train_data = ScaleLabelDataset(datadir, transforms=resize_transform, test=False)
-    test_data = ScaleLabelDataset(datadir, transforms=resize_transform, test=True)
+    train_data = ScaleLabelDataset(transforms=normalize_transform)
     trainloader = torch.utils.data.DataLoader(train_data, batch_size=batch_size, shuffle=True)
-    testloader = torch.utils.data.DataLoader(test_data, batch_size=batch_size, shuffle=True)
-    return trainloader, testloader
+    return trainloader, trainloader
 
 def get_model(checkpoint_directory, model_name):
     best_model = None
@@ -60,14 +61,17 @@ def train_one_epoch(model,
                     save_every,
                     print_every,
                     best_loss):
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     batches = 0
     for inputs, labels in trainloader:
+        inputs = inputs.to(device)
+        labels = labels.to(device)
         target_lengths = []
         for label in labels:
             label_list = label.tolist()
             target_lengths.append(label_list.index(21))
-        target_lengths = torch.tensor(target_lengths, dtype=torch.int8)
-        input_lengths = target_lengths 
+        target_lengths = torch.tensor(target_lengths, dtype=torch.int8, device=device)
+        input_lengths = torch.tensor([32]*len(target_lengths), device=device)
         predictions = model(inputs)
         predictions = predictions.permute(1, 0, 2)
         loss = criterion(predictions, labels, input_lengths, target_lengths)
@@ -78,24 +82,29 @@ def train_one_epoch(model,
         batches += 1
         if batches % print_every == 0:
             with open(results_file, "a+") as f:
-                f.write("\tBatch {}: Loss {}\n".format(batches, loss))
+                f.write("\tBatch: {}, Loss: {}, Learning Rate: {}\n".format(batches, loss, optimizer.param_groups[0]["lr"]))
     # test results
     running_loss = 0
+    i = 0
     for inputs, labels in testloader:
+        inputs = inputs.to(device)
+        labels = labels.to(device)
+        if i > 1000:
+            break
         target_lengths = []
         for label in labels:
             label_list = label.tolist()
             target_lengths.append(label_list.index(21))
-        target_lengths = torch.tensor(target_lengths, dtype=torch.int8)
-        input_lengths = target_lengths 
+        target_lengths = torch.tensor(target_lengths, dtype=torch.int8, device=device)
+        input_lengths = torch.tensor([32]*len(target_lengths), device=device)
         predictions = model(inputs)
         predictions = predictions.permute(1, 0, 2)
         loss = criterion(predictions, labels, input_lengths, target_lengths)
-        running_loss += loss
+        running_loss += float(loss)
     if running_loss < best_loss:
         best_loss = running_loss
     with open(results_file, "a+") as f:
-        f.write("Epoch {}: Running Loss: {}\n".format(epoch, running_loss))
+        f.write("Epoch: {}, Running Loss: {}, Learning Rate: {}\n".format(epoch, running_loss, optimizer.param_groups[0]["lr"]))
     # save checkpoint
     if epoch % save_every == 0:
         torch.save({
@@ -108,30 +117,30 @@ def train_one_epoch(model,
     return best_loss
 
 def train_crnn(batch_size=32,
-          epochs=600,
+          epochs=2000,
           learning_rate=0.001,
-          optimizer="adam",
+          optimizer="SGD",
           lr_scheduler="plateau",
           loss_function="CTC",
-          print_every=250,
-          save_every=2,
+          print_every=50,
+          save_every=5,
           input_channels=3,
           output_classes=22,
           cnn_to_rnn=0,
           model_name="test",
-          input_height=32,
-          input_width=128,
-          sequence_length=8,
+          input_height=128,
+          input_width=512,
+          sequence_length=32,
           recurrent_type="bi-lstm",
           cnn_kernel_size=(3,3),
-          convolution_layers=4):
+          convolution_layers=4,
+          hard_set_lr = None,
+          configuration = None):
     """ trains model """
     current_file = pathlib.Path(__file__).resolve(strict=True)
     exsclaim_root = current_file.parent.parent.parent.parent
-    label_directory = exsclaim_root / 'exsclaim' / 'figures' / 'datasets' /'samples'
-    character_directory = exsclaim_root / 'exsclaim' / 'figures' / 'datasets' / 'number_samples'
-    checkpoint_directory = current_file.parent / "checkpoints" / "label"
-    results_file = current_file.parent / "results" / "label" / (model_name + ".txt")
+    checkpoint_directory = exsclaim_root / "training" / "checkpoints"
+    results_file = exsclaim_root / "training" / "results" / (model_name + ".txt")
     # Load CRNN model and assign optimizer, lr_scheduler
     model = CRNN(input_channels=input_channels,
                  output_classes=output_classes,
@@ -140,19 +149,26 @@ def train_crnn(batch_size=32,
                  recurrent_type=recurrent_type,
                  input_height=input_height,
                  input_width=input_width,
-                 sequence_length=sequence_length)
-    print(summary(model, torch.zeros((1, 3, 32, 128)), show_input=False))
+                 sequence_length=sequence_length,
+                 configuration=configuration)
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model.to(device)
+    with open(results_file, "a+") as f:
+        f.write(summary(
+            model, 
+            torch.zeros((1, 3, input_height, input_width)).to(device),
+            show_input=False
+        ))
+        f.write("\n")
+    # set up training hyper parameters
     optimizers = {
-        "adam" : optim.Adam(model.parameters(), lr=learning_rate)
+        "adam" : optim.Adam(model.parameters(), lr=learning_rate),
+        "SGD" : optim.SGD(model.parameters(), lr=learning_rate)
     }
     optimizer = optimizers[optimizer]
-    lr_schedulers = {
-        "plateau":  optim.lr_scheduler.ReduceLROnPlateau(optimizer)
-    }
-    lr_scheduler = lr_schedulers[lr_scheduler]
     best_checkpoint = get_model(checkpoint_directory, model_name)
     if best_checkpoint is not None:
-        cuda = torch.cuda.is_available() and (gpu_id >= 0)
+        cuda = torch.cuda.is_available()
         if cuda:
             checkpoint = torch.load(best_checkpoint)
             model = model.cuda()
@@ -160,20 +176,34 @@ def train_crnn(batch_size=32,
             checkpoint = torch.load(best_checkpoint, map_location='cpu')
         model.load_state_dict(checkpoint["model_state_dict"])
         optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
-        lr_scheduler.load_state_dict(checkpoint["lr_state_dict"])
         current_epoch = checkpoint["epoch"]
         best_loss = checkpoint["best_loss"]
     else:
         current_epoch = 0
         best_loss = 999999999999
+
+    # hard set learning rate
+    hard_set_lr = 0.01
+    if hard_set_lr is not None:
+        optimizer.param_groups[0]["lr"] = hard_set_lr
+    # dict of lr_schedulers after optimizer state dict is loaded since
+    # lr_schedulers take optimizer as a parameter
+    lr_schedulers = {
+        "plateau":  optim.lr_scheduler.ReduceLROnPlateau(
+            optimizer, patience=1000, threshold=0.000001, factor=0.5
+        )
+    }
+    lr_scheduler = lr_schedulers[lr_scheduler]
+    if best_checkpoint is not None:
+        lr_scheduler.load_state_dict(checkpoint["lr_state_dict"])
     # Set loss function, load data and begin training
     loss_functions = {
         "CTC":      nn.CTCLoss(blank=21, zero_infinity=True),
         "NLL":      nn.NLLLoss()
     }
     criterion = loss_functions[loss_function]
-    label_trainloader, label_testloader = load_data(label_directory, batch_size)
-    character_trainloader, character_testloader = load_data(character_directory, batch_size)
+    label_trainloader, label_testloader = load_data(batch_size, input_height, input_width)
+    character_trainloader, character_testloader = load_data(batch_size, input_height, input_width)
     # Set rnn to untrainable
     for name, param in model.named_parameters():
         if "Recurrent" in name:
@@ -197,81 +227,6 @@ def train_crnn(batch_size=32,
                         results_file, checkpoint_directory, model_name, save_every, print_every,
                         best_loss)
 
-
-def run_crnn(model_name="test",
-              language_model_file=None,
-              decoder=0,
-              search_width=100):
-    model = CRNN(3, 22)
-    current_file = pathlib.Path(__file__).resolve(strict=True)
-    exsclaim_root = current_file.parent.parent.parent.parent
-    data_directory = exsclaim_root / 'dataset' / 'dataset_generation' / 'samples'
-    checkpoint_directory = current_file.parent / "checkpoints" / "label"
-    best_checkpoint = get_model(checkpoint_directory, model_name)
-    if best_checkpoint is not None:
-        cuda = torch.cuda.is_available() and (gpu_id >= 0)
-        if cuda:
-            checkpoint = torch.load(best_checkpoint)
-            model = model.cuda()
-        else:
-            checkpoint = torch.load(best_checkpoint, map_location='cpu')
-        model.load_state_dict(checkpoint["model_state_dict"])
-    model.eval()
-    resize_transform = transforms.Compose([transforms.Resize((32, 128)),
-                                           transforms.Lambda(convert_to_rgb),
-                                           transforms.ToTensor()])       
-    
-    classes = "0123456789mMcCuUnN .A"
-    idx_to_class = classes + "-"
-    test_image_directory = current_file.parent.parent.parent.parent / 'dataset' / 'dataset_generation' / 'scale_label_dataset'
-    correct = 0
-    incorrect = 0
-    all_results = {}
-    all_results["correct"] = []
-    for image_label in os.listdir(test_image_directory):
-        for image_name in os.listdir(test_image_directory / image_label):
-            all_results["correct"].append(image_label)
-            # open image
-            image_path = test_image_directory / image_label / image_name
-            image = Image.open(image_path).convert("RGB")
-            image = resize_transform(image)
-            image = image.unsqueeze(0)
-            # run image on model
-            logps = model(image)
-
-            # run ctcs
-            for language_model_file in [ None, "corpus.txt", "realistic.txt"]:
-                if language_model_file is not None:
-                    lm = LanguageModel(current_file.parent / language_model_file, classes)
-                else:
-                    lm = None
-                for beamwidth in [25, 50]:
-                    for constrict_search in [True,  False]:
-                        for postprocess in [True, False]:
-                            if constrict_search and language_model_file:
-                                continue
-                            decode_function = ctc_decoders(beamwidth, constrict_search, lm, postprocess)
-                            word = decode_function(logps)
-                            decoder_results = all_results.get((language_model_file, beamwidth, constrict_search, postprocess), [])
-                            decoder_results.append(word)
-                            all_results[(language_model_file, beamwidth, constrict_search, postprocess)] = decoder_results
-            print("finished one")                
-            if False:
-                outputs = logps.squeeze(0)
-                outputs = outputs.tolist()
-                results = decode(outputs, 5000)
-                words_dict = {}
-                for result in results[:50]:
-                    word = path_to_word(result, idx_to_class)
-                    word_instances = words_dict.get(word, 0)
-                    words_dict[word] = word_instances + torch.exp(torch.Tensor([score_candidate(result, True)]))
-                
-                    if word == image_label:
-                        correct += 1
-                    else:
-                        incorrect += 1
-            break
-    print(all_results)
 
 ### DECODER FUNCTIONS ###
 
