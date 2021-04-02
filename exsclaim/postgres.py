@@ -1,9 +1,27 @@
 import psycopg2
 from configparser import ConfigParser
 
+def initialize_database():
+    conn = psycopg2.connect(
+        database="postgres",
+        user='postgres',
+        password='password',
+        host='127.0.0.1',
+        port= '5432'
+    )
+    conn.autocommit = True
+    cursor = conn.cursor()
+    cursor.execute("""CREATE DATABASE exsclaim""")
+    conn.close()
+
+
 class Database():
 
     def __init__(self, name, configuration_file = "database.ini"):
+        try:
+            initialize_database()
+        except Exception as e:
+            pass
         parser = ConfigParser()
         parser.read(configuration_file)
         db_params = {}
@@ -13,7 +31,7 @@ class Database():
         else:
             db_params = {
                 "host": "localhost",
-                "database": name,
+                "database": "exsclaim",
                 "user": "postgres"
             }
         self.connection = psycopg2.connect(**db_params)
@@ -55,3 +73,6 @@ class Database():
 
     def commit(self):
         self.connection.commit()
+
+if __name__ == "__main__":
+    initialize_database()
