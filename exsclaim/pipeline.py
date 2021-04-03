@@ -11,7 +11,7 @@ import textwrap
 import pathlib
 import logging
 
-from .utilities import boxes
+from .utilities import boxes, paths
 from .figure import FigureSeparator
 from .tool import CaptionDistributor, JournalScraper
 
@@ -39,9 +39,9 @@ class Pipeline:
                 # Load query file to dict
                 self.query_dict = json.load(f)
         # Set up file structure
-        base_dir = pathlib.Path(__file__).resolve(strict=True).parent.parent
+        base_results_dir = paths.find_results_dir()
         self.results_directory = (
-            base_dir / 'extracted' / self.query_dict["results_dir"]
+            base_results_dir / self.query_dict["results_dir"]
         )
         os.makedirs(self.results_directory, exist_ok=True)
         # Set up logging

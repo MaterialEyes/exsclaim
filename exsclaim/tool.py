@@ -18,6 +18,7 @@ import pathlib
 from . import journal
 from . import caption
 from .utilities.logging import Printer
+from .utilities import paths
 
 from abc import ABC, abstractmethod
 
@@ -41,9 +42,9 @@ class ExsclaimTool(ABC):
                 " dictionary instead"))
             self.search_query = search_query
         # Set up file structure
-        base_dir = pathlib.Path(__file__).resolve(strict=True).parent.parent
+        base_results_dir = paths.find_results_dir()
         self.results_directory = (
-            base_dir / 'extracted' / self.search_query["results_dir"]
+            base_results_dir / self.search_query["results_dir"]
         )
         # set up logging / printing
         self.print = "print" in self.search_query.get("logging", [])
