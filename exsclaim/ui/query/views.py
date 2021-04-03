@@ -7,7 +7,7 @@ try:
     from exsclaim.pipeline import Pipeline
 except:
     current_file = pathlib.Path(__file__).resolve(strict=True)
-    base_dir = current_file.parent.parent.parent
+    base_dir = current_file.parent.parent.parent.parent
     sys.path.append(str(base_dir))
     from exsclaim.pipeline import Pipeline
 
