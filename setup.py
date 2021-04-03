@@ -26,11 +26,18 @@ setuptools.setup(
     package_data={
         'exsclaim': ['figures/config/yolov3_default_master.cfg',
                      'figures/config/yolov3_default_subfig.cfg',
+                     'figures/config/scale_label_reader.json'
                      'captions/models/characterization.yml',
                      'captions/models/patterns.yml',
                      'captions/models/reference.yml',
                      'captions/models/rules.yml',
-                     'tests/data/nature_test.json']
+                     'tests/data/nature_test.json',
+                     'ui/static/*',
+                     'ui/static/style/*',
+                     'ui/static/scripts/*',
+                     'ui/home/templates/exsclaim/*',
+                     'ui/results/templates/exsclaim/*',
+                     'ui/query/templates/exsclaim/*']
     },
     classifiers=[
         "Development Status :: 1 - Planning",
