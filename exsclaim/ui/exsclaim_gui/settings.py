@@ -136,6 +136,12 @@ STATICFILES_DIRS = [
     BASE_DIR / "static",
     BASE_DIR.parent.parent / "extracted"
 ]
+# Add base_dirs (base directories for saving extractions) to static file dirs
+with open(BASE_DIR.parent / "results_dirs", "r") as f:
+    results_dirs = f.readlines()
+for base_dir in results_dirs:
+    if base_dir != "":
+        STATICFILES_DIRS.append(base_dir.strip())
 
 # Content Security Policy
 

@@ -45,6 +45,7 @@ def run_pipeline():
     pipeline.run(journal_scraper=j, caption_distributor=c, figure_separator=f)
 
 def train():
+    current_file = pathlib.Path(__file__).resolve(strict=True)
     ap = argparse.ArgumentParser()
     ap.add_argument(
         "-m", "--model",
@@ -52,7 +53,8 @@ def train():
         help=(
             "Name of model you wish to train (i.e. scale_label_reader,"
             " scale_object_detector, etc.). Configuration file will be "
-            "assumed to be <model>.json"
+            "assumed to be exsclaim/figures/config/<model>.json if '.json' "
+            "extenstion is not supplied."
         )
     )
     ap.add_argument(
@@ -72,7 +74,13 @@ def train():
 
     # # Load configuration
     # training_directory = parent_directory / "training"
-    with open(args.model + ".json", "r") as f:
+    if ".json" not in args.model:
+        model_config_path = (
+            current_file / "figures" / "config" / (args.model + ".json")
+        )
+    else:
+        model_config_path = args.model
+    with open(model_config_path, "r") as f:
         configuration_dict = json.load(f)
     config = configuration_dict[args.name]
 
@@ -94,6 +102,10 @@ def train():
 
 
 def activate_ui():
+    current_file = pathlib.Path(__file__).resolve(strict=True)
+    ui_dir = current_file.parent / "ui"
+    os.chdir(ui_dir)
+    print(os.getcwd())
     parser = argparse.ArgumentParser(
         description=(
             'Run the EXSCLAIM! Pipeline User Interface. This command will'
@@ -102,7 +114,7 @@ def activate_ui():
         )
     )
     ## copied fron Django manage.py, replacing sysarg with 'runserver'
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'exsclaim_gui.settings')
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'exsclaim.ui.exsclaim_gui.settings')
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
