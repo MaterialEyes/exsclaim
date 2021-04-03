@@ -115,7 +115,14 @@ class FigureSeparator(ExsclaimTool):
                                             scale_bar_detection_model,
                                             "scale_bar_detection_model.pt")
         ## Load scale label recognition model
-        scale_label_recognition_model = CRNN(3, 22)
+        parent_dir = pathlib.Path(__file__).resolve(strict=True).parent
+        config_path = (
+            parent_dir / "figures" / "config" / "scale_label_reader.json"
+        )
+        with open(config_path, "r") as f:
+            configuration_file = json.load(f)
+        configuration = configuration_file["original"]
+        scale_label_recognition_model = CRNN(configuration=configuration)
         self.scale_label_recognition_model = self.load_model_from_checkpoint(
                                                 scale_label_recognition_model,
                                                 "scale_label_recognition_model.pt")
