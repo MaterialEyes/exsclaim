@@ -1,4 +1,5 @@
 import psycopg2
+from psycopg2 import sql
 from configparser import ConfigParser
 
 def initialize_database():
@@ -46,20 +47,41 @@ class Database():
     def copy_from(self, file, table):
         app_name = "results"
         table_to_copy_command = {
-            app_name + "_article": app_name + "_article",
-            app_name + "_figure": app_name + "_figure",
-            app_name + "_subfigure": app_name + "_subfigure",
-            app_name + "_scalebar": app_name + "_scalebar",
-            app_name + "_scalebarlabel": app_name + "_scalebarlabel(text,x1,y1,x2,y2,label_confidence,box_confidence,nm,scale_bar_id)",
-            app_name + "_subfigurelabel": app_name + "_subfigurelabel(text,x1,y1,x2,y2,label_confidence,box_confidence,subfigure_id)"
+            app_name + "_article": app_name + "_article_temp",
+            app_name + "_figure": app_name + "_figure_temp",
+            app_name + "_subfigure": app_name + "_subfigure_temp",
+            app_name + "_scalebar": app_name + "_scalebar_temp",
+            app_name + "_scalebarlabel": (
+                app_name + "_scalebarlabel_temp(text,x1,y1,x2,y2,label_confidence,box_confidence,nm,scale_bar_id)"
+            ),
+            app_name + "_subfigurelabel": (
+                app_name + "_subfigurelabel_temp(text,x1,y1,x2,y2,label_confidence,box_confidence,subfigure_id)"
+            )
         }
-
-
+        table_name = table
+        temp_name = table_name + "_temp"
+        # create a temporary table to copy data into. We then use copy to
+        # populate table with a csv contents. Then we insert temp table
+        # contents into the real table, ignoring conflicts. We use copy
+        # because it is faster than insert, but create the temporary table
+        # to mimic a nonexistent "COPY... ON CONFLICT" command
+        self.query(
+            sql.SQL(
+                "CREATE TEMPORARY TABLE {} (LIKE {} INCLUDING ALL) ON COMMIT DROP;"
+            ).format(sql.Identifier(temp_name), sql.Identifier(table_name))
+        )
         with open(file, "r") as csv_file:
             self.cursor.copy_expert(
                 "COPY {} FROM STDIN CSV".format(table_to_copy_command[table]),
                 csv_file
             )
+        self.query(
+            sql.SQL(
+                "INSERT INTO {} SELECT * FROM {} ON CONFLICT DO NOTHING;"
+            ).format(sql.Identifier(table_name), sql.Identifier(temp_name))
+        )
+
+
 
     def close(self):
         self.cursor.close()
