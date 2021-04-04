@@ -30,10 +30,10 @@
             "synonyms":["ion implantation","ion-implantated","ion implantated"]
         }
     },
-    
-    "results_dir": "nature-point-defects-SiC",
 
     "open": false,
 
-    "save_format": ["csv"]
+    "save_format": ["csv"],
+
+    "logging": ["exsclaim.log"]
 }

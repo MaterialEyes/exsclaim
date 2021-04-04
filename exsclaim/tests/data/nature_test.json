@@ -21,8 +21,6 @@
         }
     },
     
-    "results_dir": "nature-test",
-    
     "save_format": ["visualize", "boxes"],
 
     "open": false

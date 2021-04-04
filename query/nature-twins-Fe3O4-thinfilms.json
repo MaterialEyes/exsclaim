@@ -26,9 +26,9 @@
         }
     },
 
-    "results_dir": "nature-twins-Fe3O4-thinfilms",
-
     "open": false,
 
-    "save_format": ["csv"]
+    "save_format": ["csv"],
+
+    "logging": ["print", "exsclaim.log"]
 }

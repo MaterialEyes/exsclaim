@@ -15,12 +15,8 @@
             "synonyms":["nanoparticle"]
         }
     },
-    
-    "results_dir": "acs-nanoparticles/", 
 
     "save_format": [""], 
 
-    "open" : false,
-
-    "logging": ["print"]
+    "open" : false
 }
