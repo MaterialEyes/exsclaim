@@ -14,7 +14,7 @@ with open(here / "requirements.txt", "r") as f:
 
 setuptools.setup(
     name="exsclaim-tspread",
-    version="0.0.19",
+    version="0.0.20",
     author=('Eric Schwenker','Trevor Spreadbury','Weixin Jiang','Maria Chan'),
     author_email="developer@materialeyes.org",
     description="EXSCLAIM! is a library for the automatic EXtraction, Separation, and Caption-based natural Language Annotation of IMages from scientific figures.",
@@ -26,7 +26,8 @@ setuptools.setup(
     package_data={
         'exsclaim': ['figures/config/yolov3_default_master.cfg',
                      'figures/config/yolov3_default_subfig.cfg',
-                     'figures/config/scale_label_reader.json'
+                     'figures/config/scale_label_reader.json',
+                     'figures/scale/corpus.txt',
                      'captions/models/characterization.yml',
                      'captions/models/patterns.yml',
                      'captions/models/reference.yml',
