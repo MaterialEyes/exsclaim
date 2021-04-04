@@ -44,7 +44,7 @@ class ExsclaimTool(ABC):
         # Set up file structure
         base_results_dir = paths.find_results_dir()
         self.results_directory = (
-            base_results_dir / self.search_query["results_dir"]
+            base_results_dir / self.search_query["name"]
         )
         # set up logging / printing
         self.print = "print" in self.search_query.get("logging", [])

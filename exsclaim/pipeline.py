@@ -28,20 +28,22 @@ class Pipeline:
         # Load Query on which Pipeline will run
         self.current_path = pathlib.Path(__file__).resolve().parent
         if "test" == query_path:
-            self.query_path = self.current_path / 'tests' / 'data' / 'nature_test.json'
-        elif isinstance(query_path, dict):
+            query_path = self.current_path / 'tests' / 'data' / 'nature_test.json'
+        if isinstance(query_path, dict):
             self.query_dict = query_path
             self.query_path = ""
         else:
-            assert os.path.isfile(query_path), "query path must be a dict, query path, or 'test'"
+            assert os.path.isfile(query_path), "query path must be a dict, query path, or 'test', was {}".format(query_path)
             self.query_path = query_path
             with open(self.query_path) as f:
                 # Load query file to dict
                 self.query_dict = json.load(f)
         # Set up file structure
+        if "results_dir" in self.query_dict:
+            paths.add_results_dir(self.query_dict["results_dir"])
         base_results_dir = paths.find_results_dir()
         self.results_directory = (
-            base_results_dir / self.query_dict["results_dir"]
+            base_results_dir / self.query_dict["name"]
         )
         os.makedirs(self.results_directory, exist_ok=True)
         # Set up logging

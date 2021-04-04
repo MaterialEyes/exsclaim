@@ -12,6 +12,7 @@ import random
 import time
 import logging
 import pathlib
+from .utilities import paths
 
 
 from bs4 import BeautifulSoup
@@ -55,10 +56,11 @@ class JournalFamily():
         self.open = search_query.get("open", False)
         self.logger = logging.getLogger(__name__)
         # Set up file structure
-        base_dir = pathlib.Path(__file__).resolve(strict=True).parent.parent
+        base_results_dir = paths.find_results_dir()
         self.results_directory = (
-            base_dir / 'extracted' / self.search_query["results_dir"]
+            base_results_dir / self.search_query["name"]
         )
+        os.makedirs(self.results_directory, exist_ok=True)
 
     def get_domain_name(self) -> str:
         """
@@ -267,7 +269,7 @@ class JournalFamily():
         """
         soup = self.get_soup_from_request(url)
         is_open, license = self.get_license(soup)
-        save_path = self.search_query['results_dir']
+        save_path = self.results_directory
 
         # Uncomment to save html
         html_directory = self.results_directory / "html"

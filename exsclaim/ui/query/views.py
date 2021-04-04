@@ -35,11 +35,10 @@ def query_view(request):
                 }
             },
             "open": query.get("open", False) == "true",
-            "results_dir":  query_name,
             "save_format": ["postgres"],
             "logging": ["exsclaim.log"]
         }
-        if query.get("results_base_dire", None) is not None:
+        if query.get("results_base_dir", None) is not None:
             add_results_dir(query["results_base_dir"])
         def run_pipeline(search_query):
             pipeline = Pipeline(search_query)
@@ -47,7 +46,7 @@ def query_view(request):
         p = mp.Process(target=run_pipeline, args=(search_query,))
         p.start()
         minutes = int(query["max_scraped"]) * (150/60)
-        results_log = os.path.join(search_query["results_dir"], "exsclaim.log") 
+        results_log = os.path.join(search_query["name"], "exsclaim.log") 
         return render(request,
             "exsclaim/submission.html",
             context={
