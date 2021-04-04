@@ -7,10 +7,9 @@ def find_results_dir():
     with open(results_dirs_file, "r") as f:
         results_dirs = [line.strip() for line in f.readlines()]
     if results_dirs != []:
-        results_dir = results_dirs[-1]
+        results_dir = pathlib.Path(results_dirs[-1])
     else:
         results_dir = base_dir / "extracted"
-    print(results_dir)
     return results_dir
 
 def add_results_dir(results_dir):
