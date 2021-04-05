@@ -23,8 +23,8 @@ ap.add_argument("-t", "--test", default=False, action="store_true",
 args = ap.parse_args()
 
 # Load configuration
-training_directory = parent_directory / "training"
-with open(training_directory / (args.model + ".json"), "r") as f:
+config_directory = parent_directory / "exsclaim" / "figures" / "config"
+with open(config_directory / (args.model + ".json"), "r") as f:
     configuration_dict = json.load(f)
 config = configuration_dict[args.name]
 
