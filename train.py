@@ -41,5 +41,6 @@ if args.model == "scale_label_reader":
             sequence_length = config["sequence_length"],
             recurrent_type = config["recurrent_type"],
             cnn_kernel_size = config["cnn_kernel_size"],
-            convolution_layers = config["convolution_layers"]
+            convolution_layers = config["convolution_layers"],
+            text = config.get("text", "random_separate")
         )

@@ -53,7 +53,7 @@ def addBeam(beamState, labeling):
         beamState.entries[labeling] = BeamEntry()
 
 
-def ctcBeamSearch(mat, classes, lm, beamWidth=50, n=40, constrict_search=False):
+def ctcBeamSearch(mat, classes, lm, beamWidth=25):
     "beam search as described by the paper of Hwang et al. and the paper of Graves et al."
 
     blankIdx = len(classes)
@@ -96,30 +96,15 @@ def ctcBeamSearch(mat, classes, lm, beamWidth=50, n=40, constrict_search=False):
             curr.entries[labeling].prTotal += prBlank + prNonBlank
             curr.entries[labeling].prText = last.entries[labeling].prText # beam-labeling not changed, therefore also LM score unchanged from
             curr.entries[labeling].lmApplied = True # LM already applied at previous time-step for this beam-labeling
-            if constrict_search:
-                legal_next_characters = get_legal_next_characters(labeling)
-            elif len(labeling) == 0:
-                legal_next_characters = [i for i in range(1, 10)]
-            else:
-                legal_next_characters = [i for i in range(maxC-1)]
+
             # extend current beam-labeling
-            for c in legal_next_characters:
+            for c in range(maxC - 1):
                 # add new char to current beam-labeling
                 newLabeling = labeling + (c,)
 
                 # if new labeling contains duplicate char at the end, only consider paths ending with a blank
                 if labeling and labeling[-1] == c:
-                    if c == 0:
-                        if len(labeling) == 1 or len(labeling) > 4: 
-                            prNonBlank = mat[t, c] * last.entries[labeling].prBlank
-                        else:
-                            if labeling[-2] == c :
-                                prNonBlank = mat[t, c] * last.entries[labeling].prBlank
-                            else:
-                                prNonBlank = mat[t, c] * last.entries[labeling].prTotal
-                    else:                        
-                        prNonBlank = mat[t, c] * last.entries[labeling].prBlank
-
+                    prNonBlank = mat[t, c] * last.entries[labeling].prBlank
                 else:
                     prNonBlank = mat[t, c] * last.entries[labeling].prTotal
 
@@ -140,11 +125,15 @@ def ctcBeamSearch(mat, classes, lm, beamWidth=50, n=40, constrict_search=False):
     # normalise LM scores according to beam-labeling-length
     last.norm()
 
-     # sort by probability
-    bestLabeling = last.sort()[0] # get most probable labeling
+    #  # sort by probability
+    # bestLabeling = last.sort()[0] # get most probable labeling
 
-    
-    return last.sort()[:n]
+    # # map labels to chars
+    # res = ''
+    # for l in bestLabeling[0]:
+    #     res += classes[l]
+
+    return last.sort()[:10]
 
 
 ### Added by MaterialEyes
@@ -221,7 +210,6 @@ def get_legal_next_characters(path, sequence_length=8):
 def postprocess_ctc(results):
     classes = "0123456789mMcCuUnN .A"
     idx_to_class = classes + "-"
-    words = []
     for result, confidence in results:
         confidence = float(confidence)
         word = ""
@@ -229,31 +217,26 @@ def postprocess_ctc(results):
             word += idx_to_class[step]
         word = word.strip()
         word = "".join(word.split("-"))
+        print(word)
         try:
-            number, unit = word.split(" ")
+            number, unit = word.split()
             number = float(number)
-            if unit.lower() not in ["nm", "mm", "cm", "um", "a"]:
-                continue
-            else:
-                if "00" in word:
-                    confidence += .005
-                    confidence *= 7
-                words.append((word, confidence))
-        except:
+            if unit.lower() == "n":
+                unit = "nm"
+            elif unit.lower() == "c":
+                unit = "cm"
+            elif unit.lower() == "u":
+                unit = "um"
+            if unit.lower() in ["nm", "mm", "cm", "um", "a"]:
+                return number, unit, confidence
+        except Exception as e:
             continue
-    words = sorted(words, key=itemgetter(1), reverse=True)
-    if words == []:
-        return None, 0
-    else:
-        word, confidence = words[0]
-        if "00" in word:
-            confidence /= 1
-        return word, confidence
+    return -1, "m", 0
 
 def run_ctc(probs, classes):
     current_file = pathlib.Path(__file__).resolve(strict=True)
     language_model_file ="corpus.txt"
     language_model = LanguageModel(current_file.parent / language_model_file, classes)
-    top_results = ctcBeamSearch(probs, classes, lm=language_model, constrict_search=False)
-    word, confidence = postprocess_ctc(top_results)
-    return word, confidence
+    top_results = ctcBeamSearch(probs, classes, lm=language_model, beamWidth=15)
+    magnitude, unit, confidence = postprocess_ctc(top_results)
+    return magnitude, unit, confidence

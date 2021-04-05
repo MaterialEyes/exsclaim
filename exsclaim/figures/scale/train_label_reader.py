@@ -20,7 +20,7 @@ from .lm import LanguageModel
 def convert_to_rgb(image):
     return image.convert("RGB")
 
-def load_data(batch_size, input_height, input_width):
+def load_data(batch_size, input_height, input_width, text="random_separate"):
     normalize_transform = transforms.Compose([
         transforms.GaussianBlur((3,3), sigma=(0.1, 2.0)),
         transforms.Resize((input_height, input_width)),
@@ -31,7 +31,7 @@ def load_data(batch_size, input_height, input_width):
     resize_transform = transforms.Compose([transforms.Resize((32, 128)),
                                            transforms.Lambda(convert_to_rgb),
                                            transforms.ToTensor()])       
-    train_data = ScaleLabelDataset(transforms=normalize_transform)
+    train_data = ScaleLabelDataset(transforms=normalize_transform, text=text)
     trainloader = torch.utils.data.DataLoader(train_data, batch_size=batch_size, shuffle=True)
     return trainloader, trainloader
 
@@ -135,7 +135,8 @@ def train_crnn(batch_size=32,
           cnn_kernel_size=(3,3),
           convolution_layers=4,
           hard_set_lr = None,
-          configuration = None):
+          configuration = None,
+          text="random_separate"):
     """ trains model """
     current_file = pathlib.Path(__file__).resolve(strict=True)
     exsclaim_root = current_file.parent.parent.parent.parent
@@ -183,14 +184,13 @@ def train_crnn(batch_size=32,
         best_loss = 999999999999
 
     # hard set learning rate
-    hard_set_lr = 0.01
     if hard_set_lr is not None:
         optimizer.param_groups[0]["lr"] = hard_set_lr
     # dict of lr_schedulers after optimizer state dict is loaded since
     # lr_schedulers take optimizer as a parameter
     lr_schedulers = {
         "plateau":  optim.lr_scheduler.ReduceLROnPlateau(
-            optimizer, patience=1000, threshold=0.000001, factor=0.5
+            optimizer, patience=2000, threshold=0.000001, factor=0.5
         )
     }
     lr_scheduler = lr_schedulers[lr_scheduler]
@@ -202,11 +202,11 @@ def train_crnn(batch_size=32,
         "NLL":      nn.NLLLoss()
     }
     criterion = loss_functions[loss_function]
-    label_trainloader, label_testloader = load_data(batch_size, input_height, input_width)
-    character_trainloader, character_testloader = load_data(batch_size, input_height, input_width)
+    label_trainloader, label_testloader = load_data(batch_size, input_height, input_width, text)
+    character_trainloader, character_testloader = load_data(batch_size, input_height, input_width, text)
     # Set rnn to untrainable
     for name, param in model.named_parameters():
-        if "Recurrent" in name:
+        if "Recurrent" not in name:
             param.requires_grad = False
     for epoch in range(current_epoch+1, int(cnn_to_rnn*epochs)):
         best_loss = train_one_epoch(model, epoch, criterion, optimizer, lr_scheduler,
