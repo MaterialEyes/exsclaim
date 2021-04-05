@@ -1,6 +1,7 @@
 import os
 import cv2
 import json
+from torch._C import device
 import yaml
 import glob
 import torch
@@ -80,11 +81,11 @@ class FigureSeparator(ExsclaimTool):
         # https://github.com/pytorch/pytorch/issues/47038
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            self.cuda = torch.cuda.is_available() and (gpu_id >= 0)
+            self.cuda = torch.cuda.is_available()
         self.dtype = torch.cuda.FloatTensor if self.cuda else torch.FloatTensor
         if self.cuda:
-            self.logger.info("using cuda: ", args.gpu_id) 
-            torch.cuda.set_device(device=args.gpu_id)
+            self.logger.info("using cuda") 
+            #torch.cuda.set_device(device=args.gpu_id)
         self.device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
         ## Load object detection model
@@ -121,7 +122,7 @@ class FigureSeparator(ExsclaimTool):
         )
         with open(config_path, "r") as f:
             configuration_file = json.load(f)
-        configuration = configuration_file["original"]
+        configuration = configuration_file["theta"]
         scale_label_recognition_model = CRNN(configuration=configuration)
         self.scale_label_recognition_model = self.load_model_from_checkpoint(
                                                 scale_label_recognition_model,
@@ -264,7 +265,7 @@ class FigureSeparator(ExsclaimTool):
         
         ## Run model on figure
         with torch.no_grad():
-            outputs = self.object_detection_model(img)
+            outputs = self.object_detection_model(img.to(self.device))
             outputs = process.postprocess(outputs, dtype=self.dtype, 
                         conf_thre=self.confidence_threshold, nms_thre=self.nms_threshold)
 
@@ -332,7 +333,7 @@ class FigureSeparator(ExsclaimTool):
             img_patch = torch.from_numpy(img_patch).type(self.dtype).unsqueeze(0)
 
             ## Run model on figure
-            label_prediction = self.text_recognition_model(img_patch)
+            label_prediction = self.text_recognition_model(img_patch.to(self.device))
             label_confidence = np.amax(F.softmax(label_prediction, dim=1).data.cpu().numpy())
             label_value = chr(label_prediction.argmax(dim=1).data.cpu().numpy()[0]+ord("a"))
             if label_value == "z":
@@ -421,7 +422,7 @@ class FigureSeparator(ExsclaimTool):
 
         # prediction
         with torch.no_grad():
-            outputs = self.classifier_model(img, padded_label_list)
+            outputs = self.classifier_model(img.to(self.device), padded_label_list)
 
         # select the 13x13 grid as feature map
         feature_size = [13,26,52]
@@ -512,20 +513,23 @@ class FigureSeparator(ExsclaimTool):
         Returns:
             label_text (string): The text of the scale bar label
         """
-        resize_transform = T.Compose([T.Resize((32, 128)),
-                                            T.Lambda(convert_to_rgb),
-                                            T.ToTensor()])       
+        resize_transform = T.Compose([
+            T.Resize((128, 512)),
+            T.Lambda(convert_to_rgb),
+            T.ToTensor(),
+            T.Normalize(mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225]),
+        ])       
         
         classes = "0123456789mMcCuUnN .A"
         idx_to_class = classes + "-"
         image = resize_transform(cropped_image)
         image = image.unsqueeze(0)
         # run image on model
-        logps = self.scale_label_recognition_model(image)
+        logps = self.scale_label_recognition_model(image.to(self.device))
         probs = torch.exp(logps)
         probs = probs.squeeze(0)
-        word, confidence = ctc.run_ctc(probs, classes)
-        return word, float(confidence)
+        magnitude, unit, confidence = ctc.run_ctc(probs, classes)
+        return magnitude, unit, float(confidence)
 
     def create_scale_bar_objects(self, scale_bar_lines, scale_bar_labels):
         """ Match scale bar lines with labels to create scale bar jsons
@@ -628,7 +632,7 @@ class FigureSeparator(ExsclaimTool):
         # prediction
         self.scale_bar_detection_model.eval()
         with torch.no_grad():
-            outputs = self.scale_bar_detection_model([image])
+            outputs = self.scale_bar_detection_model([image.to(self.device)])
         # post-process 
         scale_bar_info = []
         for i, box in enumerate(outputs[0]["boxes"]):
@@ -636,7 +640,7 @@ class FigureSeparator(ExsclaimTool):
             if confidence > 0.5:
                 x1, y1, x2, y2 = box
                 label = outputs[0]['labels'][i]
-                scale_bar_info.append([x1, y1, x2, y2, confidence, label])
+                scale_bar_info.append([x1.data.cpu(), y1.data.cpu(), x2.data.cpu(), y2.data.cpu(), confidence.data.cpu(), label.data.cpu()])
         scale_bar_info = non_max_suppression_malisiewicz(np.asarray(scale_bar_info), 0.4)
         return scale_bar_info
 
@@ -685,18 +689,17 @@ class FigureSeparator(ExsclaimTool):
                 scale_bar_label_image = image.crop((int(x1), int(y1),
                                                     int(x2), int(y2)))
                 ## Read Scale Text
-                scale_label_text, label_confidence = self.read_scale_bar(
+                magnitude, unit, label_confidence = self.read_scale_bar(
                     scale_bar_label_image)
-                if scale_label_text is not None:
-                    magnitude, unit = scale_label_text.split(" ")
-                    magnitude = float(magnitude)
+                # 0 is never correct and -1 is the error value
+                if magnitude > 0:
                     length_in_nm = magnitude * convert_to_nm[unit.strip().lower()]
                     label_json = {
                         "geometry" : geometry,
-                        "text" : scale_label_text,
+                        "text" : str(magnitude) + " " + unit,
                         "label_confidence" : float(label_confidence),
                         "box_confidence" : float(confidence),
-                        "nm" : length_in_nm
+                        "nm" : int(length_in_nm * 100) / 100
                     }
                     scale_labels.append(label_json)
         # Match scale bars to labels and to subfigures (master images)

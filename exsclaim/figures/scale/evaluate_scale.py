@@ -18,6 +18,7 @@ from exsclaim.figures.scale.process import non_max_suppression_malisiewicz
 from exsclaim.figures.models.crnn import CRNN
 import exsclaim.utilities.boxes as boxes
 import cv2
+import random
 
 
 def convert_to_rgb(image):
@@ -111,7 +112,6 @@ def detect_scale_objects(image, scale_bar_detection_checkpoint):
 def postprocess_ctc(results):
     classes = "0123456789mMcCuUnN .A"
     idx_to_class = classes + "-"
-    words = []
     for result, confidence in results:
         confidence = float(confidence)
         word = ""
@@ -119,27 +119,21 @@ def postprocess_ctc(results):
             word += idx_to_class[step]
         word = word.strip()
         word = "".join(word.split("-"))
+        print(word)
         try:
-            number, unit = word.split(" ")
+            number, unit = word.split()
             number = float(number)
-            if unit.lower() not in ["nm", "mm", "cm", "um", "a"]:
-                continue
-            else:
-                # if "00" in word:
-                #     confidence += .005
-                #     confidence *= 7
-                words.append((word, confidence))
-        except:
-            print(word)
+            if unit.lower() == "n":
+                unit = "nm"
+            elif unit.lower() == "c":
+                unit = "cm"
+            elif unit.lower() == "u":
+                unit = "um"
+            if unit.lower() in ["nm", "mm", "cm", "um", "a"]:
+                return number, unit, confidence
+        except Exception as e:
             continue
-    words = sorted(words, key=itemgetter(1), reverse=True)
-    if words == []:
-        return None, 0
-    else:
-        word, confidence = words[0]
-        if "00" in word:
-            confidence /= 1
-        return word, confidence
+    return -1, "m", 0
 
 def determine_scale(figure_path, detection_checkpoint, recognition_checkpoint, figure_json=None):
     """ Adds scale information to figure by reading and measuring scale bars 
@@ -273,20 +267,18 @@ def read_scale_bar_label(scale_bar_model, scale_bar_label_image):
     idx_to_class = classes + "-"
     image = resize_transform(scale_bar_label_image)
     image = image.unsqueeze(0)
+    image = image.to(device)
     # run image on model
-    logps = scale_bar_model(image.to(device))
+    logps = scale_bar_model(image)
     probs = torch.exp(logps)
     probs = probs.squeeze(0)
-    #print(torch.argmax(probs, dim=1))
     # postprocess
     language_model_file ="corpus.txt"
     current_file = pathlib.Path(__file__).resolve(strict=True)
     language_model = LanguageModel(current_file.parent / language_model_file, classes)
-    top_results = ctcBeamSearch(probs, classes, lm=language_model, constrict_search=False)
-    old_version = ctcBeamSearchOld(probs, classes, lm=language_model, beamWidth=50)
-    old_version2 = ctcBeamSearchOld(probs, classes, lm=None, beamWidth=50)
+    top_results = ctcBeamSearch(probs, classes, lm=language_model, beamWidth=15)
 
-    word, confidence = postprocess_ctc(top_results)
+    magnitude, unit, confidence = postprocess_ctc(top_results)
     convert_to_nm = {
         "a"  : 0.1,
         "nm" : 1.0,
@@ -295,11 +287,6 @@ def read_scale_bar_label(scale_bar_model, scale_bar_label_image):
         "cm" : 10000000.0,
         "m"  : 1000000000.0,
     }
-    try:
-        magnitude, unit = word.split(" ")
-    except:
-        return None
-    magnitude = float(magnitude)
     nm = magnitude * convert_to_nm[unit.strip().lower()]
     return {"unit": unit, "number": magnitude, "label_confidence": float(confidence), "nm": nm}
 
@@ -357,7 +344,7 @@ def test_label_reading(model_name, epoch=None):
         scale_bar_model = scale_bar_model.cuda()
     else:
         checkpoint = torch.load(scale_bar_label_checkpoint, map_location='cpu')
-        scale_bar_model.load_state_dict(checkpoint["model_state_dict"])
+    scale_bar_model.load_state_dict(checkpoint["model_state_dict"])
     scale_bar_model.eval()
     # save constants
     convert_to_nm = {
@@ -384,8 +371,10 @@ def test_label_reading(model_name, epoch=None):
     with open(train_json, "r") as f:
         train_dict = json.load(f)
     test_dict.update(train_dict)
+    keys = list(test_dict.keys())
+    random.shuffle(keys)
     # test model on each scale bar
-    for k, figure_name in enumerate(test_dict):
+    for k, figure_name in enumerate(keys):
         correct_labels = []
         predicted_labels = []
         figure = Image.open(test_images / figure_name).convert("RGB")
@@ -406,9 +395,9 @@ def test_label_reading(model_name, epoch=None):
                 continue
             if predicted_label["nm"] != nm:
                 incorrect += 1
-                subfigure.save("incorrect/" + figure_name)
+                subfigure.save("incorrect/" + str(predicted_label["nm"]) + figure_name)
             predicted_labels.append(predicted_label)
-            #print("Correct: {}\tPredicted: {} {}".format(text, predicted_label["number"], predicted_label["unit"]))
+            print("Correct: {}\tPredicted: {} {}".format(text, predicted_label["number"], predicted_label["unit"]))
 
         for correct, predicted in zip(correct_labels, predicted_labels):
             correct_nm = correct["nm"]
@@ -423,10 +412,10 @@ def test_label_reading(model_name, epoch=None):
             pnums.append(predicted["number"])
             cnums.append(correct["number"])
         
-        # if k > 150:
+        # if k > 50:
         #     break
     #print(incorrect / len(cunits))
-    with open(str(model_name) + "-" + str(epoch) + "-nosrn.json", "w+") as f:
+    with open(str(model_name) + "-" + str(epoch) + "nosrn_newlm.json", "w+") as f:
         results = {
             "correct_nms": correct_nms, 
             "predicted_nms": predicted_nms,

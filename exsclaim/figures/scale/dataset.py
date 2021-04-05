@@ -63,11 +63,43 @@ def get_unit():
     return text, label
 
 def get_number(length):
-    digits = ["0", "1", "2", "3" "4", "5", "6", "7", "8", "9"]
+    nonzero = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
+    digits = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+    if length <= 2:
+        text = random.choice(nonzero)
+        text += random.choice(digits)
+        return text[:length]
+
+    digits = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
     first = random.choice(digits)
+
     for i in range(length-2):
-        first += random.choice(digits + ["."])
+        if first == "0":
+            first += "."
+        elif "." in first:
+            first += random.choice(digits)
+        else:
+            first += random.choice(digits + ["."]) 
+    first += random.choice(digits)
     return first
+
+def no_pattern(length):
+    characters = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", " ", "."] 
+    characters += ["u", "U", "\u03bc", "m", "M", "c", "C", "n", "N", "A", "\u212b"]
+    text = ""
+    for i in range(length-1):
+        text += random.choice(characters)
+
+    label = ""
+    for character in text:
+        if character == "\u212b":
+            label_char = "A"
+        elif character == "\u03bc":
+            label_char = "u"
+        else:
+            label_char = character
+        label += label_char
+    return text, label
 
 def find_color(image, box):
     """ finds color for text to contrast background
@@ -129,7 +161,8 @@ class ScaleLabelDataset():
             target[i] = char_to_int[char]
         return target
          
-    def __init__(self, transforms):
+    def __init__(self, transforms, text="random_separate"):
+        self.text = text
         self.transforms = transforms
         current_dir = pathlib.Path(__file__).resolve(strict=True).parent
         self.background_images = current_dir / 'background'
@@ -154,13 +187,17 @@ class ScaleLabelDataset():
                 Image.open(background_image_path).convert("RGB")
             )
 
-        ## select text to write on background
-        length = random.randint(1, 5)
-        number = get_number(length)
-        unit, label = get_unit()
-        space = random.choice([" ", "  "])
-        text = number + space + unit
-        label = number + " " + label
+        if self.text == "random_separate":
+            ## select text to write on background
+            length = random.randint(1, 5)
+            number = get_number(length)
+            unit, label = get_unit()
+            space = random.choice(["", " ", "  "])
+            text = number + space + unit
+            label = number + " " + label
+        elif self.text == "complete_random":
+            length = random.randint(3, 8)
+            text, label = no_pattern(length)
         # draw text and crop
         cropped_image = draw_text_on_image(background_image, text)        
         if self.transforms is not None:
