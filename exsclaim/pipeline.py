@@ -39,9 +39,9 @@ class Pipeline:
                 # Load query file to dict
                 self.query_dict = json.load(f)
         # Set up file structure
-        if "results_dir" in self.query_dict:
-            paths.add_results_dir(self.query_dict["results_dir"])
-        base_results_dir = paths.find_results_dir()
+        base_results_dir = paths.initialize_results_dir(
+            self.query_dict.get("results_dirs", None)
+        )
         self.results_directory = (
             base_results_dir / self.query_dict["name"]
         )
@@ -257,9 +257,11 @@ class Pipeline:
             Creates directories to save each subfigure
         """
         search_query = self.query_dict
-        self.display_info("".join(["Printing Master Image Objects to: ",
-                              search_query['results_dir'].strip("/"),"/images","\n"]))
-
+        self.display_info(
+            ("Printing Master Image Objects to: {}/images\n".format(
+                self.results_directory
+            ))
+        )
         for figure_name in self.exsclaim_dict:
             # figure_name is <figure_root_name>.<figure_extension>
             figure_root_name, figure_extension = os.path.splitext(figure_name)
@@ -278,11 +280,10 @@ class Pipeline:
             for master_image in figure_dict.get("master_images", []):
                 # create a directory for each master image in 
                 # <results_dir>/images/<figure_name>/<subfigure_label>
-                directory = "/".join([search_query['results_dir'].strip("/"),
-                                      "images",
-                                      figure_root_name,
-                                      master_image['subfigure_label']['text']
-                                      ])
+                directory = (
+                    self.results_directory / "images" / figure_root_name / 
+                    master_image['subfigure_label']['text']
+                )
                 os.makedirs(directory, exist_ok=True)
                 # generate the name of the master_image
                 master_class  = ('uas' if master_image['classification'] is None 

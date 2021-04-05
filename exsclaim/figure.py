@@ -732,17 +732,20 @@ class FigureSeparator(ExsclaimTool):
         self.text_recognition_model.eval()
         self.classifier_model.eval()
         self.scale_bar_detection_model.eval()
+
+        # Get full path to figure
+        full_figure_path = self.results_directory.parent / figure_path
         
         ## Detect the bounding boxes of each subfigure
-        subfigure_info = self.detect_subfigure_boundaries(figure_path)
+        subfigure_info = self.detect_subfigure_boundaries(full_figure_path)
 
         ## Detect the subfigure labels on each of the bboxes found
-        subfigure_info, concate_img = self.detect_subfigure_labels(figure_path, subfigure_info)
+        subfigure_info, concate_img = self.detect_subfigure_labels(full_figure_path, subfigure_info)
             
         ## Classify the subfigures
-        figure_json = self.classify_subfigures(figure_path, subfigure_info, concate_img)
+        figure_json = self.classify_subfigures(full_figure_path, subfigure_info, concate_img)
 
         ## Detect scale bar lines and labels
-        figure_json = self.determine_scale(figure_path, figure_json)
+        figure_json = self.determine_scale(full_figure_path, figure_json)
 
         return figure_json

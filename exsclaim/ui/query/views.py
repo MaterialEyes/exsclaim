@@ -5,13 +5,11 @@ import multiprocessing as mp
 import pathlib
 try:
     from exsclaim.pipeline import Pipeline
-    from exsclaim.utilities.paths import add_results_dir
 except:
     current_file = pathlib.Path(__file__).resolve(strict=True)
     base_dir = current_file.parent.parent.parent.parent
     sys.path.append(str(base_dir))
     from exsclaim.pipeline import Pipeline
-    from exsclaim.utilities.paths import add_results_dir
 
 def query_view(request):
     template_name = "exsclaim/query.html"
@@ -36,10 +34,9 @@ def query_view(request):
             },
             "open": query.get("open", False) == "true",
             "save_format": ["postgres"],
-            "logging": ["exsclaim.log"]
+            "logging": ["exsclaim.log"],
+            "results_dir": query.get("results_base_dir", None),
         }
-        if query.get("results_base_dir", None) is not None:
-            add_results_dir(query["results_base_dir"])
         def run_pipeline(search_query):
             pipeline = Pipeline(search_query)
             pipeline.run()

@@ -1,15 +1,41 @@
 import pathlib
+from sys import path
 
-def find_results_dir():
+def initialize_results_dir(results_dir=None):
+    """ Determine where to save results for a pipeline run
+
+    The output directory will be resolved in this order:
+        1. if results_dir is provided, results will be saved there
+        2. if results_dir has previously been provided, results will be
+            saved in the most recently added results directory
+        3. results will be saved in /path/to/<cwd>/extracted
+
+    Args:
+        results_dir (str): path to desired results directory, default None.
+    Returns:
+        results_dir (pathlib.Path): Full path to output directory
+    Modifies:
+        Creates results_dir if it doesn't exist. Adds results_dir
+        to results_dirs file
+    """
+
+    # find all previous results directories
     current_file = pathlib.Path(__file__).resolve(strict=True)
     base_dir = current_file.parent.parent.parent
     results_dirs_file = base_dir / "exsclaim" / "results_dirs"
     with open(results_dirs_file, "r") as f:
         results_dirs = [line.strip() for line in f.readlines()]
-    if results_dirs != []:
+
+    if results_dir:
+        results_dir = pathlib.Path(results_dir).resolve()
+    elif results_dirs:
         results_dir = pathlib.Path(results_dirs[-1])
     else:
-        results_dir = base_dir / "extracted"
+        results_dir = pathlib.Path().cwd() / "extracted"
+
+    results_dir.mkdir(parents=True, exist_ok=True)
+    if str(results_dir) not in results_dirs:
+        add_results_dir(results_dir)
     return results_dir
 
 def add_results_dir(results_dir):
@@ -18,4 +44,4 @@ def add_results_dir(results_dir):
     base_dir = current_file.parent.parent.parent
     results_dirs_file = base_dir / "exsclaim" / "results_dirs"
     with open(results_dirs_file, "a") as f:
-        f.write(results_dir)
+        f.write(str(results_dir) + "\n")

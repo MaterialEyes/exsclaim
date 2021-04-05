@@ -42,7 +42,9 @@ class ExsclaimTool(ABC):
                 " dictionary instead"))
             self.search_query = search_query
         # Set up file structure
-        base_results_dir = paths.find_results_dir()
+        base_results_dir = paths.initialize_results_dir(
+            self.search_query.get("results_dirs", None)
+        )
         self.results_directory = (
             base_results_dir / self.search_query["name"]
         )

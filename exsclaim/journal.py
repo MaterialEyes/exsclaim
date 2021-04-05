@@ -60,7 +60,8 @@ class JournalFamily():
         self.results_directory = (
             base_results_dir / self.search_query["name"]
         )
-        os.makedirs(self.results_directory, exist_ok=True)
+        figures_directory = self.results_directory / "figures"
+        os.makedirs(figures_directory, exist_ok=True)
 
     def get_domain_name(self) -> str:
         """
@@ -242,17 +243,17 @@ class JournalFamily():
         """
         return figure.find_all('p')
 
-    def save_figure(self, save_path, figure_name, image_url):
+    def save_figure(self, figure_name, image_url):
         """
         Saves figure at img_url to local machine
 
         Args:
-            save_path: path to location to save figure
             figure_name: name of figure
             img_url: url to image
         """
+        figures_directory = self.results_directory / "figures"
         response = requests.get(image_url, stream=True)
-        figure_path = save_path / figure_name
+        figure_path = figures_directory / figure_name
         with open(figure_path, 'wb') as out_file:
             shutil.copyfileobj(response.raw, out_file)
         del response 
@@ -263,13 +264,11 @@ class JournalFamily():
 
         Args:
             url: A url to a journal article
-            save_path: A location to save extracted figures
         Returns:
             A dict of figure_jsons from an article
         """
         soup = self.get_soup_from_request(url)
         is_open, license = self.get_license(soup)
-        save_path = self.results_directory
 
         # Uncomment to save html
         html_directory = self.results_directory / "html"
@@ -325,25 +324,25 @@ class JournalFamily():
             figure_json["open"] = is_open
 
             # save figure as image
-            if save_path:
-                figures_directory = self.results_directory / "figures"
-                os.makedirs(figures_directory, exist_ok=True)
-                self.save_figure(figures_directory, figure_name, image_url)
-                figure_path = os.path.join(save_path, "figures", figure_name)
-                figure_json["figure_path"] = figure_path
-            else:
-                figure_json["figure_path"] = "" 
-
+            self.save_figure(figure_name, image_url)
+            figure_path = (
+                pathlib.Path(self.search_query["name"]) / "figures" / figure_name
+            )
+            figure_json["figure_path"] = str(figure_path)
             figure_json["master_images"] = []
-            figure_json["unassigned"] = {'master_images':[],'dependent_images':[],'inset_images':[],\
-                                        'subfigure_labels':[],'scale_bar_labels':[],\
-                                        'scale_bar_lines':[],'captions':[]}
+            figure_json["unassigned"] = {
+                'master_images': [],
+                'dependent_images': [],
+                'inset_images': [],
+                'subfigure_labels': [],
+                'scale_bar_labels':[],
+                'scale_bar_lines': [],
+                'captions': []
+            }
             # add all results
             article_json[figure_name] = figure_json
-            
             # increment index
             figures += 1
-
         return article_json
 
 
@@ -483,6 +482,7 @@ class RSC(JournalFamily):
     def find_captions(self, figure):
         return figure.find_all("span", class_="graphic_title")
 
-    def save_figure(self, save_path, figure_name, image_url):
-        out_file = save_path + "/figures/" + figure_name
+    def save_figure(self, figure_name, image_url):
+        figures_directory = self.results_directory / "figures"
+        out_file = figures_directory / figure_name
         urllib.request.urlretrieve(image_url, out_file)
