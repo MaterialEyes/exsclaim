@@ -29,24 +29,6 @@ class TestScaleDetection(unittest.TestCase):
     def tearDown(self):
         pass
     
-    def is_number(self, n):
-        """ returns true if a string n represents a float """
-        try:
-            float(n)
-        except ValueError:
-            return False
-        return True
-
-    def is_valid_scale_bar_label(self, text):
-        """ returns true if label has once space separating number and unit """
-        if self.is_number(text) or "/" in text:
-            return False
-        if len(text.split(" ")) != 2:
-            return False
-        if not self.is_number(text.split(" ")[0]):
-            return False
-        return True
-
     def test_scale_object_detection_validity(self):
         """ Tests the accuracy and validity of scale bar object detection """
         test_image_directory = self.data / 'images' / 'scale_bar_test_images'
@@ -75,18 +57,15 @@ class TestScaleDetection(unittest.TestCase):
             with self.subTest(test_name = image_name):
                 scale_label_image = Image.open(
                     test_images / image_name).convert("RGB")
-                result, confidence = (
+                magnitude, unit, confidence = (
                     self.figure_separator.read_scale_bar(scale_label_image))
                 # Ensure invariants are held
-                self.assertIsInstance(result, str,
-                    ("read_scale_bar() should return a str and a float. "
-                     "Value one returned type {}".format(type(result))))
-                self.assertTrue(self.is_valid_scale_bar_label(result), 
-                    ("read_scale_bar() returned {}, an invalidly formatted "
-                     "scale bar label".format(result)))
+                self.assertIsInstance(magnitude, float,
+                    ("read_scale_bar() should return a float, str and a float."
+                     " Value one returned type {}".format(type(magnitude))))
                 self.assertIsInstance(confidence, (float, np.float32),
-                    ("read_scale_bar() should return a a str and a float. "
-                     "Value two returned type {}".format(type(confidence))))
+                    ("read_scale_bar() should return a float, str, and a float."
+                     " Value two returned type {}".format(type(confidence))))
                      
 
 class TestSubfigureDetection(unittest.TestCase):

@@ -21,7 +21,7 @@
         }
     },
     
-    "save_format": ["visualize", "boxes"],
+    "save_format": ["boxes"],
 
     "open": false
 }
