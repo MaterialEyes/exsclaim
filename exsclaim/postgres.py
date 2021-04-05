@@ -77,7 +77,7 @@ class Database():
             )
         self.query(
             sql.SQL(
-                "INSERT INTO {} SELECT * FROM {} ON CONFLICT DO NOTHING;"
+                "INSERT INTO {} SELECT * FROM {} ON CONFLICT UPDATE;"
             ).format(sql.Identifier(table_name), sql.Identifier(temp_name))
         )
 
