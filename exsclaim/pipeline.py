@@ -11,7 +11,7 @@ import textwrap
 import pathlib
 import logging
 
-from .utilities import boxes
+from .utilities import boxes, paths
 from .figure import FigureSeparator
 from .tool import CaptionDistributor, JournalScraper
 
