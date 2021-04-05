@@ -63,14 +63,28 @@ def get_unit():
     return text, label
 
 def get_number(length):
-    digits = ["0", "1", "2", "3" "4", "5", "6", "7", "8", "9"]
+    nonzero = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
+    digits = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+    if length <= 2:
+        text = random.choice(nonzero)
+        text += random.choice(digits)
+        return text[:length]
+
+    digits = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
     first = random.choice(digits)
+
     for i in range(length-2):
-        first += random.choice(digits + ["."])
+        if first == "0":
+            first += "."
+        elif "." in first:
+            first += random.choice(digits)
+        else:
+            first += random.choice(digits + ["."]) 
+    first += random.choice(digits)
     return first
 
 def no_pattern(length):
-    characters = ["0", "1", "2", "3" "4", "5", "6", "7", "8", "9", " ", "."] 
+    characters = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", " ", "."] 
     characters += ["u", "U", "\u03bc", "m", "M", "c", "C", "n", "N", "A", "\u212b"]
     text = ""
     for i in range(length-1):
