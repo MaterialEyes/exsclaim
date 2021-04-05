@@ -217,7 +217,6 @@ def postprocess_ctc(results):
             word += idx_to_class[step]
         word = word.strip()
         word = "".join(word.split("-"))
-        print(word)
         try:
             number, unit = word.split()
             number = float(number)
