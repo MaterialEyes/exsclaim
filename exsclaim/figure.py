@@ -1,6 +1,7 @@
 import os
 import cv2
 import json
+from numpy.lib import utils
 from torch._C import device
 import yaml
 import glob
@@ -594,6 +595,7 @@ class FigureSeparator(ExsclaimTool):
             scale_objects: updated with assigned objects removed
         """
         geomtery = master_image["geometry"]
+        x1, y1, x2, y2 = boxes.convert_labelbox_to_coords(geomtery)
         unassigned_scale_objects = []
         assigned_scale_objects = []
         for scale_object in scale_objects:
@@ -613,8 +615,8 @@ class FigureSeparator(ExsclaimTool):
                                / float(scale_object["length"]))
                 label = scale_object["label"]["text"]
         if len(scale_labels) == 1:
-            master_image["nm_height"] = int(nm_to_pixel * master_image["height"] * 10) / 10
-            master_image["nm_width"] = int(nm_to_pixel * master_image["width"] * 10) / 10
+            master_image["nm_height"] = int(nm_to_pixel * master_image.get("height", y2-y1) * 10) / 10
+            master_image["nm_width"] = int(nm_to_pixel * master_image.get("width", x2-x1) * 10) / 10
             master_image["scale_label"] = label
 
         return master_image, unassigned_scale_objects
