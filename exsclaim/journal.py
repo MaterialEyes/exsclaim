@@ -56,7 +56,9 @@ class JournalFamily():
         self.open = search_query.get("open", False)
         self.logger = logging.getLogger(__name__)
         # Set up file structure
-        base_results_dir = paths.find_results_dir()
+        base_results_dir = paths.initialize_results_dir(
+            self.search_query.get("results_dirs", None)
+        )
         self.results_directory = (
             base_results_dir / self.search_query["name"]
         )
