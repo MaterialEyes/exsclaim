@@ -12,5 +12,6 @@ urllib3
 spacy>=3.0
 lxml
 pytorch-model-summary
-Django
+Django>=2.0
 psycopg2-binary
+django-csp

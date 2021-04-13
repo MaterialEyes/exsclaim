@@ -14,7 +14,7 @@ with open(here / "requirements.txt", "r") as f:
 
 setuptools.setup(
     name="exsclaim-tspread",
-    version="0.0.20",
+    version="0.0.32",
     author=('Eric Schwenker','Trevor Spreadbury','Weixin Jiang','Maria Chan'),
     author_email="developer@materialeyes.org",
     description="EXSCLAIM! is a library for the automatic EXtraction, Separation, and Caption-based natural Language Annotation of IMages from scientific figures.",
@@ -39,7 +39,8 @@ setuptools.setup(
                      'ui/home/templates/exsclaim/*',
                      'ui/results/templates/exsclaim/*',
                      'ui/query/templates/exsclaim/*',
-                     'results_dirs']
+                     'results_dirs',
+                     'database.ini']
     },
     classifiers=[
         "Development Status :: 1 - Planning",
@@ -49,9 +50,7 @@ setuptools.setup(
     ],
     entry_points = {
         'console_scripts': [
-            'exsclaim=exsclaim.command_line:run_pipeline',
-            'exsclaim_ui=exsclaim.command_line:activate_ui',
-            'exsclaim_train=exsclaim.command_line:train',
+            'exsclaim=exsclaim.command_line:main',
         ],
     },
     python_requires='>=3.6',
