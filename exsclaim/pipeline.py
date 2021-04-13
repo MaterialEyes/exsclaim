@@ -639,7 +639,7 @@ class Pipeline:
         Modifies:
             Fills an existing postgres database with data from csv/ dir
         """
-        from .postgres import Database
+        from .utilities.postgres import Database
         csv_dir = self.results_directory / "csv"
         db = Database("exsclaim")
         for csv_file in ["article.csv", "figure.csv", "subfigure.csv", "scalebar.csv", "scalebarlabel.csv", "subfigurelabel.csv"]:

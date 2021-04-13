@@ -1,26 +1,60 @@
+import pathlib
+import shutil
 import psycopg2
 from psycopg2 import sql
 from configparser import ConfigParser
 
-def initialize_database():
+def initialize_database(configuration_file):
+    parser = ConfigParser()
+    parser.read(configuration_file)
+    # connect to default postgres database, create exsclaim user
+    conn = psycopg2.connect(**parser["postgres"])
+    conn.autocommit = True
+    cursor = conn.cursor()
+    query = sql.SQL(
+        "CREATE USER {username} WITH PASSWORD {password}").format(
+            username=sql.Identifier(parser["exsclaim"]["user"]),
+            password=sql.Placeholder()
+        )
+    try:
+        cursor.execute(query, (parser["exsclaim"]["password"],))
+        cursor.execute("""ALTER USER exsclaim CREATEDB;""")
+    except:
+        print("user already exists\n")
+    conn.close()
+    # connect to postgres, create exsclaim database
     conn = psycopg2.connect(
-        database="postgres",
-        user='postgres',
-        password='password',
-        host='127.0.0.1',
-        port= '5432'
+        host= parser["postgres"]["host"],
+        database= parser["postgres"]["database"],
+        user= parser["exsclaim"]["user"],
+        password= parser["exsclaim"].get("password", "")
     )
     conn.autocommit = True
     cursor = conn.cursor()
-    cursor.execute("""CREATE DATABASE exsclaim""")
+    try:
+        cursor.execute("""CREATE DATABASE exsclaim""")
+    except:
+        print("database already exists")
     conn.close()
 
+def modify_database_configuration(config_path):
+    """ Alter database.ini to store configuration for future runs
 
+    Args:
+        config_path (str): path to .ini file
+    Modifies: 
+        database.ini
+    """
+    current_file = pathlib.Path(__file__).resolve()
+    database_ini = current_file.parent / "database.ini"
+    config_path = pathlib.Path(config_path)
+    shutil.copy(config_path, database_ini)
+    
 class Database():
 
     def __init__(self, name, configuration_file = "database.ini"):
         try:
-            initialize_database()
+            initialize_database(configuration_file)
         except Exception as e:
             pass
         parser = ConfigParser()
@@ -29,12 +63,7 @@ class Database():
         if parser.has_section(name):
             for key, value in parser.items(name):
                 db_params[key] = value
-        else:
-            db_params = {
-                "host": "localhost",
-                "database": "exsclaim",
-                "user": "postgres"
-            }
+
         self.connection = psycopg2.connect(**db_params)
         self.cursor = self.connection.cursor()
 
@@ -95,6 +124,3 @@ class Database():
 
     def commit(self):
         self.connection.commit()
-
-if __name__ == "__main__":
-    initialize_database()
