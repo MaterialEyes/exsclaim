@@ -19,8 +19,8 @@ from django.conf.urls.static import static
 from django.conf import settings
 
 urlpatterns = [
-    path('results', include('results.urls')),
-    path('query', include('query.urls')),
-    path('', include('home.urls')),
+    path('results', include('exsclaim.ui.results.urls')),
+    path('query', include('exsclaim.ui.query.urls')),
+    path('', include('exsclaim.ui.home.urls')),
     path('admin/', admin.site.urls),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

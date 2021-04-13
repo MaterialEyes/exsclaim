@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
+from configparser import ConfigParser
 from pathlib import Path
 
 
@@ -38,9 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'query',
-    'results',
-    'home',
+    'exsclaim.ui.query',
+    'exsclaim.ui.results',
+    'exsclaim.ui.home',
 ]
 
 MIDDLEWARE = [
@@ -54,7 +55,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'exsclaim_gui.urls'
+ROOT_URLCONF = 'exsclaim.ui.exsclaim_gui.urls'
 
 TEMPLATES = [
     {
@@ -75,7 +76,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'exsclaim_gui.wsgi.application'
+WSGI_APPLICATION = 'exsclaim.ui.exsclaim_gui.wsgi.application'
 
 
 # Database
@@ -83,12 +84,16 @@ WSGI_APPLICATION = 'exsclaim_gui.wsgi.application'
 
 # just using a random string as password. this is unsafe for anything
 # other than locally running the ui
+configuration_file = BASE_DIR.parent / "database.ini"
+parser = ConfigParser()
+parser.read(configuration_file)
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'exsclaim',
-        'USER': 'django',
-        'PASSWORD': '', 
+        'USER': parser["exsclaim"]["user"],
+        'PASSWORD': parser["exsclaim"]["password"], 
         'HOST': 'localhost',
         'PORT': '',
     }
