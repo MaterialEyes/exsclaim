@@ -24,18 +24,20 @@ def initialize_results_dir(results_dir=None):
     current_file = pathlib.Path(__file__).resolve(strict=True)
     base_dir = current_file.parent.parent.parent
     results_dirs_file = base_dir / "exsclaim" / "results_dirs"
-    if os
-    with open(results_dirs_file, "r") as f:
-        results_dirs = [line.strip() for line in f.readlines()]
-
+    if os.path.isfile(results_dirs_file):
+        with open(results_dirs_file, "r") as f:
+            results_dirs = [line.strip() for line in f.readlines()]
+    else:
+        results_dirs = []
+    # run through results_dir resolution order
     if results_dir:
         results_dir = pathlib.Path(results_dir).resolve()
     elif results_dirs:
         results_dir = pathlib.Path(results_dirs[-1])
     else:
         results_dir = pathlib.Path().cwd() / "extracted"
-
     results_dir.mkdir(parents=True, exist_ok=True)
+    # add results_dir to results_dirs
     if str(results_dir) not in results_dirs:
         add_results_dir(results_dir)
     return results_dir

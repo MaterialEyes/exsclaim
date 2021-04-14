@@ -88,7 +88,6 @@ class FigureSeparator(ExsclaimTool):
             self.logger.info("using cuda") 
             #torch.cuda.set_device(device=args.gpu_id)
         self.device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-
         ## Load object detection model
         object_detection_model = YOLOv3(configuration['MODEL'])
         self.object_detection_model = self.load_model_from_checkpoint(
@@ -133,6 +132,7 @@ class FigureSeparator(ExsclaimTool):
         """ load checkpoint weights into model """
         checkpoints_path = pathlib.Path(__file__).parent / 'figures' / 'checkpoints'
         checkpoint = checkpoints_path / model_name
+        model.to(self.device)
         # download the model if isn't already
         if not os.path.isfile(checkpoint):
             os.makedirs(checkpoints_path, exist_ok=True)
