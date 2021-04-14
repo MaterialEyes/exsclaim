@@ -1,5 +1,6 @@
 import pathlib
 from sys import path
+import os
 
 def initialize_results_dir(results_dir=None):
     """ Determine where to save results for a pipeline run
@@ -23,6 +24,7 @@ def initialize_results_dir(results_dir=None):
     current_file = pathlib.Path(__file__).resolve(strict=True)
     base_dir = current_file.parent.parent.parent
     results_dirs_file = base_dir / "exsclaim" / "results_dirs"
+    if os
     with open(results_dirs_file, "r") as f:
         results_dirs = [line.strip() for line in f.readlines()]
 

@@ -30,3 +30,4 @@ cookie
 dist/
 build/
 *.sh
+*/results_dirs

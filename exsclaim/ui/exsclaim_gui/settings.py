@@ -84,7 +84,7 @@ WSGI_APPLICATION = 'exsclaim.ui.exsclaim_gui.wsgi.application'
 
 # just using a random string as password. this is unsafe for anything
 # other than locally running the ui
-configuration_file = BASE_DIR.parent / "database.ini"
+configuration_file = BASE_DIR.parent / "utilities" / "database.ini"
 parser = ConfigParser()
 parser.read(configuration_file)
 
