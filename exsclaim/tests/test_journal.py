@@ -6,7 +6,7 @@ import responses
 from bs4 import BeautifulSoup
 import bs4
 
-from .. import journal
+from exsclaim import journal
 
 class TestNature(unittest.TestCase):
 

@@ -7,9 +7,9 @@ import shutil
 import responses
 from deepdiff import DeepDiff
 
-from ..pipeline import Pipeline
-from ..tool import JournalScraper, CaptionDistributor
-from ..figure import FigureSeparator
+from exsclaim.pipeline import Pipeline
+from exsclaim.tool import JournalScraper, CaptionDistributor
+from exsclaim.figure import FigureSeparator
 
 class TestNatureFull(unittest.TestCase):
 

@@ -39,7 +39,13 @@ setuptools.setup(
                      'ui/home/templates/exsclaim/*',
                      'ui/results/templates/exsclaim/*',
                      'ui/query/templates/exsclaim/*',
-                     'utilities/database.ini']
+                     'utilities/database.ini',
+                     'tests/data/images/pipeline/*',
+                     'tests/data/nature_articles/*',
+                     'tests/data/nature_search.html',
+                     'tests/data/images/scale_bar_test_images/*',
+                     'tests/data/images/scale_label_test_images/*',
+                     'tests/data/nature_closed_expected.json']
     },
     classifiers=[
         "Development Status :: 1 - Planning",

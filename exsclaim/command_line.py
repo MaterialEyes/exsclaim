@@ -2,6 +2,7 @@ import argparse
 import pathlib
 import os
 import json
+import unittest
 from exsclaim.pipeline import Pipeline
 from exsclaim.figures.scale.train_label_reader import train_crnn
 from exsclaim.figures.scale.evaluate_scale import test_label_reading
@@ -104,6 +105,12 @@ def main():
             'exsclaim field. Also create database "exsclaim".'
         )
     )
+    # subparser for 'exsclaim test' command (running python unittests)
+    view_parser = subparsers.add_parser("test",
+        description=(
+            'Test the exsclaim pipeline'
+        )
+    )
 
     args = parser.parse_args()
     if args.command == "run":
@@ -149,3 +156,7 @@ def main():
             ) from exc
         fake_sysargv = ["manage.py", "runserver"]
         execute_from_command_line(fake_sysargv)
+    elif args.command == "test":
+        tests = unittest.defaultTestLoader.discover(parent_directory)
+        runner = unittest.TextTestRunner()
+        result = runner.run(tests)

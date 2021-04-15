@@ -9,10 +9,8 @@ import torchvision.transforms as T
 import torch
 import numpy as np
 
-from .. import figure
-from ..figures.scale.dataset import ScaleBarDataset
-from ..figures.scale.engine import evaluate
-from ..figures.scale.utils import collate_fn
+from exsclaim import figure
+from exsclaim.figures.scale.dataset import ScaleBarDataset
 
 class TestScaleDetection(unittest.TestCase):
 
