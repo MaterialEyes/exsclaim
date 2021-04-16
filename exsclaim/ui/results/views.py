@@ -7,7 +7,6 @@ from django.db.models import Q
 import os.path
 import sys
 from . import models
-from .forms import ResultsForm
 
 class SearchResultViews(ListView):
     model = models.Subfigure
