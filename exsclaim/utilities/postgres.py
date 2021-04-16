@@ -11,16 +11,20 @@ def initialize_database(configuration_file):
     conn = psycopg2.connect(**parser["postgres"])
     conn.autocommit = True
     cursor = conn.cursor()
-    query = sql.SQL(
-        "CREATE USER {username} WITH PASSWORD {password}").format(
+    create_query = sql.SQL(
+        "CREATE USER {username} WITH PASSWORD {password};").format(
             username=sql.Identifier(parser["exsclaim"]["user"]),
             password=sql.Placeholder()
         )
+    alter_query = sql.SQL(
+        "ALTER USER {username} CREATEDB;").format(
+            username=sql.Identifier(parser["exsclaim"]["user"])
+        )
     try:
-        cursor.execute(query, (parser["exsclaim"]["password"],))
-        cursor.execute("""ALTER USER exsclaim CREATEDB;""")
-    except:
-        print("user already exists\n")
+        cursor.execute(create_query, (parser["exsclaim"]["password"],))
+        cursor.execute(alter_query)
+    except Exception as e:
+        print(e)
     conn.close()
     # connect to postgres, create exsclaim database
     conn = psycopg2.connect(
@@ -33,8 +37,8 @@ def initialize_database(configuration_file):
     cursor = conn.cursor()
     try:
         cursor.execute("""CREATE DATABASE exsclaim""")
-    except:
-        print("database already exists")
+    except Exception as e:
+        print(e)
     conn.close()
 
 def modify_database_configuration(config_path):
