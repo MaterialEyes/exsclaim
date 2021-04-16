@@ -17,4 +17,3 @@ psycopg2-binary
 django-csp
 responses
 deepdiff
-pycocotools

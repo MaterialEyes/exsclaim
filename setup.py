@@ -14,7 +14,7 @@ with open(here / "requirements.txt", "r") as f:
 
 setuptools.setup(
     name="exsclaim-tspread",
-    version="0.0.36",
+    version="0.0.43",
     author=('Eric Schwenker','Trevor Spreadbury','Weixin Jiang','Maria Chan'),
     author_email="developer@materialeyes.org",
     description="EXSCLAIM! is a library for the automatic EXtraction, Separation, and Caption-based natural Language Annotation of IMages from scientific figures.",
@@ -23,6 +23,9 @@ setuptools.setup(
     url="https://github.com/MaterialEyes/exsclaim",
     packages=setuptools.find_packages(),
     install_requires= install_requires,
+    dependency_links=[
+        "https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.0.0/en_core_web_sm-3.0.0.tar.gz#egg=en_core_web_sm"
+    ],
     package_data={
         'exsclaim': ['figures/config/yolov3_default_master.cfg',
                      'figures/config/yolov3_default_subfig.cfg',
