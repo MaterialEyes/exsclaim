@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 
 from configparser import ConfigParser
 from pathlib import Path
+import os.path
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -142,11 +143,12 @@ STATICFILES_DIRS = [
     BASE_DIR.parent.parent / "extracted"
 ]
 # Add base_dirs (base directories for saving extractions) to static file dirs
-with open(BASE_DIR.parent / "results_dirs", "r") as f:
-    results_dirs = f.readlines()
-for base_dir in results_dirs:
-    if base_dir != "":
-        STATICFILES_DIRS.append(base_dir.strip())
+if os.path.isfile(BASE_DIR.parent / "results_dirs"):
+    with open(BASE_DIR.parent / "results_dirs", "r") as f:
+        results_dirs = f.readlines()
+    for base_dir in results_dirs:
+        if base_dir != "":
+            STATICFILES_DIRS.append(base_dir.strip())
 
 # Content Security Policy
 
