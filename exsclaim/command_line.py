@@ -154,8 +154,13 @@ def main():
                 "available on your PYTHONPATH environment variable? Did you "
                 "forget to activate a virtual environment?"
             ) from exc
-        fake_sysargv = ["manage.py", "runserver"]
-        execute_from_command_line(fake_sysargv)
+        fake_sysargvs = [
+            ["manage.py", "makemigrations"],
+            ["manage.py", "migrate"],
+            ["manage.py", "runserver"]
+        ]
+        for sysargv in fake_sysargvs:
+            execute_from_command_line(sysargv)
     elif args.command == "test":
         tests = unittest.defaultTestLoader.discover(parent_directory)
         runner = unittest.TextTestRunner()
