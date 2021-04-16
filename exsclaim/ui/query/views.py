@@ -11,6 +11,10 @@ except:
     sys.path.append(str(base_dir))
     from exsclaim.pipeline import Pipeline
 
+def run_pipeline(search_query):
+    pipeline = Pipeline(search_query)
+    pipeline.run()
+
 def query_view(request):
     template_name = "exsclaim/query.html"
     # formulate exsclaim's query json
@@ -37,9 +41,7 @@ def query_view(request):
             "logging": ["exsclaim.log"],
             "results_dir": query.get("results_base_dir", None),
         }
-        def run_pipeline(search_query):
-            pipeline = Pipeline(search_query)
-            pipeline.run()
+
         p = mp.Process(target=run_pipeline, args=(search_query,))
         p.start()
         minutes = int(query["max_scraped"]) * (150/60)
