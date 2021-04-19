@@ -432,7 +432,7 @@ class FigureSeparator(ExsclaimTool):
         preds = preds[0].data.cpu().numpy()
 
         ## Documentation
-        figure_name = str(figure_path).split("/")[-1]
+        figure_name = figure_path.name
         figure_json = self.exsclaim_json.get(figure_name, {})
         figure_json["figure_name"] = figure_name
         figure_json.get("master_images", [])
