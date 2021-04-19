@@ -56,18 +56,20 @@ def modify_database_configuration(config_path):
     
 class Database():
 
-    def __init__(self, name, configuration_file = "database.ini"):
+    def __init__(self, name, configuration_file = None):
         try:
             initialize_database(configuration_file)
         except Exception as e:
             pass
+        if configuration_file is None:
+            current_file = pathlib.Path(__file__).resolve()
+            configuration_file = current_file.parent / "database.ini"
         parser = ConfigParser()
         parser.read(configuration_file)
         db_params = {}
         if parser.has_section(name):
             for key, value in parser.items(name):
                 db_params[key] = value
-
         self.connection = psycopg2.connect(**db_params)
         self.cursor = self.connection.cursor()
 
@@ -110,7 +112,7 @@ class Database():
             )
         self.query(
             sql.SQL(
-                "INSERT INTO {} SELECT * FROM {} ON CONFLICT UPDATE;"
+                "INSERT INTO {} SELECT * FROM {} ON CONFLICT DO NOTHING;"
             ).format(sql.Identifier(table_name), sql.Identifier(temp_name))
         )
 
