@@ -614,22 +614,22 @@ class Pipeline:
                         scale_bar_id
                     ])
         ## Save lists of rows to csvs
-        with open(csv_dir / "article.csv", "w") as article_file:
+        with open(csv_dir / "article.csv", "w", encoding="utf-8") as article_file:
             article_writer = csv.writer(article_file)
             article_writer.writerows(article_rows)
-        with open(csv_dir / "figure.csv", "w") as figure_file:
+        with open(csv_dir / "figure.csv", "w", encoding="utf-8") as figure_file:
             figure_writer = csv.writer(figure_file)
             figure_writer.writerows(figure_rows)
-        with open(csv_dir / "subfigure.csv", "w") as subfigure_file:
+        with open(csv_dir / "subfigure.csv", "w", encoding="utf-8") as subfigure_file:
             subfigure_writer = csv.writer(subfigure_file)
             subfigure_writer.writerows(subfigure_rows)
-        with open(csv_dir / "scalebar.csv", "w") as scale_bar_file:
+        with open(csv_dir / "scalebar.csv", "w", encoding="utf-8") as scale_bar_file:
             scale_writer = csv.writer(scale_bar_file)
             scale_writer.writerows(scale_rows)
-        with open(csv_dir / "scalebarlabel.csv", "w") as scale_label_file:
+        with open(csv_dir / "scalebarlabel.csv", "w", encoding="utf-8") as scale_label_file:
             scale_label_writer = csv.writer(scale_label_file)
             scale_label_writer.writerows(scale_label_rows)
-        with open(csv_dir / "subfigurelabel.csv", "w") as subfigure_label_file:
+        with open(csv_dir / "subfigurelabel.csv", "w", encoding="utf-8") as subfigure_label_file:
             subfigure_label_writer = csv.writer(subfigure_label_file)
             subfigure_label_writer.writerows(subfigure_label_rows)
 

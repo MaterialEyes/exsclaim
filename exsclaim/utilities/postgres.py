@@ -103,7 +103,7 @@ class Database():
                 "CREATE TEMPORARY TABLE {} (LIKE {} INCLUDING ALL) ON COMMIT DROP;"
             ).format(sql.Identifier(temp_name), sql.Identifier(table_name))
         )
-        with open(file, "r") as csv_file:
+        with open(file, "r", encoding="utf-8") as csv_file:
             self.cursor.copy_expert(
                 "COPY {} FROM STDIN CSV".format(table_to_copy_command[table]),
                 csv_file

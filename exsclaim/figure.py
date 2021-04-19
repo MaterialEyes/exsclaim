@@ -165,11 +165,11 @@ class FigureSeparator(ExsclaimTool):
             exsclaim_json (dict): Updated EXSCLAIM JSON
             figures_separated (set): Figures which have already been separated
         """
-        with open(self.results_directory / "exsclaim.json", 'w') as f:
+        with open(self.results_directory / "exsclaim.json", 'w', encoding="utf-8") as f:
             json.dump(exsclaim_json, f, indent=3)
-        with open(self.results_directory / "_figures", "a+") as f:
+        with open(self.results_directory / "_figures", "a+", encoding="utf-8") as f:
             for figure in figures_separated:
-                f.write("%s\n" % str(figure).split("/")[-1])
+                f.write("%s\n" % figure)
 
 
     def run(self, search_query, exsclaim_dict):
@@ -182,15 +182,15 @@ class FigureSeparator(ExsclaimTool):
         ## List figures that have already been separated
         figures_file = self.results_directory / "_figures"
         if os.path.isfile(figures_file):
-            with open(figures_file, "r") as f:
+            with open(figures_file, "r", encoding="utf-8") as f:
                 contents = f.readlines()
             figures_separated = {f.strip() for f in contents}
         else:
             figures_separated = set()
 
-        with open(figures_file, "w") as f:
+        with open(figures_file, "w", encoding="utf-8") as f:
             for figure in figures_separated:
-                f.write("%s\n" % figure.split("/")[-1])
+                f.write("%s\n" % str(pathlib.Path(figure).name))
         new_figures_separated = set()
 
         counter = 1
@@ -200,10 +200,10 @@ class FigureSeparator(ExsclaimTool):
         for figure_path in figures:
             self.display_info(">>> ({0} of {1}) ".format(counter,+\
                 len(figures))+\
-                "Extracting images from: "+ str(figure_path).split("/")[-1])
+                "Extracting images from: "+ str(figure_path))
             try:
                 self.extract_image_objects(figure_path)
-                new_figures_separated.add(figure_path)
+                new_figures_separated.add(figure_path.name)
             except Exception as e:
                 if self.print:
                     Printer(("<!> ERROR: An exception occurred in"
@@ -212,7 +212,7 @@ class FigureSeparator(ExsclaimTool):
                     " FigureSeparator on figure: {}".format(figure_path)))
             
             # Save to file every N iterations (to accomodate restart scenarios)
-            if counter%500 == 0:
+            if counter % 100 == 0:
                 self._appendJSON(self.exsclaim_json, new_figures_separated)
                 new_figures_separated = set()
             counter += 1
