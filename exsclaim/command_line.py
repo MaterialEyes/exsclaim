@@ -141,11 +141,6 @@ def main():
             else:
                 train_crnn(configuration=config)
     elif args.command == "view":
-        if args.bind:
-            modify_database_configuration(args.configuration)
-        if args.initialize_postgres:
-            initialize_database(args.configuration)
-        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'exsclaim.ui.exsclaim_gui.settings')
         try:
             from django.core.management import execute_from_command_line
         except ImportError as exc:
@@ -154,13 +149,15 @@ def main():
                 "available on your PYTHONPATH environment variable? Did you "
                 "forget to activate a virtual environment?"
             ) from exc
-        fake_sysargvs = [
-            ["manage.py", "makemigrations"],
-            ["manage.py", "migrate"],
-            ["manage.py", "runserver"]
-        ]
-        for sysargv in fake_sysargvs:
-            execute_from_command_line(sysargv)
+        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'exsclaim.ui.exsclaim_gui.settings')
+
+        if args.bind:
+            modify_database_configuration(args.configuration)
+        if args.initialize_postgres:
+            initialize_database(args.configuration)
+            execute_from_command_line(["manage.py", "makemigrations"])
+            execute_from_command_line(["manage.py", "migrate"])
+        execute_from_command_line(["manage.py", "runserver"])
     elif args.command == "test":
         tests = unittest.defaultTestLoader.discover(parent_directory)
         runner = unittest.TextTestRunner()
