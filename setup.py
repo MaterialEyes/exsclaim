@@ -23,9 +23,6 @@ setuptools.setup(
     url="https://github.com/MaterialEyes/exsclaim",
     packages=setuptools.find_packages(),
     install_requires= install_requires,
-    dependency_links=[
-        "https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.0.0/en_core_web_sm-3.0.0.tar.gz#egg=en_core_web_sm"
-    ],
     package_data={
         'exsclaim': ['figures/config/yolov3_default_master.cfg',
                      'figures/config/yolov3_default_subfig.cfg',
