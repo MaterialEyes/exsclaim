@@ -150,6 +150,9 @@ if os.path.isfile(BASE_DIR.parent / "results_dirs"):
         if base_dir != "":
             STATICFILES_DIRS.append(base_dir.strip())
 
+# For django >3.2
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
 # Content Security Policy
 
 CSP_DEFAULT_SRC = ("'self'",)
