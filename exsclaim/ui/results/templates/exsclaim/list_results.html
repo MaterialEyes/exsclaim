@@ -1,0 +1,22 @@
+{% load static %}
+<div class="results">
+    <ul class="results_list">
+        {% for subfigure in list_of_subfigures_list %}
+        <li class="results_row">
+            <figure>
+                <canvas class="subfigure_image" url="{% static subfigure.figure.path %}" x1="{{ subfigure.x1 }}" y1="{{ subfigure.y1 }}" x2="{{ subfigure.x2 }}" y2="{{ subfigure.y2 }}"> </canvas>
+                <div class="image_details">
+                    <p>Classification: {{ subfigure.classification }}</p>
+                    <p>Keywords: {{ subfigure.keywords }}</p>
+                    <p>Predicted Width: {{ subfigure.nm_height }} nm</p>
+                    <p>DOI: {{ subfigure.figure.article.doi }} </p>
+                    <p>Open: {{ subfigure.figure.article.open }}</p>
+                </div>
+                <figcaption>
+                    {{ subfigure.figure.caption }}
+                </figcaption>
+            </figure>
+        </li>
+        {% endfor %}
+    </ul>
+</div>

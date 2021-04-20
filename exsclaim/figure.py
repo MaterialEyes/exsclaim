@@ -1,6 +1,8 @@
 import os
 import cv2
 import json
+from numpy.lib import utils
+from torch._C import device
 import yaml
 import glob
 import torch
@@ -9,6 +11,7 @@ import pathlib
 import time
 import requests
 import warnings
+import logging
 
 import numpy as np
 import torch.nn.functional as F
@@ -27,7 +30,8 @@ from .figures.separator import process
 from .figures.scale.process import non_max_suppression_malisiewicz
 from .figures.models.network import *
 from .tool import ExsclaimTool
-from .utilities import logging, boxes, download
+from .utilities import boxes, download
+from .utilities.logging import Printer
 from .figures.scale import ctc
 from .figures.models.crnn import CRNN
 
@@ -55,6 +59,8 @@ class FigureSeparator(ExsclaimTool):
     }
 
     def __init__(self , search_query):
+        self.logger = logging.getLogger(__name__)
+        self.initialize_query(search_query)
         self._load_model()
         self.exsclaim_json = {}
 
@@ -76,13 +82,12 @@ class FigureSeparator(ExsclaimTool):
         # https://github.com/pytorch/pytorch/issues/47038
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            self.cuda = torch.cuda.is_available() and (gpu_id >= 0)
+            self.cuda = torch.cuda.is_available()
         self.dtype = torch.cuda.FloatTensor if self.cuda else torch.FloatTensor
         if self.cuda:
-            print("using cuda: ", args.gpu_id) 
-            torch.cuda.set_device(device=args.gpu_id)
+            self.logger.info("using cuda") 
+            #torch.cuda.set_device(device=args.gpu_id)
         self.device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-
         ## Load object detection model
         object_detection_model = YOLOv3(configuration['MODEL'])
         self.object_detection_model = self.load_model_from_checkpoint(
@@ -111,7 +116,14 @@ class FigureSeparator(ExsclaimTool):
                                             scale_bar_detection_model,
                                             "scale_bar_detection_model.pt")
         ## Load scale label recognition model
-        scale_label_recognition_model = CRNN(3, 22)
+        parent_dir = pathlib.Path(__file__).resolve(strict=True).parent
+        config_path = (
+            parent_dir / "figures" / "config" / "scale_label_reader.json"
+        )
+        with open(config_path, "r") as f:
+            configuration_file = json.load(f)
+        configuration = configuration_file["theta"]
+        scale_label_recognition_model = CRNN(configuration=configuration)
         self.scale_label_recognition_model = self.load_model_from_checkpoint(
                                                 scale_label_recognition_model,
                                                 "scale_label_recognition_model.pt")
@@ -120,11 +132,12 @@ class FigureSeparator(ExsclaimTool):
         """ load checkpoint weights into model """
         checkpoints_path = pathlib.Path(__file__).parent / 'figures' / 'checkpoints'
         checkpoint = checkpoints_path / model_name
+        model.to(self.device)
         # download the model if isn't already
         if not os.path.isfile(checkpoint):
             os.makedirs(checkpoints_path, exist_ok=True)
             file_id = FigureSeparator.model_names_to_googleids[model_name]
-            print(("Downloading: https://drive.google.com/uc?export=download&id={}"
+            self.display_info(("Downloading: https://drive.google.com/uc?export=download&id={}"
                    " to {}".format(file_id, checkpoint)))
             download.download_file_from_google_drive(file_id, checkpoint)  
         if self.cuda:
@@ -144,7 +157,7 @@ class FigureSeparator(ExsclaimTool):
         return exsclaim_dict
 
 
-    def _appendJSON(self, results_directory, exsclaim_json, figures_separated):
+    def _appendJSON(self, exsclaim_json, figures_separated):
         """ Commit updates to EXSCLAIM JSON and updates list of separated figures
 
         Args:
@@ -152,55 +165,61 @@ class FigureSeparator(ExsclaimTool):
             exsclaim_json (dict): Updated EXSCLAIM JSON
             figures_separated (set): Figures which have already been separated
         """
-        with open(results_directory + "exsclaim.json", 'w') as f: 
+        with open(self.results_directory / "exsclaim.json", 'w', encoding="utf-8") as f:
             json.dump(exsclaim_json, f, indent=3)
-        with open(results_directory + "_figures", "a+") as f:
+        with open(self.results_directory / "_figures", "a+", encoding="utf-8") as f:
             for figure in figures_separated:
-                f.write("%s\n" % figure.split("/")[-1])
+                f.write("%s\n" % figure)
 
 
     def run(self, search_query, exsclaim_dict):
         """ Run the models relevant to manipulating article figures
         """
-        logging.Printer("Running Figure Separator\n")
-        os.makedirs(search_query['results_dir'], exist_ok=True)
+        self.display_info("Running Figure Separator\n")
+        os.makedirs(self.results_directory, exist_ok=True)
         self.exsclaim_json = exsclaim_dict
         t0 = time.time()
         ## List figures that have already been separated
-        if os.path.isfile(search_query["results_dir"] + "_figures"):
-            with open(search_query["results_dir"] + "_figures", "r") as f:
+        figures_file = self.results_directory / "_figures"
+        if os.path.isfile(figures_file):
+            with open(figures_file, "r", encoding="utf-8") as f:
                 contents = f.readlines()
             figures_separated = {f.strip() for f in contents}
         else:
             figures_separated = set()
 
-        with open(search_query["results_dir"] + "_figures", "w") as f:
+        with open(figures_file, "w", encoding="utf-8") as f:
             for figure in figures_separated:
-                f.write("%s\n" % figure.split("/")[-1])
+                f.write("%s\n" % str(pathlib.Path(figure).name))
         new_figures_separated = set()
 
         counter = 1
-        figures = ([self.exsclaim_json[figure]["figure_path"] for figure in self.exsclaim_json 
+        figures_path = self.results_directory / 'figures'
+        figures = ([figures_path / self.exsclaim_json[figure]["figure_name"] for figure in self.exsclaim_json 
                     if self.exsclaim_json[figure]["figure_name"] not in figures_separated])
-        for figure_name in figures:
-            logging.Printer(">>> ({0} of {1}) ".format(counter,+\
+        for figure_path in figures:
+            self.display_info(">>> ({0} of {1}) ".format(counter,+\
                 len(figures))+\
-                "Extracting images from: "+ figure_name.split("/")[-1])
-            if True:#try:
-                self.extract_image_objects(figure_name)
-                new_figures_separated.add(figure_name)
-            else:#except:
-                logging.Printer("<!> ERROR: An exception occurred in FigureSeparator\n")
+                "Extracting images from: "+ str(figure_path))
+            try:
+                self.extract_image_objects(figure_path)
+                new_figures_separated.add(figure_path.name)
+            except Exception as e:
+                if self.print:
+                    Printer(("<!> ERROR: An exception occurred in"
+                    " FigureSeparator on figure: {}".format(figure_path)))
+                self.logger.exception(("<!> ERROR: An exception occurred in"
+                    " FigureSeparator on figure: {}".format(figure_path)))
             
             # Save to file every N iterations (to accomodate restart scenarios)
-            if counter%500 == 0:
-                self._appendJSON(search_query['results_dir'], self.exsclaim_json, new_figures_separated)
+            if counter % 100 == 0:
+                self._appendJSON(self.exsclaim_json, new_figures_separated)
                 new_figures_separated = set()
             counter += 1
         
         t1 = time.time()
-        logging.Printer(">>> Time Elapsed: {0:.2f} sec ({1} figures)\n".format(t1-t0,int(counter-1)))
-        self._appendJSON(search_query["results_dir"], self.exsclaim_json, new_figures_separated)
+        self.display_info(">>> Time Elapsed: {0:.2f} sec ({1} figures)\n".format(t1-t0,int(counter-1)))
+        self._appendJSON(self.exsclaim_json, new_figures_separated)
         return self.exsclaim_json
 
 
@@ -216,8 +235,8 @@ class FigureSeparator(ExsclaimTool):
         extensions = ['.png','jpg','.gif']
         paths = []
         for ext in extensions:
-            paths+=glob.glob(search_query['results_dir']+'figures/*'+ext)
-        return paths
+            paths+=glob.glob(os.path.join(search_query['results_dir'],'figures','*'+ext))
+        return paths,
 
 
     def detect_subfigure_boundaries(self, figure_path):
@@ -247,7 +266,7 @@ class FigureSeparator(ExsclaimTool):
         
         ## Run model on figure
         with torch.no_grad():
-            outputs = self.object_detection_model(img)
+            outputs = self.object_detection_model(img.to(self.device))
             outputs = process.postprocess(outputs, dtype=self.dtype, 
                         conf_thre=self.confidence_threshold, nms_thre=self.nms_threshold)
 
@@ -256,7 +275,7 @@ class FigureSeparator(ExsclaimTool):
         subfigure_info = list()
 
         if outputs[0] is None:
-            print("No Objects Detected!!")
+            self.display_info("No Objects Detected! in {}".format(figure_path))
             return subfigure_info
 
         for x1, y1, x2, y2, conf, cls_conf, cls_pred in outputs[0]:
@@ -315,7 +334,7 @@ class FigureSeparator(ExsclaimTool):
             img_patch = torch.from_numpy(img_patch).type(self.dtype).unsqueeze(0)
 
             ## Run model on figure
-            label_prediction = self.text_recognition_model(img_patch)
+            label_prediction = self.text_recognition_model(img_patch.to(self.device))
             label_confidence = np.amax(F.softmax(label_prediction, dim=1).data.cpu().numpy())
             label_value = chr(label_prediction.argmax(dim=1).data.cpu().numpy()[0]+ord("a"))
             if label_value == "z":
@@ -404,7 +423,7 @@ class FigureSeparator(ExsclaimTool):
 
         # prediction
         with torch.no_grad():
-            outputs = self.classifier_model(img, padded_label_list)
+            outputs = self.classifier_model(img.to(self.device), padded_label_list)
 
         # select the 13x13 grid as feature map
         feature_size = [13,26,52]
@@ -413,7 +432,7 @@ class FigureSeparator(ExsclaimTool):
         preds = preds[0].data.cpu().numpy()
 
         ## Documentation
-        figure_name = figure_path.split("/")[-1]
+        figure_name = figure_path.name
         figure_json = self.exsclaim_json.get(figure_name, {})
         figure_json["figure_name"] = figure_name
         figure_json.get("master_images", [])
@@ -495,20 +514,23 @@ class FigureSeparator(ExsclaimTool):
         Returns:
             label_text (string): The text of the scale bar label
         """
-        resize_transform = T.Compose([T.Resize((32, 128)),
-                                            T.Lambda(convert_to_rgb),
-                                            T.ToTensor()])       
+        resize_transform = T.Compose([
+            T.Resize((128, 512)),
+            T.Lambda(convert_to_rgb),
+            T.ToTensor(),
+            T.Normalize(mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225]),
+        ])       
         
         classes = "0123456789mMcCuUnN .A"
         idx_to_class = classes + "-"
         image = resize_transform(cropped_image)
         image = image.unsqueeze(0)
         # run image on model
-        logps = self.scale_label_recognition_model(image)
+        logps = self.scale_label_recognition_model(image.to(self.device))
         probs = torch.exp(logps)
         probs = probs.squeeze(0)
-        word, confidence = ctc.run_ctc(probs, classes)
-        return word, float(confidence)
+        magnitude, unit, confidence = ctc.run_ctc(probs, classes)
+        return magnitude, unit, float(confidence)
 
     def create_scale_bar_objects(self, scale_bar_lines, scale_bar_labels):
         """ Match scale bar lines with labels to create scale bar jsons
@@ -573,6 +595,7 @@ class FigureSeparator(ExsclaimTool):
             scale_objects: updated with assigned objects removed
         """
         geomtery = master_image["geometry"]
+        x1, y1, x2, y2 = boxes.convert_labelbox_to_coords(geomtery)
         unassigned_scale_objects = []
         assigned_scale_objects = []
         for scale_object in scale_objects:
@@ -592,8 +615,8 @@ class FigureSeparator(ExsclaimTool):
                                / float(scale_object["length"]))
                 label = scale_object["label"]["text"]
         if len(scale_labels) == 1:
-            master_image["nm_height"] = nm_to_pixel * master_image["height"]
-            master_image["nm_width"] = nm_to_pixel * master_image["width"]
+            master_image["nm_height"] = int(nm_to_pixel * master_image.get("height", y2-y1) * 10) / 10
+            master_image["nm_width"] = int(nm_to_pixel * master_image.get("width", x2-x1) * 10) / 10
             master_image["scale_label"] = label
 
         return master_image, unassigned_scale_objects
@@ -611,7 +634,7 @@ class FigureSeparator(ExsclaimTool):
         # prediction
         self.scale_bar_detection_model.eval()
         with torch.no_grad():
-            outputs = self.scale_bar_detection_model([image])
+            outputs = self.scale_bar_detection_model([image.to(self.device)])
         # post-process 
         scale_bar_info = []
         for i, box in enumerate(outputs[0]["boxes"]):
@@ -619,7 +642,7 @@ class FigureSeparator(ExsclaimTool):
             if confidence > 0.5:
                 x1, y1, x2, y2 = box
                 label = outputs[0]['labels'][i]
-                scale_bar_info.append([x1, y1, x2, y2, confidence, label])
+                scale_bar_info.append([x1.data.cpu(), y1.data.cpu(), x2.data.cpu(), y2.data.cpu(), confidence.data.cpu(), label.data.cpu()])
         scale_bar_info = non_max_suppression_malisiewicz(np.asarray(scale_bar_info), 0.4)
         return scale_bar_info
 
@@ -668,19 +691,19 @@ class FigureSeparator(ExsclaimTool):
                 scale_bar_label_image = image.crop((int(x1), int(y1),
                                                     int(x2), int(y2)))
                 ## Read Scale Text
-                scale_label_text, label_confidence = self.read_scale_bar(
+                magnitude, unit, label_confidence = self.read_scale_bar(
                     scale_bar_label_image)
-                magnitude, unit = scale_label_text.split(" ")
-                magnitude = float(magnitude)
-                length_in_nm = magnitude * convert_to_nm[unit.strip().lower()]
-                label_json = {
-                    "geometry" : geometry,
-                    "text" : scale_label_text,
-                    "label_confidence" : float(label_confidence),
-                    "box_confidence" : float(confidence),
-                    "nm" : length_in_nm
-                }
-                scale_labels.append(label_json)
+                # 0 is never correct and -1 is the error value
+                if magnitude > 0:
+                    length_in_nm = magnitude * convert_to_nm[unit.strip().lower()]
+                    label_json = {
+                        "geometry" : geometry,
+                        "text" : str(magnitude) + " " + unit,
+                        "label_confidence" : float(label_confidence),
+                        "box_confidence" : float(confidence),
+                        "nm" : int(length_in_nm * 100) / 100
+                    }
+                    scale_labels.append(label_json)
         # Match scale bars to labels and to subfigures (master images)
         scale_bar_jsons, unassigned_labels = (
             self.create_scale_bar_objects(scale_bars, scale_labels))
@@ -711,17 +734,20 @@ class FigureSeparator(ExsclaimTool):
         self.text_recognition_model.eval()
         self.classifier_model.eval()
         self.scale_bar_detection_model.eval()
+
+        # Get full path to figure
+        full_figure_path = self.results_directory.parent / figure_path
         
         ## Detect the bounding boxes of each subfigure
-        subfigure_info = self.detect_subfigure_boundaries(figure_path)
+        subfigure_info = self.detect_subfigure_boundaries(full_figure_path)
 
         ## Detect the subfigure labels on each of the bboxes found
-        subfigure_info, concate_img = self.detect_subfigure_labels(figure_path, subfigure_info)
+        subfigure_info, concate_img = self.detect_subfigure_labels(full_figure_path, subfigure_info)
             
         ## Classify the subfigures
-        figure_json = self.classify_subfigures(figure_path, subfigure_info, concate_img)
+        figure_json = self.classify_subfigures(full_figure_path, subfigure_info, concate_img)
 
         ## Detect scale bar lines and labels
-        figure_json = self.determine_scale(figure_path, figure_json)
+        figure_json = self.determine_scale(full_figure_path, figure_json)
 
         return figure_json

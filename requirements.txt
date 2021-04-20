@@ -5,10 +5,15 @@ pyyaml>=5.1
 scipy
 scikit-image
 torch>=1.6
-opencv-python
+opencv-contrib-python
 requests
 torchvision>=0.7
 urllib3
 spacy>=3.0
 lxml
 pytorch-model-summary
+Django>=2.0
+psycopg2-binary
+django-csp
+responses
+deepdiff

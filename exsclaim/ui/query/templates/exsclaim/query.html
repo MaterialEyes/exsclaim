@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+<head>
+    <script src="{% static 'scripts/progress.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'style/query.css' %}"></style>
+    <link rel="shortcut icon" type="image/png" href="{% static 'favicon-32x32.png' %}"/>
+    <title>EXSCLAIM Query</title>
+</head>
+
+<body>
+
+    <div class="search_form">
+        <form action="{% url 'query_page' %}" method="POST">
+            {% csrf_token %}
+            <fieldset>
+                <legend>Keywords</legend>
+                <div>
+                    <input name="keyword" type="text" placeholder="Search...">
+                </div>
+                <div>
+                    <label for="synonyms">Keyword Synonyms</label>
+                    <input type="text" name="synonyms" id="synonyms">
+                </div>
+            </fieldset>
+            <fieldset>
+                <legend>Journal Families to Search:</legend>
+                <div>
+                    <input type="checkbox" name="journalfamily[]" value="nature" id="natrue">
+                    <label for="natrue">Nature</label>
+                </div>
+                <div>
+                    <input type="checkbox" name="journalfamily[]" value="acs" id="acs">
+                    <label for="acs">ACS</label>
+                </div> 
+            </fieldset>
+            <fieldset>
+                <legend>License</legend>
+                <input type="radio" name="open" value="true" id="open">
+                <label for="open">Include only Open Access Subfigures</label>
+            </fieldset>
+            <fieldset>
+                <legend>MetaData</legend>
+                <input type="number" name="max_scraped" value="100" id="max_scraped">
+                <label for="max_scraped">Max Journal Articles to Search</label>
+            </fieldset> 
+            <fieldset>
+                <legend>Results Base Directory</legend>
+                <input type="text" name="results_base_dir" id="results_base_dir">
+                <label for="results_base_dir">Change Directory to which results are saved from default (/path/to/exsclaim/extracted)</label>
+            </fieldset>
+            <fieldset>
+                <input type="submit" value="Search">
+            </fieldset>
+        </form>
+
+</body>
+</html>

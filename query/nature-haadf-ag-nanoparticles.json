@@ -3,7 +3,7 @@
 
     "journal_family": "nature",
 
-    "maximum_scraped": 2,
+    "maximum_scraped": 5,
 
     "sortby": "relevant",
 
@@ -20,10 +20,10 @@
             "synonyms":["HAADF STEM", "High-angle annular dark-field STEM","HAADF image", "(HAADF)", "High-angle ADF", "high-angle annular dark-field (HAADF) imaging", "HAADF imaging"]
         }
     },
-    
-    "results_dir": "extracted/nature-haadf-ag-nanoparticles/", 
 
     "open": true,
 
-    "save_format": ["visualize"]
+    "save_format": ["postgres"],
+
+    "logging": ["print", "exsclaim.log"]
 }

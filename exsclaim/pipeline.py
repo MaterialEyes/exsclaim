@@ -1,44 +1,79 @@
+from exsclaim.utilities.logging import Printer
 import os
 import csv
 import json
+from os.path import join
 import time
 import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image, ImageDraw, ImageFont
 import textwrap
 import pathlib
+import logging
 
-from .utilities import boxes, logging
+from .utilities import boxes, paths
 from .figure import FigureSeparator
 from .tool import CaptionDistributor, JournalScraper
 
+
 class Pipeline:
+
     def __init__(self , query_path):
         """ initialize a Pipeline to run on query path and save to exsclaim path
 
         Args:
             query_path (dict or path to json): An EXSCLAIM user query JSON
         """
+        self.logger = logging.getLogger(__name__)
+        # Load Query on which Pipeline will run
         self.current_path = pathlib.Path(__file__).resolve().parent
         if "test" == query_path:
-            self.query_path = self.current_path / 'tests' / 'data' / 'nature_test.json'
-        elif isinstance(query_path, dict):
+            query_path = self.current_path / 'tests' / 'data' / 'nature_test.json'
+        if isinstance(query_path, dict):
             self.query_dict = query_path
             self.query_path = ""
         else:
-            assert os.path.isfile(query_path), "query path must be a dict, query path, or 'test'"
+            assert os.path.isfile(query_path), "query path must be a dict, query path, or 'test', was {}".format(query_path)
             self.query_path = query_path
-        with open(self.query_path) as f:
-            # Load query file to dict
-            self.query_dict = json.load(f)
+            with open(self.query_path) as f:
+                # Load query file to dict
+                self.query_dict = json.load(f)
+        # Set up file structure
+        base_results_dir = paths.initialize_results_dir(
+            self.query_dict.get("results_dirs", None)
+        )
+        self.results_directory = (
+            base_results_dir / self.query_dict["name"]
+        )
+        os.makedirs(self.results_directory, exist_ok=True)
+        # Set up logging
+        self.print = False
+        for log_output in self.query_dict.get("logging", []):
+            if log_output.lower() == "print":
+                self.print = True
+            else:
+                log_output = self.results_directory / log_output
+                logging.basicConfig(filename=log_output, filemode="w+", level=logging.INFO, style="{")
+        # Check for an existing exsclaim json
         try:
-            self.exsclaim_path = self.query_dict["results_dir"] + "exsclaim.json"
+            self.exsclaim_path = self.results_directory / "exsclaim.json"
             with open(self.exsclaim_path, 'r') as f:
                 # Load configuration file values
                 self.exsclaim_dict = json.load(f)
-        except:
+        except Exception as e:
+            self.logger.info("No exsclaim.json file found, starting a new one.")
             # Keep preset values
             self.exsclaim_dict = {}
+
+    def display_info(self, info):
+        """ Display information to the user as the specified in the query
+
+        Args:
+            info (str): A string to display (either to stdout, a log file)
+        """
+        if self.print: 
+            Printer(info)
+        self.logger.info(info)
 
     def run(self, tools=None, figure_separator=True, caption_distributor=True, journal_scraper=True):
         """ Run EXSCLAIM pipeline on Pipeline instance's query path
@@ -59,7 +94,7 @@ class Pipeline:
         Modifies:
             self.exsclaim_dict
         """
-        print("""
+        exsclaim_art = """
         @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
         @@@@@@@@@@@@@@@@@@@&   /&@@@(   /@@@@@@@@@@@@@@@@@@@
         @@@@@@@@@@@@@@@ %@@@@@@@@@@@@@@@@@@@ *@@@@@@@@@@@@@@
@@ -86,7 +121,8 @@ class Pipeline:
         @@@@@@@@@@@@@@@ ,@@@@@@@@@@@@@@@@@@@ &@@@@@@@@@@@@@@
         @@@@@@@@@@@@@@@@@@@@   ,%@@&/   (@@@@@@@@@@@@@@@@@@@
         @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-        """)
+        """
+        self.display_info(exsclaim_art)
         # set default values
         if tools is None:
             tools = []
@@ -192,10 +228,10 @@ class Pipeline:
     def group_objects(self):
         """ Pair captions with subfigures for each figure in exsclaim json """
         search_query = self.query_dict
-        logging.Printer("Matching Image Objects to Caption Text\n")
+        self.display_info("Matching Image Objects to Caption Text\n")
         counter = 1
         for figure in self.exsclaim_dict:
-            logging.Printer(">>> ({0} of {1}) ".format(counter,+\
+            self.display_info(">>> ({0} of {1}) ".format(counter,+\
                 len(self.exsclaim_dict))+\
                 "Matching objects from figure: "+figure)
     
@@ -206,50 +242,48 @@ class Pipeline:
             figure_json["unassigned"] = unassigned
 
             counter +=1 
-        logging.Printer(">>> SUCCESS!\n")
-
-        with open(search_query['results_dir'] + 'exsclaim.json', 'w') as f:
+        self.display_info(">>> SUCCESS!\n")
+        with open(self.results_directory / 'exsclaim.json', 'w') as f:
             json.dump(self.exsclaim_dict, f, indent=3)
         
         return self.exsclaim_dict
 
+    ### Save Methods ###
+
     def to_file(self):
         """ Saves data to a csv and saves subfigures as individual images
         
-        Note: 
-            Will be run if 'save_subfigures' or 'csv' are in query['save_format']
         Modifies:
-            Creates directories to save each subfigure and a csv file to save data
+            Creates directories to save each subfigure
         """
         search_query = self.query_dict
-        logging.Printer("".join(["Printing Master Image Objects to: ",
-                              search_query['results_dir'].strip("/"),"/images","\n"]))
-        # Rows for output csv file
-        rows = [['article_url', 'figure_path','figure_num', 'image_path',
-                 'master_label', 'dependent_id', 'inset_id', 'class',
-                 'subclasses', 'caption', 'keywords', 'scale_bar', 'pixel_size']]
-
+        self.display_info(
+            ("Printing Master Image Objects to: {}/images\n".format(
+                self.results_directory
+            ))
+        )
         for figure_name in self.exsclaim_dict:
             # figure_name is <figure_root_name>.<figure_extension>
             figure_root_name, figure_extension = os.path.splitext(figure_name)
-            
             try:
-                figure = plt.imread(search_query['results_dir'] + "figures/" + figure_name)
-            except:
-                print("Error printing {0} to file. It may be damaged!".format(figure_name))
+                figure = plt.imread(
+                    self.results_directory / "figures" / figure_name
+                )
+            except Exception as e:
+                self.logger.exception(("Error printing {0} to file."
+                    " It may be damaged!".format(figure_name)))
                 figure = np.zeros((256,256))
 
-            ## Populate a CSV for each subfigure and save each master, inset, and
-            ## dependent image as their own file in a directory according to label
+            ## save each master, inset, and dependent image as their own file
+            ## in a directory according to label
             figure_dict = self.exsclaim_dict[figure_name]
             for master_image in figure_dict.get("master_images", []):
                 # create a directory for each master image in 
                 # <results_dir>/images/<figure_name>/<subfigure_label>
-                directory = "/".join([search_query['results_dir'].strip("/"),
-                                      "images",
-                                      figure_root_name,
-                                      master_image['subfigure_label']['text']
-                                      ])
+                directory = (
+                    self.results_directory / "images" / figure_root_name / 
+                    master_image['subfigure_label']['text']
+                )
                 os.makedirs(directory, exist_ok=True)
                 # generate the name of the master_image
                 master_class  = ('uas' if master_image['classification'] is None 
@@ -264,17 +298,8 @@ class Pipeline:
                 try:
                     plt.imsave(directory + master_name, master_patch)  
                 except Exception as err:
-                    print("Error in saving cropped master image: {}".format(err))        
-                # append data to rows for csv
-                rows.append([figure_dict["article_url"], figure_dict["figure_path"],
-                             figure_root_name.split("_fig")[-1], 
-                             directory+master_name, 
-                             master_image['subfigure_label']['text'], None, None,
-                             master_image['classification'], master_image['general'],
-                             master_image['caption'], master_image['keywords'],
-                             master_image.get('scale_bar', {}).get('label', {}).get('text', None),
-                             None])
-                
+                    self.logger.exception(("Error in saving cropped master"
+                        " image of figure: {}".format(figure_root_name)))
                 # Repeat for dependents of the master image to file
                 for dependent_id, dependent_image in enumerate(master_image.get("dependent_images", [])):
                     dependent_root_name = "/".join([directory, "dependent"])
@@ -290,16 +315,8 @@ class Pipeline:
                     try:
                         plt.imsave(dependent_root_name+dependent_name,dpatch) 
                     except Exception as err:
-                        print("Error in saving cropped dependent image: {}".format(err)) 
-                    # append data to rows for csv
-                    rows.append([figure_dict["article_url"], figure_dict["figure_path"],
-                                figure_root_name.split("_fig")[-1],
-                                dependent_root_name + dependent_name,
-                                master_image['subfigure_label']['text'],
-                                str(dependent_id), None,
-                                dependent_image['classification'], None, None,
-                                dependent_image.get('scale_bar', {}).get('label', {}).get('text', None),
-                                None])
+                        self.logger.exception(("Error in saving cropped master"
+                            " image of figure: {}".format(figure_root_name)))
                     # Repeat for insets of dependents of master image to file
                     for inset_id, inset_image in enumerate(dependent_image.get("inset_images", [])):
                         inset_root_name = "/".join([dependent_root_name,"inset"])
@@ -315,16 +332,8 @@ class Pipeline:
                         try:
                             plt.imsave(inset_root_name+inset_name,ipatch)
                         except Exception as err:
-                            print("Error in saving cropped inset image: {}".format(err))
-                        # append data to rows for csv
-                        rows.append([figure_dict["article_url"], figure_dict["figure_path"],
-                                     figure_root_name.split("_fig")[-1],
-                                     inset_root_name+inset_name,
-                                     master_image['subfigure_label']['text'],
-                                     str(dependent_id), str(inset_id),
-                                     inset_image['classification'], None, None,
-                                     inset_image.get('scale_bar', {}).get('label', {}).get('text', None),
-                                     None])
+                            self.logger.exception(("Error in saving cropped master"
+                                " image of figure: {}".format(figure_root_name)))
                 # Write insets of masters to file
                 for inset_id, inset_image in enumerate(master_image.get("inset_images", [])):
                     inset_root_name = "/".join([directory,"inset"])
@@ -339,22 +348,9 @@ class Pipeline:
                     try:
                         plt.imsave(inset_root_name+inset_name,ipatch)
                     except Exception as err:
-                        print("Error in saving cropped dependent image: {}".format(err))  
-                    # append data to rows for csv
-                    rows.append([figure_dict["article_url"], figure_dict["figure_path"],
-                                 figure_root_name.split("_fig")[-1],
-                                 inset_root_name + inset_name,
-                                 master_image['subfigure_label']['text'],
-                                 None, str(inset_id),
-                                 inset_image['classification'], None, None,
-                                 inset_image.get('scale_bar', {}).get('label', {}).get('text', None),
-                                 None])
-        # write rows to csv file
-        with open(search_query['results_dir']+'labels.csv', 'w') as csvFile:
-            writer = csv.writer(csvFile)
-            writer.writerows(rows)
-
-        logging.Printer(">>> SUCCESS!\n")
+                        self.logger.exception(("Error in saving cropped master"
+                            " image of figure: {}".format(figure_root_name)))
+        self.display_info(">>> SUCCESS!\n")
 
     def make_visualization(self, figure_name):
         """ Save subfigures and their labels as images
@@ -366,7 +362,7 @@ class Pipeline:
             Creates images and text files in <save_path>/extractions folders
             showing details about each subfigure
         """
-        os.makedirs(os.path.join(self.query_dict["results_dir"], "extractions"), exist_ok=True)
+        os.makedirs(self.results_directory / "extractions", exist_ok=True)
         figure_json = self.exsclaim_dict[figure_name]
         master_images = figure_json.get("master_images", [])
         # to handle older versions that didn't store height and width
@@ -387,7 +383,8 @@ class Pipeline:
         draw = ImageDraw.Draw(labeled_image)
         font = ImageFont.truetype("/usr/share/fonts/dejavu/DejaVuSans.ttf")
 
-        full_figure = Image.open(figure_json["figure_path"]).convert("RGB")
+        figures_path = self.results_directory / 'figures'
+        full_figure = Image.open(figures_path / figure_json["figure_name"]).convert("RGB")
         draw_full_figure = ImageDraw.Draw(full_figure)
 
         image_y = 0
@@ -432,7 +429,7 @@ class Pipeline:
             image_y += image_buffer
 
         del draw
-        labeled_image.save(os.path.join(self.query_dict["results_dir"], "extractions", figure_name))
+        labeled_image.save(self.results_directory / "extractions" / figure_name)
 
     def draw_bounding_boxes(self, figure_name,
                             draw_scale=True,
@@ -450,12 +447,14 @@ class Pipeline:
             Creates images and text files in <save_path>/boxes folders
             showing details about each subfigure
         """
-        os.makedirs(os.path.join(self.query_dict["results_dir"], "boxes"), exist_ok=True)
+        os.makedirs(self.results_directory / "boxes", exist_ok=True)
         figure_json = self.exsclaim_dict[figure_name]
         master_images = figure_json.get("master_images", [])
 
 
-        full_figure = Image.open(figure_json["figure_path"]).convert("RGB")
+
+        figures_path = self.results_directory / 'figures'
+        full_figure = Image.open(figures_path / figure_json["figure_name"]).convert("RGB")       
         draw_full_figure = ImageDraw.Draw(full_figure)
         
         scale_objects = []
@@ -507,12 +506,17 @@ class Pipeline:
             for bounding_box in subfigures:
                 draw_full_figure.rectangle(bounding_box, width=2, outline="red")
         del draw_full_figure
-        full_figure.save(os.path.join(self.query_dict["results_dir"], "boxes", figure_name))
+        full_figure.save(self.results_directory / "boxes" / figure_name)
 
     def to_csv(self):
-        """ Places data in a set of csv's ready for database upload """
+        """ Places data in a set of csv's ready for database upload 
+        
+        Modifies:
+            Creates csv/ folder with article, figure, scalebar, scalebarlabel,
+            subfigure, and subfigurelabel csvs.
+        """
         exsclaim_json = self.exsclaim_dict
-        csv_dir = os.path.join(self.query_dict["results_dir"], "csv")
+        csv_dir = self.results_directory / "csv"
         os.makedirs(csv_dir, exist_ok=True)
         articles = set()
         classification_codes = {
@@ -609,34 +613,38 @@ class Pipeline:
                         scale_label.get("nm", None),
                         scale_bar_id
                     ])
-
-        with open(os.path.join(csv_dir, "article.csv"), "w") as article_file:
+        ## Save lists of rows to csvs
+        with open(csv_dir / "article.csv", "w", encoding="utf-8", newline="") as article_file:
             article_writer = csv.writer(article_file)
             article_writer.writerows(article_rows)
-        with open(os.path.join(csv_dir, "figure.csv"), "w") as figure_file:
+        with open(csv_dir / "figure.csv", "w", encoding="utf-8", newline="") as figure_file:
             figure_writer = csv.writer(figure_file)
             figure_writer.writerows(figure_rows)
-        with open(os.path.join(csv_dir, "subfigure.csv"), "w") as subfigure_file:
+        with open(csv_dir / "subfigure.csv", "w", encoding="utf-8", newline="") as subfigure_file:
             subfigure_writer = csv.writer(subfigure_file)
             subfigure_writer.writerows(subfigure_rows)
-        with open(os.path.join(csv_dir, "scalebar.csv"), "w") as scale_bar_file:
+        with open(csv_dir / "scalebar.csv", "w", encoding="utf-8", newline="") as scale_bar_file:
             scale_writer = csv.writer(scale_bar_file)
             scale_writer.writerows(scale_rows)
-        with open(os.path.join(csv_dir, "scalebarlabel.csv"), "w") as scale_label_file:
+        with open(csv_dir / "scalebarlabel.csv", "w", encoding="utf-8", newline="") as scale_label_file:
             scale_label_writer = csv.writer(scale_label_file)
             scale_label_writer.writerows(scale_label_rows)
-        with open(os.path.join(csv_dir, "subfigurelabel.csv"), "w") as subfigure_label_file:
+        with open(csv_dir / "subfigurelabel.csv", "w", encoding="utf-8", newline="") as subfigure_label_file:
             subfigure_label_writer = csv.writer(subfigure_label_file)
             subfigure_label_writer.writerows(subfigure_label_rows)
 
     def to_postgres(self):
-        """ Send csv files to a postgres database """
-        from .postgres import Database
-        csv_dir = os.path.join(self.query_dict["results_dir"], "csv")
+        """ Send csv files to a postgres database
+        
+        Modifies:
+            Fills an existing postgres database with data from csv/ dir
+        """
+        from .utilities.postgres import Database
+        csv_dir = self.results_directory / "csv"
         db = Database("exsclaim")
         for csv_file in ["article.csv", "figure.csv", "subfigure.csv", "scalebar.csv", "scalebarlabel.csv", "subfigurelabel.csv"]:
             table_name = csv_file.replace(".csv", "")
-            table_name = "exsclaim_app_" + table_name
-            db.copy_from(os.path.join(csv_dir, csv_file), table_name)
+            table_name = "results_" + table_name
+            db.copy_from(csv_dir / csv_file, table_name)
             db.commit()
         db.close()        

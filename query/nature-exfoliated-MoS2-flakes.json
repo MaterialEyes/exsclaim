@@ -25,10 +25,10 @@
             "synonyms":["edge of an exfoliated"]
         }
     },
-    
-    "results_dir": "extracted/nature-exfoliated-MoS2-flakes/",
 
     "open": false,
 
-    "save_format": ["visualize"]
+    "save_format": ["visualize"],
+
+    "logging": ["print"]
 }

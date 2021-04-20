@@ -20,10 +20,10 @@
             "synonyms":["HAADF STEM", "High-angle annular dark-field STEM","HAADF image", "(HAADF)", "High-angle ADF", "high-angle annular dark-field (HAADF) imaging", "HAADF imaging"]
         }
     },
-    
-    "results_dir": "extracted/acs-haadf-ag-nanoparticles/",
 
     "open": false,
 
-    "save_format": ["visualize"]
+    "save_format": ["visualize"],
+
+    "logging": ["print"]
 }

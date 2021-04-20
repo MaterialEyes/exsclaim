@@ -1,0 +1,110 @@
+<div class="search_form">
+    <form action="{% url 'search_results'%}" method="GET">
+        <fieldset>
+            <legend>Keywords</legend>
+            <div>
+                <input name="keyword" type="text" placeholder="Search..." value="{{query.keyword}}">
+            </div>
+            <legend>Search for keywords in:</legend>
+            <div>
+                <input type="checkbox" name="keyword_location[]" value="caption" id="caption">
+                <label for="caption">Subfigure's Distributed Caption</label>
+            </div>
+            <div>
+                <input type="checkbox" name="keyword_location[]" value="full_caption" id="full_caption">
+                <label for="full_caption">Subfigure's containing Figure's Caption</label>
+            </div>
+            <div>
+                <input type="checkbox" name="keyword_location[]" value="title" id="title">
+                <label for="title">Article Title</label>
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>Classification:</legend>
+            <div>
+                <input type="checkbox" name="classification[]" value="MC" id="MC">
+                <label for="MC">Microscopy</label>
+            </div>
+            <div>
+                <input type="checkbox" name="classification[]" value="DF" id="DF">
+                <label for="DF">Diffraction</label>
+            </div>
+            <div>
+                <input type="checkbox" name="classification[]" value="GR" id="GR">
+                <label for="GR">Graph</label>
+            </div>
+            <div>
+                <input type="checkbox" name="classification[]" value="PH" id="PH">
+                <label for="PH">Basic Photo</label>
+            </div>
+            <div>
+                <input type="checkbox" name="classification[]" value="IL" id="IL">
+                <label for="IL">Illustration</label>
+            </div>
+            <div>
+                <input type="checkbox" name="classification[]" value="UN" id="UN">
+                <label for="UN">Unclear</label>
+            </div>
+            <div>
+                <input type="checkbox" name="classification[]" value="PT" id="PT">
+                <label for="PT">Parent</label>
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>License</legend>
+            <input type="radio" name="open" value="true" id="open">
+            <label for="open">Include only Open Access Subfigures</label>
+        </fieldset>
+        <fieldset>
+            <legend>Scale</legend>
+            <legend>Show only Subfigures with detected widths of:</legend>
+            <input type="number" step="0.01" name="min_scale" id="min_scale">
+            <label for="min_scale">nm</label> to
+            <input type="number" step="0.01" name="max_scale" id="max_scale">            
+            <label for="max_scale">nm</label>
+            <div>
+                <label for="scale_confidence">Scale Detection Confidence Threshold</label>
+                <input type="range" min="0" max="100" value="30" class="scale_slider" id="scale_confidence" name="scale_confidence">
+                <span id="scale_confidence_value"></span>
+            </div>
+        </fieldset> 
+        <fieldset>
+            <legend>Submission</legend>
+            <legend> Results Format</legend>
+            <input type="radio" name="view" value="list" id="listview">
+            <label for="listview">List View</label>
+            <input type="radio" name="view" value="grid" id="gridview">
+            <label for="gridview">Grid View</label>
+            <legend>Pagination</legend>
+            <div>
+                <input type="number" name="pagination" value="100" id="pagination">
+                <label for="pagination"> Results Per Page</label>
+            </div>
+            <div>
+                <input type="number" name="columns" value="8" id="columns">
+                <label for="columns">(For Grid View) Number of Columns</label>
+            </div>
+            <div>
+                <input type="submit" value="Search">
+            </div>
+        </fieldset>
+    </form>
+    <div class="pagination">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+                <a href="{{uri}}&page=1">&laquo; first</a>
+                <a href="{{uri}}&page={{ page_obj.previous_page_number }}">previous</a>
+            {% endif %}
+    
+            <span class="current">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+            </span>
+    
+            {% if page_obj.has_next %}
+                <a href="{{uri}}&page={{ page_obj.next_page_number }}">next</a>
+                <a href="{{uri}}&page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+
+</div>

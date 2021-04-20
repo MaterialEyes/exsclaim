@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+<head>
+<script src="{% static 'scripts/images.js' %}"></script>
+<link rel="stylesheet" href="{% static 'style/search_results.css' %}"></style>
+<link rel="shortcut icon" type="image/png" href="{% static 'favicon-32x32.png' %}"/>
+<title>EXSCLAIM Image Search</title>
+
+</head>
+<body>
+
+{% include "exsclaim/search_form.html" %}
+
+{% include results_template %}
+
+</body>
+</html>

@@ -12,15 +12,19 @@ import json
 import glob
 import copy
 import time
+import logging
+import pathlib
 
-from .utilities import logging
 from . import journal
 from . import caption
+from .utilities.logging import Printer
+from .utilities import paths
 
 from abc import ABC, abstractmethod
 
 class ExsclaimTool(ABC):
     def __init__(self, search_query):
+        self.logger = logging.getLogger(__name__)
         self.initialize_query(search_query)
 
     def initialize_query(self, search_query):
@@ -33,8 +37,19 @@ class ExsclaimTool(ABC):
             with open(search_query) as f:
                 # Load query file to dict
                 self.search_query = json.load(f)
-        except: 
+        except Exception as e:
+            self.logger.debug(("Search Query path {} not found. Using it as"
+                " dictionary instead"))
             self.search_query = search_query
+        # Set up file structure
+        base_results_dir = paths.initialize_results_dir(
+            self.search_query.get("results_dirs", None)
+        )
+        self.results_directory = (
+            base_results_dir / self.search_query["name"]
+        )
+        # set up logging / printing
+        self.print = "print" in self.search_query.get("logging", [])
 
     @abstractmethod
     def _load_model(self):
@@ -48,6 +63,15 @@ class ExsclaimTool(ABC):
     def run(self):
         pass
 
+    def display_info(self, info):
+        """ Display information to the user as the specified in the query
+
+        Args:
+            info (str): A string to display (either to stdout, a log file)
+        """
+        if self.print: 
+            Printer(info)
+        self.logger.info(info)
 
 class JournalScraper(ExsclaimTool):
     """ 
@@ -64,14 +88,16 @@ class JournalScraper(ExsclaimTool):
     }
 
     def __init__(self, search_query):
+        self.logger = logging.getLogger(__name__ + ".JournalScraper")
         self.initialize_query(search_query)
         self.new_articles_visited = set()
 
         ## Check if any articles have already been scraped by checking
         ##   results_dir/_articles
         articles_visited = {}
-        if os.path.isfile(self.search_query['results_dir'] + "_articles"):
-            with open(self.search_query['results_dir']+'_articles','r') as f:
+        articles_file = self.results_directory / "_articles"
+        if os.path.isfile(articles_file):
+            with open(articles_file,'r') as f:
                 contents = f.readlines()
             articles_visited ={a.strip() for a in contents}
         self.articles_visited = articles_visited
@@ -101,7 +127,8 @@ class JournalScraper(ExsclaimTool):
         """
         with open(filename,'w') as f: 
             json.dump(exsclaim_json, f, indent=3)
-        with open(self.search_query["results_dir"] + "_articles", "a") as f:
+        articles_file = self.results_directory / "_articles"
+        with open(articles_file, "a") as f:
             for article in self.new_articles_visited:
                 f.write('%s\n' % article.split("/")[-1])
 
@@ -125,8 +152,7 @@ class JournalScraper(ExsclaimTool):
         Returns:
             exsclaim_json (dict): Updated with results of search
         """
-        logging.Printer("Running Journal Scraper\n")
-        
+        self.display_info("Running Journal Scraper\n")
         ## Checks that user inputted journal family has been defined and
         ## grabs instantiates an instance of the journal family object
         journal_family = search_query['journal_family']
@@ -134,31 +160,34 @@ class JournalScraper(ExsclaimTool):
             raise NameError('journal family {0} is not defined'.format(journal_family))
         j_instance = self.journals[journal_family](search_query)
 
-        os.makedirs(search_query['results_dir'], exist_ok=True)
+        os.makedirs(self.results_directory, exist_ok=True)
         t0 = time.time()
         counter = 1
         articles = self._get_articles(j_instance)
         ## Extract figures, captions, and metadata from each article
         for article in articles:
-            logging.Printer(">>> ({0} of {1}) Extracting figures from: ".format(counter, len(articles))+\
+            self.display_info(">>> ({0} of {1}) Extracting figures from: ".format(counter, len(articles))+\
                 article.split("/")[-1])
-
             try:
                 request = j_instance.get_domain_name() + article
                 article_dict = j_instance.get_article_figures(request)
                 exsclaim_json = self._update_exsclaim(exsclaim_json, article_dict)
                 self.new_articles_visited.add(article)
-            except:
-                logging.Printer("<!> ERROR: An exception occurred in JournalScraper\n")
+            except Exception as e:
+                exception_string = ("<!> ERROR: An exception occurred in"
+                    " JournalScraper on article: {}".format(article))
+                if self.print:
+                    Printer(exception_string + "\n")
+                self.logger.exception(exception_string)
             
             # Save to file every N iterations (to accomodate restart scenarios)
             if counter%1000 == 0:
-                self._appendJSON(search_query['results_dir'] + "exsclaim.json", exsclaim_json)
+                self._appendJSON(self.results_directory / "exsclaim.json", exsclaim_json)
             counter += 1
 
         t1 = time.time()
-        logging.Printer(">>> Time Elapsed: {0:.2f} sec ({1} articles)\n".format(t1-t0,int(counter-1)))
-        self._appendJSON(search_query['results_dir'] + "exsclaim.json", exsclaim_json)
+        self.display_info(">>> Time Elapsed: {0:.2f} sec ({1} articles)\n".format(t1-t0,int(counter-1)))
+        self._appendJSON(self.results_directory / "exsclaim.json", exsclaim_json)
         return exsclaim_json
 
 
@@ -173,6 +202,7 @@ class CaptionDistributor(ExsclaimTool):
     """
     def __init__(self , search_query={}):
         super().__init__(search_query)
+        self.logger = logging.getLogger(__name__ + ".CaptionDistributor")
         self.model_path = ""
 
     def _load_model(self):
@@ -187,7 +217,7 @@ class CaptionDistributor(ExsclaimTool):
             exsclaim_dict[figure_name]['unassigned']['captions'].append(master_image)
         return exsclaim_dict
 
-    def _appendJSON(self, results_directory, exsclaim_json, captions_distributed):
+    def _appendJSON(self, exsclaim_json, captions_distributed):
         """ Commit updates to EXSCLAIM JSON and updates list of ed figures
 
         Args:
@@ -195,9 +225,9 @@ class CaptionDistributor(ExsclaimTool):
             exsclaim_json (dict): Updated EXSCLAIM JSON
             figures_separated (set): Figures which have already been separated
         """
-        with open(results_directory + "exsclaim.json",'w') as f: 
+        with open(self.results_directory / "exsclaim.json",'w') as f: 
             json.dump(exsclaim_json, f, indent=3)
-        with open(results_directory + "_captions", "a+") as f:
+        with open(self.results_directory / "_captions", "a+") as f:
             for figure in captions_distributed:
                 f.write("%s\n" % figure.split("/")[-1])
 
@@ -211,14 +241,15 @@ class CaptionDistributor(ExsclaimTool):
         Returns:
             exsclaim_json (dict): Updated with results of search
         """
-        logging.Printer("Running Caption Distributor\n")
-        os.makedirs(search_query['results_dir'], exist_ok=True)
+        self.display_info("Running Caption Distributor\n")
+        os.makedirs(self.results_directory, exist_ok=True)
         t0 = time.time()
         model = self._load_model()
 
         ## List captions that have already been distributed
-        if os.path.isfile(search_query["results_dir"] + "_captions"):
-            with open(search_query["results_dir"] + "_captions", "r") as f:
+        captions_file = self.results_directory / "_captions"
+        if os.path.isfile(captions_file):
+            with open(captions_file, "r") as f:
                 contents = f.readlines()
             captions_distributed = {f.strip() for f in contents}
         else:
@@ -229,7 +260,7 @@ class CaptionDistributor(ExsclaimTool):
                     if exsclaim_json[figure]["figure_name"] not in captions_distributed])
         counter = 1
         for figure_name in figures:
-            logging.Printer(">>> ({0} of {1}) ".format(counter,+\
+            self.display_info(">>> ({0} of {1}) ".format(counter,+\
                 len(figures))+\
                 "Parsing captions from: "+figure_name)
             try:
@@ -238,17 +269,19 @@ class CaptionDistributor(ExsclaimTool):
                 caption_dict  = caption.associate_caption_text(model, caption_text, search_query['query'])
                 exsclaim_json = self._update_exsclaim(exsclaim_json, figure_name, delimiter, caption_dict) 
                 new_captions_distributed.add(figure_name)
-            except:
-                logging.Printer("<!> ERROR: An exception occurred in CaptionDistributor\n")
-        
+            except Exception as e:
+                if self.print:
+                    Printer(("<!> ERROR: An exception occurred in"
+                        " CaptionDistributor on figue: {}".format(figure_name)))
+                self.logger.exception(("<!> ERROR: An exception occurred in"
+                    " CaptionDistributor on figue: {}".format(figure_name)))        
             # Save to file every N iterations (to accomodate restart scenarios)
             if counter%1000 == 0:
-                self._appendJSON(search_query['results_dir'], exsclaim_json, new_captions_distributed)
+                self._appendJSON(exsclaim_json, new_captions_distributed)
                 new_captions_distributed = set()
             counter += 1
 
         t1 = time.time()
-        logging.Printer(">>> Time Elapsed: {0:.2f} sec ({1} captions)\n".format(t1-t0,int(counter-1)))
-
-        self._appendJSON(search_query['results_dir'], exsclaim_json, new_captions_distributed)
+        self.display_info(">>> Time Elapsed: {0:.2f} sec ({1} captions)\n".format(t1-t0,int(counter-1)))
+        self._appendJSON(exsclaim_json, new_captions_distributed)
         return exsclaim_json

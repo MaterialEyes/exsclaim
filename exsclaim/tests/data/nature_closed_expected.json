@@ -9,7 +9,7 @@
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fs41467-018-06211-3/MediaObjects/41467_2018_6211_Fig1_HTML.png",
       "license": "http://creativecommons.org/licenses/by/4.0/",
       "open": true,
-      "figure_path": "extracted/nature-test/figures/s41467-018-06211-3_fig1.jpg",
+      "figure_path": "nature-test/figures/s41467-018-06211-3_fig1.jpg",
       "master_images": [
          {
             "classification": "microscopy",
@@ -697,7 +697,7 @@
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fs41467-018-06211-3/MediaObjects/41467_2018_6211_Fig2_HTML.png",
       "license": "http://creativecommons.org/licenses/by/4.0/",
       "open": true,
-      "figure_path": "extracted/nature-test/figures/s41467-018-06211-3_fig2.jpg",
+      "figure_path": "nature-test/figures/s41467-018-06211-3_fig2.jpg",
       "master_images": [
          {
             "classification": "microscopy",
@@ -1211,7 +1211,7 @@
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fs41467-018-06211-3/MediaObjects/41467_2018_6211_Fig3_HTML.png",
       "license": "http://creativecommons.org/licenses/by/4.0/",
       "open": true,
-      "figure_path": "extracted/nature-test/figures/s41467-018-06211-3_fig3.jpg",
+      "figure_path": "nature-test/figures/s41467-018-06211-3_fig3.jpg",
       "master_images": [
          {
             "classification": "graph",
@@ -1446,7 +1446,7 @@
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fs41467-018-06211-3/MediaObjects/41467_2018_6211_Fig4_HTML.png",
       "license": "http://creativecommons.org/licenses/by/4.0/",
       "open": true,
-      "figure_path": "extracted/nature-test/figures/s41467-018-06211-3_fig4.jpg",
+      "figure_path": "nature-test/figures/s41467-018-06211-3_fig4.jpg",
       "master_images": [
          {
             "classification": "graph",
@@ -1682,7 +1682,7 @@
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fs41467-018-06211-3/MediaObjects/41467_2018_6211_Fig5_HTML.png",
       "license": "http://creativecommons.org/licenses/by/4.0/",
       "open": true,
-      "figure_path": "extracted/nature-test/figures/s41467-018-06211-3_fig5.jpg",
+      "figure_path": "nature-test/figures/s41467-018-06211-3_fig5.jpg",
       "master_images": [
          {
             "classification": "graph",
@@ -1914,7 +1914,7 @@
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fncomms5946/MediaObjects/41467_2014_Article_BFncomms5946_Fig1_HTML.jpg",
       "license": null,
       "open": false,
-      "figure_path": "extracted/nature-test/figures/ncomms5946_fig1.jpg",
+      "figure_path": "nature-test/figures/ncomms5946_fig1.jpg",
       "master_images": [
          {
             "classification": "microscopy",
@@ -2295,7 +2295,7 @@
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fncomms5946/MediaObjects/41467_2014_Article_BFncomms5946_Fig2_HTML.jpg",
       "license": null,
       "open": false,
-      "figure_path": "extracted/nature-test/figures/ncomms5946_fig2.jpg",
+      "figure_path": "nature-test/figures/ncomms5946_fig2.jpg",
       "master_images": [
          {
             "classification": "microscopy",
@@ -2728,7 +2728,7 @@
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fncomms5946/MediaObjects/41467_2014_Article_BFncomms5946_Fig3_HTML.jpg",
       "license": null,
       "open": false,
-      "figure_path": "extracted/nature-test/figures/ncomms5946_fig3.jpg",
+      "figure_path": "nature-test/figures/ncomms5946_fig3.jpg",
       "master_images": [
          {
             "classification": "graph",
@@ -2956,7 +2956,7 @@
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fncomms5946/MediaObjects/41467_2014_Article_BFncomms5946_Fig4_HTML.jpg",
       "license": null,
       "open": false,
-      "figure_path": "extracted/nature-test/figures/ncomms5946_fig4.jpg",
+      "figure_path": "nature-test/figures/ncomms5946_fig4.jpg",
       "master_images": [
          {
             "classification": "microscopy",
@@ -3269,7 +3269,7 @@
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fncomms5946/MediaObjects/41467_2014_Article_BFncomms5946_Fig5_HTML.jpg",
       "license": null,
       "open": false,
-      "figure_path": "extracted/nature-test/figures/ncomms5946_fig5.jpg",
+      "figure_path": "nature-test/figures/ncomms5946_fig5.jpg",
       "master_images": [
          {
             "classification": "graph",
@@ -3586,7 +3586,7 @@
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fncomms5946/MediaObjects/41467_2014_Article_BFncomms5946_Fig6_HTML.jpg",
       "license": null,
       "open": false,
-      "figure_path": "extracted/nature-test/figures/ncomms5946_fig6.jpg",
+      "figure_path": "nature-test/figures/ncomms5946_fig6.jpg",
       "master_images": [
          {
             "classification": "microscopy",
@@ -3821,7 +3821,7 @@
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fncomms5946/MediaObjects/41467_2014_Article_BFncomms5946_Fig7_HTML.jpg",
       "license": null,
       "open": false,
-      "figure_path": "extracted/nature-test/figures/ncomms5946_fig7.jpg",
+      "figure_path": "nature-test/figures/ncomms5946_fig7.jpg",
       "master_images": [
          {
             "classification": "microscopy",
@@ -4433,7 +4433,7 @@
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fncomms5946/MediaObjects/41467_2014_Article_BFncomms5946_Fig8_HTML.jpg",
       "license": null,
       "open": false,
-      "figure_path": "extracted/nature-test/figures/ncomms5946_fig8.jpg",
+      "figure_path": "nature-test/figures/ncomms5946_fig8.jpg",
       "master_images": [
          {
             "classification": "microscopy",
@@ -4800,7 +4800,7 @@
       "image_url": "https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fncomms5946/MediaObjects/41467_2014_Article_BFncomms5946_Fig9_HTML.jpg",
       "license": null,
       "open": false,
-      "figure_path": "extracted/nature-test/figures/ncomms5946_fig9.jpg",
+      "figure_path": "nature-test/figures/ncomms5946_fig9.jpg",
       "master_images": [
          {
             "classification": "microscopy",

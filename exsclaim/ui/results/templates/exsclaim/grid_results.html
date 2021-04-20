@@ -1,0 +1,9 @@
+{% load static %}
+<div class="results">
+    {% for subfigures_list in list_of_subfigures_list %}
+    <div class="column" columns="{{ columns }}">
+        {% for subfigure in subfigures_list|slice:":images_per_row" %}
+        <a href="{{ subfigure.figure.article.url }}"><canvas class="subfigure_image" url="{% static subfigure.figure.path %}" x1="{{ subfigure.x1 }}" y1="{{ subfigure.y1 }}" x2="{{ subfigure.x2 }}" y2="{{ subfigure.y2 }}"> </canvas></a>
+        {% endfor %}
+    </div>
+    {% endfor %}

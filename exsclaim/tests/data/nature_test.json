@@ -21,9 +21,7 @@
         }
     },
     
-    "results_dir": "extracted/nature-test/",
-    
-    "save_format": ["visualize", "boxes"],
+    "save_format": ["boxes"],
 
     "open": false
 }

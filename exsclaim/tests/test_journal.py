@@ -6,7 +6,7 @@ import responses
 from bs4 import BeautifulSoup
 import bs4
 
-from .. import journal
+from exsclaim import journal
 
 class TestNature(unittest.TestCase):
 
@@ -22,7 +22,7 @@ class TestNature(unittest.TestCase):
     def test_get_page_info(self):
         """ tests that get_page_info finds correct params in nature article """
         test_html = pathlib.Path(__file__).parent / 'data' / 'nature_search.html'
-        with open(test_html, "r") as f:
+        with open(test_html, "r", encoding="utf-8") as f:
             soup = BeautifulSoup(f.read(), 'lxml')
         ## sample soup
         expected_info = (1, 1, 12)
@@ -69,7 +69,7 @@ class TestNature(unittest.TestCase):
     def test_get_soup_from_request(self):
         # set up expected soup from request
         test_html_file = pathlib.Path(__file__).parent / 'data' / 'nature_articles' / 'ncomms1737.html'
-        with open(test_html_file, "r") as f:
+        with open(test_html_file, "r", encoding="utf-8") as f:
             test_html = f.read()
         expected_soup = BeautifulSoup(test_html, 'lxml')
         
@@ -85,7 +85,7 @@ class TestNature(unittest.TestCase):
         """ tests that get_figure_list gets the correct figures from test article """
         # set up expected soup from request
         test_html_file = pathlib.Path(__file__).parent / 'data' / 'nature_articles' / 'ncomms1737.html'
-        with open(test_html_file, "r") as f:
+        with open(test_html_file, "r", encoding="utf-8") as f:
             test_html = f.read()
         expected_soup = BeautifulSoup(test_html, 'lxml')
 

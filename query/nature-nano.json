@@ -1,0 +1,24 @@
+{   
+    "name": "nature-stem",
+
+    "journal_family": "nature",
+
+    "maximum_scraped": 5,
+
+    "sortby": "relevant",
+
+    "query":
+    {
+        "search_field_1":
+        {
+            "term":"stem",
+            "synonyms":[]
+        }
+    },
+
+    "open": true,
+
+    "save_format": ["postgres"],
+
+    "logging": ["print", "exsclaim.log"]
+}
