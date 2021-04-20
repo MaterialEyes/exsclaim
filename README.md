@@ -27,6 +27,7 @@ results = test_pipeline.run()
 $ exsclaim run /path/to/query.json
 ```
 - [user interface](https://github.com/MaterialEyes/exsclaim/wiki/User-Interface)
+![Screenshot of EXSCLAIM user interface. Search form on left of screen and grid of image results on the right.](https://drive.google.com/uc?export=view&id=1OGPrMwld_9fYPlYh50PV7JowIzP52nha)
 
 ## Using EXSCLAIM
 
