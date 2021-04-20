@@ -40,7 +40,7 @@ There are multiple ways to use EXSCLAIM. If you wish to develop or modify the so
 #### Pip
 To install the latest stable release:
 ```
-pip install --extra-index-url https://test.pypi.org/simple/ exsclaim-materialeyes
+pip install exsclaim
 python -m spacy download en_core_web_sm
 ```
 

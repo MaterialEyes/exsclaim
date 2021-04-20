@@ -50,7 +50,7 @@ setuptools.setup(
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Science/Research",
-        "Topic :: Scientific/Engineering :: Image Processing"
+        "Topic :: Scientific/Engineering :: Image Processing",
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
