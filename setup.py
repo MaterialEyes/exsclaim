@@ -13,8 +13,8 @@ with open(here / "requirements.txt", "r") as f:
     install_requires = list(f.read().splitlines())
 
 setuptools.setup(
-    name="exsclaim-tspread",
-    version="0.0.49",
+    name="exsclaim",
+    version="0.1.0",
     author=('Eric Schwenker','Trevor Spreadbury','Weixin Jiang','Maria Chan'),
     author_email="developer@materialeyes.org",
     description="EXSCLAIM! is a library for the automatic EXtraction, Separation, and Caption-based natural Language Annotation of IMages from scientific figures.",
@@ -48,7 +48,9 @@ setuptools.setup(
                      'tests/data/nature_closed_expected.json']
     },
     classifiers=[
-        "Development Status :: 1 - Planning",
+        "Development Status :: 4 - Beta",
+        "Intended Audience :: Science/Research",
+        "Topic :: Scientific/Engineering :: Image Processing"
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
