@@ -8,6 +8,7 @@ import os.path
 import sys
 from . import models
 from exsclaim.utilities.paths import add_results_dir
+from exsclaim.utilities.data import extract_queryset
 
 class SearchResultViews(ListView):
     model = models.Subfigure
@@ -100,5 +101,8 @@ class SearchResultViews(ListView):
             if "title" in keyword_locations:
                 q_expression |= Q(figure__article__title__icontains=keyword)
             queryset = queryset.filter(q_expression)
+
+        if query.get("download", False):
+            extract_queryset(queryset)
 
         return queryset
