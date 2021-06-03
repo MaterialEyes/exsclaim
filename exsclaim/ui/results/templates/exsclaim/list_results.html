@@ -1,19 +1,42 @@
 {% load static %}
+{% load file_exists %}
 <div class="results">
     <ul class="results_list">
         {% for subfigure in list_of_subfigures_list %}
         <li class="results_row">
             <figure>
-                <canvas class="subfigure_image" url="{% static subfigure.figure.path %}" x1="{{ subfigure.x1 }}" y1="{{ subfigure.y1 }}" x2="{{ subfigure.x2 }}" y2="{{ subfigure.y2 }}"> </canvas>
+                {% if subfigure.figure.path|exists != False %}
+                    <canvas class="subfigure_image" url="{% static subfigure.figure.path %}" x1="{{ subfigure.x1 }}" y1="{{ subfigure.y1 }}" x2="{{ subfigure.x2 }}" y2="{{ subfigure.y2 }}"> </canvas>
+                {% else %}
+                    <canvas class="subfigure_image" url="{{ subfigure.figure.url }}" x1="{{ subfigure.x1 }}" y1="{{ subfigure.y1 }}" x2="{{ subfigure.x2 }}" y2="{{ subfigure.y2 }}"> </canvas>
+                {% endif %}
                 <div class="image_details">
-                    <p>Classification: {{ subfigure.classification }}</p>
-                    <p>Keywords: {{ subfigure.keywords }}</p>
-                    <p>Predicted Width: {{ subfigure.nm_height }} nm</p>
+                    {% if subfigure.classification == 'MC' %}
+                        <p>Classification: Microscopy</p>
+                    {% elif subfigure.classification == 'DF' %}
+                        <p>Classification: Diffraction</p>                    
+                    {% elif subfigure.classification == 'GR' %}
+                        <p>Classification: Graph</p>                    
+                    {% elif subfigure.classification == 'IL' %}
+                        <p>Classification: Illustration</p>                    
+                    {% elif subfigure.classification == 'PT' %}
+                        <p>Classification: Parent</p>                    
+                    {% elif subfigure.classification == 'UN' %}
+                        <p>Classification: Unknown</p>     
+                    {% endif %}               
+                        <p>Keywords: {{ subfigure.keywords }}</p>
+                    {% if subfigure.nm_width %}
+                        <p>Predicted Width: {{ subfigure.nm_height }} nm</p>
+                    {% endif %}
                     <p>DOI: {{ subfigure.figure.article.doi }} </p>
                     <p>Open: {{ subfigure.figure.article.open }}</p>
                 </div>
                 <figcaption>
-                    {{ subfigure.figure.caption }}
+                    {% if subfigure.caption and subfigure.caption|length > 5 %}
+                        {{ subfigure.caption }}
+                    {% else %}
+                        {{ subfigure.figure.caption }}
+                    {% endif %}
                 </figcaption>
             </figure>
         </li>
