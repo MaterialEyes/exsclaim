@@ -194,12 +194,12 @@ class Pipeline:
             for caption_label in captions:
                 # remove periods or commas from around caption label
                 processed_caption_label = caption_label['label'].replace(")","")
-                processed_capiton_label = processed_caption_label.replace("(","")
+                processed_caption_label = processed_caption_label.replace("(","")
                 processed_caption_label = processed_caption_label.replace(".","")
                 # check if caption label and subfigure label match and caption label
                 # has not already been matched
-                if (processed_caption_label.lower() == processed_label.lower()) and \
-                (processed_caption_label.lower() in [a.lower() for a in not_assigned]):
+                if (processed_caption_label.lower() == processed_label.lower()
+                    and processed_caption_label.lower() in [a.lower() for a in not_assigned]):
                     master_image["caption"]  = caption_label['description']
                     master_image["keywords"] = caption_label['keywords']
                     master_image["general"]  = caption_label['general']
@@ -211,9 +211,9 @@ class Pipeline:
             if paired:
                 continue
             # no pairing found, create empty fields
-            master_image["caption"] = []
-            master_image["keywords"]= []
-            master_image["general"] = []
+            master_image["caption"] = master_image.get("caption", [])
+            master_image["keywords"]= master_image.get("keywords", [])
+            master_image["general"] = master_image.get("general", [])
             masters.append(master_image)
 
         # update unassigned captions
@@ -519,6 +519,7 @@ class Pipeline:
         csv_dir = self.results_directory / "csv"
         os.makedirs(csv_dir, exist_ok=True)
         articles = set()
+        subfigures = set()
         classification_codes = {
             'microscopy': "MC",
             "diffraction": "DF",
@@ -567,6 +568,9 @@ class Pipeline:
                 subfigure_label = master_image["subfigure_label"]["text"]
                 subfigure_coords = boxes.convert_labelbox_to_coords(master_image["geometry"])
                 subfigure_id = figure_id + "-" + subfigure_label
+                if subfigure_id in subfigures:
+                    continue
+                subfigures.add(subfigure_id)
                 subfigure_row = [
                     subfigure_id,
                     classification_codes[master_image["classification"]],
