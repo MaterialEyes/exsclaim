@@ -51,11 +51,11 @@ class FigureSeparator(ExsclaimTool):
     ## stores the google drive file IDs of default neural network checkpoints
     ## replace these if you wish to change a model
     model_names_to_googleids = {
-        "classifier_model.pt":              "1ZodeH37Nd4ZbA0_1G_MkLKuuiyk7VUXR",
-        "object_detection_model.pt":        "1Hh7IPTEc-oTWDGAxI9o0lKrv9MBgP4rm",
-        "text_recognition_model.pt":        "1rZaxCPEWKGwvwYYa8jLINpUt20h0jo8y",
-        "scale_bar_detection_model.pt":     "1B4_rMbP3a1XguHHX4EnJ6tSlyCCRIiy4",
-        "scale_label_recognition_model.pt": "1oGjPG698LdSGvv3FhrLYh_1FhcmYYKpu"
+        "classifier_model.pt":              "16BxXXGJyHfMtzhDEufIwMkcDoBftZosh",
+        "object_detection_model.pt":        "1HbzvNvhPcvUKh_RCddjKIvdRFt6T4PEH",
+        "text_recognition_model.pt":        "1p9miOnR_dUxO5jpIv1hKtsZQuFHAaQpX",
+        "scale_bar_detection_model.pt":     "11Kfu9xEbjG0Mw2u0zCJlKy_4C6K21qqg",
+        "scale_label_recognition_model.pt": "1AND30sQpSrph2CGl86k2aWNqNp-0vLnR"
     }
 
     def __init__(self , search_query):
@@ -339,7 +339,6 @@ class FigureSeparator(ExsclaimTool):
             label_value = chr(label_prediction.argmax(dim=1).data.cpu().numpy()[0]+ord("a"))
             if label_value == "z":
                 continue
-
             ## Reformat results for to desired format
             x1,y1,x2,y2, box_confidence = subfigure
             total_confidence = float(box_confidence)*label_confidence
@@ -366,7 +365,6 @@ class FigureSeparator(ExsclaimTool):
                 subfigure_info.append((label, float(x1), float(y1), float(x2-x1), float(y2-y1)))
         # concate_img needed for classify_subfigures
         concate_img = np.concatenate((np.array(img_raw),binary_img),axis=2)
-        
         return subfigure_info, concate_img
 
 
@@ -436,9 +434,6 @@ class FigureSeparator(ExsclaimTool):
         figure_json = self.exsclaim_json.get(figure_name, {})
         figure_json["figure_name"] = figure_name
         figure_json.get("master_images", [])
-        # create an unassigned field with a master images field if it doesn't exist
-        figure_json.get("unassigned", {'master_images' : []}).get('master_images', [])
-
 
         full_figure_is_master = True if len(subfigure_labels) == 0 else False
 
@@ -520,7 +515,6 @@ class FigureSeparator(ExsclaimTool):
             T.ToTensor(),
             T.Normalize(mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225]),
         ])       
-        
         classes = "0123456789mMcCuUnN .A"
         idx_to_class = classes + "-"
         image = resize_transform(cropped_image)
@@ -618,7 +612,6 @@ class FigureSeparator(ExsclaimTool):
             master_image["nm_height"] = int(nm_to_pixel * master_image.get("height", y2-y1) * 10) / 10
             master_image["nm_width"] = int(nm_to_pixel * master_image.get("width", x2-x1) * 10) / 10
             master_image["scale_label"] = label
-
         return master_image, unassigned_scale_objects
 
     def detect_scale_objects(self, image):
