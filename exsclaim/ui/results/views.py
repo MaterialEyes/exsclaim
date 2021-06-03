@@ -4,6 +4,7 @@ from django.db.models.query import QuerySet
 from django.http import HttpResponse
 from django.views.generic import ListView
 from django.db.models import Q
+import multiprocessing as mp
 import os.path
 import sys
 from . import models
@@ -103,6 +104,10 @@ class SearchResultViews(ListView):
             queryset = queryset.filter(q_expression)
 
         if query.get("download", False):
-            extract_queryset(queryset)
+            p = mp.Process(
+                target=extract_queryset, 
+                args=(queryset,query.get("output_directory", "queryset"))
+            )
+            p.start()
 
         return queryset

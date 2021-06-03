@@ -5,6 +5,7 @@ from pathlib import Path
 from shutil import copyfile
 import requests
 from exsclaim.ui.exsclaim_gui.settings import STATICFILES_DIRS
+from exsclaim.ui.results import models
 
 def move_image(figure, destination):
     """ move image represented by figure to destination """
@@ -21,10 +22,10 @@ def move_image(figure, destination):
         copyfile(figure_path, destination / figure_path.name)
 
 
-def extract_queryset(queryset):
+def extract_queryset(queryset, output_directory):
     """ save a queryset as an exsclaim.json with figures zip """
     exsclaim_json = {}
-    figure_directory = Path.cwd() / "queryset" / "figures"
+    figure_directory = Path(output_directory).resolve() / "figures"
     Path.mkdir(figure_directory, parents=True, exist_ok=True)
     for subfigure in queryset:
         figure_path = subfigure.figure.path
@@ -46,24 +47,71 @@ def extract_queryset(queryset):
                 "figure_path": figure_path,
                 "master_images": []
             }
-        exsclaim_json[figure_name]["master_images"].append(
-            {
-                "classification": subfigure.classification,
-                "height": subfigure.height,
-                "width": subfigure.width,
+        subfigure_json = {
+            "classification": subfigure.classification,
+            "height": subfigure.height,
+            "width": subfigure.width,
+            "geometry": [
+                {"x": subfigure.x1, "y": subfigure.y1},
+                {"x": subfigure.x1, "y": subfigure.y2},
+                {"x": subfigure.x2, "y": subfigure.y2},
+                {"x": subfigure.x2, "y": subfigure.y1},                                        
+            ],
+            "caption": subfigure.caption,
+            "keywords": subfigure.keywords,
+            "general": subfigure.general,
+            "nm_width": subfigure.nm_width,
+            "nm_height": subfigure.nm_height,
+        }
+        scale_bars = models.ScaleBar.objects.filter(subfigure__exact=subfigure.subfigure_id)
+        scale_bar_jsons = []
+        for scale_bar in scale_bars:
+            scale_bar_labels = models.ScaleBarLabel.objects.filter(scale_bar__exact=scale_bar.scale_bar_id)
+            if scale_bar_labels:
+                scale_bar_label = scale_bar_labels[0]
+                scale_bar_label_json = {
+                    "text": scale_bar_label.text,
+                    "label_confidence": scale_bar_label.label_confidence,
+                    "box_confidence": scale_bar_label.box_confidence,
+                    "nm": scale_bar_label.nm,
+                    "geometry": [
+                        {"x": scale_bar_label.x1, "y": scale_bar_label.y1},
+                        {"x": scale_bar_label.x1, "y": scale_bar_label.y2},
+                        {"x": scale_bar_label.x2, "y": scale_bar_label.y2},
+                        {"x": scale_bar_label.x2, "y": scale_bar_label.y1},                                        
+                    ],
+                }
+            else:
+                scale_bar_label_json = None
+            scale_bar_json = {
+                "label": scale_bar_label_json,
+                "length": scale_bar.length,
+                "line_label_distance": scale_bar.line_label_distance,
+                "confidence": scale_bar.confidence,
                 "geometry": [
-                    {"x": subfigure.x1, "y": subfigure.y1},
-                    {"x": subfigure.x1, "y": subfigure.y2},
-                    {"x": subfigure.x2, "y": subfigure.y2},
-                    {"x": subfigure.x2, "y": subfigure.y1},                                        
+                    {"x": scale_bar.x1, "y": scale_bar.y1},
+                    {"x": scale_bar.x1, "y": scale_bar.y2},
+                    {"x": scale_bar.x2, "y": scale_bar.y2},
+                    {"x": scale_bar.x2, "y": scale_bar.y1},                                        
                 ],
-                "caption": subfigure.caption,
-                "keywords": subfigure.keywords,
-                "general": subfigure.general,
-                "nm_width": subfigure.nm_width,
-                "nm_height": subfigure.nm_height,
             }
-        )
+            scale_bar_jsons.append(scale_bar_json)
+        subfigure_json["scale_bars"] = scale_bar_jsons
+        try:
+            label = models.SubfigureLabel.objects.get(subfigure__exact=subfigure.subfigure_id)
+            subfigure_json["subfigure_label"] = {
+                "text": label.text,
+                "geometry": [
+                    {"x": label.x1, "y": label.y1},
+                    {"x": label.x1, "y": label.y2},
+                    {"x": label.x2, "y": label.y2},
+                    {"x": label.x2, "y": label.y1},                                        
+                ],
+            }
+        except:
+            pass
+        exsclaim_json[figure_name]["master_images"].append(subfigure_json)
+
         move_image(figure, figure_directory)
     with open(figure_directory.parent / "exsclaim.json", "w") as f:
         json.dump(exsclaim_json, f)
