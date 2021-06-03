@@ -1,7 +1,5 @@
 /**
- * @param {string} url - The source image
- * @param {number} aspectRatio - The aspect ratio
- * @return {Promise<HTMLCanvasElement>} A Promise that resolves with the resulting image as a canvas element
+ * @param {<HTMLCanvasElement>} subfigure_image - The htmlcanvas to be filled by the subfigure
  */
 function crop(subfigure_image) {
   // extract parameters stored in html canvas element
@@ -17,7 +15,6 @@ function crop(subfigure_image) {
   var width = x2 - x1;
   subfigure_image.setAttribute("width", width);
   subfigure_image.setAttribute("height", height);
-
   // create a new image to load the content
   var image = new Image(),
   ctx = subfigure_image.getContext('2d');
@@ -25,10 +22,10 @@ function crop(subfigure_image) {
 
   image.onload = function(){
     ctx.drawImage(image,
-        x1, y1,   // Start at 70/20 pixels from the left and the top of the image (crop),
-        width, height,   // "Get" a `50 * 50` (w * h) area from the source image (crop),
+        x1, y1,
+        width, height,   
         0, 0,     // Place the result at 0, 0 in the canvas,
-        width, height); // With as width / height: 100 * 100 (scale)
+        width, height); 
   }
 }
 
