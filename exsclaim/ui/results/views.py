@@ -7,6 +7,7 @@ from django.db.models import Q
 import os.path
 import sys
 from . import models
+from exsclaim.utilities.paths import add_results_dir
 
 class SearchResultViews(ListView):
     model = models.Subfigure
@@ -60,6 +61,8 @@ class SearchResultViews(ListView):
         queryset = models.Subfigure.objects.all()
         query = self.get_http_parameters()
 
+        if "directory" in query:
+            add_results_dir(query["directory"])
 
         # Filter based on classification first (reducing queryset size looking
         # at exact on a 2 char field, seems more efficient)

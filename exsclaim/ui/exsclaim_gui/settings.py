@@ -148,7 +148,7 @@ if os.path.isfile(BASE_DIR.parent / "results_dirs"):
         results_dirs = f.readlines()
     for base_dir in results_dirs:
         if base_dir != "":
-            STATICFILES_DIRS.append(base_dir.strip())
+            STATICFILES_DIRS.append(Path(base_dir.strip()))
 
 # For django >3.2
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
