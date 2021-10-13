@@ -25,7 +25,7 @@ class TestNature(unittest.TestCase):
         with open(test_html, "r", encoding="utf-8") as f:
             soup = BeautifulSoup(f.read(), 'lxml')
         ## sample soup
-        expected_info = (1, 1, 12)
+        expected_info = (1, 1, 13)
         actual_info = self.jfamily.get_page_info(soup)
         self.assertEqual(expected_info, actual_info)
 

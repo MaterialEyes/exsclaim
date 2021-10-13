@@ -230,7 +230,7 @@ class JournalFamily():
         wait_time = float(random.randint(0, 50))
         time.sleep(wait_time/float(10))
         with requests.Session() as session:
-            r = session.get(url, headers=headers) 
+            r = session.get(url, headers=headers)
         soup = BeautifulSoup(r.text, 'lxml')
         return soup
 
@@ -408,14 +408,18 @@ class Nature(JournalFamily):
     def get_page_info(self, soup):
         ## Finds total results, page number, and total pages in article html
         ## Data exists as json inside script tag with 'data-test'='dataLayer' attr.
-        data_layer = soup.find(attrs = {'data-test': 'dataLayer'})
-        data_layer_string = str(data_layer.string)
-        data_layer_json = "{" + data_layer_string.split("[{", 1)[1].split("}];", 1)[0] + "}"
-        parsed = json.loads(data_layer_json)
-        search_info = parsed["page"]["search"]
-        return (search_info["page"],
-                search_info["totalPages"], 
-                search_info["totalResults"])
+        data_layer = soup.find(attrs = {'data-test': 'results-data'})
+        # <span data-test="results-data"><span>Showing  <X>–<X+pg_size> of&nbsp;</span><span>N results</span></span>
+        current_page_tag, total_results_tag = data_layer.contents
+        result_range = current_page_tag.contents[0].split()[1]
+        start, end = result_range.split("–")
+        page_size = int(end) - int(start) + 1
+        page = int(end) // page_size
+        total_results = int(total_results_tag.contents[0].split(" ")[0])
+        total_pages = math.ceil(total_results / page_size)
+        return (page,
+                total_pages, 
+                total_results)
 
     def turn_page(self, url, pg_num, pg_size):
         return url.split('&page=')[0]+'&page='+str(pg_num)
