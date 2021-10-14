@@ -442,14 +442,15 @@ class Nature(JournalFamily):
         return is_open, license
 
     def is_link_to_open_article(self, tag):
-        i = 0
         current_tag = tag
-        while current_tag.parent and i < 3:
+        while current_tag.parent:
+            if (current_tag.name == "li" 
+                and "app-article-list-row__item" in current_tag["class"]):
+                break
             current_tag = current_tag.parent
-            i += 1
-        candidates = current_tag.find_all("span", class_="text-orange")
+        candidates = current_tag.find_all("span", class_="u-color-open-access")
         for candidate in candidates:
-            if candidate.text == "Open":
+            if candidate.text.startswith("Open"):
                 return True
         return False
         
