@@ -40,7 +40,7 @@ class Pipeline:
                 self.query_dict = json.load(f)
         # Set up file structure
         base_results_dir = paths.initialize_results_dir(
-            self.query_dict.get("results_dirs", None)
+            self.query_dict.get("results_dir", None)
         )
         self.results_directory = (
             base_results_dir / self.query_dict["name"]
@@ -288,7 +288,7 @@ class Pipeline:
                 # generate the name of the master_image
                 master_class  = ('uas' if master_image['classification'] is None 
                                        else master_image['classification'][0:3].lower())
-                master_name = "/" + "_".join([figure_root_name,
+                master_name = "_".join([figure_root_name,
                                               master_image['subfigure_label']['text'],
                                               master_class
                                             ]) + figure_extension
@@ -296,7 +296,7 @@ class Pipeline:
                 master_patch = boxes.crop_from_geometry(master_image['geometry'], figure)
                 master_patch = master_patch.copy(order='C')
                 try:
-                    plt.imsave(directory + master_name, master_patch)  
+                    plt.imsave(directory / master_name, master_patch)  
                 except Exception as err:
                     self.logger.exception(("Error in saving cropped master"
                         " image of figure: {}".format(figure_root_name)))
@@ -313,7 +313,7 @@ class Pipeline:
                     # save dependent image to file
                     dpatch = boxes.crop_from_geometry(dependent_image['geometry'], figure)
                     try:
-                        plt.imsave(dependent_root_name+dependent_name,dpatch) 
+                        plt.imsave(dependent_root_name / dependent_name,dpatch) 
                     except Exception as err:
                         self.logger.exception(("Error in saving cropped master"
                             " image of figure: {}".format(figure_root_name)))
@@ -346,7 +346,7 @@ class Pipeline:
                     ipatch = boxes.crop_from_geometry(inset_image['geometry'], figure)
                     # save inset image to file
                     try:
-                        plt.imsave(inset_root_name+inset_name,ipatch)
+                        plt.imsave(inset_root_name / inset_name,ipatch)
                     except Exception as err:
                         self.logger.exception(("Error in saving cropped master"
                             " image of figure: {}".format(figure_root_name)))
