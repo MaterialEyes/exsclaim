@@ -26,18 +26,15 @@ def load_models(models_path=str) -> "caption_nlp_model":
     # Load pre-trained statistical model (English) and input vocab to Matcher
     nlp     = load("en_core_web_sm") 
     matcher = Matcher(nlp.vocab)
-
     # Get list of caption-spectific spaCy rules (contains label + pattern)
     caption_rules = files.load_yaml(models_path+'rules.yml')
-
     # Add custom caption rules to spaCy matcher
     for rule in caption_rules:
         matcher.add(rule['label'], [rule['pattern']])
 
     # Add new spans to the Doc.ents and then to the processing pipeline.
-    ruler = EntityRuler(nlp, name="entity_ruler", patterns=caption_rules)
-    nlp.add_pipe("entity_ruler", before="ner")
-    
+    entity_ruler = nlp.add_pipe("entity_ruler", before="ner")
+    entity_ruler.initialize(lambda: [], nlp=nlp, patterns=caption_rules)
     return (nlp, matcher) 
 
 
