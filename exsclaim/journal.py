@@ -12,6 +12,8 @@ import random
 import time
 import logging
 import pathlib
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 from .utilities import paths
 
 
@@ -24,24 +26,33 @@ class JournalFamily():
     """
     ## journal attributes -- these must be defined for each journal
     ## family based on the explanations provided here
-    domain =        "The domain name of journal family",
+    domain =            "The domain name of journal family",
     ## the next 6 fields determine the url of journals search page
-    relevant =      ("The value for the journal's sorting field"
-                    "that donotes sorting search results based" 
-                    "on relevance in the search page url"),
-    recent =        "The sorting field value for recency",
-    path =          ("The portion of the url that runs from the"
-                    "end of the domain to search terms"),
-    join =          ("The portion of the url that appears between"
-                    "consecutive search terms"),
-    pre_sb =        ("Portion of the url that extends from the"
-                    "search terms to the paremeter value for"
-                    "sorting search results"),
-    open_pre_sb =   ("Pre sb, except with parameter (if it exists)"
-                     " to only search for open access articles"),
-    post_sb =       "The final portion of the url", 
+    search_path =       ("The portion of the url that runs from the"
+                         " end of the domain to search terms")
+    ## params should include trailing '='
+    page_param =        "URL parameter noting current page number"
+    max_page_size =     ("URL parameter and value requesting max results per"
+                         "page to limit total requests")
+    term_param =        "URL parameter noting search term"
+    order_param =       "URL parameter noting results order"
+    open_param =        "URL parameter optionally noting open results only"
+    journal_param =     "URL paremter noting journal to search"
+    date_range_prarm =  "URL parameter noting range of dates to search"
+    # order options
+    order_values = {
+        "relevant" :    "URL value meaning to rank relevant results first",
+        "recent" :      "URL value meaning to rank recent results first",
+        "old" :         "URL value meaning to rank old results first"
+    }
+    join =              ("The portion of the url that appears between"
+                         "consecutive search terms")
+    max_query_results = ("Maximum results journal family will return for "
+                         "single query")
     ## used for get_article_delimiters
-    article_path =  "The journal's url path to articles"
+    articles_path =  ("The journal's url path to articles, where articles"
+                      " are located at domain.name/articles_path/article")
+    articles_path_length = "Number of / separated segments to articles path"
 
     def __init__(self, search_query):
         """
@@ -54,6 +65,7 @@ class JournalFamily():
         """
         self.search_query = search_query
         self.open = search_query.get("open", False)
+        self.order = search_query.get("order", "relevant")
         self.logger = logging.getLogger(__name__)
         # Set up file structure
         base_results_dir = paths.initialize_results_dir(
@@ -65,6 +77,16 @@ class JournalFamily():
         figures_directory = self.results_directory / "figures"
         os.makedirs(figures_directory, exist_ok=True)
 
+        ## Check if any articles have already been scraped by checking
+        ## results_dir/_articles
+        articles_visited = {}
+        articles_file = self.results_directory / "_articles"
+        if os.path.isfile(articles_file):
+            with open(articles_file,'r') as f:
+                contents = f.readlines()
+            articles_visited ={a.strip() for a in contents}
+        self.articles_visited = articles_visited
+
     def get_domain_name(self) -> str:
         """
         Get url base path (domain name) for the requested journal family in search_query.
@@ -73,16 +95,6 @@ class JournalFamily():
             The domain name of the journal, as a string
         """
         return self.domain
-
-    def get_article_delimiters(self) -> tuple:
-        """
-        Get delimiters (url path to articles) specific to this journal
-
-        Returns:
-            (delimiter for articles in the journal family url, \
-            list containing delimiters for possible reader versions for an article).
-        """
-        return self.article_path
 
     def get_page_info(self, soup):
         """
@@ -94,24 +106,38 @@ class JournalFamily():
         Returns:
             (index origin, total page count in search, total results from search)
         """
-        print("implement get_page_info for journal")
+        raise NotImplementedError()
 
-    def turn_page(self, url, pg_num, pg_size):
+    def turn_page(self, url, pg_num):
         """
         Create url for a GET request based on the search_query.
 
         Args:
             url: the url to a search results page
             pg_num: page number to search on (-1 = starts at index origin for journal)
-            pg_size: number of results on given page
         Returns:
             A url.
         """ 
-        print("implement get_page_info for journal")
+        raise NotImplementedError()
+
+    def get_additional_url_arguments(self, soup):
+        """
+        Get lists of additional search url parameters
+
+        Args:
+            soup (bs4): soup of initial search page
+        Returns:
+            (years, journal_codes, orderings): where:
+                years is a list of strings of desired date ranges
+                journal_codes is a list of strings of desired journal codes
+                orderings is a list of strings of desired results ordering
+            Each of these should be in order of precedence.
+        """
+        raise NotImplementedError()
 
     def get_search_query_urls(self) -> str:
         """
-        Create url for a GET request based on the search_query.
+        Create list of search query urls based on input query.
 
         Returns:
             A list of urls (as strings)
@@ -123,27 +149,32 @@ class JournalFamily():
                        for key in search_query['query']])
         search_product = list(itertools.product(*search_list))
 
-        # sortby is the requested method to sort results (relevancy or recency) and
-        # sbtext gives the journal specific parameter to sort as requested
-        sortby = search_query['sortby']
-        if sortby == 'relevant':
-            sbext = self.relevant
-        elif sortby == 'recent':
-            sbext = self.recent
-
-        # modify search to find only open access articles
-        if search_query.get("open", False):
-            self.pre_sb = self.open_pre_sb
-
-        search_query_urls = []
-        # this creates the url (excluding domain and protocol) for each search query
-        for search_group in search_product:
-            search_query_url = (self.domain + self.path
-                + self.join.join(["+".join(a.split(" ")) for a in search_group])
-                + self.pre_sb + sbext + self.post_sb)
-            search_query_urls.append(search_query_url)
-
-        return search_query_urls
+        search_urls = []
+        for term in search_product:
+            url_parameters = "&".join(
+                [self.term_param + self.join.join(term),
+                 self.max_page_size]
+            )
+            search_url = self.domain + self.search_path + url_parameters
+            if self.open:
+                search_url += "&" + self.open_param
+            soup = self.get_soup_from_request(search_url, fast_load=True)
+            years, journal_codes, orderings = self.get_additional_url_arguments(soup)
+            search_url_args = []
+            for year_value in years:
+                for journal_value in journal_codes:
+                    for order_value in orderings:
+                        args = "&".join(
+                            [
+                                self.date_range_param + year_value,
+                                self.journal_param + journal_value,
+                                self.order_param + order_value
+                            ]
+                        )
+                        search_url_args.append(args)
+            search_term_urls = [search_url + url_args for url_args in search_url_args]
+            search_urls += search_term_urls
+        return search_urls
 
     def get_license(self, soup):
         """ Checks the article license and whether it is open access 
@@ -167,37 +198,50 @@ class JournalFamily():
         """
         return False
 
-    def get_article_extensions(self, articles_visited=set()) -> list:
+    def get_articles_from_search_url(self, search_url):
+        max_scraped = self.search_query["maximum_scraped"]
+        self.logger.info("GET request: {}".format(search_url))
+        soup = self.get_soup_from_request(search_url, fast_load=True)
+        start_page, stop_page, total_articles = self.get_page_info(soup)
+
+        article_paths = set()
+        for page_number in range(start_page, stop_page):
+            for tag in soup.find_all('a', href=True):
+                url = tag.attrs['href']
+                self.logger.debug("Candidate Article: {}".format(url))
+                if (self.articles_path not in url 
+                      or url.count("/") != self.articles_path_length):
+                    # The url does not point to an article
+                    continue
+                if (url.split("/")[-1] in self.articles_visited
+                      or (self.open and not self.is_link_to_open_article(tag))):
+                    # It is an article but we are not interested
+                    continue
+                self.logger.debug("Candidate Article: PASS")
+                article_paths.add(url)
+                if len(article_paths) >= max_scraped:
+                    return article_paths
+            # Get next page at end of loop since page 1 is obtained from 
+            # search_url
+            request = self.turn_page(search_url, page_number+1)
+            soup = self.get_soup_from_request(request, fast_load=False)
+        return article_paths
+
+    def get_article_extensions(self) -> list:
         """
         Create a list of article url extensions from search_query
 
         Returns:
             A list of article url extensions from search.
         """
-        search_query = self.search_query
-        maximum_scraped = search_query["maximum_scraped"]
-        article_delim, reader_delims = self.get_article_delimiters()
+        # This returns urls based on the combinations of desired search terms.
         search_query_urls = self.get_search_query_urls()
         article_paths = set()
-        for page1 in search_query_urls:
-            self.logger.info("GET request: {}".format(page1))
-            soup = self.get_soup_from_request(page1, fast_load=True)
-            start_page, stop_page, total_articles = self.get_page_info(soup)
-            for page_number in range(start_page, stop_page + 1):
-                request = self.turn_page(page1, page_number, total_articles)
-                soup = self.get_soup_from_request(request, fast_load=False)
-                for tag in soup.find_all('a', href=True):
-                    article = tag.attrs['href']
-                    article = article.split('?page=search')[0]
-                    if (len(article.split(article_delim)) > 1 
-                            and article.split("/")[-1] not in articles_visited
-                            and article != None
-                            and len(set(reader_delims).intersection(set(article.split("/")))) <= 0
-                            and not (self.open
-                                     and not self.is_link_to_open_article(tag))):
-                        article_paths.add(article)
-                    if len(article_paths) >= maximum_scraped:
-                        return list(article_paths)
+        for search_url in search_query_urls:
+            new_article_paths = self.get_articles_from_search_url(search_url)
+            article_paths.update(new_article_paths)
+            if len(article_paths) >= self.search_query["maximum_scraped"]:
+                break
         return list(article_paths)
 
     def get_figure_list(self, url):
@@ -356,17 +400,28 @@ class JournalFamily():
 #####################################################################
 
 class ACS(JournalFamily):
-    domain =        "https://pubs.acs.org"
-    relevant =      "relevancy"
-    recent =        "Earliest"
-    path =          "/action/doSearch?AllField=\""
-    join =          "\"+\""
-    pre_sb =        "\"&publication=&accessType=allContent&Earliest=&pageSize=20&startPage=0&sortBy="
-    open_pre_sb =   "\"&publication=&openAccess=18&accessType=openAccess&Earliest=&pageSize=20&startPage=0&sortBy="
-    post_sb =       ""
-    article_path =  ('/doi/',['abs','full','pdf'])
-    prepend =       "https://pubs.acs.org"
-    extra_key =     "inline-fig internalNav"
+    domain =                "https://pubs.acs.org"
+    search_path =           "/action/doSearch?"
+    term_param =            "AllField="
+    max_page_size =         "pageSize=100"
+    page_param =            "startPage="
+    order_param =           "sortBy="
+    open_param =            "openAccess=18&accessType=openAccess"
+    journal_param =         "SeriesKey="
+    date_range_param =      "Earliest="
+    # order options
+    order_values = {
+        "relevant" : "relevancy",
+        "old" : "Earliest_asc",
+        "recent" : "Earliest"
+    }
+    join =                  "\"+\""
+
+    articles_path =         "/doi/"
+    prepend =               "https://pubs.acs.org"
+    extra_key =             "inline-fig internalNav"
+    articles_path_length =  3
+    max_query_results =     1000
 
     def get_page_info(self, soup):
         totalResults = int(soup.find('span', {'class': "result__count"}).text)
@@ -374,7 +429,30 @@ class ACS(JournalFamily):
         page = 0
         return page, totalPages, totalResults
 
-    def turn_page(self, url, pg_num, pg_size):
+    def get_additional_url_arguments(self, soup):
+        now = datetime.now()
+        time_format = "%Y%m%d"
+        journal_list = soup.find(id="Publication")
+        journal_link_tags = journal_list.parent.find_all('a', href=True)
+        journal_codes = [jlt.attrs["href"].split("=")[-1] for jlt in journal_link_tags]
+        if self.order == "exhaustive":
+            num_years = 100
+            orderings = list(self.order_values.values())
+        else:
+            num_years = 25
+            orderings = [self.order_values[self.order]]
+            journal_codes = journal_codes[:10]
+        years = [
+            "[{} TO {}]".format(
+                (now - relativedelta(years=k-1)).strftime(time_format),
+                (now - relativedelta(years=k)).strftime(time_format)
+            ) for k in range(1, num_years)
+        ]
+        years = [""] + years
+        return years, journal_codes, orderings
+
+
+    def turn_page(self, url, pg_num):
         return url.split('&startPage=')[0]+'&startPage='+str(pg_num)+"&pageSize="+str(20)
 
     def get_license(self, soup):
@@ -392,17 +470,34 @@ class ACS(JournalFamily):
 
 
 class Nature(JournalFamily):
-    domain =        "https://www.nature.com"
-    relevant =      "relevance"
-    recent =        "date_desc"
-    path =          "/search?q=\""
-    join =          "\"%20\""
-    pre_sb =        "\"&order="
-    open_pre_sb =   "\"&order="
-    post_sb =       "&page=1"
-    article_path =  ('/articles/','')
+    domain =                "https://www.nature.com"
+    search_path =           "/search?"
+    page_param =            "page="
+    max_page_size =         "" # not available for nature
+    term_param =            "q="
+    order_param =           "order="
+    open_param =            ""
+    date_range_param =      "date_range="
+    journal_param =         "journal="
+    # order options
+    order_values = {
+        "relevant" : "relevance",
+        "old" : "date_asc",
+        "recent" : "date_desc"
+    }
+    # codes for journals most relevant to materials science
+    materials_journals =    [
+        "", "nature", "nmat", "ncomms", "sdata", "nnano", "natrevmats", "am",
+        "npj2dmaterials", "npjcompumats", "npjmatdeg", "npjquantmats",
+        "commsmat"
+    ]
+
+    join =                  "\"%20\""
+    articles_path =         '/articles/'
+    articles_path_length =  2
     prepend =       ""
     extra_key =     " "
+    max_query_results =     1000
 
     def get_page_info(self, soup):
         ## Finds total results, page number, and total pages in article html
@@ -420,7 +515,35 @@ class Nature(JournalFamily):
                 total_pages, 
                 total_results)
 
-    def turn_page(self, url, pg_num, pg_size):
+    def get_additional_url_arguments(self, soup):
+        current_year = datetime.now().year
+        earliest_year = 1845
+        non_exhaustive_years = 25
+        ## If the search is exhaustive, search all 161 nature journals,
+        ## for all years since 1845, in relevance, oldest, and youngest order.
+        if self.order == "exhaustive":
+            search_url = "https://www.nature.com/search/advanced"
+            advanced_search = self.get_soup_from_request(search_url)
+            journal_tags = advanced_search.find_all(name="journal[]")
+            journal_codes = [tag.value for tag in journal_tags]
+            years = [
+                str(year)+"-"+str(year) 
+                for year in range(current_year, earliest_year, -1)
+            ]
+            orderings = list(self.order_values.values())
+        ## If the search is not exhaustive, search the most relevant materials
+        ## journals, for the past 25 years, in self.order order. 
+        else:
+            journal_codes = self.materials_journals
+            years = [
+                str(year)+"-"+str(year)
+                for year in range(current_year-non_exhaustive_years, current_year)
+            ]
+            orderings = [self.order_values[self.order]]
+        years = [""] + years
+        return years, journal_codes, orderings
+
+    def turn_page(self, url, pg_num):
         return url.split('&page=')[0]+'&page='+str(pg_num)
 
     def get_license(self, soup):
@@ -458,12 +581,13 @@ class RSC(JournalFamily):
     domain =        "https://pubs.rsc.org"
     relevant =      "Relevance"
     recent =        "Latest%20to%20oldest"
-    path =          "/en/results?searchtext="
+    path =          "/en/results?"
+    term =          "searchtext="
     join =          "\"%20\""
     pre_sb =        "\"&SortBy="
     open_pre_sb =   "\"&SortBy="
     post_sb =       "&PageSize=1&tab=all&fcategory=all&filter=all&Article%20Access=Open+Access"
-    article_path =  ('/en/content/articlehtml/','')
+    articles_path =  '/en/content/articlehtml/'
     prepend =       "https://pubs.rsc.org"
     extra_key =     "/image/article"
 
@@ -477,8 +601,8 @@ class RSC(JournalFamily):
         page = 1
         return page, totalPages, totalResults
 
-    def turn_page(self, url, pg_num, pg_size):
-        return url.split('1&tab=all')[0]+str(pg_size)+'&tab=all&fcategory=all&filter=all&Article%20Access=Open+Access'
+    def turn_page(self, url, pg_num):
+        pass#return url.split('1&tab=all')[0]+str(pg_size)+'&tab=all&fcategory=all&filter=all&Article%20Access=Open+Access'
 
     def get_figure_list(self, url):
         soup = self.get_soup_from_request(url)

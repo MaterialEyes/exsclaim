@@ -92,16 +92,6 @@ class JournalScraper(ExsclaimTool):
         self.initialize_query(search_query)
         self.new_articles_visited = set()
 
-        ## Check if any articles have already been scraped by checking
-        ##   results_dir/_articles
-        articles_visited = {}
-        articles_file = self.results_directory / "_articles"
-        if os.path.isfile(articles_file):
-            with open(articles_file,'r') as f:
-                contents = f.readlines()
-            articles_visited ={a.strip() for a in contents}
-        self.articles_visited = articles_visited
-
     def _load_model(self):
         pass
 
@@ -132,17 +122,6 @@ class JournalScraper(ExsclaimTool):
             for article in self.new_articles_visited:
                 f.write('%s\n' % article.split("/")[-1])
 
-    def _get_articles(self, j_instance):
-        """ Get a list of articles that have not already been scraped
-
-        Args:
-            j_instance (journal.JournalFamily): An instance of a
-                JounralFamily search. 
-        """
-        articles = j_instance.get_article_extensions(self.articles_visited)
-
-        return articles
-
     def run(self, search_query, exsclaim_json={}):
         """ Run the JournalScraper to find relevant article figures
 
@@ -163,7 +142,7 @@ class JournalScraper(ExsclaimTool):
         os.makedirs(self.results_directory, exist_ok=True)
         t0 = time.time()
         counter = 1
-        articles = self._get_articles(j_instance)
+        articles = j_instance.get_article_extensions()
         ## Extract figures, captions, and metadata from each article
         for article in articles:
             self.display_info(">>> ({0} of {1}) Extracting figures from: ".format(counter, len(articles))+\
