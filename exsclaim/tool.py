@@ -134,10 +134,11 @@ class JournalScraper(ExsclaimTool):
         self.display_info("Running Journal Scraper\n")
         ## Checks that user inputted journal family has been defined and
         ## grabs instantiates an instance of the journal family object
-        journal_family = search_query['journal_family']
-        if journal_family not in self.journals:
-            raise NameError('journal family {0} is not defined'.format(journal_family))
-        j_instance = self.journals[journal_family](search_query)
+        journal_family_name = search_query['journal_family']
+        if journal_family_name not in self.journals:
+            raise NameError('journal family {0} is not defined'.format(journal_family_name))
+        journal_subclass = self.journals[journal_family_name]
+        j_instance = journal_subclass(search_query)
 
         os.makedirs(self.results_directory, exist_ok=True)
         t0 = time.time()
