@@ -25,7 +25,7 @@ class TestNature(unittest.TestCase):
         with open(test_html, "r", encoding="utf-8") as f:
             soup = BeautifulSoup(f.read(), 'lxml')
         ## sample soup
-        expected_info = (1, 1, 13)
+        expected_info = (1, 50, 2469)
         actual_info = self.jfamily.get_page_info(soup)
         self.assertEqual(expected_info, actual_info)
 
@@ -37,23 +37,14 @@ class TestNature(unittest.TestCase):
         This just ensures we have a list of strings, where the strings
         are appropriate url extensions
         """
-        # set up sortby to test that urls extensions contain sorting param
-        sortby = self.query['sortby']
-        if sortby == 'relevant':
-            sbext = self.jfamily.relevant
-        elif sortby == 'recent':
-            sbext = self.jfamily.recent
-
         search_extensions = self.jfamily.get_search_query_urls()
         # assure the result is a list, and each item is a string
         self.assertIsInstance(search_extensions, list)
         for url in search_extensions:
             self.assertIsInstance(url, str)
             # assure that each url fits certain constraints
-            self.assertIn(self.jfamily.path, url)
-            self.assertIn(self.jfamily.pre_sb, url)
-            self.assertIn(self.jfamily.post_sb, url)
-            self.assertIn(sbext, url)
+            self.assertIn(self.jfamily.search_path, url)
+            self.assertIn(self.jfamily.term_param, url)
             domain_length = len(self.jfamily.domain)
             self.assertEqual(url[0:domain_length], self.jfamily.domain)
 
@@ -92,7 +83,7 @@ class TestNature(unittest.TestCase):
         # set up and execute mock execution
         mock_url = 'http://www.test_exsclaim.com/article/test_article'
         responses.add(responses.GET, mock_url, body=test_html)
-        figures = self.jfamily.get_figure_list(mock_url)
+        figures = self.jfamily.get_figure_subtrees(mock_url)
 
         self.assertIsInstance(figures, list)
         for figure in figures:

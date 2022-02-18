@@ -1,7 +1,6 @@
 import pathlib
 from sys import path
 import os
-from exsclaim.ui.exsclaim_gui.settings import STATICFILES_DIRS
 
 def initialize_results_dir(results_dir=None):
     """ Determine where to save results for a pipeline run
@@ -20,7 +19,6 @@ def initialize_results_dir(results_dir=None):
         Creates results_dir if it doesn't exist. Adds results_dir
         to results_dirs file
     """
-
     # find all previous results directories
     current_file = pathlib.Path(__file__).resolve(strict=True)
     base_dir = current_file.parent.parent.parent
@@ -57,5 +55,3 @@ def add_results_dir(results_dir):
     if results_dir not in results_dirs:
         with open(results_dirs_file, "a") as f:
             f.write(str(results_dir) + "\n")
-    if results_dir not in STATICFILES_DIRS:
-        STATICFILES_DIRS.append(pathlib.Path(results_dir))

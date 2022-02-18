@@ -45,10 +45,9 @@ class TestNatureFull(unittest.TestCase):
             with open(test_articles / article_name, "r", encoding="utf-8") as f:
                 article_html = f.read()
             responses.add(responses.GET, url, body = article_html)
-        search_url_1 = ("https://www.nature.com/search?q=%22Ag+nanoparticle"
-                        "%22%20%22HAADF-STEM%22&order=relevance&page=1")
-        search_url_2 = ("https://www.nature.com/search?q=%22Ag+nanoparticle"
-                        "%22%20%22HAADF+STEM%22&order=relevance&page=1")
+        search_url_1 = ("https://www.nature.com/search?q=Ag%20nanoparticle&")
+        search_url_2 = ("https://www.nature.com/search?q=Ag%20nanoparticle&"
+                        "date_range=&journal=&order=relevance")
         test_search = self.data / 'nature_search.html'
         with open(test_search, "r", encoding="utf-8") as f:
             article_html = f.read()
