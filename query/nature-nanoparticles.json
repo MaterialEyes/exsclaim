@@ -1,9 +1,9 @@
 {   
-    "name": "nature-haadf-ag-nanoparticles",
+    "name": "nature-nanoparticles",
 
     "journal_family": "nature",
 
-    "maximum_scraped": 5,
+    "maximum_scraped": 2,
 
     "sortby": "relevant",
 
@@ -13,17 +13,12 @@
         {
             "term":"Ag nanoparticle",
             "synonyms":["Ag nanoparticles", "silver nanoparticle", "silver nanoparticle", "nanoparticles of silver", "AgNPs", "AgNP", "Ag NPs", "silver NPs", "silver NP"]
-        },
-        "search_field_2":
-        {
-            "term":"HAADF-STEM",
-            "synonyms":["HAADF STEM", "High-angle annular dark-field STEM","HAADF image", "(HAADF)", "High-angle ADF", "high-angle annular dark-field (HAADF) imaging", "HAADF imaging"]
         }
     },
 
     "open": true,
 
-    "save_format": ["postgres"],
+    "save_format": ["save_subfigures"],
 
     "logging": ["print", "exsclaim.log"]
 }
