@@ -1,9 +1,9 @@
 {   
-    "name": "acs-haadf-ag-nanoparticles",
+    "name": "acs-nanoparticles",
 
     "journal_family": "acs",
 
-    "maximum_scraped": 10,
+    "maximum_scraped": 2,
 
     "sortby": "relevant",
 
@@ -16,7 +16,7 @@
         }
     },
 
-    "save_format": [""], 
+    "logging": ["exsclaim.log", "print"], 
 
-    "open" : false
+    "open" : true
 }

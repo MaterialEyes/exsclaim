@@ -14,6 +14,16 @@ import logging
 import pathlib
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+try:
+    from selenium import webdriver
+    from selenium.webdriver.common.by import By
+    from selenium.webdriver.support.ui import WebDriverWait
+    from selenium.webdriver.support import expected_conditions as EC
+    from selenium.common.exceptions import TimeoutException
+    from webdriver_manager.chrome import ChromeDriverManager
+
+except:
+    pass
 from .utilities import paths
 
 
@@ -118,7 +128,8 @@ class JournalFamily():
         Returns:
             A url.
         """ 
-        raise NotImplementedError()
+        new_url = url + "&" + self.page_param + str(pg_num)
+        return self.get_soup_from_request(new_url)
 
     def get_additional_url_arguments(self, soup):
         """
@@ -145,7 +156,7 @@ class JournalFamily():
         search_query = self.search_query
         ## creates a list of search terms
         search_list = ([[search_query['query'][key]['term']] + 
-                       search_query['query'][key]['synonyms'] 
+                       search_query['query'][key].get('synonyms', []) 
                        for key in search_query['query']])
         search_product = list(itertools.product(*search_list))
 
@@ -157,7 +168,7 @@ class JournalFamily():
             )
             search_url = self.domain + self.search_path + url_parameters
             if self.open:
-                search_url += "&" + self.open_param
+                search_url += "&" + self.open_param + "&"
             soup = self.get_soup_from_request(search_url, fast_load=True)
             years, journal_codes, orderings = self.get_additional_url_arguments(soup)
             search_url_args = []
@@ -203,9 +214,8 @@ class JournalFamily():
         self.logger.info("GET request: {}".format(search_url))
         soup = self.get_soup_from_request(search_url, fast_load=True)
         start_page, stop_page, total_articles = self.get_page_info(soup)
-
         article_paths = set()
-        for page_number in range(start_page, stop_page):
+        for page_number in range(start_page, stop_page+1):
             for tag in soup.find_all('a', href=True):
                 url = tag.attrs['href']
                 self.logger.debug("Candidate Article: {}".format(url))
@@ -223,8 +233,8 @@ class JournalFamily():
                     return article_paths
             # Get next page at end of loop since page 1 is obtained from 
             # search_url
-            request = self.turn_page(search_url, page_number+1)
-            soup = self.get_soup_from_request(request, fast_load=False)
+            soup = self.turn_page(search_url, page_number+1)
+
         return article_paths
 
     def get_article_extensions(self) -> list:
@@ -244,16 +254,15 @@ class JournalFamily():
                 break
         return list(article_paths)
 
-    def get_figure_list(self, url):
+    def get_figure_subtrees(self, soup):
         """
-        Returns list of figures in the givin url
+        Retrieves list of bs4 parse subtrees containing figure elements
 
         Args:
-            url: a string, the url to be searched
+            soup: A beautifulsoup parse tree
         Returns:
             A list of all figures in the article as BeaustifulSoup Tag objects
         """
-        soup = self.get_soup_from_request(url)
         figure_list = [a for a in soup.find_all('figure') if str(a).find(self.extra_key)>-1]
         return figure_list
 
@@ -274,19 +283,21 @@ class JournalFamily():
         time.sleep(wait_time/float(10))
         with requests.Session() as session:
             r = session.get(url, headers=headers)
+        # with open('exsclaim/' + url.split("/")[-1], "w+") as f:
+        #     f.write(r.text)
         soup = BeautifulSoup(r.text, 'lxml')
         return soup
 
-    def find_captions(self, figure):
+    def find_captions(self, figure_subtree):
         """
         Returns all captions associated with a given figure
 
         Args:
-            figure: an html figure
+            figure_subtree: an bs4 parse tree
         Returns:
             all captions for given figure
         """
-        return figure.find_all('p')
+        return figure_subtree.find_all('p')
 
     def save_figure(self, figure_name, image_url):
         """
@@ -302,6 +313,18 @@ class JournalFamily():
         with open(figure_path, 'wb') as out_file:
             shutil.copyfileobj(response.raw, out_file)
         del response 
+
+    def get_figure_url(self, figure_subtree):
+        """ Returns url of figure from figure's html subtree
+        
+        Args:
+            figure_subtree (bs4): subtree containing an article figure
+        Returns:
+            url (str)
+        """
+        image_tag = figure_subtree.find('img')
+        image_url = image_tag.get('src')
+        return self.prepend + image_url
 
     def get_article_figures(self, url: str) -> dict:
         """
@@ -321,20 +344,21 @@ class JournalFamily():
         with open(html_directory / (url.split("/")[-1]+'.html'), "w", encoding='utf-8') as file:
             file.write(str(soup))
 
-        figure_list = self.get_figure_list(url)
-        figures = 1
+        figure_subtrees = self.get_figure_subtrees(soup)
+        self.logger.info(len(figure_subtrees))
+        figure_number = 1
         article_json = {}
 
-        # for figure in soup.find_all('figure'):
-        for figure in figure_list:
-            captions = self.find_captions(figure)
+        for figure_subtree in figure_subtrees:
+
+            captions = self.find_captions(figure_subtree)
 
             # acs captions are duplicated, one version with no captions
             if len(captions) == 0:
                 continue
             
             # initialize the figure's json
-            article_name = url.split("/")[-1]
+            article_name = url.split("/")[-1].split("?")[0]
             figure_json = {"title": soup.find('title').get_text(), 
                            "article_url" : url,
                            "article_name" : article_name}
@@ -349,18 +373,13 @@ class JournalFamily():
             figure_json["caption_delimiter"] = ""
 
             # get figure url and name
-            if 'rsc' in url.split("."):
-                # for image_tag in figure.find_all("a", href=True):
-                for image_tag in [a for a in figure.find_all("a", href=True) if str(a).find(self.extra_key)>-1]:
-                    image_url = image_tag['href']
-            else:
-                image_tag = figure.find('img')
-                image_url = image_tag.get('src')
+            image_url = self.get_figure_url(figure_subtree)
 
-            image_url = self.prepend + image_url.replace('_hi-res','')
+
+            # image_url = self.prepend + image_url.replace('_hi-res','')
             if ":" not in image_url:
                 image_url = "https:" + image_url
-            figure_name = article_name + "_fig" + str(figures) + ".jpg"  #" +  image_url.split('.')[-1]
+            figure_name = article_name + "_fig" + str(figure_number) + ".jpg"  #" +  image_url.split('.')[-1]
 
             # save image info
             figure_json["figure_name"] = figure_name
@@ -387,7 +406,7 @@ class JournalFamily():
             # add all results
             article_json[figure_name] = figure_json
             # increment index
-            figures += 1
+            figure_number += 1
         return article_json
 
 
@@ -452,9 +471,6 @@ class ACS(JournalFamily):
         return years, journal_codes, orderings
 
 
-    def turn_page(self, url, pg_num):
-        return url.split('&startPage=')[0]+'&startPage='+str(pg_num)+"&pageSize="+str(20)
-
     def get_license(self, soup):
         open_access = soup.find('div', {"class": "article_header-open-access"})
         if open_access and ("ACS AuthorChoice" in open_access.text or
@@ -492,7 +508,7 @@ class Nature(JournalFamily):
         "commsmat"
     ]
 
-    join =                  "\"%20\""
+    join =                  " "
     articles_path =         '/articles/'
     articles_path_length =  2
     prepend =       ""
@@ -543,9 +559,6 @@ class Nature(JournalFamily):
         years = [""] + years
         return years, journal_codes, orderings
 
-    def turn_page(self, url, pg_num):
-        return url.split('&page=')[0]+'&page='+str(pg_num)
-
     def get_license(self, soup):
         data_layer = soup.find(attrs = {'data-test': 'dataLayer'})
         data_layer_string = str(data_layer.string)
@@ -578,18 +591,82 @@ class Nature(JournalFamily):
         
 
 class RSC(JournalFamily):
-    domain =        "https://pubs.rsc.org"
-    relevant =      "Relevance"
-    recent =        "Latest%20to%20oldest"
-    path =          "/en/results?"
-    term =          "searchtext="
-    join =          "\"%20\""
-    pre_sb =        "\"&SortBy="
-    open_pre_sb =   "\"&SortBy="
-    post_sb =       "&PageSize=1&tab=all&fcategory=all&filter=all&Article%20Access=Open+Access"
-    articles_path =  '/en/content/articlehtml/'
-    prepend =       "https://pubs.rsc.org"
-    extra_key =     "/image/article"
+    domain =                "https://pubs.rsc.org"
+    search_path =           "/en/results?"
+    page_param =            ""  # pagination through javascript
+    max_page_size =         "PageSize=1000"
+    term_param =            "searchtext="
+    order_param =           "SortBy="
+    open_param =            "Article Access=Open+Access"
+    date_range_param =      "Date Range="
+    journal_param =         "Journal="
+    # order options
+    order_values = {
+        "relevant" : "Relevance",
+        "old" : "Oldest to latest",
+        "recent" : "Latest to oldest"
+    }
+    # codes for journals most relevant to materials science
+    materials_journals =    [
+        "", "Nanoscale", "RSC+Adv.", "Chem.+Sci.", "Mater.+Adv.",
+        "Nanoscale+Adv.", "Mater.+Chem.+Front."
+    ]
+
+    join =                  " "
+    articles_path =         '/en/content/articlehtml/' # YYYY/2 char journal/
+    articles_path_length =  6
+    prepend =               "https://pubs.rsc.org"
+    extra_key =     " "
+    max_query_results =     np.inf
+
+    def __init__(self, search_query):
+        super().__init__(search_query)
+        ## set up selenium
+        chromeOptions = webdriver.ChromeOptions() 
+        chromeOptions.add_argument("--no-sandbox")
+        chromeOptions.add_argument("--headless")
+        chromeOptions.add_argument("--disable-dev-shm-usage") 
+        chromeOptions.add_argument("--hide-scrollbars")
+        chromeOptions.add_argument('--disable-extensions')
+        chromeOptions.add_argument('--profile-directory=Default')
+        chromeOptions.add_argument("--incognito")
+        chromeOptions.add_argument("--disable-plugins-discovery")
+        chromeOptions.add_argument("--start-maximized")
+        self.browser = webdriver.Chrome(ChromeDriverManager().install(), chrome_options=chromeOptions)
+
+    def get_soup_from_request(self, url: str, fast_load=False):
+        url.replace(" ", "+")
+        self.browser.get(url)
+        article_request = "en/content/articlehtml" in url
+        try:
+            if article_request:
+                element = WebDriverWait(self.browser, 5).until(
+                    EC.presence_of_element_located((By.CLASS_NAME, "imgHolder"))
+                )
+            else:
+                element = WebDriverWait(self.browser,30).until(
+                    lambda driver: 
+                        (driver.find_element(By.XPATH, "//*[@class='capsule__action']") or 
+                        driver.find_element(By.CLASS_NAME,'img-tbl__image'))
+                )
+        except TimeoutException:
+            article_msg = "\n  3. Article contains no figures"
+            error_msg = (
+                "Selenium request unsuccessful for {}. Either\n"
+                "  1. internet connection is unstable / slow\n"
+                "  2. HTML structure of articles has changed"
+                "{}"
+            ).format(url, article_msg if article_request else "")
+            self.logger.info(error_msg)
+        soup = BeautifulSoup(self.browser.page_source, 'lxml')
+        return soup
+
+    def get_additional_url_arguments(self, soup):
+        # rsc allows unlimited results, so no need for additoinal args
+        return [""], [""], [""]
+
+    def is_link_to_open_article(self, tag):
+        return self.open
 
     def get_page_info(self, soup):
         possible_entries = [a.strip("\n") for a in soup.text.split(" - Showing page 1 of")[0].split("Back to tab navigation")[-1].split(" ") if a.strip("\n").isdigit()]
@@ -602,12 +679,19 @@ class RSC(JournalFamily):
         return page, totalPages, totalResults
 
     def turn_page(self, url, pg_num):
-        pass#return url.split('1&tab=all')[0]+str(pg_size)+'&tab=all&fcategory=all&filter=all&Article%20Access=Open+Access'
+        self.get_soup_from_request(url)
+        next_page = self.browser.find_element_by_class_name("paging__btn--next")
+        self.browser.execute_script("arguments[0].setAttribute('data-pageno',arguments[1])",next_page, pg_num)
+        next_page.click()
+        soup = BeautifulSoup(self.browser.page_source, 'lxml')
+        return soup
 
-    def get_figure_list(self, url):
-        soup = self.get_soup_from_request(url)
-        figure_list = soup.find_all("div", class_="image_table")
-        return figure_list
+    def get_figure_subtrees(self, soup):
+        figure_subtrees = soup.find_all("div", "image_table")
+        return figure_subtrees
+
+    def get_figure_url(self, figure_subtree):
+       return self.prepend + figure_subtree.find("a", href=True)['href']
 
     def find_captions(self, figure):
         return figure.find_all("span", class_="graphic_title")
