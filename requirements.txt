@@ -1,5 +1,6 @@
 numpy
 pillow
+matplotlib
 beautifulsoup4
 pyyaml>=5.1
 scipy
@@ -11,9 +12,9 @@ torchvision>=0.7
 urllib3
 spacy>=3.0
 lxml
+selenium
+webdriver-manager
 pytorch-model-summary
-Django>=2.0
 psycopg2-binary
-django-csp
 responses
 deepdiff
