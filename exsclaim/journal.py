@@ -128,7 +128,8 @@ class JournalFamily():
         Returns:
             A url.
         """ 
-        raise NotImplementedError()
+        new_url = url + "&" + self.page_param + str(pg_num)
+        return self.get_soup_from_request(new_url)
 
     def get_additional_url_arguments(self, soup):
         """
@@ -170,7 +171,6 @@ class JournalFamily():
                 search_url += "&" + self.open_param + "&"
             soup = self.get_soup_from_request(search_url, fast_load=True)
             years, journal_codes, orderings = self.get_additional_url_arguments(soup)
-            print(years, journal_codes, orderings)
             search_url_args = []
             for year_value in years:
                 for journal_value in journal_codes:
@@ -233,8 +233,8 @@ class JournalFamily():
                     return article_paths
             # Get next page at end of loop since page 1 is obtained from 
             # search_url
-            #request = self.turn_page(search_url, page_number+1)
-            #soup = self.get_soup_from_request(request, fast_load=False)
+            soup = self.turn_page(search_url, page_number+1)
+
         return article_paths
 
     def get_article_extensions(self) -> list:
@@ -471,9 +471,6 @@ class ACS(JournalFamily):
         return years, journal_codes, orderings
 
 
-    def turn_page(self, url, pg_num):
-        return url.split('&startPage=')[0]+'&startPage='+str(pg_num)+"&pageSize="+str(20)
-
     def get_license(self, soup):
         open_access = soup.find('div', {"class": "article_header-open-access"})
         if open_access and ("ACS AuthorChoice" in open_access.text or
@@ -561,9 +558,6 @@ class Nature(JournalFamily):
             orderings = [self.order_values[self.order]]
         years = [""] + years
         return years, journal_codes, orderings
-
-    def turn_page(self, url, pg_num):
-        return url.split('&page=')[0]+'&page='+str(pg_num)
 
     def get_license(self, soup):
         data_layer = soup.find(attrs = {'data-test': 'dataLayer'})
@@ -668,6 +662,7 @@ class RSC(JournalFamily):
         return soup
 
     def get_additional_url_arguments(self, soup):
+        # rsc allows unlimited results, so no need for additoinal args
         return [""], [""], [""]
 
     def is_link_to_open_article(self, tag):
@@ -684,7 +679,12 @@ class RSC(JournalFamily):
         return page, totalPages, totalResults
 
     def turn_page(self, url, pg_num):
-        pass#return url.split('1&tab=all')[0]+str(pg_size)+'&tab=all&fcategory=all&filter=all&Article%20Access=Open+Access'
+        self.get_soup_from_request(url)
+        next_page = self.browser.find_element_by_class_name("paging__btn--next")
+        self.browser.execute_script("arguments[0].setAttribute('data-pageno',arguments[1])",next_page, pg_num)
+        next_page.click()
+        soup = BeautifulSoup(self.browser.page_source, 'lxml')
+        return soup
 
     def get_figure_subtrees(self, soup):
         figure_subtrees = soup.find_all("div", "image_table")
