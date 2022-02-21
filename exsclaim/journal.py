@@ -39,7 +39,7 @@ class JournalFamily():
     open_param =        "URL parameter optionally noting open results only"
     journal_param =     "URL paremter noting journal to search"
     date_range_prarm =  "URL parameter noting range of dates to search"
-    pub_type =          "URL paramter noting publication type (specific to Wiley)"
+    pub_type =          "" # URL paramter noting publication type (specific to Wiley)
     # order options
     order_values = {
         "relevant" :    "URL value meaning to rank relevant results first",
@@ -661,7 +661,7 @@ class Wiley(JournalFamily):
 
     def get_additional_url_arguements(self,soup):
         current_year = datetime.now().year
-
+        journal_list = soup_w.find(id="Published in").parent.next_sibling
         journal_link_tags = journal_list.find_all('a', href=True)
         journal_link_tags_exh = journal_list.find_all('option', value=True)
 
@@ -699,6 +699,6 @@ class Wiley(JournalFamily):
         return (False, "unknown")
 
     def is_link_to_open_article(self, tag):
-        # ACS allows filtering for search. Therefore, if self.open is
+        # Wiley allows filtering for search. Therefore, if self.open is
         # true, all results will be open.
         return self.open
