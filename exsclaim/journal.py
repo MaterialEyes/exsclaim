@@ -661,7 +661,7 @@ class Wiley(JournalFamily):
 
     def get_additional_url_arguements(self,soup):
         current_year = datetime.now().year
-        journal_list = soup_w.find(id="Published in").parent.next_sibling
+        journal_list = soup.find(id="Published in").parent.next_sibling
         journal_link_tags = journal_list.find_all('a', href=True)
         journal_link_tags_exh = journal_list.find_all('option', value=True)
 
