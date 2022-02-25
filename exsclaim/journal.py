@@ -49,6 +49,7 @@ class JournalFamily():
     open_param =        "URL parameter optionally noting open results only"
     journal_param =     "URL paremter noting journal to search"
     date_range_prarm =  "URL parameter noting range of dates to search"
+    pub_type =          "" # URL paramter noting publication type (specific to Wiley)
     # order options
     order_values = {
         "relevant" :    "URL value meaning to rank relevant results first",
@@ -166,18 +167,21 @@ class JournalFamily():
                 [self.term_param + self.join.join(term),
                  self.max_page_size]
             )
-            search_url = self.domain + self.search_path + url_parameters
+            search_url = self.domain + self.search_path + self.pub_type + url_parameters
             if self.open:
                 search_url += "&" + self.open_param + "&"
             soup = self.get_soup_from_request(search_url, fast_load=True)
             years, journal_codes, orderings = self.get_additional_url_arguments(soup)
             search_url_args = []
+
             for year_value in years:
+                year_param = self.date_range_param + year_value
+
                 for journal_value in journal_codes:
                     for order_value in orderings:
                         args = "&".join(
                             [
-                                self.date_range_param + year_value,
+                                year_param,
                                 self.journal_param + journal_value,
                                 self.order_param + order_value
                             ]
@@ -188,7 +192,7 @@ class JournalFamily():
         return search_urls
 
     def get_license(self, soup):
-        """ Checks the article license and whether it is open access 
+        """ Checks the article license and whether it is open access
 
         Args:
             soup (a BeautifulSoup parse tree): representation of page html
@@ -199,13 +203,13 @@ class JournalFamily():
         return (False, "unknown")
 
     def is_link_to_open_article(self, tag):
-        """ Checks if link is to an open access article 
-        
+        """ Checks if link is to an open access article
+
         Args:
             tag (bs4.tag): A tag containing an href attribute that
                 links to an article
         Returns:
-            True if the article is confirmed open_access 
+            True if the article is confirmed open_access
         """
         return False
 
@@ -219,7 +223,7 @@ class JournalFamily():
             for tag in soup.find_all('a', href=True):
                 url = tag.attrs['href']
                 self.logger.debug("Candidate Article: {}".format(url))
-                if (self.articles_path not in url 
+                if (self.articles_path not in url
                       or url.count("/") != self.articles_path_length):
                     # The url does not point to an article
                     continue
@@ -231,7 +235,7 @@ class JournalFamily():
                 article_paths.add(url)
                 if len(article_paths) >= max_scraped:
                     return article_paths
-            # Get next page at end of loop since page 1 is obtained from 
+            # Get next page at end of loop since page 1 is obtained from
             # search_url
             soup = self.turn_page(search_url, page_number+1)
 
@@ -268,10 +272,10 @@ class JournalFamily():
 
     def get_soup_from_request(self, url: str, fast_load=True):
         """
-        Get a BeautifulSoup parse tree (lxml parser) from a url request 
+        Get a BeautifulSoup parse tree (lxml parser) from a url request
 
         Args:
-            url: A requested url 
+            url: A requested url
         Returns:
             A BeautifulSoup parse tree.
         """
@@ -312,7 +316,7 @@ class JournalFamily():
         figure_path = figures_directory / figure_name
         with open(figure_path, 'wb') as out_file:
             shutil.copyfileobj(response.raw, out_file)
-        del response 
+        del response
 
     def get_figure_url(self, figure_subtree):
         """ Returns url of figure from figure's html subtree
@@ -328,7 +332,7 @@ class JournalFamily():
 
     def get_article_figures(self, url: str) -> dict:
         """
-        Get all figures from an article 
+        Get all figures from an article
 
         Args:
             url: A url to a journal article
@@ -356,19 +360,19 @@ class JournalFamily():
             # acs captions are duplicated, one version with no captions
             if len(captions) == 0:
                 continue
-            
+
             # initialize the figure's json
             article_name = url.split("/")[-1].split("?")[0]
             figure_json = {"title": soup.find('title').get_text(), 
                            "article_url" : url,
                            "article_name" : article_name}
-            
+
             # get figure caption
             figure_caption = ""
             for caption in captions:
                 figure_caption += caption.get_text()
             figure_json["full_caption"] = figure_caption
-            
+
             # Allocate entry for caption delimiter
             figure_json["caption_delimiter"] = ""
 
@@ -411,7 +415,7 @@ class JournalFamily():
 
 
 ################ JOURNAL FAMILY SPECIFIC INFORMATION ################
-## To add a new journal family, create a new subclass of 
+## To add a new journal family, create a new subclass of
 ## JournalFamily. Fill out the methods and attributes according to
 ## their descriptions in the JournalFamily class. Then add the an
 ## entry to the journals dictionary with the journal family's name in
@@ -528,7 +532,7 @@ class Nature(JournalFamily):
         total_results = int(total_results_tag.contents[0].split(" ")[0])
         total_pages = math.ceil(total_results / page_size)
         return (page,
-                total_pages, 
+                total_pages,
                 total_results)
 
     def get_additional_url_arguments(self, soup):
@@ -543,12 +547,12 @@ class Nature(JournalFamily):
             journal_tags = advanced_search.find_all(name="journal[]")
             journal_codes = [tag.value for tag in journal_tags]
             years = [
-                str(year)+"-"+str(year) 
+                str(year)+"-"+str(year)
                 for year in range(current_year, earliest_year, -1)
             ]
             orderings = list(self.order_values.values())
         ## If the search is not exhaustive, search the most relevant materials
-        ## journals, for the past 25 years, in self.order order. 
+        ## journals, for the past 25 years, in self.order order.
         else:
             journal_codes = self.materials_journals
             years = [
@@ -579,7 +583,7 @@ class Nature(JournalFamily):
     def is_link_to_open_article(self, tag):
         current_tag = tag
         while current_tag.parent:
-            if (current_tag.name == "li" 
+            if (current_tag.name == "li"
                 and "app-article-list-row__item" in current_tag["class"]):
                 break
             current_tag = current_tag.parent
@@ -588,7 +592,7 @@ class Nature(JournalFamily):
             if candidate.text.startswith("Open"):
                 return True
         return False
-        
+
 
 class RSC(JournalFamily):
     domain =                "https://pubs.rsc.org"
@@ -700,3 +704,81 @@ class RSC(JournalFamily):
         figures_directory = self.results_directory / "figures"
         out_file = figures_directory / figure_name
         urllib.request.urlretrieve(image_url, out_file)
+
+
+class Wiley(JournalFamily):
+    domain =            "https://onlinelibrary.wiley.com"
+    search_path =       "/action/doSearch?"
+    page_param =        "startPage="
+    max_page_size =     "pageSize=20"
+    term_param =        "AllField="
+    order_param =       "sortBy="
+    open_param =        "ConceptID=15941"
+    journal_param =     "SeriesKey="
+    date_range_param =  "AfterYear="
+    pub_type =          "PubType=journal" # Type of publication hosted on Wiley
+    # order options
+    order_values = {
+        "relevant" :    "relevancy",
+        "recent" :      "Earliest",
+        "old" :         ""
+    }
+    # join is for terms in search query
+    join =              "\"+\""
+    max_query_results = 2000
+    articles_path =  "/doi/"
+    prepend = "https://onlinelibrary.wiley.com"
+    extra_key = # what is this?
+    articles_path_length = 3
+
+    def get_page_info(self, soup):
+        totalResults = (soup.find('span', {'class': 'result__count'}).text)
+        totalResults = int(totalResults.replace(",",""))
+
+        totalPages = math.ceil(float(totalResults/20))-1
+        page = 0
+        return page, totalPages, totalResults
+
+    def get_additional_url_arguements(self,soup):
+        current_year = datetime.now().year
+        journal_list = soup.find(id="Published in").parent.next_sibling
+        journal_link_tags = journal_list.find_all('a', href=True)
+        journal_link_tags_exh = journal_list.find_all('option', value=True)
+
+        journal_codes = [jlt.attrs['href'].split('=')[-1] for jlt in journal_link_tags]
+
+
+        if self.order == 'exhaustive':
+            num_years = 100
+            orderings = list(self.order_values.values())
+            journal_codes = journal_codes +\
+                            [jlte.attrs['value'].split('=')[-1] for jlte in journal_link_tags_exh]
+
+        else:
+            num_years = 25
+            orderings = [self.order_values[self.order]]
+        # the wiley search engine uses 2 different phrases to dilineate
+        # start and stop year AfterYear=YYYY&BeforeYear=YYYY
+        years = [
+            "{}&BeforeYear={}".format(year,year)
+            for year in range(current_year-num_years, current_year)
+        ]
+
+        years = [["", ""]] + years
+        return years, journal_codes, orderings
+
+    def turn_page(self, url, pg_num):
+        return url.split('&startPage=')[0]+'&startPage='+str(pg_num)+"&pageSize="+str(20)
+
+
+    def get_license(self, soup):
+        open_access = soup.find('div', {'class':{'doi-access'}})
+        if open_access and 'Open Access' in open_access.text:
+            is_open = True
+            return (is_open, open_access.text)
+        return (False, "unknown")
+
+    def is_link_to_open_article(self, tag):
+        # Wiley allows filtering for search. Therefore, if self.open is
+        # true, all results will be open.
+        return self.open
