@@ -164,12 +164,7 @@ class JournalFamily():
             search_url_args = []
 
             for year_value in years:
-                if self.domain == "https://onlinelibrary.wiley.com":
-                    year_param = '{}&{}'.format(
-                                    (self.date_range_param[0] + year_value[0]),
-                                    (self.date_range_param[1] + year_value[1]))
-                else:
-                    year_param = self.date_range_param + year_value
+                year_param = self.date_range_param + year_value
 
                 for journal_value in journal_codes:
                     for order_value in orderings:
@@ -636,7 +631,7 @@ class Wiley(JournalFamily):
     order_param =       "sortBy="
     open_param =        "ConceptID=15941"
     journal_param =     "SeriesKey="
-    date_range_param =  ("AfterYear=", "BeforeYear=")
+    date_range_param =  "AfterYear="
     pub_type =          "PubType=journal" # Type of publication hosted on Wiley
     # order options
     order_values = {
@@ -658,6 +653,7 @@ class Wiley(JournalFamily):
 
         totalPages = math.ceil(float(totalResults/20))-1
         page = 0
+        return page, totalPages, totalResults
 
     def get_additional_url_arguements(self,soup):
         current_year = datetime.now().year
@@ -678,9 +674,9 @@ class Wiley(JournalFamily):
             num_years = 25
             orderings = [self.order_values[self.order]]
         # the wiley search engine uses 2 different phrases to dilineate
-        # start and stop year
+        # start and stop year AfterYear=YYYY&BeforeYear=YYYY
         years = [
-            [str(year), str(year)]
+            "{}&BeforeYear={}".format(year,year)
             for year in range(current_year-num_years, current_year)
         ]
 
