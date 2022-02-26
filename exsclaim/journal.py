@@ -14,6 +14,7 @@ import logging
 import pathlib
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+from abc import ABC, abstractmethod
 try:
     from selenium import webdriver
     from selenium.webdriver.common.by import By
@@ -30,40 +31,103 @@ from .utilities import paths
 from bs4 import BeautifulSoup
 
 
-class JournalFamily():
+class JournalFamily(ABC):
     """
     Base class to represent journals and provide scraping methods
     """
     ## journal attributes -- these must be defined for each journal
     ## family based on the explanations provided here
-    domain =            "The domain name of journal family",
+    @property
+    def domain(self) -> str:
+        """ The domain name of journal family """
+        return self._domain
+
     ## the next 6 fields determine the url of journals search page
-    search_path =       ("The portion of the url that runs from the"
-                         " end of the domain to search terms")
+    @property
+    def search_path(self) -> str:    
+        """ URL portion from end of TLD to query parameters """
+        return self._search_path
+
     ## params should include trailing '='
-    page_param =        "URL parameter noting current page number"
-    max_page_size =     ("URL parameter and value requesting max results per"
-                         "page to limit total requests")
-    term_param =        "URL parameter noting search term"
-    order_param =       "URL parameter noting results order"
-    open_param =        "URL parameter optionally noting open results only"
-    journal_param =     "URL paremter noting journal to search"
-    date_range_prarm =  "URL parameter noting range of dates to search"
-    pub_type =          "" # URL paramter noting publication type (specific to Wiley)
-    # order options
-    order_values = {
-        "relevant" :    "URL value meaning to rank relevant results first",
-        "recent" :      "URL value meaning to rank recent results first",
-        "old" :         "URL value meaning to rank old results first"
-    }
-    join =              ("The portion of the url that appears between"
-                         "consecutive search terms")
-    max_query_results = ("Maximum results journal family will return for "
-                         "single query")
+    @property
+    def page_param(self) -> str:       
+        """ URL parameter noting current page number """
+        return self._page_param
+    
+    @property
+    def max_page_size(self) -> str:  
+        """ URL parameter and value requesting max results per page
+        
+        Used to limit total number of requests.
+        """
+        return self._max_page_size
+    
+    @property
+    def term_param(self) -> str:       
+        """ URL parameter noting search term """
+        return self._term_param
+    
+    @property
+    def order_param(self) -> str:      
+        """ URL parameter noting results order """
+        return self._order_param
+    
+    @property
+    def open_param(self) -> str:       
+        """ URL parameter optionally noting open results only """
+        return self._open_param
+    
+    @property
+    def journal_param(self) -> str:    
+        """ URL paremter noting journal to search """
+        return self._journal_param
+    
+    @property
+    def date_range_prarm(self) -> str: 
+        """ URL parameter noting range of dates to search """
+        return self._date_range_prarm
+
+    @property
+    def pub_type(self) -> str:       
+        """ URL paramter noting publication type (specific to Wiley) """
+        return self._pub_type
+    
+    @property
+    def order_values(self) -> dict:
+        """ Dictionary with journal parameter values for sorting results 
+        
+        'relevant' for ordering results in order of relevance
+        'recent' for ordering results most recent first
+        'old' for ordering results oldest first
+        """
+        return self._order_values
+    
+    @property
+    def join(self) -> str:
+        """ Separator in URL between multiple search terms """
+        return self._join
+
+    @property
+    def max_query_results(self) -> int:
+        """ Maximum results journal family will return for single query
+
+        Certain journals will restrict a given search to ~1000 results
+        """
+        return self.__max_query_results
+
     ## used for get_article_delimiters
-    articles_path =  ("The journal's url path to articles, where articles"
-                      " are located at domain.name/articles_path/article")
-    articles_path_length = "Number of / separated segments to articles path"
+    @property
+    def articles_path(self) -> str:
+        """ The journal's url path to articles
+
+        Articles are located at domain.name/articles_path/article
+        """
+        return self._articles_path
+
+    @property
+    def articles_path_length(self) -> int:
+        """ Number of / separated segments to articles path """
+        return self._articles_path_length
 
     def __init__(self, search_query):
         """
@@ -728,7 +792,7 @@ class Wiley(JournalFamily):
     max_query_results = 2000
     articles_path =  "/doi/"
     prepend = "https://onlinelibrary.wiley.com"
-    extra_key = # what is this?
+    extra_key = " "
     articles_path_length = 3
 
     def get_page_info(self, soup):
