@@ -84,9 +84,9 @@ class JournalFamily(ABC):
         return self._journal_param
     
     @property
-    def date_range_prarm(self) -> str: 
+    def date_range_param(self) -> str: 
         """ URL parameter noting range of dates to search """
-        return self._date_range_prarm
+        return self._date_range_param
 
     @property
     def pub_type(self) -> str:       
@@ -162,13 +162,14 @@ class JournalFamily(ABC):
             articles_visited ={a.strip() for a in contents}
         self.articles_visited = articles_visited
 
+    ## Helper Methods for retrieving relevant article URLS
+
     @abstractmethod
     def get_page_info(self, soup: bs4.BeautifulSoup) -> tuple:
         """ Retrieve details on total results from search query
 
         Args:
             soup: a search results page
-
         Returns:
             (index origin, total page count in search, total results from search)
         """
@@ -200,51 +201,9 @@ class JournalFamily(ABC):
                 orderings is a list of strings of desired results ordering
             Each of these should be in order of precedence.
         """
-        raise NotImplementedError()
+        pass
 
-    @abstractmethod
-    def get_search_query_urls(self) -> list:
-        """ Create list of search query urls based on input query
-
-        Returns:
-            A list of urls (as strings)
-        """
-        search_query = self.search_query
-        ## creates a list of search terms
-        search_list = ([[search_query['query'][key]['term']] + 
-                       search_query['query'][key].get('synonyms', []) 
-                       for key in search_query['query']])
-        search_product = list(itertools.product(*search_list))
-
-        search_urls = []
-        for term in search_product:
-            url_parameters = "&".join(
-                [self.term_param + self.join.join(term),
-                 self.max_page_size]
-            )
-            search_url = self.domain + self.search_path + self.pub_type + url_parameters
-            if self.open:
-                search_url += "&" + self.open_param + "&"
-            soup = self.get_soup_from_request(search_url, fast_load=True)
-            years, journal_codes, orderings = self.get_additional_url_arguments(soup)
-            search_url_args = []
-
-            for year_value in years:
-                year_param = self.date_range_param + year_value
-
-                for journal_value in journal_codes:
-                    for order_value in orderings:
-                        args = "&".join(
-                            [
-                                year_param,
-                                self.journal_param + journal_value,
-                                self.order_param + order_value
-                            ]
-                        )
-                        search_url_args.append(args)
-            search_term_urls = [search_url + url_args for url_args in search_url_args]
-            search_urls += search_term_urls
-        return search_urls
+    ## Helper Methods for retrieving figures from articles
 
     @abstractmethod
     def get_license(self, soup: bs4.BeautifulSoup) -> tuple:
@@ -299,8 +258,6 @@ class JournalFamily(ABC):
         time.sleep(wait_time/float(10))
         with requests.Session() as session:
             r = session.get(url, headers=headers)
-        # with open('exsclaim/' + url.split("/")[-1], "w+") as f:
-        #     f.write(r.text)
         soup = BeautifulSoup(r.text, 'lxml')
         return soup
 
@@ -345,7 +302,50 @@ class JournalFamily(ABC):
         image_url = image_tag.get('src')
         return self.prepend + image_url
 
+    def get_search_query_urls(self) -> list:
+        """ Create list of search query urls based on input query
+
+        Returns:
+            A list of urls (as strings)
+        """
+        search_query = self.search_query
+        ## creates a list of search terms
+        search_list = ([[search_query['query'][key]['term']] + 
+                       search_query['query'][key].get('synonyms', []) 
+                       for key in search_query['query']])
+        search_product = list(itertools.product(*search_list))
+
+        search_urls = []
+        for term in search_product:
+            url_parameters = "&".join(
+                [self.term_param + self.join.join(term),
+                 self.max_page_size]
+            )
+            search_url = self.domain + self.search_path + self.pub_type + url_parameters
+            if self.open:
+                search_url += "&" + self.open_param + "&"
+            soup = self.get_soup_from_request(search_url, fast_load=True)
+            years, journal_codes, orderings = self.get_additional_url_arguments(soup)
+            search_url_args = []
+
+            for year_value in years:
+                year_param = self.date_range_param + year_value
+                for journal_value in journal_codes:
+                    for order_value in orderings:
+                        args = "&".join(
+                            [
+                                year_param,
+                                self.journal_param + journal_value,
+                                self.order_param + order_value
+                            ]
+                        )
+                        search_url_args.append(args)
+            search_term_urls = [search_url + url_args for url_args in search_url_args]
+            search_urls += search_term_urls
+        return search_urls
+
     def get_articles_from_search_url(self, search_url: str) -> list:
+        """ Generates a list of articles from a single search query """
         max_scraped = self.search_query["maximum_scraped"]
         self.logger.info("GET request: {}".format(search_url))
         soup = self.get_soup_from_request(search_url)
@@ -374,12 +374,7 @@ class JournalFamily(ABC):
         return article_paths
 
     def get_article_extensions(self) -> list:
-        """
-        Create a list of article url extensions from search_query
-
-        Returns:
-            A list of article url extensions from search.
-        """
+        """ Retrieves a list of article url paths from search_query """
         # This returns urls based on the combinations of desired search terms.
         search_query_urls = self.get_search_query_urls()
         article_paths = set()
@@ -413,61 +408,52 @@ class JournalFamily(ABC):
         article_json = {}
 
         for figure_subtree in figure_subtrees:
-
             captions = self.find_captions(figure_subtree)
 
             # acs captions are duplicated, one version with no captions
             if len(captions) == 0:
                 continue
 
-            # initialize the figure's json
-            article_name = url.split("/")[-1].split("?")[0]
-            figure_json = {"title": soup.find('title').get_text(), 
-                           "article_url" : url,
-                           "article_name" : article_name}
-
             # get figure caption
             figure_caption = ""
             for caption in captions:
                 figure_caption += caption.get_text()
-            figure_json["full_caption"] = figure_caption
 
-            # Allocate entry for caption delimiter
-            figure_json["caption_delimiter"] = ""
-
-            # get figure url and name
             image_url = self.get_figure_url(figure_subtree)
-
-
             # image_url = self.prepend + image_url.replace('_hi-res','')
             if ":" not in image_url:
                 image_url = "https:" + image_url
-            figure_name = article_name + "_fig" + str(figure_number) + ".jpg"  #" +  image_url.split('.')[-1]
-
-            # save image info
-            figure_json["figure_name"] = figure_name
-            figure_json["image_url"] = image_url
-            figure_json["license"] = license
-            figure_json["open"] = is_open
-
-            # save figure as image
-            self.save_figure(figure_name, image_url)
+            figure_name = article_name + "_fig" + str(figure_number) + ".jpg"
             figure_path = (
                 pathlib.Path(self.search_query["name"]) / "figures" / figure_name
             )
-            figure_json["figure_path"] = str(figure_path)
-            figure_json["master_images"] = []
-            figure_json["unassigned"] = {
-                'master_images': [],
-                'dependent_images': [],
-                'inset_images': [],
-                'subfigure_labels': [],
-                'scale_bar_labels':[],
-                'scale_bar_lines': [],
-                'captions': []
+            # initialize the figure's json
+            article_name = url.split("/")[-1].split("?")[0]
+            figure_json = {
+                "title": soup.find('title').get_text(), 
+                "article_url" : url,
+                "article_name" : article_name,
+                "image_url": image_url,
+                "figure_name": figure_name,
+                "license": license,
+                "open": is_open,
+                "full_caption": figure_caption,
+                "caption_delimiter": "",
+                "figure_path": str(figure_path),
+                "master_images": [],
+                "unassigned": {
+                    'master_images': [],
+                    'dependent_images': [],
+                    'inset_images': [],
+                    'subfigure_labels': [],
+                    'scale_bar_labels':[],
+                    'scale_bar_lines': [],
+                    'captions': []
+                }
             }
             # add all results
             article_json[figure_name] = figure_json
+            self.save_figure(figure_name, image_url)
             # increment index
             figure_number += 1
         return article_json
