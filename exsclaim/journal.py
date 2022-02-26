@@ -4,6 +4,7 @@ import math
 import time
 import shutil
 import urllib.request
+import bs4
 import requests
 import itertools
 import numpy as np
@@ -130,8 +131,7 @@ class JournalFamily(ABC):
         return self._articles_path_length
 
     def __init__(self, search_query):
-        """
-        Initializes an instance of a journal family search using a query
+        """ creates an instance of a journal family search using a query
 
         Args:
             search_query: a query json (python dictionary)
@@ -162,46 +162,37 @@ class JournalFamily(ABC):
             articles_visited ={a.strip() for a in contents}
         self.articles_visited = articles_visited
 
-    def get_domain_name(self) -> str:
-        """
-        Get url base path (domain name) for the requested journal family in search_query.
-
-        Returns:
-            The domain name of the journal, as a string
-        """
-        return self.domain
-
-    def get_page_info(self, soup):
-        """
-        Get index origin and total number of pages from search_query.
+    @abstractmethod
+    def get_page_info(self, soup: bs4.BeautifulSoup) -> tuple:
+        """ Retrieve details on total results from search query
 
         Args:
-            soup: a beautifulSoup object representing the html page of interest
+            soup: a search results page
 
         Returns:
             (index origin, total page count in search, total results from search)
         """
-        raise NotImplementedError()
+        pass
 
-    def turn_page(self, url, pg_num):
-        """
-        Create url for a GET request based on the search_query.
+    @abstractmethod
+    def turn_page(self, url: str, page_number: int) -> bs4.BeautifulSoup:
+        """ Return page_number page of search results
 
         Args:
             url: the url to a search results page
-            pg_num: page number to search on (-1 = starts at index origin for journal)
+            page_number: page number to search on
         Returns:
-            A url.
+            soup of next page
         """ 
-        new_url = url + "&" + self.page_param + str(pg_num)
+        new_url = url + "&" + self.page_param + str(page_number)
         return self.get_soup_from_request(new_url)
 
-    def get_additional_url_arguments(self, soup):
-        """
-        Get lists of additional search url parameters
+    @abstractmethod
+    def get_additional_url_arguments(self, soup: bs4.BeautifulSoup) -> tuple:
+        """ Get lists of additional search url parameters
 
         Args:
-            soup (bs4): soup of initial search page
+            soup: initial search result for search term
         Returns:
             (years, journal_codes, orderings): where:
                 years is a list of strings of desired date ranges
@@ -211,9 +202,9 @@ class JournalFamily(ABC):
         """
         raise NotImplementedError()
 
-    def get_search_query_urls(self) -> str:
-        """
-        Create list of search query urls based on input query.
+    @abstractmethod
+    def get_search_query_urls(self) -> list:
+        """ Create list of search query urls based on input query
 
         Returns:
             A list of urls (as strings)
@@ -255,18 +246,20 @@ class JournalFamily(ABC):
             search_urls += search_term_urls
         return search_urls
 
-    def get_license(self, soup):
+    @abstractmethod
+    def get_license(self, soup: bs4.BeautifulSoup) -> tuple:
         """ Checks the article license and whether it is open access
 
         Args:
-            soup (a BeautifulSoup parse tree): representation of page html
+            soup: representation of page html
         Returns:
             is_open (a bool): True if article is open
             license (a string): Requried text of article license
         """
         return (False, "unknown")
 
-    def is_link_to_open_article(self, tag):
+    @abstractmethod
+    def is_link_to_open_article(self, tag: bs4.BeautifulSoup) -> bool:
         """ Checks if link is to an open access article
 
         Args:
@@ -277,10 +270,85 @@ class JournalFamily(ABC):
         """
         return False
 
-    def get_articles_from_search_url(self, search_url):
+    @abstractmethod
+    def get_figure_subtrees(self, soup: bs4.BeautifulSoup) -> list:
+        """ Retrieves list of bs4 parse subtrees containing figure elements
+
+        Args:
+            soup: A beautifulsoup parse tree
+        Returns:
+            A list of all figures in the article as BeaustifulSoup objects
+        """
+        figure_list = [a for a in soup.find_all('figure') if str(a).find(self.extra_key)>-1]
+        return figure_list
+
+    @abstractmethod
+    def get_soup_from_request(self, url: str) -> bs4.BeautifulSoup:
+        """ Get a BeautifulSoup parse tree (lxml parser) from a url request
+
+        Args:
+            url: A requested url
+        Returns:
+            A BeautifulSoup parse tree.
+        """
+        headers = {"Accept":   "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+                   "Accept-Language": "en-US,en;q=0.5",
+                   "Upgrade-Insecure-Requests":   "1",
+                   "User-Agent":  "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:82.0) Gecko/20100101 Firefox/82.0"}
+        wait_time = float(random.randint(0, 50))
+        time.sleep(wait_time/float(10))
+        with requests.Session() as session:
+            r = session.get(url, headers=headers)
+        # with open('exsclaim/' + url.split("/")[-1], "w+") as f:
+        #     f.write(r.text)
+        soup = BeautifulSoup(r.text, 'lxml')
+        return soup
+
+    @abstractmethod
+    def find_captions(self, figure_subtree: bs4.BeautifulSoup):
+        """
+        Returns all captions associated with a given figure
+
+        Args:
+            figure_subtree: an bs4 parse tree
+        Returns:
+            all captions for given figure
+        """
+        return figure_subtree.find_all('p')
+
+    @abstractmethod
+    def save_figure(self, figure_name: str, image_url: str):
+        """
+        Saves figure at img_url to local machine
+
+        Args:
+            figure_name: name of figure
+            img_url: url to image
+        """
+        figures_directory = self.results_directory / "figures"
+        response = requests.get(image_url, stream=True)
+        figure_path = figures_directory / figure_name
+        with open(figure_path, 'wb') as out_file:
+            shutil.copyfileobj(response.raw, out_file)
+        del response
+
+    @abstractmethod
+    def get_figure_url(self, figure_subtree: bs4.BeautifulSoup) -> str:
+        """ Returns url of figure from figure's html subtree
+        
+        Args:
+            figure_subtree (bs4): subtree containing an article figure
+        Returns:
+            url (str)
+        """
+        image_tag = figure_subtree.find('img')
+        image_url = image_tag.get('src')
+        return self.prepend + image_url
+
+    def get_articles_from_search_url(self, search_url: str) -> list:
         max_scraped = self.search_query["maximum_scraped"]
         self.logger.info("GET request: {}".format(search_url))
-        soup = self.get_soup_from_request(search_url, fast_load=True)
+        soup = self.get_soup_from_request(search_url)
         start_page, stop_page, total_articles = self.get_page_info(soup)
         article_paths = set()
         for page_number in range(start_page, stop_page+1):
@@ -322,81 +390,8 @@ class JournalFamily(ABC):
                 break
         return list(article_paths)
 
-    def get_figure_subtrees(self, soup):
-        """
-        Retrieves list of bs4 parse subtrees containing figure elements
-
-        Args:
-            soup: A beautifulsoup parse tree
-        Returns:
-            A list of all figures in the article as BeaustifulSoup Tag objects
-        """
-        figure_list = [a for a in soup.find_all('figure') if str(a).find(self.extra_key)>-1]
-        return figure_list
-
-    def get_soup_from_request(self, url: str, fast_load=True):
-        """
-        Get a BeautifulSoup parse tree (lxml parser) from a url request
-
-        Args:
-            url: A requested url
-        Returns:
-            A BeautifulSoup parse tree.
-        """
-        headers = {"Accept":   "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-                   "Accept-Language": "en-US,en;q=0.5",
-                   "Upgrade-Insecure-Requests":   "1",
-                   "User-Agent":  "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:82.0) Gecko/20100101 Firefox/82.0"}
-        wait_time = float(random.randint(0, 50))
-        time.sleep(wait_time/float(10))
-        with requests.Session() as session:
-            r = session.get(url, headers=headers)
-        # with open('exsclaim/' + url.split("/")[-1], "w+") as f:
-        #     f.write(r.text)
-        soup = BeautifulSoup(r.text, 'lxml')
-        return soup
-
-    def find_captions(self, figure_subtree):
-        """
-        Returns all captions associated with a given figure
-
-        Args:
-            figure_subtree: an bs4 parse tree
-        Returns:
-            all captions for given figure
-        """
-        return figure_subtree.find_all('p')
-
-    def save_figure(self, figure_name, image_url):
-        """
-        Saves figure at img_url to local machine
-
-        Args:
-            figure_name: name of figure
-            img_url: url to image
-        """
-        figures_directory = self.results_directory / "figures"
-        response = requests.get(image_url, stream=True)
-        figure_path = figures_directory / figure_name
-        with open(figure_path, 'wb') as out_file:
-            shutil.copyfileobj(response.raw, out_file)
-        del response
-
-    def get_figure_url(self, figure_subtree):
-        """ Returns url of figure from figure's html subtree
-        
-        Args:
-            figure_subtree (bs4): subtree containing an article figure
-        Returns:
-            url (str)
-        """
-        image_tag = figure_subtree.find('img')
-        image_url = image_tag.get('src')
-        return self.prepend + image_url
-
     def get_article_figures(self, url: str) -> dict:
-        """
-        Get all figures from an article
+        """ Get all figures from an article
 
         Args:
             url: A url to a journal article
@@ -702,7 +697,7 @@ class RSC(JournalFamily):
         chromeOptions.add_argument("--start-maximized")
         self.browser = webdriver.Chrome(ChromeDriverManager().install(), chrome_options=chromeOptions)
 
-    def get_soup_from_request(self, url: str, fast_load=False):
+    def get_soup_from_request(self, url: str) -> bs4.BeautifulSoup:
         url.replace(" ", "+")
         self.browser.get(url)
         article_request = "en/content/articlehtml" in url
