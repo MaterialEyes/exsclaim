@@ -324,7 +324,7 @@ class JournalFamily(ABC):
             search_url = self.domain + self.search_path + self.pub_type + url_parameters
             if self.open:
                 search_url += "&" + self.open_param + "&"
-            soup = self.get_soup_from_request(search_url, fast_load=True)
+            soup = self.get_soup_from_request(search_url)
             years, journal_codes, orderings = self.get_additional_url_arguments(soup)
             search_url_args = []
 
@@ -423,12 +423,12 @@ class JournalFamily(ABC):
             # image_url = self.prepend + image_url.replace('_hi-res','')
             if ":" not in image_url:
                 image_url = "https:" + image_url
+            article_name = url.split("/")[-1].split("?")[0]
             figure_name = article_name + "_fig" + str(figure_number) + ".jpg"
             figure_path = (
                 pathlib.Path(self.search_query["name"]) / "figures" / figure_name
             )
             # initialize the figure's json
-            article_name = url.split("/")[-1].split("?")[0]
             figure_json = {
                 "title": soup.find('title').get_text(), 
                 "article_url" : url,
@@ -544,6 +544,7 @@ class Nature(JournalFamily):
     open_param =            ""
     date_range_param =      "date_range="
     journal_param =         "journal="
+    pub_type =              ""
     # order options
     order_values = {
         "relevant" : "relevance",
@@ -563,6 +564,25 @@ class Nature(JournalFamily):
     prepend =       ""
     extra_key =     " "
     max_query_results =     1000
+
+    def find_captions(self, figure_subtree: bs4.BeautifulSoup):
+        return super().find_captions(figure_subtree)
+
+    def get_figure_subtrees(self, soup: bs4.BeautifulSoup) -> list:
+        return super().get_figure_subtrees(soup)
+    
+    def get_figure_url(self, figure_subtree: bs4.BeautifulSoup) -> str:
+        return super().get_figure_url(figure_subtree)
+
+    def get_soup_from_request(self, url: str) -> bs4.BeautifulSoup:
+        return super().get_soup_from_request(url)
+
+    def save_figure(self, figure_name: str, image_url: str):
+        return super().save_figure(figure_name, image_url)
+
+    def turn_page(self, url: str, page_number: int) -> bs4.BeautifulSoup:
+        return super().turn_page(url, page_number)
+
 
     def get_page_info(self, soup):
         ## Finds total results, page number, and total pages in article html
