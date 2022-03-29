@@ -44,6 +44,16 @@ pip install exsclaim
 python -m spacy download en_core_web_sm
 ```
 
+#### Docker
+To start container:
+`docker-compose up`
+To re-build:
+`docker-compose up --build`
+
+
+To run in python shell
+`docker exec -it <service_name> bash`
+
 #### Git Clone
 To install directly from github, run the following commands (it is recommended to run in a conda or python virtual environment):
 ```

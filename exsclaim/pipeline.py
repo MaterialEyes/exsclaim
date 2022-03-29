@@ -702,7 +702,7 @@ class Pipeline:
                             scale_bar_id,
                             *scale_bar_coords,
                             scale_bar.get("length", None),
-                            scale_bar.get("line_label_distance", None),
+                            scale_bar.get("label_line_distance", None),
                             scale_bar.get("confidence", None),
                             subfigure_id,
                         ]

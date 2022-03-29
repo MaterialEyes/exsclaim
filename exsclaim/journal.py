@@ -8,8 +8,10 @@ import random
 import shutil
 import time
 import urllib.request
+from abc import ABC, abstractmethod
 from datetime import datetime
 
+import bs4
 import numpy as np
 import requests
 from dateutil.relativedelta import relativedelta
@@ -29,51 +31,111 @@ from bs4 import BeautifulSoup
 from .utilities import paths
 
 
-class JournalFamily:
-    """
-    Base class to represent journals and provide scraping methods
-    """
+class JournalFamily(ABC):
+    """Base class to represent journals and provide scraping methods"""
 
     # journal attributes -- these must be defined for each journal
     # family based on the explanations provided here
-    domain = ("The domain name of journal family",)
+    @property
+    def domain(self) -> str:
+        """The domain name of journal family"""
+        return self._domain
+
     # the next 6 fields determine the url of journals search page
-    search_path = (
-        "The portion of the url that runs from the" " end of the domain to search terms"
-    )
+    @property
+    def search_path(self) -> str:
+        """URL portion from end of TLD to query parameters"""
+        return self._search_path
+
     # params should include trailing '='
-    page_param = "URL parameter noting current page number"
-    max_page_size = (
-        "URL parameter and value requesting max results per"
-        "page to limit total requests"
-    )
-    term_param = "URL parameter noting search term"
-    order_param = "URL parameter noting results order"
-    open_param = "URL parameter optionally noting open results only"
-    journal_param = "URL paremter noting journal to search"
-    date_range_prarm = "URL parameter noting range of dates to search"
-    pub_type = ""  # URL paramter noting publication type (specific to Wiley)
-    # order options
-    order_values = {
-        "relevant": "URL value meaning to rank relevant results first",
-        "recent": "URL value meaning to rank recent results first",
-        "old": "URL value meaning to rank old results first",
-    }
-    join = "The portion of the url that appears between" "consecutive search terms"
-    max_query_results = "Maximum results journal family will return for " "single query"
-    # used for get_article_delimiters
-    articles_path = (
-        "The journal's url path to articles, where articles"
-        " are located at domain.name/articles_path/article"
-    )
-    articles_path_length = "Number of / separated segments to articles path"
+    @property
+    def page_param(self) -> str:
+        """URL parameter noting current page number"""
+        return self._page_param
 
-    def __init__(self, search_query):
+    @property
+    def max_page_size(self) -> str:
+        """URL parameter and value requesting max results per page
+
+        Used to limit total number of requests.
         """
-        Initializes an instance of a journal family search using a query
+        return self._max_page_size
 
-        Args:
-            search_query: a query json (python dictionary)
+    @property
+    def term_param(self) -> str:
+        """URL parameter noting search term"""
+        return self._term_param
+
+    @property
+    def order_param(self) -> str:
+        """URL parameter noting results order"""
+        return self._order_param
+
+    @property
+    def open_param(self) -> str:
+        """URL parameter optionally noting open results only"""
+        return self._open_param
+
+    @property
+    def journal_param(self) -> str:
+        """URL paremter noting journal to search"""
+        return self._journal_param
+
+    @property
+    def date_range_param(self) -> str:
+        """URL parameter noting range of dates to search"""
+        return self._date_range_param
+
+    @property
+    def pub_type(self) -> str:
+        """URL paramter noting publication type (specific to Wiley)"""
+        return self._pub_type
+
+    @property
+    def order_values(self) -> dict:
+        """Dictionary with journal parameter values for sorting results
+
+        'relevant' for ordering results in order of relevance
+        'recent' for ordering results most recent first
+        'old' for ordering results oldest first
+
+
+        """
+        return self._order_values
+
+    @property
+    def join(self) -> str:
+        """Separator in URL between multiple search terms"""
+        return self._join
+
+    @property
+    def max_query_results(self) -> int:
+        """Maximum results journal family will return for single query
+
+        Certain journals will restrict a given search to ~1000 results
+
+
+        """
+        return self.__max_query_results
+
+    # used for get_article_delimiters
+    @property
+    def articles_path(self) -> str:
+        """The journal's url path to articles
+
+        Articles are located at domain.name/articles_path/article
+        """
+        return self._articles_path
+
+    @property
+    def articles_path_length(self) -> int:
+        """Number of / separated segments to articles path"""
+        return self._articles_path_length
+
+    def __init__(self, search_query: dict):
+        """creates an instance of a journal family search using a query
+
+        :param search_query: a query json (python dictionary)
         Returns:
             An initialized instance of a search on a journal family
         """
@@ -99,60 +161,152 @@ class JournalFamily:
             articles_visited = {a.strip() for a in contents}
         self.articles_visited = articles_visited
 
-    def get_domain_name(self) -> str:
-        """Get url domain name requested journal family.
+    # Helper Methods for retrieving relevant article URLS
 
-        Returns:
-            The domain name of the journal, as a string
+    @abstractmethod
+    def get_page_info(self, soup: BeautifulSoup) -> tuple:
+        """Retrieve details on total results from search query
+
+        :param soup: BeautifulSoup:
+        :returns: (index origin, total page count in search, total results from search)
         """
-        return self.domain
+        pass
 
-    def get_page_info(self, soup):
+    @abstractmethod
+    def turn_page(self, url: str, page_number: int) -> BeautifulSoup:
+        """Return page_number page of search results
+
+        :param url: the url to a search results page
+        :param page_number: page number to search on
+        :param url: str:
+        :param page_number: int:
+        :returns: soup of next page
+
         """
-        Get index origin and total number of pages from search_query.
-
-        Args:
-            soup: a beautifulSoup object representing the html page of interest
-
-        Returns:
-            (index origin, total page count in search, total results from search)
-        """
-        raise NotImplementedError()
-
-    def turn_page(self, url, pg_num):
-        """
-        Create url for a GET request based on the search_query.
-
-        Args:
-            url: the url to a search results page
-            pg_num: page number to search on (-1 = starts at index origin for journal)
-        Returns:
-            A url.
-        """
-        new_url = url + "&" + self.page_param + str(pg_num)
+        new_url = url + "&" + self.page_param + str(page_number)
         return self.get_soup_from_request(new_url)
 
-    def get_additional_url_arguments(self, soup):
-        """
-        Get lists of additional search url parameters
+    @abstractmethod
+    def get_additional_url_arguments(self, soup: BeautifulSoup) -> tuple:
+        """Get lists of additional search url parameters
 
-        Args:
-            soup (bs4): soup of initial search page
-        Returns:
-            (years, journal_codes, orderings): where:
+        :param soup: BeautifulSoup:
+        :returns: (years, journal_codes, orderings) -> where:
                 years is a list of strings of desired date ranges
                 journal_codes is a list of strings of desired journal codes
                 orderings is a list of strings of desired results ordering
-            Each of these should be in order of precedence.
-        """
-        raise NotImplementedError()
+        :rtype: tuple
 
-    def get_search_query_urls(self) -> str:
         """
-        Create list of search query urls based on input query.
+        pass
 
-        Returns:
-            A list of urls (as strings)
+    # Helper Methods for retrieving figures from articles
+
+    @abstractmethod
+    def get_license(self, soup: BeautifulSoup) -> tuple:
+        """Checks the article license and whether it is open access
+
+        :param soup: article soup
+        :returns: is_open-> True if article is open
+        :rtype: a bool
+
+        """
+        return (False, "unknown")
+
+    @abstractmethod
+    def is_link_to_open_article(self, tag: BeautifulSoup) -> bool:
+        """Checks if link is to an open access article
+
+        :param tag: A tag containing an href attribute that
+        :type tag: bs4.tag
+        :returns: True if the article is confirmed open_access
+
+        """
+        return False
+
+    @abstractmethod
+    def get_figure_subtrees(self, soup: BeautifulSoup) -> list:
+        """Retrieves list of bs4 parse subtrees containing figure elements
+
+        :param soup: Soup of an article
+        :returns: A list of all figures in the article as BeaustifulSoup objects
+
+        """
+        figure_list = [
+            a for a in soup.find_all("figure") if str(a).find(self.extra_key) > -1
+        ]
+        return figure_list
+
+    @abstractmethod
+    def get_soup_from_request(self, url: str) -> BeautifulSoup:
+        """Get a BeautifulSoup parse tree (lxml parser) from a url request
+
+        :param url: URL to journal results page or html article
+        :returns: A BeautifulSoup parse tree.
+
+        """
+        headers = {
+            "Accept": (
+                "text/html,application/xhtml+xml,application/xml;"
+                "q=0.9,image/webp,*/*;q=0.8"
+            ),
+            "Accept-Language": "en-US,en;q=0.5",
+            "Upgrade-Insecure-Requests": "1",
+            "User-Agent": (
+                "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:82.0)"
+                " Gecko/20100101 Firefox/82.0"
+            ),
+        }
+        wait_time = float(random.randint(0, 50))
+        time.sleep(wait_time / float(10))
+        with requests.Session() as session:
+            r = session.get(url, headers=headers)
+        soup = BeautifulSoup(r.text, "lxml")
+        return soup
+
+    @abstractmethod
+    def find_captions(self, figure_subtree: BeautifulSoup) -> bs4.element.ResultSet:
+        """Returns all captions associated with a given figure
+
+        :param figure_subtree: soup for a figure and its child elements
+        :returns: all captions for given figure
+
+        """
+        return figure_subtree.find_all("p")
+
+    @abstractmethod
+    def save_figure(self, figure_name: str, image_url: str):
+        """Saves figure at img_url to local machine
+
+        :param figure_name: name of figure
+        :param img_url: url to image
+
+        """
+        figures_directory = self.results_directory / "figures"
+        response = requests.get(image_url, stream=True)
+        figure_path = figures_directory / figure_name
+        with open(figure_path, "wb") as out_file:
+            shutil.copyfileobj(response.raw, out_file)
+        del response
+
+    @abstractmethod
+    def get_figure_url(self, figure_subtree: BeautifulSoup) -> str:
+        """Returns url of figure from figure's html subtree
+
+        :param figure_subtree: soup for a figure and its child elements
+        :returns: url to figure's image
+
+        """
+        image_tag = figure_subtree.find("img")
+        image_url = image_tag.get("src")
+        return self.prepend + image_url
+
+    def get_search_query_urls(self) -> list:
+        """Create list of search query urls based on input query
+
+
+        :returns: A list of urls (as strings)
+
         """
         search_query = self.search_query
         # creates a list of search terms
@@ -171,13 +325,12 @@ class JournalFamily:
             search_url = self.domain + self.search_path + self.pub_type + url_parameters
             if self.open:
                 search_url += "&" + self.open_param + "&"
-            soup = self.get_soup_from_request(search_url, fast_load=True)
+            soup = self.get_soup_from_request(search_url)
             years, journal_codes, orderings = self.get_additional_url_arguments(soup)
             search_url_args = []
 
             for year_value in years:
                 year_param = self.date_range_param + year_value
-
                 for journal_value in journal_codes:
                     for order_value in orderings:
                         args = "&".join(
@@ -192,32 +345,15 @@ class JournalFamily:
             search_urls += search_term_urls
         return search_urls
 
-    def get_license(self, soup):
-        """Checks the article license and whether it is open access
+    def get_articles_from_search_url(self, search_url: str) -> list:
+        """Generates a list of articles from a single search query
 
-        Args:
-            soup (a BeautifulSoup parse tree): representation of page html
-        Returns:
-            is_open (a bool): True if article is open
-            license (a string): Requried text of article license
+        :param search_url: A url to search for articles from a journal website
+
         """
-        return (False, "unknown")
-
-    def is_link_to_open_article(self, tag):
-        """Checks if link is to an open access article
-
-        Args:
-            tag (bs4.tag): A tag containing an href attribute that
-                links to an article
-        Returns:
-            True if the article is confirmed open_access
-        """
-        return False
-
-    def get_articles_from_search_url(self, search_url):
         max_scraped = self.search_query["maximum_scraped"]
         self.logger.info("GET request: {}".format(search_url))
-        soup = self.get_soup_from_request(search_url, fast_load=True)
+        soup = self.get_soup_from_request(search_url)
         start_page, stop_page, total_articles = self.get_page_info(soup)
         article_paths = set()
         for page_number in range(start_page, stop_page + 1):
@@ -246,12 +382,7 @@ class JournalFamily:
         return article_paths
 
     def get_article_extensions(self) -> list:
-        """
-        Create a list of article url extensions from search_query
-
-        Returns:
-            A list of article url extensions from search.
-        """
+        """Retrieves a list of article url paths from search_query"""
         # This returns urls based on the combinations of desired search terms.
         search_query_urls = self.get_search_query_urls()
         article_paths = set()
@@ -262,96 +393,12 @@ class JournalFamily:
                 break
         return list(article_paths)
 
-    def get_figure_subtrees(self, soup):
-        """
-        Retrieves list of bs4 parse subtrees containing figure elements
-
-        Args:
-            soup: A beautifulsoup parse tree
-        Returns:
-            A list of all figures in the article as BeaustifulSoup Tag objects
-        """
-        figure_list = [
-            a for a in soup.find_all("figure") if str(a).find(self.extra_key) > -1
-        ]
-        return figure_list
-
-    def get_soup_from_request(self, url: str, fast_load=True):
-        """
-        Get a BeautifulSoup parse tree (lxml parser) from a url request
-
-        Args:
-            url: A requested url
-        Returns:
-            A BeautifulSoup parse tree.
-        """
-        headers = {
-            "Accept": (
-                "text/html,application/xhtml+xml,application/xml;"
-                "q=0.9,image/webp,*/*;q=0.8"
-            ),
-            "Accept-Language": "en-US,en;q=0.5",
-            "Upgrade-Insecure-Requests": "1",
-            "User-Agent": (
-                "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:82.0)"
-                " Gecko/20100101 Firefox/82.0"
-            ),
-        }
-        wait_time = float(random.randint(0, 50))
-        time.sleep(wait_time / float(10))
-        with requests.Session() as session:
-            r = session.get(url, headers=headers)
-        # with open('exsclaim/' + url.split("/")[-1], "w+") as f:
-        #     f.write(r.text)
-        soup = BeautifulSoup(r.text, "lxml")
-        return soup
-
-    def find_captions(self, figure_subtree):
-        """
-        Returns all captions associated with a given figure
-
-        Args:
-            figure_subtree: an bs4 parse tree
-        Returns:
-            all captions for given figure
-        """
-        return figure_subtree.find_all("p")
-
-    def save_figure(self, figure_name, image_url):
-        """
-        Saves figure at img_url to local machine
-
-        Args:
-            figure_name: name of figure
-            img_url: url to image
-        """
-        figures_directory = self.results_directory / "figures"
-        response = requests.get(image_url, stream=True)
-        figure_path = figures_directory / figure_name
-        with open(figure_path, "wb") as out_file:
-            shutil.copyfileobj(response.raw, out_file)
-        del response
-
-    def get_figure_url(self, figure_subtree):
-        """Returns url of figure from figure's html subtree
-
-        Args:
-            figure_subtree (bs4): subtree containing an article figure
-        Returns:
-            url (str)
-        """
-        image_tag = figure_subtree.find("img")
-        image_url = image_tag.get("src")
-        return self.prepend + image_url
-
     def get_article_figures(self, url: str) -> dict:
-        """
-        Get all figures from an article
+        """Get all figures from an article
 
-        Args:
-            url: A url to a journal article
-        Returns:
-            A dict of figure_jsons from an article
+        :param url: a url to an html article
+        :returns: A dict of figure_jsons from an article
+
         """
         soup = self.get_soup_from_request(url)
         is_open, license = self.get_license(soup)
@@ -370,70 +417,58 @@ class JournalFamily:
         article_json = {}
 
         for figure_subtree in figure_subtrees:
-
             captions = self.find_captions(figure_subtree)
 
             # acs captions are duplicated, one version with no captions
             if len(captions) == 0:
                 continue
 
-            # initialize the figure's json
-            article_name = url.split("/")[-1].split("?")[0]
-            figure_json = {
-                "title": soup.find("title").get_text(),
-                "article_url": url,
-                "article_name": article_name,
-            }
-
             # get figure caption
             figure_caption = ""
             for caption in captions:
                 figure_caption += caption.get_text()
-            figure_json["full_caption"] = figure_caption
 
-            # Allocate entry for caption delimiter
-            figure_json["caption_delimiter"] = ""
-
-            # get figure url and name
             image_url = self.get_figure_url(figure_subtree)
-
             # image_url = self.prepend + image_url.replace('_hi-res','')
             if ":" not in image_url:
                 image_url = "https:" + image_url
-            figure_name = (
-                article_name + "_fig" + str(figure_number) + ".jpg"
-            )  # " +  image_url.split('.')[-1]
-
-            # save image info
-            figure_json["figure_name"] = figure_name
-            figure_json["image_url"] = image_url
-            figure_json["license"] = license
-            figure_json["open"] = is_open
-
-            # save figure as image
-            self.save_figure(figure_name, image_url)
+            article_name = url.split("/")[-1].split("?")[0]
+            figure_name = article_name + "_fig" + str(figure_number) + ".jpg"
             figure_path = (
                 pathlib.Path(self.search_query["name"]) / "figures" / figure_name
             )
-            figure_json["figure_path"] = str(figure_path)
-            figure_json["master_images"] = []
-            figure_json["unassigned"] = {
+            # initialize the figure's json
+            figure_json = {
+                "title": soup.find("title").get_text(),
+                "article_url": url,
+                "article_name": article_name,
+                "image_url": image_url,
+                "figure_name": figure_name,
+                "license": license,
+                "open": is_open,
+                "full_caption": figure_caption,
+                "caption_delimiter": "",
+                "figure_path": str(figure_path),
                 "master_images": [],
-                "dependent_images": [],
-                "inset_images": [],
-                "subfigure_labels": [],
-                "scale_bar_labels": [],
-                "scale_bar_lines": [],
-                "captions": [],
+                "unassigned": {
+                    "master_images": [],
+                    "dependent_images": [],
+                    "inset_images": [],
+                    "subfigure_labels": [],
+                    "scale_bar_labels": [],
+                    "scale_bar_lines": [],
+                    "captions": [],
+                },
             }
             # add all results
             article_json[figure_name] = figure_json
+            self.save_figure(figure_name, image_url)
             # increment index
             figure_number += 1
         return article_json
 
 
-# ############## JOURNAL FAMILY SPECIFIC INFORMATION ################
+# ############# JOURNAL FAMILY SPECIFIC INFORMATION ################
 # To add a new journal family, create a new subclass of
 # JournalFamily. Fill out the methods and attributes according to
 # their descriptions in the JournalFamily class. Then add the an
@@ -443,6 +478,8 @@ class JournalFamily:
 
 
 class ACS(JournalFamily):
+    """ """
+
     domain = "https://pubs.acs.org"
     search_path = "/action/doSearch?"
     term_param = "AllField="
@@ -512,6 +549,8 @@ class ACS(JournalFamily):
 
 
 class Nature(JournalFamily):
+    """ """
+
     domain = "https://www.nature.com"
     search_path = "/search?"
     page_param = "page="
@@ -521,6 +560,7 @@ class Nature(JournalFamily):
     open_param = ""
     date_range_param = "date_range="
     journal_param = "journal="
+    pub_type = ""
     # order options
     order_values = {"relevant": "relevance", "old": "date_asc", "recent": "date_desc"}
     # codes for journals most relevant to materials science
@@ -546,6 +586,24 @@ class Nature(JournalFamily):
     prepend = ""
     extra_key = " "
     max_query_results = 1000
+
+    def find_captions(self, figure_subtree: BeautifulSoup):
+        return super().find_captions(figure_subtree)
+
+    def get_figure_subtrees(self, soup: BeautifulSoup) -> list:
+        return super().get_figure_subtrees(soup)
+
+    def get_figure_url(self, figure_subtree: BeautifulSoup) -> str:
+        return super().get_figure_url(figure_subtree)
+
+    def get_soup_from_request(self, url: str) -> BeautifulSoup:
+        return super().get_soup_from_request(url)
+
+    def save_figure(self, figure_name: str, image_url: str):
+        return super().save_figure(figure_name, image_url)
+
+    def turn_page(self, url: str, page_number: int) -> BeautifulSoup:
+        return super().turn_page(url, page_number)
 
     def get_page_info(self, soup):
         # Finds total results, page number, and total pages in article html
@@ -628,6 +686,8 @@ class Nature(JournalFamily):
 
 
 class RSC(JournalFamily):
+    """ """
+
     domain = "https://pubs.rsc.org"
     search_path = "/en/results?"
     page_param = ""  # pagination through javascript
@@ -678,7 +738,7 @@ class RSC(JournalFamily):
             ChromeDriverManager().install(), chrome_options=chromeOptions
         )
 
-    def get_soup_from_request(self, url: str, fast_load=False):
+    def get_soup_from_request(self, url: str) -> BeautifulSoup:
         url.replace(" ", "+")
         self.browser.get(url)
         article_request = "en/content/articlehtml" in url
@@ -711,6 +771,11 @@ class RSC(JournalFamily):
         return [""], [""], [""]
 
     def is_link_to_open_article(self, tag):
+        """
+
+        :param tag:
+
+        """
         return self.open
 
     def get_page_info(self, soup):
@@ -756,6 +821,8 @@ class RSC(JournalFamily):
 
 
 class Wiley(JournalFamily):
+    """ """
+
     domain = "https://onlinelibrary.wiley.com"
     search_path = "/action/doSearch?"
     page_param = "startPage="
@@ -773,7 +840,7 @@ class Wiley(JournalFamily):
     max_query_results = 2000
     articles_path = "/doi/"
     prepend = "https://onlinelibrary.wiley.com"
-    extra_key = ""
+    extra_key = " "
     articles_path_length = 3
 
     def get_page_info(self, soup):

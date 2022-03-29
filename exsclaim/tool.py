@@ -152,7 +152,7 @@ class JournalScraper(ExsclaimTool):
                 + article.split("/")[-1]
             )
             try:
-                request = j_instance.get_domain_name() + article
+                request = j_instance.domain + article
                 article_dict = j_instance.get_article_figures(request)
                 exsclaim_json = self._update_exsclaim(exsclaim_json, article_dict)
                 self.new_articles_visited.add(article)
