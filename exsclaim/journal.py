@@ -11,6 +11,7 @@ import urllib.request
 from abc import ABC, abstractmethod
 from datetime import datetime
 
+import bs4
 import numpy as np
 import requests
 from dateutil.relativedelta import relativedelta
@@ -129,7 +130,7 @@ class JournalFamily(ABC):
         """Number of / separated segments to articles path"""
         return self._articles_path_length
 
-    def __init__(self, search_query):
+    def __init__(self, search_query: dict):
         """creates an instance of a journal family search using a query
 
         Args:
@@ -269,7 +270,7 @@ class JournalFamily(ABC):
         return soup
 
     @abstractmethod
-    def find_captions(self, figure_subtree: BeautifulSoup):
+    def find_captions(self, figure_subtree: BeautifulSoup) -> bs4.element.ResultSet:
         """
         Returns all captions associated with a given figure
 
