@@ -1,4 +1,4 @@
-{   
+{
     "name": "nature-test",
 
     "journal_family": "nature",
@@ -14,7 +14,7 @@
             "term":"Ag nanoparticle"
         }
     },
-    
+
     "save_format": ["boxes"],
 
     "open": false

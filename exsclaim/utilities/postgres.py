@@ -1,8 +1,10 @@
 import pathlib
 import shutil
+from configparser import ConfigParser
+
 import psycopg2
 from psycopg2 import sql
-from configparser import ConfigParser
+
 
 def initialize_database(configuration_file):
     parser = ConfigParser()
@@ -11,15 +13,12 @@ def initialize_database(configuration_file):
     conn = psycopg2.connect(**parser["postgres"])
     conn.autocommit = True
     cursor = conn.cursor()
-    create_query = sql.SQL(
-        "CREATE USER {username} WITH PASSWORD {password};").format(
-            username=sql.Identifier(parser["exsclaim"]["user"]),
-            password=sql.Placeholder()
-        )
-    alter_query = sql.SQL(
-        "ALTER USER {username} CREATEDB;").format(
-            username=sql.Identifier(parser["exsclaim"]["user"])
-        )
+    create_query = sql.SQL("CREATE USER {username} WITH PASSWORD {password};").format(
+        username=sql.Identifier(parser["exsclaim"]["user"]), password=sql.Placeholder()
+    )
+    alter_query = sql.SQL("ALTER USER {username} CREATEDB;").format(
+        username=sql.Identifier(parser["exsclaim"]["user"])
+    )
     try:
         cursor.execute(create_query, (parser["exsclaim"]["password"],))
         cursor.execute(alter_query)
@@ -28,10 +27,10 @@ def initialize_database(configuration_file):
     conn.close()
     # connect to postgres, create exsclaim database
     conn = psycopg2.connect(
-        host= parser["postgres"]["host"],
-        database= parser["postgres"]["database"],
-        user= parser["exsclaim"]["user"],
-        password= parser["exsclaim"].get("password", "")
+        host=parser["postgres"]["host"],
+        database=parser["postgres"]["database"],
+        user=parser["exsclaim"]["user"],
+        password=parser["exsclaim"].get("password", ""),
     )
     conn.autocommit = True
     cursor = conn.cursor()
@@ -41,25 +40,26 @@ def initialize_database(configuration_file):
         print(e)
     conn.close()
 
+
 def modify_database_configuration(config_path):
-    """ Alter database.ini to store configuration for future runs
+    """Alter database.ini to store configuration for future runs
 
     Args:
         config_path (str): path to .ini file
-    Modifies: 
+    Modifies:
         database.ini
     """
     current_file = pathlib.Path(__file__).resolve()
     database_ini = current_file.parent / "database.ini"
     config_path = pathlib.Path(config_path)
     shutil.copy(config_path, database_ini)
-    
-class Database():
 
-    def __init__(self, name, configuration_file = None):
+
+class Database:
+    def __init__(self, name, configuration_file=None):
         try:
             initialize_database(configuration_file)
-        except Exception as e:
+        except Exception:
             pass
         if configuration_file is None:
             current_file = pathlib.Path(__file__).resolve()
@@ -86,12 +86,22 @@ class Database():
             app_name + "_figure": app_name + "_figure_temp",
             app_name + "_subfigure": app_name + "_subfigure_temp",
             app_name + "_scalebar": app_name + "_scalebar_temp",
-            app_name + "_scalebarlabel": (
-                app_name + "_scalebarlabel_temp(text,x1,y1,x2,y2,label_confidence,box_confidence,nm,scale_bar_id)"
+            app_name
+            + "_scalebarlabel": (
+                app_name
+                + (
+                    "_scalebarlabel_temp(text,x1,y1,x2,y2,"
+                    "label_confidence,box_confidence,nm,scale_bar_id)"
+                )
             ),
-            app_name + "_subfigurelabel": (
-                app_name + "_subfigurelabel_temp(text,x1,y1,x2,y2,label_confidence,box_confidence,subfigure_id)"
-            )
+            app_name
+            + "_subfigurelabel": (
+                app_name
+                + (
+                    "_subfigurelabel_temp(text,x1,y1,x2,y2,"
+                    "label_confidence,box_confidence,subfigure_id)"
+                )
+            ),
         }
         table_name = table
         temp_name = table_name + "_temp"
@@ -107,16 +117,13 @@ class Database():
         )
         with open(file, "r", encoding="utf-8") as csv_file:
             self.cursor.copy_expert(
-                "COPY {} FROM STDIN CSV".format(table_to_copy_command[table]),
-                csv_file
+                "COPY {} FROM STDIN CSV".format(table_to_copy_command[table]), csv_file
             )
         self.query(
-            sql.SQL(
-                "INSERT INTO {} SELECT * FROM {} ON CONFLICT DO NOTHING;"
-            ).format(sql.Identifier(table_name), sql.Identifier(temp_name))
+            sql.SQL("INSERT INTO {} SELECT * FROM {} ON CONFLICT DO NOTHING;").format(
+                sql.Identifier(table_name), sql.Identifier(temp_name)
+            )
         )
-
-
 
     def close(self):
         self.cursor.close()
