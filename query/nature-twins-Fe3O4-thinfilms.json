@@ -1,4 +1,4 @@
-{   
+{
     "name": "nature-twins-Fe3O4-thinfilms",
 
     "journal_family": "nature",
@@ -19,10 +19,10 @@
             "term":"Fe3O4",
             "synonyms":["Fe3O4 thin films"]
         },
-        "search_field_3": 
+        "search_field_3":
         {
             "term":"atomic resolution",
-            "synonyms":[""] 
+            "synonyms":[""]
         }
     },
 

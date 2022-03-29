@@ -2,7 +2,7 @@ FROM python:3.9-slim-bullseye as base
 
 ENV PYTHONUNBUFFERED=1
 
-# Install wget to set up the PPA (Personal Package Archives), 
+# Install wget to set up the PPA (Personal Package Archives),
 # xvfb to have a virtual screen, and unzip to install the
 # Chromedriver, among other packages
 RUN apt-get update -y && apt-get install -y wget xvfb unzip make gnupg curl apt-transport-https
