@@ -14,7 +14,7 @@ ABF-STEM:
 - "ABF-STEM"
 - "Annular bright-field scanning transmission electron microscopy"
 - "Annular bright-field STEM"
-HAADF-STEM: 
+HAADF-STEM:
 - "HAADF–STEM"
 - "HAADF-STEM"
 - "HAADF STEM"
@@ -30,7 +30,7 @@ HAADF-STEM:
 - "High-angle annular dark field"
 - "high-angle annular dark-field"
 - "High-angle annular dark-field"
-MAADF-STEM: 
+MAADF-STEM:
 - "MAADF–STEM"
 - "MAADF-STEM"
 - "MAADF STEM"
@@ -43,7 +43,7 @@ MAADF-STEM:
 - "MAADF"
 - "medium-angle annular dark field"
 - "Medium-angle annular dark field"
-LAADF-STEM: 
+LAADF-STEM:
 - "LAADF–STEM"
 - "LAADF-STEM"
 - "LAADF STEM"
@@ -56,11 +56,11 @@ LAADF-STEM:
 - "LAADF"
 - "low-angle annular dark field"
 - "Low-angle annular dark field"
-BF-STEM: 
+BF-STEM:
 - "BF-STEM"
 - "BF STEM"
 - "High-resolution BF-STEM"
-STEM: 
+STEM:
 - "STEM"
 - "STEM image"
 - "STEM micrograph"
@@ -91,7 +91,7 @@ HRTEM:
 - "high-resolution transmission electron microscope"
 - "high-resolution transmission electron microscopy"
 - "HREM"
-SEM: 
+SEM:
 - "SEM"
 - "scanning electron microscope"
 - "SEM micrograph"
@@ -252,7 +252,7 @@ DSC curve:
 - "Differential scanning calorimetry"
 - "differential scanning calorimetry"
 TRR:
-- "Time-Resolved Reflectivity" 
+- "Time-Resolved Reflectivity"
 Electron density:
 - "electron density"
 SAD:

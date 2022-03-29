@@ -1,12 +1,12 @@
 version: "3.9"
-services: 
+services:
     exsclaim:
         build:
             context: .
             target: base
         tty: true
         stdin_open: true
-        volumes: 
+        volumes:
             - ./exsclaim:/app/exsclaim
             - ./query:/app/query
             - ./run.py:/app/run.py

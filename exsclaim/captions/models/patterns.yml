@@ -1,4 +1,4 @@
-patterns: 
+patterns:
 # Ex: (a) and (b) TEM images of 1.93 wt% Ru–WSe2. (c) HRTEM image of 1.93 wt% Ru–WSe2. (d) and (e) The enlarged area denoted in (c) corresponds to the HRTEM images of WSe2. (f) HAADF-STEM image of 1.93 wt% Ru–WSe2. (g–i) The EDS mapping of Ru, W, and Se, respectively.
 - ("CAP",1),"!",("NC",1),"*",("IN",1),"*",(".",1)
 - ("CAP",1),"!",("NC",1),"*",("IN",1),"*",(",",0)
@@ -89,11 +89,11 @@ patterns:
 - ("NC",1),("IN",1),("NC",1),("VBG",1),("NC",1),"*",("CAP",0),"!",("CAP",0),"!",("CAP",0),"!",("CAP",1),("NC",1),"*",("CAP",0)
 - ("NC",1),("IN",1),("NC",1),("VBG",1),("NC",1),"*",("CAP",0),"!",("CAP",0),"!",("CAP",0),"!",("CAP",0),"!",("CAP",1),("NC",1),"*",("CAP",0)
 - ("NC",1),("IN",1),("NC",1),("VBG",1),("NC",1),"*",("CAP",0),"!",("CAP",0),"!",("CAP",0),"!",("CAP",0),"!",("CAP",0),"!",("CAP",1),("NC",1),"*",(".",1)
-# Synthetic scheme and Characterization of RuIrZnOx h-nanoboxes. a Schematic illustration of the synthetic process. 
+# Synthetic scheme and Characterization of RuIrZnOx h-nanoboxes. a Schematic illustration of the synthetic process.
 - ("NC",1),("CC",1),("NC",1),("IN",1),("NC",1),"*",("CAP",1),("NC",1),("IN",1),"*",("CAP",0)
 - ("NC",1),("CC",1),("NC",1),("IN",1),("NC",1),"*",("CAP",0),"!",("CAP",1),("NC",1),"*",("CAP",0)
 - ("NC",1),("IN",1),"*",("IN",1),"*",("NC",1),("CAP",1)
-#  c, d Normalized XANES spectra of RuIrOx measured at different electrode potentials at Ru K-edge (c) and Ir L3-edge (d) during the OER process under acidic condition 
+#  c, d Normalized XANES spectra of RuIrOx measured at different electrode potentials at Ru K-edge (c) and Ir L3-edge (d) during the OER process under acidic condition
 - ("CAP",1),("NNP",1),"*",("IN", 1),("NC", 1),"*",("CAP", 0),"*",("CAP", 0),("IN", 0),"*",(".",1)
 - ("NC",1),("IN",1),("NC",1),("IN",1),("NC",1),"*",("CAP", 1),"*",("CAP", 0)
 - ("NC",1),("IN",1),("NC",1),("IN",1),("NC",1),"*",("CAP", 0),"!",("CAP", 1),"*",("CAP", 0)
@@ -103,5 +103,5 @@ patterns:
 # Schematics of the strategy for fabricating BixSn1-x nano-alloy catalysts and the Bi–Sn phase diagram . a A flow ...
 - ("NC",1),("IN",1),("NC",1),("IN",1),("VBG",1),"*",("NC",1),("CAP",1),("NC",1),("VBG",1),("NC",1),"*",("CAP",0)
 - ("NC",1),("IN",1),("NC",1),("IN",1),("VBG",1),"*",("NC",1),("CAP",0),"!",("CAP",1),("DT",1),"*",("NC",1),"*",("IN",1),("NC",1),"*",("CAP",0)
-# ... e–h Size distribution of the particles with their median and mean values indicated . i, j Control samples prepared with Sn metal (i) and Bi metal (j) 
+# ... e–h Size distribution of the particles with their median and mean values indicated . i, j Control samples prepared with Sn metal (i) and Bi metal (j)
 - ("NC",1),("IN",1),"*",("NC",1),("CAP",0),"!",(".",1),"*",("CAP",1),("NC",1),"*",("NC",1),("IN",1),"*",("CC",1),("NC",1),"*",("CAP",0)

@@ -42,7 +42,7 @@
     window.config = window.config || {};
     window.config.mustardcut = false;
 
-    
+
     if (window.matchMedia && window.matchMedia('only screen and (-webkit-min-device-pixel-ratio:0) and (min-color-index:0), (-ms-high-contrast: none), only all and (min--moz-device-pixel-ratio:0) and (min-resolution: 3e1dpcm)').matches) {
         window.config.mustardcut = true;
     }
@@ -182,7 +182,7 @@
     j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     'https://www.googletagmanager.com/gtm.js?id='+i+dl;
 
-    
+
     j.addEventListener('load', function() {
     var _ge = new CustomEvent('gtm_loaded', { bubbles: true });
     d.dispatchEvent(_ge);

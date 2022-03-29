@@ -1,9 +1,9 @@
-import pathlib
-from sys import path
 import os
+import pathlib
+
 
 def initialize_results_dir(results_dir=None):
-    """ Determine where to save results for a pipeline run
+    """Determine where to save results for a pipeline run
 
     The output directory will be resolved in this order:
         1. if results_dir is provided, results will be saved there
@@ -41,8 +41,9 @@ def initialize_results_dir(results_dir=None):
         add_results_dir(results_dir)
     return results_dir
 
+
 def add_results_dir(results_dir):
-    """ Add results_dir (a full path) to store extractions in """
+    """Add results_dir (a full path) to store extractions in"""
     current_file = pathlib.Path(__file__).resolve(strict=True)
     base_dir = current_file.parent.parent.parent
     results_dirs_file = base_dir / "exsclaim" / "results_dirs"

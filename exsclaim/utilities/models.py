@@ -1,8 +1,9 @@
-from exsclaim.utilities import download
-import pathlib
 import os
+import pathlib
+
 import torch
 
+from exsclaim.utilities import download
 
 # stores the google drive file IDs of default neural network checkpoints
 # replace these if you wish to change a model
