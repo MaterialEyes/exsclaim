@@ -32,8 +32,39 @@ from .utilities import paths
 
 
 class JournalFamily(ABC):
-    """
-    Base class to represent journals and provide scraping methods
+    """Base class to represent journals and provide scraping methods
+
+    This class defines the interface for interacting with JournalFamilies.
+    A JournalFamily is a collection of academic journals with articles
+    hosted on a single domain. For example *Nature* is a single journal
+    family that serves articles from both *Scientific Reports* and
+    *Nature Communications* (and many others) on nature.com.
+
+    The attributes defined mainly consist of documenting the format
+    of urls in the journal family. Two urls are of interest:
+
+    * search_results_url: the url one goes to in order to query
+    journal articles, and the associated url parameters to filter
+    those queries
+
+    * article_url: the general form of the url path containing **html**
+    versions of article
+
+    The methods of this class are focused on parsing the html structure
+    of the page types returned by the two url types above.
+
+    There are two major types of JournalFamiles (in the future, these
+    may make sense to be split into separate subclasses of JournalFamily):
+    static and dynamic. Static journal families serve all results using
+    static html. Nature is an example. These are simpler as GET requests
+    alone will return all of the relevant data. Dynamic familes utilize
+    javascript to populate results so a browser emulator like selenium
+    is used. RSC is an example of a dynamic journal.
+
+    **Contributing**: If you would like to add a new JournalFamily, decide
+    whether a static or dynamic one is needed and look to an existing
+    subclass to base your efforts. Create an issue before you start so your
+    efforts are not duplicated and submit a PR upon completion. Thanks!
     """
 
     # journal attributes -- these must be defined for each journal
@@ -46,7 +77,7 @@ class JournalFamily(ABC):
     # the next 6 fields determine the url of journals search page
     @property
     def search_path(self) -> str:
-        """URL portion from end of TLD to query parameters"""
+        """URL portion from end of top level domain to query parameters"""
         return self._search_path
 
     # params should include trailing '='
@@ -190,6 +221,11 @@ class JournalFamily(ABC):
     def get_additional_url_arguments(self, soup: BeautifulSoup) -> tuple:
         """Get lists of additional search url parameters
 
+        Some JournalFamilies limit the number of articles returned
+        by a single search. In order to retrieve articles beyond this,
+        we create additional search queries filtering for non-overlapping
+        sets, and execute them individually.
+
         Args:
             soup: initial search result for search term
         Returns:
@@ -311,7 +347,7 @@ class JournalFamily(ABC):
         return self.prepend + image_url
 
     def get_search_query_urls(self) -> list:
-        """Create list of search query urls based on input query
+        """Create list of search query urls based on input query json
 
         Returns:
             A list of urls (as strings)
@@ -354,7 +390,7 @@ class JournalFamily(ABC):
         return search_urls
 
     def get_articles_from_search_url(self, search_url: str) -> list:
-        """Generates a list of articles from a single search query"""
+        """Generates a list of articles from a single search term"""
         max_scraped = self.search_query["maximum_scraped"]
         self.logger.info("GET request: {}".format(search_url))
         soup = self.get_soup_from_request(search_url)
@@ -386,7 +422,7 @@ class JournalFamily(ABC):
         return article_paths
 
     def get_article_extensions(self) -> list:
-        """Retrieves a list of article url paths from search_query"""
+        """Retrieves a list of article url paths from a search query"""
         # This returns urls based on the combinations of desired search terms.
         search_query_urls = self.get_search_query_urls()
         article_paths = set()
