@@ -38,12 +38,12 @@ def load_models(models_path=str) -> tuple:
 
 
 def find_subfigure_delimiter(caption_nlp_model=tuple, caption=str) -> str:
-    """
-    Determine which type of character is functioning as a delimiter
-    between segments of text describing the individual subfigures.
+    """Determine type of character functioning as a delimiter
+
     Args:
         caption_nlp_model: A tuple (nlp, matcher)
         caption: A string of caption text
+
     Returns:
         char_delim: The primary delimiter in the list of matches
     """
@@ -93,10 +93,11 @@ def find_subfigure_delimiter(caption_nlp_model=tuple, caption=str) -> str:
 
 
 def get_subfigure_tokens(caption_nlp_model=tuple, caption=str) -> list:
-    """
-    Split caption text into subfigure tokens based on subfigure delimiters.
+    """Split caption text into subfigure tokens based on subfigure delimiters.
+
     The delimiting subfigure tokens are a given as list of subfigure tokens elements
     A single subfigure token element is a tuple containing:
+
         - match_id: The hash value of the string ID
         - string_id: The the caption rule label -> "rule['label']"
         - start/end: Describes a start/end slice of span in doc, i.e. doc[start:end]
@@ -108,9 +109,11 @@ def get_subfigure_tokens(caption_nlp_model=tuple, caption=str) -> list:
     Note:
         A list of subfigure tokens only refers to portions of the caption text
         containing a subfigure label. Not all caption text is given a subfigure token!
+
     Args:
         caption_nlp_model: A tuple (nlp, matcher)
         caption: A string of caption text
+
     Returns:
         subfigure_tokens:  List of subfigure tokens elements (list of tuples)
     """
@@ -253,11 +256,12 @@ def get_subfigure_count(caption_nlp_model=tuple, caption=str) -> int:
 
 
 def get_subfigure_labels(caption_nlp_model=tuple, caption=str) -> list:
-    """
-    Get the text for subfigure delimiters from 'doc_text' labels in subfigure tokens
+    """Get text for subfigure delimiters from 'doc_text' labels in subfigure tokens
+
     Args:
         caption_nlp_model: A tuple (nlp, matcher)
         caption: A string of caption text
+
     Returns:
         subfigure_labels: A list of 'doc_text' labels from subfigure tokens
     """
@@ -272,9 +276,8 @@ def get_subfigure_labels(caption_nlp_model=tuple, caption=str) -> list:
 def associate_caption_text(
     caption_nlp_model=tuple, caption=str, keywords={}, keys="implied"
 ) -> dict:
-    """
-    Find portions of caption text and assigns them to appropriate subfigure token key
-    in a caption_dict.
+    """Find and assigns portions of caption text to appropriate subfigure token
+
     Args:
         caption_nlp_model: A tuple (nlp, matcher)
         caption: A string of caption text
@@ -286,6 +289,7 @@ def associate_caption_text(
                            subfigure token: (a–c)
               "implied"  – caption labels keys from the implied_text of
                            a subfigure token : a, b, c.
+
     Returns:
         caption_dict: A dictionary with subfigure token keys and
             associated text as entries.

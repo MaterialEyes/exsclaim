@@ -43,12 +43,11 @@ class JournalFamily(ABC):
     The attributes defined mainly consist of documenting the format
     of urls in the journal family. Two urls are of interest:
 
-    * search_results_url: the url one goes to in order to query
-    journal articles, and the associated url parameters to filter
-    those queries
-
-    * article_url: the general form of the url path containing **html**
-    versions of article
+        * search_results_url: the url one goes to in order to query
+          journal articles, and the associated url parameters to filter
+          those queries
+        * article_url: the general form of the url path containing **html**
+          versions of article
 
     The methods of this class are focused on parsing the html structure
     of the page types returned by the two url types above.

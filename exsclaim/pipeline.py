@@ -17,6 +17,8 @@ from .utilities import boxes, paths
 
 
 class Pipeline:
+    """Defines the exsclaim! pipeline"""
+
     def __init__(self, query_path):
         """initialize a Pipeline to run on query path and save to exsclaim path
 

@@ -177,17 +177,18 @@ def is_likely_subfigure(label: str, suggested_labels: list, caption_text: str) -
 
     The purpose of this function is to overwrite likely "false negative"
     label deletions. "Probable" means one (or more) of the folowing:
-        (1) label is contained in the span of suggested_labels
-        (2) label is attached via a connections list
-        (3) label is immediately adjacent to a suggested_label
+        1. label is contained in the span of suggested_labels
+        2. label is attached via a connections list
+        3. label is immediately adjacent to a suggested_label
 
-    Example:
+    Example::
         interpret.is_probable_subfigure(
             'a',['b','c','d'],
             ("(a) Cross-sectional BSE image of the crystal grain"
              "including CaSi2FX compound. (b) EPMA quantitative...")
             )
         >> True
+
         NOTE: 'a' is likely a subfigure label despite fact it was deleted
         from suggested_labels!
 
