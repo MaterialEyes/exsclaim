@@ -1,3 +1,6 @@
+"""Code for loading models from checkpoints saved in GoogleDrive
+
+Model names are mapped to googleids in model_names_to_google_ids."""
 import os
 import pathlib
 

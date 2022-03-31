@@ -1,3 +1,4 @@
+"""Logging and sending output to stdout code"""
 import os
 import sys
 

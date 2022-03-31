@@ -1,5 +1,6 @@
-"""Functions for downloading from Google Drive ###
-Adapted from https://stackoverflow.com/questions/38511444/
+"""Functions for downloading from Google Drive
+
+Adapted from `this StackOverflow <https://stackoverflow.com/questions/38511444/>`_
 """
 import requests
 

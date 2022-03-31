@@ -1,3 +1,4 @@
+"""Handles location of output files"""
 import os
 import pathlib
 

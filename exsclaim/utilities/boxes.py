@@ -1,3 +1,14 @@
+"""Module for handling bounding box coordinates
+
+Throughout the models and data formats used in exsclaim, bounding
+boxes are sometimes stored as x1,y1,x2,y2 or 'coords' and sometimes
+as [{"x": x1, "y": y1}, ...] or 'labelbox'
+
+In addition, we often want to check the relation of two bounding
+boxes and their properites (like center point)
+"""
+
+
 def convert_coords_to_labelbox(bbox_coordinates):
     """Converts x1,y1,x2,y2 to [{"x": x1, "y": y1}, ...]"""
     x1, y1, x2, y2 = bbox_coordinates
