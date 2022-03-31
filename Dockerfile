@@ -1,4 +1,4 @@
-FROM python:3.9-slim-bullseye as base
+FROM python:3.9-slim-bullseye as dev
 
 ENV PYTHONUNBUFFERED=1
 
@@ -35,9 +35,9 @@ RUN pip install --no-cache-dir --upgrade pip && \
 
 RUN python -m spacy download en_core_web_sm
 
+FROM dev as prod
 
-# ENTRYPOINT [ "python", "./app/run.py"]
+COPY . .
+RUN python setup.py install
 
-# # copy app files
-FROM base as prod
-COPY exsclaim /app/
+ENTRYPOINT [ "python", "./run.py"]

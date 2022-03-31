@@ -79,12 +79,12 @@ class FigureSeparator(ExsclaimTool):
         # Load object detection model
         object_detection_model = YOLOv3(configuration["MODEL"])
         self.object_detection_model = load_model_from_checkpoint(
-            object_detection_model, "object_detection_model.pt", self.cuda
+            object_detection_model, "object_detection_model.pt", self.cuda, self.device
         )
         # Load text recognition model
         text_recognition_model = resnet152()
         self.text_recognition_model = load_model_from_checkpoint(
-            text_recognition_model, "text_recognition_model.pt", self.cuda
+            text_recognition_model, "text_recognition_model.pt", self.cuda, self.device
         )
         # Load classification model
         master_config_file = model_path + "config/yolov3_default_master.cfg"
@@ -92,7 +92,7 @@ class FigureSeparator(ExsclaimTool):
             master_config = yaml.load(f, Loader=yaml.FullLoader)
         classifier_model = YOLOv3img(master_config["MODEL"])
         self.classifier_model = load_model_from_checkpoint(
-            classifier_model, "classifier_model.pt", self.cuda
+            classifier_model, "classifier_model.pt", self.cuda, self.device
         )
         # Load scale bar detection model
         # load an object detection model pre-trained on COCO
@@ -107,7 +107,10 @@ class FigureSeparator(ExsclaimTool):
             input_features, number_classes
         )
         self.scale_bar_detection_model = load_model_from_checkpoint(
-            scale_bar_detection_model, "scale_bar_detection_model.pt", self.cuda
+            scale_bar_detection_model,
+            "scale_bar_detection_model.pt",
+            self.cuda,
+            self.device,
         )
         # Load scale label recognition model
         parent_dir = pathlib.Path(__file__).resolve(strict=True).parent
@@ -117,7 +120,10 @@ class FigureSeparator(ExsclaimTool):
         configuration = configuration_file["theta"]
         scale_label_recognition_model = CRNN(configuration=configuration)
         self.scale_label_recognition_model = load_model_from_checkpoint(
-            scale_label_recognition_model, "scale_label_recognition_model.pt", self.cuda
+            scale_label_recognition_model,
+            "scale_label_recognition_model.pt",
+            self.cuda,
+            self.device,
         )
 
     def _update_exsclaim(self, exsclaim_dict, figure_name, figure_dict):

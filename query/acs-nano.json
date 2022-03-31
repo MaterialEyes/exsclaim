@@ -1,7 +1,7 @@
 {
-    "name": "nature-nano",
+    "name": "acs-nano",
 
-    "journal_family": "nature",
+    "journal_family": "acs",
 
     "maximum_scraped": 2,
 
