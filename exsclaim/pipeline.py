@@ -469,8 +469,12 @@ class Pipeline:
         # Make and save images
         labeled_image = Image.new(mode="RGB", size=(image_width, image_height))
         draw = ImageDraw.Draw(labeled_image)
-        font = ImageFont.truetype("/usr/share/fonts/dejavu/DejaVuSans.ttf")
-
+        try:
+            font = ImageFont.truetype("/usr/share/fonts/dejavu/DejaVuSans.ttf")
+        except OSError:
+            font = ImageFont.truetype(
+                "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf"
+            )
         figures_path = self.results_directory / "figures"
         full_figure = Image.open(figures_path / figure_json["figure_name"]).convert(
             "RGB"
@@ -523,7 +527,7 @@ class Pipeline:
         labeled_image.save(self.results_directory / "extractions" / figure_name)
 
     def draw_bounding_boxes(
-        self, figure_name, draw_scale=True, draw_labels=False, draw_subfigures=False
+        self, figure_name, draw_scale=True, draw_labels=True, draw_subfigures=True
     ):
         """Save figures with bounding boxes drawn
 
