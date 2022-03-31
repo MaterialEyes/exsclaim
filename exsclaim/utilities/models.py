@@ -19,21 +19,15 @@ model_names_to_googleids = {
 }
 
 
-def load_model_from_checkpoint(self, model, model_name, cuda):
+def load_model_from_checkpoint(model, model_name, cuda, device):
     """load checkpoint weights into model"""
     checkpoints_path = pathlib.Path(__file__).parent.parent / "figures" / "checkpoints"
     checkpoint = checkpoints_path / model_name
-    model.to(self.device)
+    model.to(device)
     # download the model if isn't already
     if not os.path.isfile(checkpoint):
         os.makedirs(checkpoints_path, exist_ok=True)
         file_id = model_names_to_googleids[model_name]
-        self.display_info(
-            (
-                "Downloading: https://drive.google.com/uc?export=download&id={}"
-                " to {}".format(file_id, checkpoint)
-            )
-        )
         download.download_file_from_google_drive(file_id, checkpoint)
     if cuda:
         model.load_state_dict(torch.load(checkpoint))
