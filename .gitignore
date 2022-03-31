@@ -33,3 +33,4 @@ build/
 */results_dirs
 .ipynb_checkpoints/
 **/local.ini
+docs/build/
