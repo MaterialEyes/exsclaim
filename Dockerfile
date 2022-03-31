@@ -35,9 +35,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
 
 RUN python -m spacy download en_core_web_sm
 
+COPY . .
+RUN python setup.py install
 
-# ENTRYPOINT [ "python", "./app/run.py"]
-
-# # copy app files
-FROM base as prod
-COPY exsclaim /app/
+ENTRYPOINT [ "python", "./run.py"]

@@ -1,2 +1,6 @@
-*md
+docs/
 */tests
+build/
+dist/
+.ipynb_checkpoints/
+exsclaim.egg-info/
