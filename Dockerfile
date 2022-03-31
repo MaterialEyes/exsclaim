@@ -1,4 +1,4 @@
-FROM python:3.9-slim-bullseye as base
+FROM python:3.9-slim-bullseye as dev
 
 ENV PYTHONUNBUFFERED=1
 
@@ -34,6 +34,8 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
 RUN python -m spacy download en_core_web_sm
+
+FROM dev as prod
 
 COPY . .
 RUN python setup.py install
