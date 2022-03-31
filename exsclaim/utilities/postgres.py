@@ -1,3 +1,4 @@
+"""Functions for interacting with postgres database"""
 import pathlib
 import shutil
 from configparser import ConfigParser
