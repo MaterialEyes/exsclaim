@@ -142,7 +142,7 @@ class JournalFamily():
                 + self.join.join(["+".join(a.split(" ")) for a in search_group])
                 + self.pre_sb + sbext + self.post_sb)
             search_query_urls.append(search_query_url)
-
+        search_query_url = search_query_url.replace('"',  "'")
         return search_query_urls
 
     def get_license(self, soup):
@@ -413,11 +413,15 @@ class Nature(JournalFamily):
             if len(info) != 2 or info[0] != 'page':
                 raise ValueError(f'Info {info} should be of the format "page i"')
             return int(info[1])  
-
+        
         active_link = soup.find(class_='c-pagination__link c-pagination__link--active')
-        current_page = parse_page(active_link.text)  
-        pages = soup.find_all(class_='c-pagination__item')
-        total_pages = parse_page(pages[-2].text)
+        try: 
+            current_page = parse_page(active_link.text)  
+            pages = soup.find_all(class_='c-pagination__item')
+            total_pages = parse_page(pages[-2].text)  
+        except:
+            current_page, total_pages = 1, 1
+            
         total_results = int(soup.find(attrs={'data-test': 'results-data'}).text.split()[-2])
         return current_page, total_pages, total_results
 
