@@ -417,6 +417,22 @@ class Nature(JournalFamily):
                 search_info["totalPages"], 
                 search_info["totalResults"])
 
+    def get_page_info(self, soup):
+        def parse_page(page):
+            # Fetches the page number given the string 'page #' (e.g. page 1) otherwise
+            # returns None
+            info = page.strip().split()
+            if len(info) != 2 or info[0] != 'page':
+                raise ValueError(f'Info {info} should be of the format "page i"')
+            return int(info[1])  
+            
+        active_link = soup.find(class_='c-pagination__link c-pagination__link--active')
+        current_page = parse_page(active_link.text)  
+        pages = soup.find_all(class_='c-pagination__item')
+        total_pages = parse_page(pages[-2].text)
+        total_results = int(soup.find(attrs={'data-test': 'results-data'}).text.split()[-2])
+        return current_page, total_pages, total_results
+
     def turn_page(self, url, pg_num, pg_size):
         return url.split('&page=')[0]+'&page='+str(pg_num)
 
@@ -440,15 +456,12 @@ class Nature(JournalFamily):
     def is_link_to_open_article(self, tag):
         i = 0
         current_tag = tag
-        while current_tag.parent and i < 3:
+        while current_tag.parent and i < 4:
             current_tag = current_tag.parent
             i += 1
-        candidates = current_tag.find_all("span", class_="text-orange")
-        for candidate in candidates:
-            if candidate.text == "Open":
-                return True
-        return False
-        
+        candidates = current_tag.find_all("span", attrs={'data-test': 'open-access', 'itemprop': "openAccess"})
+        return len(candidates)>=1
+
 
 class RSC(JournalFamily):
     domain =        "https://pubs.rsc.org"
