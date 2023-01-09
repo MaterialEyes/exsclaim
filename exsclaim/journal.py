@@ -406,18 +406,6 @@ class Nature(JournalFamily):
     extra_key =     " "
 
     def get_page_info(self, soup):
-        ## Finds total results, page number, and total pages in article html
-        ## Data exists as json inside script tag with 'data-test'='dataLayer' attr.
-        data_layer = soup.find(attrs = {'data-test': 'dataLayer'})
-        data_layer_string = str(data_layer.string)
-        data_layer_json = "{" + data_layer_string.split("[{", 1)[1].split("}];", 1)[0] + "}"
-        parsed = json.loads(data_layer_json)
-        search_info = parsed["page"]["search"]
-        return (search_info["page"],
-                search_info["totalPages"], 
-                search_info["totalResults"])
-
-    def get_page_info(self, soup):
         def parse_page(page):
             # Fetches the page number given the string 'page #' (e.g. page 1) otherwise
             # returns None
@@ -425,7 +413,7 @@ class Nature(JournalFamily):
             if len(info) != 2 or info[0] != 'page':
                 raise ValueError(f'Info {info} should be of the format "page i"')
             return int(info[1])  
-            
+
         active_link = soup.find(class_='c-pagination__link c-pagination__link--active')
         current_page = parse_page(active_link.text)  
         pages = soup.find_all(class_='c-pagination__item')
