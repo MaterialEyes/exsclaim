@@ -381,7 +381,7 @@ class Pipeline:
         ## Make and save images
         labeled_image = Image.new(mode="RGB",size=(image_width, image_height))
         draw = ImageDraw.Draw(labeled_image)
-        font = ImageFont.truetype("/usr/share/fonts/dejavu/DejaVuSans.ttf")
+        font = ImageFont.load_default()
 
         figures_path = self.results_directory / 'figures'
         full_figure = Image.open(figures_path / figure_json["figure_name"]).convert("RGB")
