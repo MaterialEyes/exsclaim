@@ -421,7 +421,10 @@ class Nature(JournalFamily):
             total_pages = parse_page(pages[-2].text)  
         except:
             current_page, total_pages = 1, 1
-            
+
+        if soup.find(attrs={'data-test': 'results-data'}) == None:
+            raise ValueError(f'No articles were found, try to modily the search criteria')
+
         total_results = int(soup.find(attrs={'data-test': 'results-data'}).text.split()[-2])
         return current_page, total_pages, total_results
 
