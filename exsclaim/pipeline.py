@@ -296,7 +296,7 @@ class Pipeline:
                 master_patch = boxes.crop_from_geometry(master_image['geometry'], figure)
                 master_patch = master_patch.copy(order='C')
                 try:
-                    plt.imsave(directory + master_name, master_patch)  
+                    plt.imsave(str(directory) + master_name, master_patch)  
                 except Exception as err:
                     self.logger.exception(("Error in saving cropped master"
                         " image of figure: {}".format(figure_root_name)))
