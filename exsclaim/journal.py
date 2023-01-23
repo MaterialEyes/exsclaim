@@ -17,6 +17,7 @@ import requests
 from dateutil.relativedelta import relativedelta
 
 try:
+    from selenium_stealth import stealth
     from selenium import webdriver
     from selenium.common.exceptions import TimeoutException
     from selenium.webdriver.common.by import By
@@ -432,6 +433,16 @@ class JournalFamily(ABC):
                 break
         return list(article_paths)
 
+    def get_license(self, soup):
+        """ Checks the article license and whether it is open access 
+        Args:
+            soup (a BeautifulSoup parse tree): representation of page html
+        Returns:
+            is_open (a bool): True if article is open
+            license (a string): Requried text of article license
+        """
+        return (False, "unknown")
+        
     def get_article_figures(self, url: str) -> dict:
         """Get all figures from an article
 
@@ -507,7 +518,162 @@ class JournalFamily(ABC):
             figure_number += 1
         return article_json
 
+class JournalFamilyDynamic(JournalFamily):
 
+    def __init__(self):
+        # initiallize the selenium-stealth 
+        options = webdriver.ChromeOptions()
+        options.add_argument("start-maximized")  
+        options.add_experimental_option("excludeSwitches", ["enable-automation"])
+        options.add_experimental_option('useAutomationExtension', False)
+        options.add_argument('--headless')
+        options.add_argument('--no-sandbox')
+        options.add_argument('--disable-dev-shm-usage')
+        self.driver = webdriver.Chrome('chromedriver',chrome_options=options)
+
+        stealth(self.driver,
+                languages=["en-US", "en"],
+                vendor="Google Inc.",
+                platform="Win32",
+                webgl_vendor="Intel Inc.",
+                renderer="Intel Iris OpenGL Engine",
+                fix_hairline=True,
+                )
+
+    def get_article_extensions(self, articles_visited=set()) -> list:
+        """
+        Create a list of article url extensions from search_query
+        Returns:
+            A list of article url extensions from search.
+        """
+        search_query = self.search_query
+        maximum_scraped = search_query["maximum_scraped"]
+        article_delim, reader_delims = self.get_article_delimiters()
+        search_query_urls = self.get_search_query_urls()
+        article_paths = set()
+        for page1 in search_query_urls:
+            self.logger.info("GET request: {}".format(page1))
+            start_page, stop_page, total_articles = self.get_page_info(page1)
+            for page_number in range(start_page, stop_page + 1):
+                request = self.turn_page(page1, page_number, total_articles)    
+                self.driver.get(request)
+                soup = BeautifulSoup(self.driver.page_source, 'html.parser')
+                for tag in soup.find_all('a', href=True):
+                    article = tag.attrs['href']
+                    article = article.split('?page=search')[0]
+
+                    if (len(article.split(article_delim)) > 1 
+                            and article.split("/")[-1] not in articles_visited
+                            and article != None
+                            and len(set(reader_delims).intersection(set(article.split("/")))) <= 0
+                            and not (self.open
+                                     and not self.is_link_to_open_article(tag))):
+                        article_paths.add(article)
+                    if len(article_paths) >= maximum_scraped:
+                        return list(article_paths)
+        return list(article_paths)
+
+    def get_article_figures(self, url: str) -> dict:
+        """
+        Get all figures from an article 
+        Args:
+            url: A url to a journal article
+        Returns:
+            A dict of figure_jsons from an article
+        """
+
+        self.driver.get(url)
+        soup = BeautifulSoup(self.driver.page_source, 'html.parser')
+        is_open, license = self.get_license(soup)
+
+        html_directory = self.results_directory / "html"
+        os.makedirs(html_directory, exist_ok=True)
+        with open(html_directory / (url.split("/")[-1]+'.html'), "w", encoding='utf-8') as file:
+            file.write(str(soup))
+
+        figure_list = self.get_figure_list(url)
+        figures = 1
+        article_json = {}
+
+        # for figure in soup.find_all('figure'):
+        for figure in figure_list:
+            captions = self.find_captions(figure)
+
+            # acs captions are duplicated, one version with no captions
+            if len(captions) == 0:
+                continue
+
+            # initialize the figure's json
+            article_name = url.split("/")[-1]
+            figure_json = {"title": soup.find('title').get_text(), 
+                            "article_url" : url,
+                            "article_name" : article_name}
+
+            # get figure caption
+            figure_caption = ""
+            for caption in captions:
+                figure_caption += caption.get_text()
+            figure_json["full_caption"] = figure_caption
+
+            # Allocate entry for caption delimiter
+            figure_json["caption_delimiter"] = ""
+
+            # get figure url and name
+            if 'rsc' in url.split("."):
+                # for image_tag in figure.find_all("a", href=True):
+                for image_tag in [a for a in figure.find_all("a", href=True) if str(a).find(self.extra_key)>-1]:
+                    image_url = image_tag['href']
+            else:
+                image_tag = figure.find('img')
+                image_url = image_tag.get('src')
+
+            image_url = self.prepend + image_url.replace('_hi-res','')
+            if ":" not in image_url:
+                image_url = "https:" + image_url
+            figure_name = article_name + "_fig" + str(figures) + ".jpg"  #" +  image_url.split('.')[-1]
+            print('fig_name',figure_name)
+            print('im_url',image_url)
+            # save image info
+            figure_json["figure_name"] = figure_name
+            figure_json["image_url"] = image_url
+            figure_json["license"] = license
+            figure_json["open"] = is_open
+
+            # save figure as image
+            self.save_figure(figure_name, image_url)
+            figure_path = (
+                pathlib.Path(self.search_query["name"]) / "figures" / figure_name
+            )
+            figure_json["figure_path"] = str(figure_path)
+            figure_json["master_images"] = []
+            figure_json["unassigned"] = {
+                'master_images': [],
+                'dependent_images': [],
+                'inset_images': [],
+                'subfigure_labels': [],
+                'scale_bar_labels':[],
+                'scale_bar_lines': [],
+                'captions': []
+            }
+            # add all results
+            article_json[figure_name] = figure_json
+            # increment index
+            figures += 1
+        return article_json
+
+    def get_figure_list(self, url):
+        """
+        Returns list of figures in the givin url
+        Args:
+            url: a string, the url to be searched
+        Returns:
+            A list of all figures in the article as BeaustifulSoup Tag objects
+        """
+
+        self.driver.get(url)
+        soup = BeautifulSoup(self.driver.page_source, 'html.parser')
+        figure_list = [a for a in soup.find_all('figure') if str(a).find(self.extra_key)>-1]
+        return figure_list
 # ############# JOURNAL FAMILY SPECIFIC INFORMATION ################
 # To add a new journal family, create a new subclass of
 # JournalFamily. Fill out the methods and attributes according to
