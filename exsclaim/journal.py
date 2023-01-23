@@ -442,7 +442,27 @@ class JournalFamily(ABC):
             license (a string): Requried text of article license
         """
         return (False, "unknown")
-        
+
+    def get_soup_from_request(self, url: str, fast_load=True):
+        """
+        Get a BeautifulSoup parse tree (lxml parser) from a url request 
+        Args:
+            url: A requested url 
+        Returns:
+            A BeautifulSoup parse tree.
+        """
+        headers = {"Accept":   "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+                   "Accept-Encoding": "gzip, deflate, br",
+                   "Accept-Language": "en-US,en;q=0.5",
+                   "Upgrade-Insecure-Requests":   "1",
+                   "User-Agent":  "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:82.0) Gecko/20100101 Firefox/82.0"}
+        wait_time = float(random.randint(0, 50))
+        time.sleep(wait_time/float(10))
+        with requests.Session() as session:
+            r = session.get(url, headers=headers) 
+        soup = BeautifulSoup(r.text, 'lxml')
+        return soup
+
     def get_article_figures(self, url: str) -> dict:
         """Get all figures from an article
 
@@ -928,6 +948,33 @@ class RSC(JournalFamilyDynamic):
         figures_directory = self.results_directory / "figures"
         out_file = figures_directory / figure_name
         urllib.request.urlretrieve(image_url, out_file)
+
+    def get_license(self, soup):
+        """ Checks the article license and whether it is open access 
+        Args:
+            soup (a BeautifulSoup parse tree): representation of page html
+        Returns:
+            is_open (a bool): True if article is open
+            license (a string): Requried text of article license
+        """
+        return (False, "unknown")
+
+    def get_additional_url_arguments(self, soup):
+        # rsc allows unlimited results, so no need for additoinal args
+        return [""], [""], [""]
+
+    def is_link_to_open_article(self, tag):
+        return self.open
+    
+    def get_figure_subtrees(self, soup):
+        figure_subtrees = soup.find_all("div", "image_table")
+        return figure_subtrees
+
+    def get_figure_url(self, figure_subtree):
+        return self.prepend + figure_subtree.find("a", href=True)["href"]
+
+    def get_soup_from_request(self, url: str) -> BeautifulSoup:
+        return super().get_soup_from_request(url)
 
 
 
