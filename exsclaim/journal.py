@@ -921,12 +921,12 @@ class RSC(JournalFamilyDynamic):
     extra_key = " "
     max_query_results = np.inf
 
-    def __init__(self, search_query):
-        super().__init__(search_query)
+    #def __init__(self, search_query):
+    #    super().__init__(search_query)
         
     def get_soup_from_request(self, url: str) -> BeautifulSoup:
         return super().get_soup_from_request(url)
-        
+
     #def get_soup_from_request(self, url: str) -> BeautifulSoup:
     #    url.replace(" ", "+")
     #    self.browser.get(url)
@@ -1004,6 +1004,15 @@ class RSC(JournalFamilyDynamic):
         figures_directory = self.results_directory / "figures"
         out_file = figures_directory / figure_name
         urllib.request.urlretrieve(image_url, out_file)
+
+    #def turn_page(self, url, pg_num, pg_size):
+    #    return url.split('1&tab=all')[0]+str(pg_size)+'&tab=all&fcategory=all&filter=all&Article%20Access=Open+Access'
+
+    def get_figure_list(self, url):
+        soup = self.get_soup_from_request(url)
+        figure_list = soup.find_all("div", class_="image_table")
+        return figure_list
+
 
 
 class Wiley(JournalFamily):
