@@ -32,7 +32,7 @@ from bs4 import BeautifulSoup
 from .utilities import paths
 
 
-class JournalFamily():
+class JournalFamily(ABC):
     """Base class to represent journals and provide scraping methods
 
     This class defines the interface for interacting with JournalFamilies.
@@ -696,6 +696,8 @@ class JournalFamilyDynamic(JournalFamily):
         soup = BeautifulSoup(self.driver.page_source, 'html.parser')
         figure_list = [a for a in soup.find_all('figure') if str(a).find(self.extra_key)>-1]
         return figure_list
+
+
 # ############# JOURNAL FAMILY SPECIFIC INFORMATION ################
 # To add a new journal family, create a new subclass of
 # JournalFamily. Fill out the methods and attributes according to
@@ -705,7 +707,7 @@ class JournalFamilyDynamic(JournalFamily):
 # ####################################################################
 
 
-class ACS(JournalFamily):
+class ACS(JournalFamilyDynamic):
     domain = "https://pubs.acs.org"
     search_path = "/action/doSearch?"
     term_param = "AllField="
@@ -729,11 +731,22 @@ class ACS(JournalFamily):
     articles_path_length = 3
     max_query_results = 1000
 
-    def get_page_info(self, soup):
-        totalResults = int(soup.find("span", {"class": "result__count"}).text)
-        totalPages = math.ceil(float(totalResults) / 20) - 1
-        page = 0
-        return page, totalPages, totalResults
+    def get_page_info(self, url):
+
+        self.driver.get(url)
+        soup = BeautifulSoup(self.driver.page_source, 'html.parser')
+        self.driver.close()
+        total_results = int(soup.find(class_='result__count').text) 
+        if total_results > 2020:
+            total_results = 2020
+
+        page_counter_list=[]
+        page_counter = soup.find(class_='pagination')
+        for page_number in page_counter.find_all('li'):
+            page_counter_list.append(page_number.text.strip())
+        current_page = int(page_counter_list[0])
+        total_pages = total_results // 20
+        return current_page, total_pages, total_results
 
     def get_additional_url_arguments(self, soup):
         now = datetime.now()
@@ -772,6 +785,24 @@ class ACS(JournalFamily):
         # ACS allows filtering for search. Therefore, if self.open is
         # true, all results will be open.
         return self.open
+
+    def find_captions(self, figure_subtree: BeautifulSoup):
+        return super().find_captions(figure_subtree)
+
+    def get_figure_subtrees(self, soup: BeautifulSoup) -> list:
+        return super().get_figure_subtrees(soup)
+
+    def get_figure_url(self, figure_subtree: BeautifulSoup) -> str:
+        return super().get_figure_url(figure_subtree)
+
+    def get_soup_from_request(self, url: str) -> BeautifulSoup:
+        return super().get_soup_from_request(url)
+
+    def save_figure(self, figure_name: str, image_url: str):
+        return super().save_figure(figure_name, image_url)
+
+    def turn_page(self, url: str, page_number: int) -> BeautifulSoup:
+        return super().turn_page(url, page_number)
 
 
 class Nature(JournalFamily):
@@ -922,8 +953,8 @@ class RSC(JournalFamilyDynamic):
     prepend =       "https://pubs.rsc.org"
     extra_key =     "/image/article"
 
-    def __init__(self, search_query):
-        super().__init__(search_query)
+    #def __init__(self, search_query):
+    #    super().__init__(search_query)
 
     def get_page_info(self, url):
         self.driver.get(url)
