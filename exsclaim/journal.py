@@ -17,6 +17,7 @@ import requests
 from dateutil.relativedelta import relativedelta
 
 try:
+    import selenium
     from selenium_stealth import stealth
     from selenium import webdriver
     from selenium.common.exceptions import TimeoutException
