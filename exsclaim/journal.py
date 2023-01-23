@@ -16,18 +16,17 @@ import numpy as np
 import requests
 from dateutil.relativedelta import relativedelta
 
-try:
-    import selenium
-    from selenium_stealth import stealth
-    from selenium import webdriver
-    from selenium.common.exceptions import TimeoutException
-    from selenium.webdriver.common.by import By
-    from selenium.webdriver.support import expected_conditions as EC
-    from selenium.webdriver.support.ui import WebDriverWait
-    from webdriver_manager.chrome import ChromeDriverManager
+#try:
+from selenium_stealth import stealth
+from selenium import webdriver
+from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+from webdriver_manager.chrome import ChromeDriverManager
 
-except ImportError:
-    pass
+#except ImportError:
+#    pass
 from bs4 import BeautifulSoup
 
 from .utilities import paths
@@ -530,7 +529,7 @@ class JournalFamilyDynamic(JournalFamily):
         options.add_argument('--headless')
         options.add_argument('--no-sandbox')
         options.add_argument('--disable-dev-shm-usage')
-        self.driver = webdriver.Chrome('chromedriver',chrome_options=options)
+        self.driver = webdriver.Chrome('chromedriver', options=options)
 
         stealth(self.driver,
                 languages=["en-US", "en"],
