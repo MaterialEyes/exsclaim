@@ -32,7 +32,7 @@ from bs4 import BeautifulSoup
 from .utilities import paths
 
 
-class JournalFamily(ABC):
+class JournalFamily():
     """Base class to represent journals and provide scraping methods
 
     This class defines the interface for interacting with JournalFamilies.
