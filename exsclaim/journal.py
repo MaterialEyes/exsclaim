@@ -924,7 +924,9 @@ class RSC(JournalFamilyDynamic):
     def __init__(self, search_query):
         super().__init__(search_query)
         
-
+    def get_soup_from_request(self, url: str) -> BeautifulSoup:
+        return super().get_soup_from_request(url)
+        
     #def get_soup_from_request(self, url: str) -> BeautifulSoup:
     #    url.replace(" ", "+")
     #    self.browser.get(url)
