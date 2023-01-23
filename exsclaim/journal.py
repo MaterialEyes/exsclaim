@@ -563,38 +563,64 @@ class JournalFamilyDynamic(JournalFamily):
                 fix_hairline=True,
                 )
 
-    def get_article_extensions(self, articles_visited=set()) -> list:
-        """
-        Create a list of article url extensions from search_query
+
+    def get_search_query_urls(self) -> list:
+        """Create list of search query urls based on input query json
+
         Returns:
-            A list of article url extensions from search.
+            A list of urls (as strings)
         """
         search_query = self.search_query
-        maximum_scraped = search_query["maximum_scraped"]
-        article_delim, reader_delims = self.get_article_delimiters()
+        # creates a list of search terms
+        search_list = [
+            [search_query["query"][key]["term"]]
+            + search_query["query"][key].get("synonyms", [])
+            for key in search_query["query"]
+        ]
+        search_product = list(itertools.product(*search_list))
+
+        search_urls = []
+        for term in search_product:
+            url_parameters = "&".join(
+                [self.term_param + self.join.join(term), self.max_page_size]
+            )
+            search_url = self.domain + self.search_path + self.pub_type + url_parameters
+            if self.open:
+                search_url += "&" + self.open_param + "&"
+            #soup = self.get_soup_from_request(search_url)
+            self.driver.get(search_url)
+            soup = BeautifulSoup(self.driver.page_source, 'html.parser')
+            years, journal_codes, orderings = self.get_additional_url_arguments(soup)
+            search_url_args = []
+
+            for year_value in years:
+                year_param = self.date_range_param + year_value
+                for journal_value in journal_codes:
+                    for order_value in orderings:
+                        args = "&".join(
+                            [
+                                year_param,
+                                self.journal_param + journal_value,
+                                self.order_param + order_value,
+                            ]
+                        )
+                        search_url_args.append(args)
+            search_term_urls = [search_url + url_args for url_args in search_url_args]
+            search_urls += search_term_urls
+        return search_urls
+
+    def get_article_extensions(self) -> list:
+        """Retrieves a list of article url paths from a search query"""
+        # This returns urls based on the combinations of desired search terms.
         search_query_urls = self.get_search_query_urls()
         article_paths = set()
-        for page1 in search_query_urls:
-            self.logger.info("GET request: {}".format(page1))
-            start_page, stop_page, total_articles = self.get_page_info(page1)
-            for page_number in range(start_page, stop_page + 1):
-                request = self.turn_page(page1, page_number, total_articles)    
-                self.driver.get(request)
-                soup = BeautifulSoup(self.driver.page_source, 'html.parser')
-                for tag in soup.find_all('a', href=True):
-                    article = tag.attrs['href']
-                    article = article.split('?page=search')[0]
-
-                    if (len(article.split(article_delim)) > 1 
-                            and article.split("/")[-1] not in articles_visited
-                            and article != None
-                            and len(set(reader_delims).intersection(set(article.split("/")))) <= 0
-                            and not (self.open
-                                     and not self.is_link_to_open_article(tag))):
-                        article_paths.add(article)
-                    if len(article_paths) >= maximum_scraped:
-                        return list(article_paths)
+        for search_url in search_query_urls:
+            new_article_paths = self.get_articles_from_search_url(search_url)
+            article_paths.update(new_article_paths)
+            if len(article_paths) >= self.search_query["maximum_scraped"]:
+                break
         return list(article_paths)
+        
 
     def get_article_figures(self, url: str) -> dict:
         """
