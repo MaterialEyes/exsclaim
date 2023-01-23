@@ -888,79 +888,17 @@ class Nature(JournalFamily):
 
 
 class RSC(JournalFamilyDynamic):
-    domain = "https://pubs.rsc.org"
-    search_path = "/en/results?"
-    page_param = ""  # pagination through javascript
-    max_page_size = "PageSize=1000"
-    term_param = "searchtext="
-    order_param = "SortBy="
-    open_param = "Article Access=Open+Access"
-    date_range_param = "Date Range="
-    journal_param = "Journal="
-    # order options
-    order_values = {
-        "relevant": "Relevance",
-        "old": "Oldest to latest",
-        "recent": "Latest to oldest",
-    }
-    # codes for journals most relevant to materials science
-    materials_journals = [
-        "",
-        "Nanoscale",
-        "RSC+Adv.",
-        "Chem.+Sci.",
-        "Mater.+Adv.",
-        "Nanoscale+Adv.",
-        "Mater.+Chem.+Front.",
-    ]
-
-    join = " "
-    articles_path = "/en/content/articlehtml/"  # YYYY/2 char journal/
-    articles_path_length = 6
-    prepend = "https://pubs.rsc.org"
-    extra_key = " "
-    max_query_results = np.inf
-
-    #def __init__(self, search_query):
-    #    super().__init__(search_query)
-        
-    def get_soup_from_request(self, url: str) -> BeautifulSoup:
-        return super().get_soup_from_request(url)
-
-    #def get_soup_from_request(self, url: str) -> BeautifulSoup:
-    #    url.replace(" ", "+")
-    #    self.browser.get(url)
-    #    article_request = "en/content/articlehtml" in url
-    #    try:
-    #        if article_request:
-    #            _ = WebDriverWait(self.browser, 5).until(
-    #                EC.presence_of_element_located((By.CLASS_NAME, "imgHolder"))
-    #            )
-    #        else:
-    #            _ = WebDriverWait(self.browser, 30).until(
-    #                lambda driver: (
-    #                    driver.find_element(By.XPATH, "//*[@class='capsule__action']")
-    #                    or driver.find_element(By.CLASS_NAME, "img-tbl__image")
-    #                )
-    #            )
-    #    except TimeoutException:
-    #        article_msg = "\n  3. Article contains no figures"
-    #        error_msg = (
-    #            "Selenium request unsuccessful for {}. Either\n"
-    #            "  1. internet connection is unstable / slow\n"
-    #            "  2. HTML structure of articles has changed"
-    #            "{}"
-    #        ).format(url, article_msg if article_request else "")
-    #        self.logger.info(error_msg)
-    #    soup = BeautifulSoup(self.browser.page_source, "lxml")
-    #    return soup
-    
-    def get_additional_url_arguments(self, soup):
-        # rsc allows unlimited results, so no need for additoinal args
-        return [""], [""], [""]
-
-    def is_link_to_open_article(self, tag):
-        return self.open
+    domain =        "https://pubs.rsc.org"
+    relevant =      "Relevance"
+    recent =        "Latest%20to%20oldest"
+    path =          "/en/results?searchtext="
+    join =          "\"%20\""
+    pre_sb =        "\"&SortBy="
+    open_pre_sb =   "\"&SortBy="
+    post_sb =       "&PageSize=1&tab=all&fcategory=all&filter=all&Article%20Access=Open+Access"
+    article_path =  ('/en/content/articlehtml/','')
+    prepend =       "https://pubs.rsc.org"
+    extra_key =     "/image/article"
 
     def get_page_info(self, url):
         self.driver.get(url)
@@ -975,27 +913,13 @@ class RSC(JournalFamilyDynamic):
         page = 1
         return page, totalPages, totalResults
 
-    def turn_page(self, url, pg_num):
-        self.driver.get(url)
-        soup = BeautifulSoup(self.driver.page_source, 'html.parser')
-        self.driver.close()
-        next_page = self.browser.find_element_by_class_name("paging__btn--next")
-        self.browser.execute_script(
-            "arguments[0].setAttribute('data-pageno',arguments[1])", next_page, pg_num
-        )
-        next_page.click()
-        soup = BeautifulSoup(self.browser.page_source, "lxml")
-        return soup
+    def turn_page(self, url, page_number, pg_size):
+        return url.split('1&tab=all')[0]+str(pg_size)+'&tab=all&fcategory=all&filter=all&Article%20Access=Open+Access'
 
-    def get_figure_subtrees(self, url):
-        self.driver.get(url)
-        soup = BeautifulSoup(self.driver.page_source, 'html.parser')
-        self.driver.close()
-        figure_subtrees = soup.find_all("div", "image_table")
-        return figure_subtrees
-
-    def get_figure_url(self, figure_subtree):
-        return self.prepend + figure_subtree.find("a", href=True)["href"]
+    def get_figure_list(self, url):
+        soup = self.get_soup_from_request(url)
+        figure_list = soup.find_all("div", class_="image_table")
+        return figure_list
 
     def find_captions(self, figure):
         return figure.find_all("span", class_="graphic_title")
@@ -1004,14 +928,6 @@ class RSC(JournalFamilyDynamic):
         figures_directory = self.results_directory / "figures"
         out_file = figures_directory / figure_name
         urllib.request.urlretrieve(image_url, out_file)
-
-    #def turn_page(self, url, pg_num, pg_size):
-    #    return url.split('1&tab=all')[0]+str(pg_size)+'&tab=all&fcategory=all&filter=all&Article%20Access=Open+Access'
-
-    def get_figure_list(self, url):
-        soup = self.get_soup_from_request(url)
-        figure_list = soup.find_all("div", class_="image_table")
-        return figure_list
 
 
 
