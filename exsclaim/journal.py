@@ -538,6 +538,8 @@ class JournalFamily(ABC):
             figure_number += 1
         return article_json
 
+
+
 class JournalFamilyDynamic(JournalFamily):
 
     def __init__(self):
@@ -919,6 +921,9 @@ class RSC(JournalFamilyDynamic):
     article_path =  ('/en/content/articlehtml/','')
     prepend =       "https://pubs.rsc.org"
     extra_key =     "/image/article"
+
+    def __init__(self, search_query):
+        super().__init__(search_query)
 
     def get_page_info(self, url):
         self.driver.get(url)
