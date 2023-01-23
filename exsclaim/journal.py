@@ -542,7 +542,8 @@ class JournalFamily(ABC):
 
 class JournalFamilyDynamic(JournalFamily):
 
-    def __init__(self):
+    def __init__(self, search_query: dict):
+        super().__init__(search_query)
         # initiallize the selenium-stealth 
         options = webdriver.ChromeOptions()
         options.add_argument("start-maximized")  
