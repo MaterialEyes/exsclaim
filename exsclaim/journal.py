@@ -522,7 +522,10 @@ class JournalFamilyDynamic(JournalFamily):
             + search_query["query"][key].get("synonyms", [])
             for key in search_query["query"]
         ]
+        #print('search list',search_list)
         search_product = list(itertools.product(*search_list))
+        #print('search_product',search_product)
+        
 
         search_urls = []
         for term in search_product:
@@ -532,9 +535,11 @@ class JournalFamilyDynamic(JournalFamily):
             search_url = self.domain + self.search_path + self.pub_type + url_parameters
             if self.open:
                 search_url += "&" + self.open_param + "&"
-            #soup = self.get_soup_from_request(search_url)
+            #print('search_url',search_url)
             self.driver.get(search_url)
             soup = BeautifulSoup(self.driver.page_source, 'html.parser')
+            #self.driver.implicitly_wait(5)
+            
             years, journal_codes, orderings = self.get_additional_url_arguments(soup)
             search_url_args = []
 
@@ -552,6 +557,8 @@ class JournalFamilyDynamic(JournalFamily):
                         search_url_args.append(args)
             search_term_urls = [search_url + url_args for url_args in search_url_args]
             search_urls += search_term_urls
+            #print('search url', search_urls)
+            self.driver.close()
         return search_urls
 
 
@@ -560,33 +567,48 @@ class JournalFamilyDynamic(JournalFamily):
         max_scraped = self.search_query["maximum_scraped"]
         self.logger.info("GET request: {}".format(search_url))
         self.driver.get(search_url)
-        soup = BeautifulSoup(self.driver.page_source, 'html.parser')
+        
+        #time.sleep(2)
         #self.driver.close()
         start_page, stop_page, total_articles = self.get_page_info(search_url)
+        print('search url', search_url)
         article_paths = set()
+        soup = BeautifulSoup(self.driver.page_source, 'html.parser')
+        #raise NameError(
+        #        "journal family {0} is not defined"
+         #   )
         for page_number in range(start_page, stop_page + 1):
+            
+            #print(soup.find_all("a", href=True))
             for tag in soup.find_all("a", href=True):
-                url = tag.attrs["href"]
-                self.logger.debug("Candidate Article: {}".format(url))
-                if (
-                    self.articles_path not in url
-                    or url.count("/") != self.articles_path_length
-                ):
-                    # The url does not point to an article
-                    continue
+                url = tag.attrs['href']
+                url = url.split('?page=search')[0]
+                #print(url)
+                
+                #url = tag.attrs["href"]
+                #print(url)
+                #self.logger.debug("Candidate Article: {}".format(url))
+                #if (
+                #    self.articles_path not in url
+                #    or url.count("/") != self.articles_path_length
+                #):
+                #    # The url does not point to an article
+                #    continue
                 if url.split("/")[-1] in self.articles_visited or (
                     self.open and not self.is_link_to_open_article(tag)
                 ):
                     # It is an article but we are not interested
                     continue
-                self.logger.debug("Candidate Article: PASS")
-                article_paths.add(url)
+                #self.logger.debug("Candidate Article: PASS")
+                if url.startswith('/en/content/articlehtml/') == True:
+                    article_paths.add(url)
                 if len(article_paths) >= max_scraped:
                     return article_paths
             # Get next page at end of loop since page 1 is obtained from
             # search_url
-            soup = self.turn_page(search_url, page_number + 1)
-
+            search_url = self.turn_page(search_url, page_number + 1)
+            #print('new search url', search_url)
+        #print(article_paths)
         return article_paths
 
     def get_article_extensions(self) -> list:
@@ -980,19 +1002,35 @@ class RSC(JournalFamilyDynamic):
     #def __init__(self, search_query):
     #    super().__init__(search_query)
 
-    def get_page_info(self, url):
+    def get_page_info(self, url):  
+
         self.driver.get(url)
-        soup = BeautifulSoup(self.driver.page_source, 'html.parser')
         time.sleep(2)
+        #print('got url')
+
+        #driver.execute_script("window.open('');")
+        soup = BeautifulSoup(self.driver.page_source, 'html.parser')
+        possible_entries = [a.strip("\n") for a in soup.find(class_="fixpadv--l pos--left pagination-summary").text.strip().split(" ") if a.strip("\n").isdigit()]
+        #print(possible_entries)
+        #print(possible_entries[1])
         self.driver.close()
-        possible_entries = [a.strip("\n") for a in soup.text.split(" - Showing page 1 of")[0].split("Back to tab navigation")[-1].split(" ") if a.strip("\n").isdigit()]
-        if len(possible_entries) == 1:
-            totalResults = possible_entries[0]
-        else:
-            totalResults = 0
-        totalPages = 1
-        page = 1
-        return page, totalPages, totalResults
+
+
+
+        #possible_entries = [a.strip("\n") for a in soup.text.split(" - Showing page 1 of")[0].split("Back to tab navigation")[-1].split(" ") if a.strip("\n").isdigit()]
+        #possible_entries = [a.strip("\n") for a in soup.find(class_="fixpadv--l pos--left pagination-summary").text.strip().split(" ") if a.strip("\n").isdigit()]
+        #print(soup.find_all(class_="fixpadv--l pos--left pagination-summary")) #soup.find("pagination-summary") )
+        #if len(possible_entries) == 1:
+        #    totalResults = possible_entries[0]
+        #else:
+        #    totalResults = 1
+        totalPages = possible_entries[-1]
+        totalResults = possible_entries[0]
+        page = possible_entries[1]
+        #print(page, totalPages, totalResults)
+        #page = 1 
+        #totalPages = 1
+        return int(page), int(totalPages), int(totalResults)
 
     def turn_page(self, url, pg_size):
         return url.split('1&tab=all')[0]+str(pg_size)+'&tab=all&fcategory=all&filter=all&Article%20Access=Open+Access'
