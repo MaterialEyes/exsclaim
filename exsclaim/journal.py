@@ -746,6 +746,7 @@ class ACS(JournalFamilyDynamic):
     open_param = "openAccess=18&accessType=openAccess"
     journal_param = "SeriesKey="
     date_range_param = "Earliest="
+    pub_type = ""
     # order options
     order_values = {
         "relevant": "relevancy",
