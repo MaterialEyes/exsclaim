@@ -616,7 +616,7 @@ class JournalFamilyDynamic(JournalFamily):
         self.logger.info("GET request: {}".format(search_url))
         self.driver.get(search_url)
         soup = BeautifulSoup(self.driver.page_source, 'html.parser')
-        start_page, stop_page, total_articles = self.get_page_info(soup)
+        start_page, stop_page, total_articles = self.get_page_info(search_url)
         article_paths = set()
         for page_number in range(start_page, stop_page + 1):
             for tag in soup.find_all("a", href=True):
@@ -1030,6 +1030,7 @@ class RSC(JournalFamilyDynamic):
         "old": "Oldest to latest",
         "recent": "Latest to oldest",
     }
+    articles_path = "/doi/"
     #def __init__(self, search_query):
     #    super().__init__(search_query)
 
