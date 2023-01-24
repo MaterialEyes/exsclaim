@@ -1021,7 +1021,7 @@ class RSC(JournalFamilyDynamic):
     term_param = "searchtext="
     order_param = "SortBy="
     open_param = "ArticleAccess=Open+Access"
-    date_range_param = "Date Range="
+    date_range_param = "DateRange="
     journal_param = "Journal="
     pub_type = ""
     # order options
