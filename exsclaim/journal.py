@@ -765,8 +765,10 @@ class ACS(JournalFamilyDynamic):
 
         self.driver.get(url)
         soup = BeautifulSoup(self.driver.page_source, 'html.parser')
-        self.driver.close()
+        
         total_results = int(soup.find(class_='result__count').text) 
+        time.sleep(2)
+        self.driver.close()
         if total_results > 2020:
             total_results = 2020
 
