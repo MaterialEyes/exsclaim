@@ -989,6 +989,7 @@ class RSC(JournalFamilyDynamic):
     open_param = "Article Access=Open+Access"
     date_range_param = "Date Range="
     journal_param = "Journal="
+    pub_type = ""
     # order options
     order_values = {
         "relevant": "Relevance",
