@@ -620,7 +620,7 @@ class JournalFamilyDynamic(JournalFamily):
             if len(article_paths) >= self.search_query["maximum_scraped"]:
                 break
         return list(article_paths)
-        
+
 
     def get_article_figures(self, url: str) -> dict:
         """
@@ -969,6 +969,7 @@ class Nature(JournalFamily):
 
 class RSC(JournalFamilyDynamic):
     domain =        "https://pubs.rsc.org"
+    #term_param = "AllField="
     relevant =      "Relevance"
     recent =        "Latest%20to%20oldest"
     path =          "/en/results?searchtext="
@@ -979,7 +980,21 @@ class RSC(JournalFamilyDynamic):
     article_path =  ('/en/content/articlehtml/','')
     prepend =       "https://pubs.rsc.org"
     extra_key =     "/image/article"
-
+    domain = "https://pubs.rsc.org"
+    search_path = "/en/results?"
+    page_param = ""  # pagination through javascript
+    max_page_size = "PageSize=1000"
+    term_param = "searchtext="
+    order_param = "SortBy="
+    open_param = "Article Access=Open+Access"
+    date_range_param = "Date Range="
+    journal_param = "Journal="
+    # order options
+    order_values = {
+        "relevant": "Relevance",
+        "old": "Oldest to latest",
+        "recent": "Latest to oldest",
+    }
     #def __init__(self, search_query):
     #    super().__init__(search_query)
 
