@@ -614,7 +614,7 @@ class JournalFamilyDynamic(JournalFamily):
         """Generates a list of articles from a single search term"""
         max_scraped = self.search_query["maximum_scraped"]
         self.logger.info("GET request: {}".format(search_url))
-        self.driver.get(url)
+        self.driver.get(search_url)
         soup = BeautifulSoup(self.driver.page_source, 'html.parser')
         start_page, stop_page, total_articles = self.get_page_info(soup)
         article_paths = set()
