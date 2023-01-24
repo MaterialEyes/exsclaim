@@ -609,6 +609,40 @@ class JournalFamilyDynamic(JournalFamily):
             search_urls += search_term_urls
         return search_urls
 
+
+    def get_articles_from_search_url(self, search_url: str) -> list:
+        """Generates a list of articles from a single search term"""
+        max_scraped = self.search_query["maximum_scraped"]
+        self.logger.info("GET request: {}".format(search_url))
+        self.driver.get(url)
+        soup = BeautifulSoup(self.driver.page_source, 'html.parser')
+        start_page, stop_page, total_articles = self.get_page_info(soup)
+        article_paths = set()
+        for page_number in range(start_page, stop_page + 1):
+            for tag in soup.find_all("a", href=True):
+                url = tag.attrs["href"]
+                self.logger.debug("Candidate Article: {}".format(url))
+                if (
+                    self.articles_path not in url
+                    or url.count("/") != self.articles_path_length
+                ):
+                    # The url does not point to an article
+                    continue
+                if url.split("/")[-1] in self.articles_visited or (
+                    self.open and not self.is_link_to_open_article(tag)
+                ):
+                    # It is an article but we are not interested
+                    continue
+                self.logger.debug("Candidate Article: PASS")
+                article_paths.add(url)
+                if len(article_paths) >= max_scraped:
+                    return article_paths
+            # Get next page at end of loop since page 1 is obtained from
+            # search_url
+            soup = self.turn_page(search_url, page_number + 1)
+
+        return article_paths
+
     def get_article_extensions(self) -> list:
         """Retrieves a list of article url paths from a search query"""
         # This returns urls based on the combinations of desired search terms.
@@ -986,7 +1020,7 @@ class RSC(JournalFamilyDynamic):
     max_page_size = "PageSize=1000"
     term_param = "searchtext="
     order_param = "SortBy="
-    open_param = "Article Access=Open+Access"
+    open_param = "ArticleAccess=Open+Access"
     date_range_param = "Date Range="
     journal_param = "Journal="
     pub_type = ""
