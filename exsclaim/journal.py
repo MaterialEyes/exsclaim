@@ -538,7 +538,7 @@ class JournalFamilyDynamic(JournalFamily):
             #print('search_url',search_url)
             self.driver.get(search_url)
             soup = BeautifulSoup(self.driver.page_source, 'html.parser')
-            #self.driver.implicitly_wait(5)
+            time.sleep(2)
             
             years, journal_codes, orderings = self.get_additional_url_arguments(soup)
             search_url_args = []
@@ -558,7 +558,8 @@ class JournalFamilyDynamic(JournalFamily):
             search_term_urls = [search_url + url_args for url_args in search_url_args]
             search_urls += search_term_urls
             #print('search url', search_urls)
-            self.driver.close()
+            
+            #self.driver.close()
         return search_urls
 
 
@@ -634,6 +635,7 @@ class JournalFamilyDynamic(JournalFamily):
         """
 
         self.driver.get(url)
+        time.sleep(2)
         soup = BeautifulSoup(self.driver.page_source, 'html.parser')
         is_open, license = self.get_license(soup)
 
@@ -722,6 +724,7 @@ class JournalFamilyDynamic(JournalFamily):
         """
 
         self.driver.get(url)
+        time.sleep(2)
         soup = BeautifulSoup(self.driver.page_source, 'html.parser')
         figure_list = [a for a in soup.find_all('figure') if str(a).find(self.extra_key)>-1]
         return figure_list
@@ -761,6 +764,37 @@ class ACS(JournalFamilyDynamic):
     articles_path_length = 3
     max_query_results = 1000
 
+    def get_articles_from_search_url(self, search_url: str) -> list:
+        """Generates a list of articles from a single search term"""
+        max_scraped = self.search_query["maximum_scraped"]
+        self.logger.info("GET request: {}".format(search_url))
+
+        self.driver.get(search_url)
+        time.sleep(2)
+        soup = BeautifulSoup(self.driver.page_source, 'html.parser')
+        start_page, stop_page, total_articles = self.get_page_info(search_url)
+        article_paths = set()
+        for page_number in range(start_page, stop_page + 1):
+
+            for tag in soup.find_all("a", href=True):
+                #print('tag', tag)
+                url = tag.attrs['href']
+                if url.split("/")[-1] in self.articles_visited or (
+                    self.open and not self.is_link_to_open_article(tag)
+                ):
+                    # It is an article but we are not interested
+                    continue
+                if url.startswith('/doi/full/') == True:
+                    article_paths.add(url)
+                if url.startswith('/en/content/articlehtml/') == True:
+                    article_paths.add(url)
+                if len(article_paths) >= max_scraped:
+                    return article_paths
+            # Get next page at end of loop since page 1 is obtained from
+            # search_url
+            search_url = self.turn_page(search_url, page_number + 1)
+        return article_paths
+
     def get_page_info(self, url):
 
         self.driver.get(url)
@@ -781,27 +815,8 @@ class ACS(JournalFamilyDynamic):
         return current_page, total_pages, total_results
 
     def get_additional_url_arguments(self, soup):
-        now = datetime.now()
-        time_format = "%Y%m%d"
-        journal_list = soup.find(id="Publication")
-        journal_link_tags = journal_list.parent.find_all("a", href=True)
-        journal_codes = [jlt.attrs["href"].split("=")[-1] for jlt in journal_link_tags]
-        if self.order == "exhaustive":
-            num_years = 100
-            orderings = list(self.order_values.values())
-        else:
-            num_years = 25
-            orderings = [self.order_values[self.order]]
-            journal_codes = journal_codes[:10]
-        years = [
-            "[{} TO {}]".format(
-                (now - relativedelta(years=k - 1)).strftime(time_format),
-                (now - relativedelta(years=k)).strftime(time_format),
-            )
-            for k in range(1, num_years)
-        ]
-        years = [""] + years
-        return years, journal_codes, orderings
+        # rsc allows unlimited results, so no need for additoinal args
+        return [""], [""], [""]
 
     def get_license(self, soup):
         open_access = soup.find("div", {"class": "article_header-open-access"})
@@ -833,8 +848,8 @@ class ACS(JournalFamilyDynamic):
     def save_figure(self, figure_name: str, image_url: str):
         return super().save_figure(figure_name, image_url)
 
-    def turn_page(self, url: str, page_number: int) -> BeautifulSoup:
-        return super().turn_page(url, page_number)
+    def turn_page(self, url, pg_num):
+        return url.split('&startPage=')[0]+'&startPage='+str(pg_num)+"&pageSize="+str(20)
 
 
 class Nature(JournalFamily):
