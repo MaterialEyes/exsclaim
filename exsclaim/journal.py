@@ -901,7 +901,7 @@ class Nature(JournalFamily):
         time.sleep(2)
         soup = BeautifulSoup(self.driver.page_source, 'html.parser')
         possible_entries = [a.strip("\n") for a in soup.find(class_="fixpadv--l pos--left pagination-summary").text.strip().split(" ") if a.strip("\n").isdigit()]
-        self.driver.close()
+        #self.driver.close()
         totalPages = possible_entries[-1]
         totalResults = possible_entries[0]
         page = possible_entries[1]
