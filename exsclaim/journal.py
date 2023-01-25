@@ -535,7 +535,7 @@ class JournalFamilyDynamic(JournalFamily):
             search_url = self.domain + self.search_path + self.pub_type + url_parameters
             if self.open:
                 search_url += "&" + self.open_param + "&"
-            #print('search_url',search_url)
+            print('search_url',search_url)
             self.driver.get(search_url)
             soup = BeautifulSoup(self.driver.page_source, 'html.parser')
             time.sleep(2)
@@ -557,7 +557,7 @@ class JournalFamilyDynamic(JournalFamily):
                         search_url_args.append(args)
             search_term_urls = [search_url + url_args for url_args in search_url_args]
             search_urls += search_term_urls
-            #print('search url', search_urls)
+            print('search url', search_urls)
             
             #self.driver.close()
         return search_urls
@@ -572,7 +572,7 @@ class JournalFamilyDynamic(JournalFamily):
         #time.sleep(2)
         #self.driver.close()
         start_page, stop_page, total_articles = self.get_page_info(search_url)
-        print('search url', search_url)
+        #print('search url', search_url)
         article_paths = set()
         soup = BeautifulSoup(self.driver.page_source, 'html.parser')
         #raise NameError(
@@ -601,6 +601,8 @@ class JournalFamilyDynamic(JournalFamily):
                     # It is an article but we are not interested
                     continue
                 #self.logger.debug("Candidate Article: PASS")
+                if url.startswith('/doi/full/') == True:
+                    article_paths.add(url)
                 if url.startswith('/en/content/articlehtml/') == True:
                     article_paths.add(url)
                 if len(article_paths) >= max_scraped:
@@ -764,37 +766,7 @@ class ACS(JournalFamilyDynamic):
     articles_path_length = 3
     max_query_results = 1000
 
-    def get_articles_from_search_url(self, search_url: str) -> list:
-        """Generates a list of articles from a single search term"""
-        max_scraped = self.search_query["maximum_scraped"]
-        self.logger.info("GET request: {}".format(search_url))
-
-        self.driver.get(search_url)
-        time.sleep(2)
-        soup = BeautifulSoup(self.driver.page_source, 'html.parser')
-        start_page, stop_page, total_articles = self.get_page_info(search_url)
-        article_paths = set()
-        for page_number in range(start_page, stop_page + 1):
-
-            for tag in soup.find_all("a", href=True):
-                #print('tag', tag)
-                url = tag.attrs['href']
-                if url.split("/")[-1] in self.articles_visited or (
-                    self.open and not self.is_link_to_open_article(tag)
-                ):
-                    # It is an article but we are not interested
-                    continue
-                if url.startswith('/doi/full/') == True:
-                    article_paths.add(url)
-                if url.startswith('/en/content/articlehtml/') == True:
-                    article_paths.add(url)
-                if len(article_paths) >= max_scraped:
-                    return article_paths
-            # Get next page at end of loop since page 1 is obtained from
-            # search_url
-            search_url = self.turn_page(search_url, page_number + 1)
-        return article_paths
-
+    
     def get_page_info(self, url):
 
         self.driver.get(url)
@@ -907,20 +879,33 @@ class Nature(JournalFamily):
     def turn_page(self, url: str, page_number: int) -> BeautifulSoup:
         return super().turn_page(url, page_number)
 
-    def get_page_info(self, soup):
-        # Finds total results, page number, and total pages in article html
-        # Data exists as json inside script tag with 'data-test'='dataLayer' attr.
-        data_layer = soup.find(attrs={"data-test": "results-data"})
-        # <span data-test="results-data"><span>Showing  <X>–<X+pg_size>
-        # of&nbsp;</span><span>N results</span></span>
-        current_page_tag, total_results_tag = data_layer.contents
-        result_range = current_page_tag.contents[0].split()[1]
-        start, end = result_range.split("–")
-        page_size = int(end) - int(start) + 1
-        page = int(end) // page_size
-        total_results = int(total_results_tag.contents[0].split(" ")[0])
-        total_pages = math.ceil(total_results / page_size)
-        return (page, total_pages, total_results)
+    def get_page_info(self, url):  
+        #options = webdriver.ChromeOptions()
+        #options.add_argument("start-maximized")  
+        #options.add_experimental_option("excludeSwitches", ["enable-automation"])
+        #options.add_experimental_option('useAutomationExtension', False)
+        #options.add_argument('--headless')
+        #options.add_argument('--no-sandbox')
+        #options.add_argument('--disable-dev-shm-usage')
+        #options.add_argument('--no-sandbox') 
+        #driver = webdriver.Chrome('chromedriver', options=options)
+        #stealth(driver,
+        #        languages=["en-US", "en"],
+        #        vendor="Google Inc.",
+        #        platform="Win32",
+        #        webgl_vendor="Intel Inc.",
+        #        renderer="Intel Iris OpenGL Engine",
+        #        fix_hairline=True,
+        #        )
+        self.driver.get(url)
+        time.sleep(2)
+        soup = BeautifulSoup(self.driver.page_source, 'html.parser')
+        possible_entries = [a.strip("\n") for a in soup.find(class_="fixpadv--l pos--left pagination-summary").text.strip().split(" ") if a.strip("\n").isdigit()]
+        self.driver.close()
+        totalPages = possible_entries[-1]
+        totalResults = possible_entries[0]
+        page = possible_entries[1]
+        return int(page), int(totalPages), int(totalResults)
 
     def get_additional_url_arguments(self, soup):
         current_year = datetime.now().year
