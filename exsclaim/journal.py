@@ -774,7 +774,7 @@ class ACS(JournalFamilyDynamic):
         
         total_results = int(soup.find(class_='result__count').text) 
         time.sleep(2)
-        self.driver.close()
+        #self.driver.close()
         if total_results > 2020:
             total_results = 2020
 
@@ -1016,10 +1016,7 @@ class RSC(JournalFamilyDynamic):
         possible_entries = [a.strip("\n") for a in soup.find(class_="fixpadv--l pos--left pagination-summary").text.strip().split(" ") if a.strip("\n").isdigit()]
         #print(possible_entries)
         #print(possible_entries[1])
-        self.driver.close()
-
-
-
+        #self.driver.close()
         #possible_entries = [a.strip("\n") for a in soup.text.split(" - Showing page 1 of")[0].split("Back to tab navigation")[-1].split(" ") if a.strip("\n").isdigit()]
         #possible_entries = [a.strip("\n") for a in soup.find(class_="fixpadv--l pos--left pagination-summary").text.strip().split(" ") if a.strip("\n").isdigit()]
         #print(soup.find_all(class_="fixpadv--l pos--left pagination-summary")) #soup.find("pagination-summary") )
