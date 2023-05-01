@@ -16,17 +16,18 @@ import numpy as np
 import requests
 from dateutil.relativedelta import relativedelta
 
-#try:
-from selenium_stealth import stealth
-from selenium import webdriver
-from selenium.common.exceptions import TimeoutException
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
-from webdriver_manager.chrome import ChromeDriverManager
+try:
+    from selenium_stealth import stealth
+    from selenium import webdriver
+    from selenium.common.exceptions import TimeoutException
+    from selenium.webdriver.common.by import By
+    from selenium.webdriver.support import expected_conditions as EC
+    from selenium.webdriver.support.ui import WebDriverWait
+    from webdriver_manager.chrome import ChromeDriverManager
 
-#except ImportError:
-#    pass
+except ImportError:
+    pass
+
 from bs4 import BeautifulSoup
 
 from .utilities import paths
@@ -879,7 +880,7 @@ class Nature(JournalFamily):
     def turn_page(self, url: str, page_number: int) -> BeautifulSoup:
         return super().turn_page(url, page_number)
 
-    def get_page_info(self, url):  
+    def get_page_info(self, soup):  
         #options = webdriver.ChromeOptions()
         #options.add_argument("start-maximized")  
         #options.add_experimental_option("excludeSwitches", ["enable-automation"])
@@ -897,9 +898,9 @@ class Nature(JournalFamily):
         #        renderer="Intel Iris OpenGL Engine",
         #        fix_hairline=True,
         #        )
-        self.driver.get(url)
-        time.sleep(2)
-        soup = BeautifulSoup(self.driver.page_source, 'html.parser')
+        #self.driver.get(url)
+        #time.sleep(2)
+        #soup = BeautifulSoup(self.driver.page_source, 'html.parser')
         possible_entries = [a.strip("\n") for a in soup.find(class_="fixpadv--l pos--left pagination-summary").text.strip().split(" ") if a.strip("\n").isdigit()]
         #self.driver.close()
         totalPages = possible_entries[-1]
