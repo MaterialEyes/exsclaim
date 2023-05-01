@@ -880,33 +880,35 @@ class Nature(JournalFamily):
     def turn_page(self, url: str, page_number: int) -> BeautifulSoup:
         return super().turn_page(url, page_number)
 
-    def get_page_info(self, soup):  
-        #options = webdriver.ChromeOptions()
-        #options.add_argument("start-maximized")  
-        #options.add_experimental_option("excludeSwitches", ["enable-automation"])
-        #options.add_experimental_option('useAutomationExtension', False)
-        #options.add_argument('--headless')
-        #options.add_argument('--no-sandbox')
-        #options.add_argument('--disable-dev-shm-usage')
-        #options.add_argument('--no-sandbox') 
-        #driver = webdriver.Chrome('chromedriver', options=options)
-        #stealth(driver,
-        #        languages=["en-US", "en"],
-        #        vendor="Google Inc.",
-        #        platform="Win32",
-        #        webgl_vendor="Intel Inc.",
-        #        renderer="Intel Iris OpenGL Engine",
-        #        fix_hairline=True,
-        #        )
-        #self.driver.get(url)
-        #time.sleep(2)
-        #soup = BeautifulSoup(self.driver.page_source, 'html.parser')
-        possible_entries = [a.strip("\n") for a in soup.find(class_="fixpadv--l pos--left pagination-summary").text.strip().split(" ") if a.strip("\n").isdigit()]
-        #self.driver.close()
-        totalPages = possible_entries[-1]
-        totalResults = possible_entries[0]
-        page = possible_entries[1]
-        return int(page), int(totalPages), int(totalResults)
+    def get_page_info(self, soup):
+        def parse_page(page):
+            # Fetches the page number given the string 'page #' (e.g. page 1) otherwise
+            # returns None
+            info = page.strip().split()
+            if len(info) != 2 or info[0] != 'page':
+                raise ValueError(f'Info {info} should be of the format "page i"')
+            
+            return int(info[1])
+        
+        active_link = soup.find(class_='c-pagination__link c-pagination__link--active')
+
+        try: 
+            current_page = parse_page(active_link.text)  
+            pages = soup.find_all(class_='c-pagination__item')
+            total_pages = parse_page(pages[-2].text)  
+
+        except:
+            current_page, total_pages = 1, 1
+
+        if soup.find(attrs={'data-test': 'results-data'}) == None:
+            #pass
+            raise ValueError(f'No articles were found, try to modily the search criteria')
+
+        try:
+            total_results = int(soup.find(attrs={'data-test': 'results-data'}).text.split()[-2])
+            return current_page, total_pages, total_results
+        except: 
+            pass
 
     def get_additional_url_arguments(self, soup):
         current_year = datetime.now().year
