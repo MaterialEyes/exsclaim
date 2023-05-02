@@ -1,0 +1,28 @@
+name: Development Checks
+
+on:
+  # Trigger the workflow on push or pull request,
+  # but only for the main branch
+  pull_request:
+    branches:
+      - main
+      - master
+      - dev
+
+jobs:
+  linter:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout Code Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.9"
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+      - name: Run pre-commit
+        uses: pre-commit/action@v3.0.0
