@@ -1,4 +1,4 @@
-alphabet: 
+alphabet:
 - "a"
 - "b"
 - "c"
@@ -25,7 +25,7 @@ alphabet:
 - "x"
 - "y"
 - "z"
-roman numerals: 
+roman numerals:
 - "I"
 - "II"
 - "III"
@@ -76,7 +76,7 @@ roman numerals:
 - "XLVIII"
 - "XLIX"
 - "L"
-positions: 
+positions:
 - "above"
 - "after"
 - "around"
@@ -113,7 +113,7 @@ positions:
 - "up"
 - "upper"
 - "upside down"
-chemical elements: 
+chemical elements:
 - "H"
 - "He"
 - "Li"

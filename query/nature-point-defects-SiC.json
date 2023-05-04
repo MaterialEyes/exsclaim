@@ -1,4 +1,4 @@
-{   
+{
     "name": "nature-point-defects-SiC",
 
     "journal_family": "nature",
@@ -24,7 +24,7 @@
             "term":"HRTEM",
             "synonyms":[""]
         },
-        "search_field_4": 
+        "search_field_4":
         {
             "term":"ion-implantation",
             "synonyms":["ion implantation","ion-implantated","ion implantated"]

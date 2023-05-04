@@ -31,3 +31,6 @@ dist/
 build/
 *.sh
 */results_dirs
+.ipynb_checkpoints/
+**/local.ini
+docs/build/

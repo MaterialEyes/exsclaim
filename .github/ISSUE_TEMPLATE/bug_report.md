@@ -19,7 +19,7 @@ Steps to reproduce the behavior:
 A clear and concise description of what you expected to happen.
 
 **Outputs**
-If applicable, add screenshots to help explain your problem. For error messages, please copy and paste them here. 
+If applicable, add screenshots to help explain your problem. For error messages, please copy and paste them here.
 
 **Environment (please complete the following information):**
  - OS: [e.g. Ubuntu]
