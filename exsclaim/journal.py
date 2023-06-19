@@ -489,14 +489,15 @@ class JournalFamily(ABC):
 
 class JournalFamilyDynamic(JournalFamily):
 
-    def __init__(self, search_query: dict):
-        super().__init__(search_query)
+    def __init__(self, search_query: dict):        
         """creates an instance of a journal family search using a query
         Args:
             search_query: a query json (python dictionary)
         Returns:
             An initialized instance of a search on a journal family
+            and the webdriver for dynamic webpages
         """
+        super().__init__(search_query)
         self.search_query = search_query
         self.open = search_query.get("open", False)
         self.order = search_query.get("order", "relevant")
