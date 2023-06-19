@@ -491,11 +491,37 @@ class JournalFamilyDynamic(JournalFamily):
 
     def __init__(self, search_query: dict):
         super().__init__(search_query)
+        """creates an instance of a journal family search using a query
+        Args:
+            search_query: a query json (python dictionary)
+        Returns:
+            An initialized instance of a search on a journal family
+        """
+        self.search_query = search_query
+        self.open = search_query.get("open", False)
+        self.order = search_query.get("order", "relevant")
+        self.logger = logging.getLogger(__name__)
+        # Set up file structure
+        base_results_dir = paths.initialize_results_dir(
+            self.search_query.get("results_dirs", None)
+        )
+        self.results_directory = base_results_dir / self.search_query["name"]
+        figures_directory = self.results_directory / "figures"
+        os.makedirs(figures_directory, exist_ok=True)
+
+        # Check if any articles have already been scraped by checking
+        # results_dir/_articles
+        articles_visited = {}
+        articles_file = self.results_directory / "_articles"
+        if os.path.isfile(articles_file):
+            with open(articles_file, "r") as f:
+                contents = f.readlines()
+            articles_visited = {a.strip() for a in contents}
+        self.articles_visited = articles_visited       
+        
+        
         # initiallize the selenium-stealth 
         options = Options()
-        #options.add_argument("start-maximized")  
-        #options.add_experimental_option("excludeSwitches", ["enable-automation"])
-        #options.add_experimental_option('useAutomationExtension', False)
         options.add_argument('--headless')
         options.add_argument('--no-sandbox')
         options.add_argument('--disable-dev-shm-usage')
