@@ -801,7 +801,7 @@ class ACS(JournalFamilyDynamic):
         self.driver.get(url)
         #time.sleep(5)
       
-        soup = BeautifulSoup(driver.page_source, 'html.parser')
+        soup = BeautifulSoup(self.driver.page_source, 'html.parser')
         self.driver.close()
       
         total_results = int(soup.find(class_='result__count').text) 
