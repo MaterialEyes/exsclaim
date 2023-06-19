@@ -799,19 +799,20 @@ class ACS(JournalFamilyDynamic):
     def get_page_info(self, url):
 
         self.driver.get(url)
-        time.sleep(2)
-        soup = BeautifulSoup(self.driver.page_source, 'html.parser')
-        
+        #time.sleep(5)
+      
+        soup = BeautifulSoup(driver.page_source, 'html.parser')
+        self.driver.close()
+      
         total_results = int(soup.find(class_='result__count').text) 
-        
-        #self.driver.close()
         if total_results > 2020:
-            total_results = 2020
-
+          total_results = 2020
+       
         page_counter_list=[]
         page_counter = soup.find(class_='pagination')
         for page_number in page_counter.find_all('li'):
-            page_counter_list.append(page_number.text.strip())
+          page_counter_list.append(page_number.text.strip())
+      
         current_page = int(page_counter_list[0])
         total_pages = total_results // 20
         return current_page, total_pages, total_results
