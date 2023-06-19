@@ -24,6 +24,7 @@ try:
     from selenium.webdriver.support import expected_conditions as EC
     from selenium.webdriver.support.ui import WebDriverWait
     from webdriver_manager.chrome import ChromeDriverManager
+    from selenium.webdriver.chrome.options import Options
 
 except ImportError:
     pass
@@ -491,14 +492,14 @@ class JournalFamilyDynamic(JournalFamily):
     def __init__(self, search_query: dict):
         super().__init__(search_query)
         # initiallize the selenium-stealth 
-        options = webdriver.ChromeOptions()
-        options.add_argument("start-maximized")  
-        options.add_experimental_option("excludeSwitches", ["enable-automation"])
-        options.add_experimental_option('useAutomationExtension', False)
+        options = Options()
+        #options.add_argument("start-maximized")  
+        #options.add_experimental_option("excludeSwitches", ["enable-automation"])
+        #options.add_experimental_option('useAutomationExtension', False)
         options.add_argument('--headless')
         options.add_argument('--no-sandbox')
         options.add_argument('--disable-dev-shm-usage')
-        self.driver = webdriver.Chrome('chromedriver', options=options)
+        self.driver = webdriver.Chrome(options=options)
 
         stealth(self.driver,
                 languages=["en-US", "en"],
