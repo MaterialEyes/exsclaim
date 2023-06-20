@@ -8,7 +8,7 @@ Automatic **EX**traction, **S**eparation, and **C**aption-based natural **L**ang
 
 If you find this tool or any of its derived capabilities useful, please consider registering as a user of Center for Nanoscale Materials. We will keep you posted of latest developments, as well as opportunities for computational resources, relevant data, and collaboration. Please contact Maria Chan (mchan@anl.gov) for details.
 
-## Introduction
+## Introduction to EXSCLAIM!
 
 EXSCLAIM! is a Python package that can be used for the automatic generation of datasets of labelled images from published papers. It in three main steps:
 1. [JournalScraper](https://github.com/MaterialEyes/exsclaim/wiki/JournalScraper): scrap journal websites, acquiring figures, captions, and metadata
@@ -31,7 +31,7 @@ $ exsclaim run /path/to/query.json
 
 ## Using EXSCLAIM
 
-### Requirements
+### Requirements 
 EXSCLAIM works with Python 3.6+. We recommend using a conda or python environment to install dependencies. To use the pipeline, you need a Query on which to run the pipeline. The query can be a JSON or Python dictionary (depending on how you are accessing the pipeline) and must have the parameters(/keys/attributes) defined in the [Query JSON schema](https://github.com/MaterialEyes/exsclaim/wiki/JSON-Schema#query-json-) and examples can be found [in the query directory](https://github.com/MaterialEyes/exsclaim/tree/master/query).
 
 ### Installation
@@ -60,7 +60,16 @@ To install directly from github, run the following commands (it is recommended t
 git clone https://github.com/MaterialEyes/exsclaim.git
 cd exsclaim
 pip setup.py install
+python load_models.py
 python -m spacy download en_core_web_sm
+```
+
+# Scrapping data from dynamic journal webpages
+If scrapping data from Journals that use javascript (e.g. RSC, ACS) you need to setup chome-driver and chome and add their path to the `exsclaim/journal.py` file.
+```
+e.g. for a linux terminal you need the following:
+wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+wget https://chromedriver.storage.googleapis.com/90.0.4430.24/chromedriver_linux64.zip
 ```
 
 If you run into errors, please check [Troubleshooting](https://github.com/MaterialEyes/exsclaim/wiki/Troubleshooting). If they persist, please open an issue.
