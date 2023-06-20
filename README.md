@@ -60,7 +60,16 @@ To install directly from github, run the following commands (it is recommended t
 git clone https://github.com/MaterialEyes/exsclaim.git
 cd exsclaim
 pip setup.py install
+python load_models.py
 python -m spacy download en_core_web_sm
+```
+
+# Scrapping data from dynamic journal webpages
+If scrapping data from Journals that use javascript (e.g. RSC, ACS) you need to setup chome-driver and chome and add their path to the `exsclaim/journal.py` file.
+```
+e.g. for a linux terminal you need the following:
+wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+wget https://chromedriver.storage.googleapis.com/90.0.4430.24/chromedriver_linux64.zip
 ```
 
 If you run into errors, please check [Troubleshooting](https://github.com/MaterialEyes/exsclaim/wiki/Troubleshooting). If they persist, please open an issue.
