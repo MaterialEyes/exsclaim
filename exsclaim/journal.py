@@ -25,6 +25,9 @@ try:
     from selenium.webdriver.support.ui import WebDriverWait
     from webdriver_manager.chrome import ChromeDriverManager
     from selenium.webdriver.chrome.options import Options
+    from selenium.webdriver.chrome.service import Service
+    from selenium.webdriver.common.action_chains import ActionChains
+    from selenium.webdriver.common.keys import Keys
 
 except ImportError:
     pass
@@ -526,7 +529,10 @@ class JournalFamilyDynamic(JournalFamily):
         options.add_argument('--headless')
         options.add_argument('--no-sandbox')
         options.add_argument('--disable-dev-shm-usage')
-        self.driver = webdriver.Chrome(options=options)
+        options.add_argument("--remote-debugging-port=9222")
+        options.binary_location = "/gpfs/fs1/home/avriza/chrome/opt/google/chrome/google-chrome"
+        self.driver = webdriver.Chrome(service=Service('/gpfs/fs1/home/avriza/chromedriver'), options=options)
+
 
         stealth(self.driver,
                 languages=["en-US", "en"],
@@ -797,17 +803,36 @@ class ACS(JournalFamilyDynamic):
 
     
     def get_page_info(self, url):
-
-        self.driver.get(url)
+        options = Options()
+        options.add_argument('--headless')
+        options.add_argument("start-maximized")
+        options.add_experimental_option("excludeSwitches", ["enable-automation"])
+        options.add_experimental_option('useAutomationExtension', False)
+        options.add_argument("--no-sandbox") #bypass OS security model
+        options.add_argument("--disable-dev-shm-usage") #overcome limited resource problems
+        options.add_experimental_option("excludeSwitches", ["enable-automation"])
+        options.add_experimental_option('useAutomationExtension', False)
+        options.binary_location = "/gpfs/fs1/home/avriza/chrome/opt/google/chrome/google-chrome"
+        driver = webdriver.Chrome(service=Service('/gpfs/fs1/home/avriza/chromedriver'), options=options)
+        #driver = webdriver.Chrome( options=options)
+        stealth(driver,
+              languages=["en-US", "en"],
+              vendor="Google Inc.",
+              platform="Win32",
+              webgl_vendor="Intel Inc.",
+              renderer="Intel Iris OpenGL Engine",
+              fix_hairline=True,
+              )
+        driver.get(url)
         #time.sleep(5)
       
-        soup = BeautifulSoup(self.driver.page_source, 'html.parser')
-        self.driver.close()
+        soup = BeautifulSoup(driver.page_source, 'html.parser')
+        driver.close()
       
-        total_results = int(soup.find(class_='result__count').text) 
+        total_results = int(soup.find(class_='result__count').text)
         if total_results > 2020:
           total_results = 2020
-       
+      
         page_counter_list=[]
         page_counter = soup.find(class_='pagination')
         for page_number in page_counter.find_all('li'):
