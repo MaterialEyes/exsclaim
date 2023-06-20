@@ -1,7 +1,8 @@
 import numpy as np
 
+
 def non_max_suppression_malisiewicz(boxes, overlap_threshold):
-    """ Eliminates redundant boxes using NMS adapted from Malisiewicz et al.
+    """Eliminates redundant boxes using NMS adapted from Malisiewicz et al.
 
     Args:
         boxes (np.ndarray): A >=5 by N array of bounding boxes where each
@@ -10,10 +11,11 @@ def non_max_suppression_malisiewicz(boxes, overlap_threshold):
         overlap_threshold (float): If two boxes exist in which their intersection
             divided by their union (IoU) is greater than overlap_threshold,
             only the box with higher confidence score will remain
-    
+
     Returns:
         boxes (np.ndarray): A >=5 by K array where K <= N of bounding boxes that
-            remain after applying NMS adapted from https://www.pyimagesearch.com/2015/02/16/faster-non-maximum-suppression-python/
+            remain after applying NMS adapted from
+        https://www.pyimagesearch.com/2015/02/16/faster-non-maximum-suppression-python/
             based off of Malisiewicz et al.
     """
     # if there are no boxes, return an empty list
@@ -25,15 +27,15 @@ def non_max_suppression_malisiewicz(boxes, overlap_threshold):
     if boxes.dtype.kind == "i":
         boxes = boxes.astype("float")
 
-    # initialize the list of picked indexes    
+    # initialize the list of picked indexes
     pick = []
 
     # grab the coordinates of the bounding boxes
-    x1 = boxes[:,0]
-    y1 = boxes[:,1]
-    x2 = boxes[:,2]
-    y2 = boxes[:,3]
-    scores = boxes[:,4]
+    x1 = boxes[:, 0]
+    y1 = boxes[:, 1]
+    x2 = boxes[:, 2]
+    y2 = boxes[:, 3]
+    scores = boxes[:, 4]
 
     # compute the area of the bounding boxes and sort the bounding
     # boxes by the bottom-right y-coordinate of the bounding box
@@ -65,8 +67,9 @@ def non_max_suppression_malisiewicz(boxes, overlap_threshold):
         overlap = (w * h) / area[idxs[:last]]
 
         # delete all indexes from the index list that have
-        idxs = np.delete(idxs, np.concatenate(([last],
-            np.where(overlap > overlap_threshold)[0])))
+        idxs = np.delete(
+            idxs, np.concatenate(([last], np.where(overlap > overlap_threshold)[0]))
+        )
 
     # return only the bounding boxes that were picked using the
     # integer data type

@@ -1,0 +1,24 @@
+{
+    "name": "nature-nanoparticles",
+
+    "journal_family": "nature",
+
+    "maximum_scraped": 2,
+
+    "sortby": "relevant",
+
+    "query":
+    {
+        "search_field_1":
+        {
+            "term":"Ag nanoparticle",
+            "synonyms":["Ag nanoparticles", "silver nanoparticle", "silver nanoparticle", "nanoparticles of silver", "AgNPs", "AgNP", "Ag NPs", "silver NPs", "silver NP"]
+        }
+    },
+
+    "open": true,
+
+    "save_format": ["save_subfigures"],
+
+    "logging": ["print", "exsclaim.log"]
+}

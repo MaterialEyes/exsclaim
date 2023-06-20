@@ -1,8 +1,9 @@
 from __future__ import division
 
-import torch
 import cv2
 import numpy as np
+import torch
+
 
 def label2yolobox(labels, info_img, maxsize, lrflip):
     """
@@ -41,6 +42,7 @@ def label2yolobox(labels, info_img, maxsize, lrflip):
         labels[:, 1] = 1 - labels[:, 1]
     return labels
 
+
 def yolobox2label(box, info_img):
     """
     Transform yolo box labels to yxyx box labels.
@@ -61,8 +63,9 @@ def yolobox2label(box, info_img):
     box_w = ((x2 - x1) / nw) * w
     y1 = ((y1 - dy) / nh) * h
     x1 = ((x1 - dx) / nw) * w
-    label = [max(x1,0), max(y1,0), min(x1 + box_w,w), min(y1 + box_h,h)]
+    label = [max(x1, 0), max(y1, 0), min(x1 + box_w, w), min(y1 + box_h, h)]
     return label
+
 
 def nms(bbox, thresh, score=None, limit=None):
     """Suppress bounding boxes according to their IoUs and confidence scores.
@@ -112,6 +115,7 @@ def nms(bbox, thresh, score=None, limit=None):
         selec = order[selec]
     return selec.astype(np.int32)
 
+
 def postprocess(prediction, dtype, conf_thre=0.7, nms_thre=0.45):
     """
     Postprocess for the output of YOLO model
@@ -157,7 +161,8 @@ def postprocess(prediction, dtype, conf_thre=0.7, nms_thre=0.45):
 
         # Detections ordered as (x1, y1, x2, y2, obj_conf, class_conf, class_pred)
         detections = torch.cat(
-            (image_pred[:, :5], class_conf.float(), class_pred.float()), 1)
+            (image_pred[:, :5], class_conf.float(), class_pred.float()), 1
+        )
         # Iterate through all predicted classes
         unique_labels = detections[:, -1].cpu().unique()
         if prediction.is_cuda:
@@ -167,7 +172,8 @@ def postprocess(prediction, dtype, conf_thre=0.7, nms_thre=0.45):
             detections_class = detections[detections[:, -1] == c]
             nms_in = detections_class.cpu().numpy()
             nms_out_index = nms(
-                nms_in[:, :4], nms_thre, score=nms_in[:, 4]*nms_in[:, 5])
+                nms_in[:, :4], nms_thre, score=nms_in[:, 4] * nms_in[:, 5]
+            )
             detections_class = detections_class[nms_out_index]
             if output[i] is None:
                 output[i] = detections_class
@@ -175,15 +181,17 @@ def postprocess(prediction, dtype, conf_thre=0.7, nms_thre=0.45):
                 output[i] = torch.cat((output[i], detections_class))
 
     return output
-    
+
+
 def preprocess_mask(mask, imgsize, info_img):
     h, w, nh, nw, dx, dy = info_img
     sized = np.ones((imgsize, imgsize, 1), dtype=np.uint8) * 127
     mask = cv2.resize(mask, (nw, nh))
-    sized[dy:dy+nh, dx:dx+nw, 0] = mask
-    
-    return sized    
-            
+    sized[dy : dy + nh, dx : dx + nw, 0] = mask
+
+    return sized
+
+
 def preprocess(img, imgsize, jitter, random_placing=False):
     """
     Image preprocess for yolo input
@@ -202,7 +210,7 @@ def preprocess(img, imgsize, jitter, random_placing=False):
             h, w (int): original shape of the image
             nh, nw (int): shape of the resized image without padding
             dx, dy (int): pad size
-    """    
+    """
     h, w, _ = img.shape
     img = img[:, :, ::-1]
     assert img is not None
@@ -211,8 +219,9 @@ def preprocess(img, imgsize, jitter, random_placing=False):
         # add jitter
         dw = jitter * w
         dh = jitter * h
-        new_ar = (w + np.random.uniform(low=-dw, high=dw))\
-                 / (h + np.random.uniform(low=-dh, high=dh))
+        new_ar = (w + np.random.uniform(low=-dw, high=dw)) / (
+            h + np.random.uniform(low=-dh, high=dh)
+        )
     else:
         new_ar = w / h
 
@@ -222,7 +231,7 @@ def preprocess(img, imgsize, jitter, random_placing=False):
     else:
         nw = imgsize
         nh = nw / new_ar
-    nw, nh = int(max(nw,1)), int(max(nh,1))
+    nw, nh = int(max(nw, 1)), int(max(nh, 1))
 
     if random_placing:
         dx = int(np.random.uniform(imgsize - nw))
@@ -233,7 +242,7 @@ def preprocess(img, imgsize, jitter, random_placing=False):
 
     img = cv2.resize(img, (nw, nh))
     sized = np.ones((imgsize, imgsize, 3), dtype=np.uint8) * 127
-    sized[dy:dy+nh, dx:dx+nw, :] = img
+    sized[dy : dy + nh, dx : dx + nw, :] = img
 
     info_img = (h, w, nh, nw, dx, dy)
     return sized, info_img
