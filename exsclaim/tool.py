@@ -82,6 +82,7 @@ class JournalScraper(ExsclaimTool):
         "acs": journal.ACS,
         "nature": journal.Nature,
         "rsc": journal.RSC,
+        "wiley": journal.Wiley,
     }
 
     def __init__(self, search_query):

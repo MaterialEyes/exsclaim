@@ -452,7 +452,7 @@ class JournalFamily(ABC):
             file.write(str(soup))
 
         figure_subtrees = self.get_figure_subtrees(soup)
-        self.logger.info(len(figure_subtrees))
+        self.logger.debug(f"Found {len(figure_subtrees)} figures")
         figure_number = 1
         article_json = {}
 
@@ -540,6 +540,25 @@ class ACS(JournalFamily):
     extra_key = "inline-fig internalNav"
     articles_path_length = 3
     max_query_results = 1000
+    pub_type = ""
+
+    def find_captions(self, figure_subtree: BeautifulSoup) -> bs4.element.ResultSet:
+        return super().find_captions(figure_subtree)
+
+    def turn_page(self, url: str, page_number: int) -> BeautifulSoup:
+        return super().turn_page(url, page_number)
+
+    def get_figure_subtrees(self, soup: BeautifulSoup) -> list:
+        return super().get_figure_subtrees(soup)
+
+    def get_soup_from_request(self, url: str) -> BeautifulSoup:
+        return super().get_soup_from_request(url)
+
+    def get_figure_url(self, figure_subtree: BeautifulSoup) -> str:
+        return super().get_figure_url(figure_subtree)
+
+    def save_figure(self, figure_name: str, image_url: str):
+        return super().save_figure(figure_name, image_url)
 
     def get_page_info(self, soup):
         totalResults = int(soup.find("span", {"class": "result__count"}).text)
@@ -551,8 +570,14 @@ class ACS(JournalFamily):
         now = datetime.now()
         time_format = "%Y%m%d"
         journal_list = soup.find(id="Publication")
-        journal_link_tags = journal_list.parent.find_all("a", href=True)
-        journal_codes = [jlt.attrs["href"].split("=")[-1] for jlt in journal_link_tags]
+        if journal_list:
+            journal_link_tags = journal_list.parent.find_all("a", href=True)
+            journal_codes = [
+                jlt.attrs["href"].split("=")[-1] for jlt in journal_link_tags
+            ]
+        else:
+            journal_codes = []
+            self.logger.info("No journal codes found")
         if self.order == "exhaustive":
             num_years = 100
             orderings = list(self.order_values.values())
@@ -754,6 +779,7 @@ class RSC(JournalFamily):
     prepend = "https://pubs.rsc.org"
     extra_key = " "
     max_query_results = np.inf
+    pub_type = ""
 
     def __init__(self, search_query):
         super().__init__(search_query)
@@ -771,6 +797,15 @@ class RSC(JournalFamily):
         self.browser = webdriver.Chrome(
             ChromeDriverManager().install(), chrome_options=chromeOptions
         )
+
+    def get_license(self, soup: BeautifulSoup) -> tuple:
+        return super().get_license(soup)
+
+    def is_link_to_open_article(self, tag: BeautifulSoup) -> bool:
+        return super().is_link_to_open_article(tag)
+
+    def get_figure_url(self, figure_subtree: BeautifulSoup) -> str:
+        return super().get_figure_url(figure_subtree)
 
     def get_soup_from_request(self, url: str) -> BeautifulSoup:
         url.replace(" ", "+")
@@ -804,9 +839,6 @@ class RSC(JournalFamily):
         # rsc allows unlimited results, so no need for additoinal args
         return [""], [""], [""]
 
-    def is_link_to_open_article(self, tag):
-        return self.open
-
     def get_page_info(self, soup):
         possible_entries = [
             a.strip("\n")
@@ -836,9 +868,6 @@ class RSC(JournalFamily):
     def get_figure_subtrees(self, soup):
         figure_subtrees = soup.find_all("div", "image_table")
         return figure_subtrees
-
-    def get_figure_url(self, figure_subtree):
-        return self.prepend + figure_subtree.find("a", href=True)["href"]
 
     def find_captions(self, figure):
         return figure.find_all("span", class_="graphic_title")
@@ -870,6 +899,21 @@ class Wiley(JournalFamily):
     extra_key = " "
     articles_path_length = 3
 
+    def get_figure_subtrees(self, soup: BeautifulSoup) -> list:
+        return super().get_figure_subtrees(soup)
+
+    def get_soup_from_request(self, url: str) -> BeautifulSoup:
+        return super().get_soup_from_request(url)
+
+    def find_captions(self, figure_subtree: BeautifulSoup) -> bs4.element.ResultSet:
+        return super().find_captions(figure_subtree)
+
+    def save_figure(self, figure_name: str, image_url: str):
+        return super().save_figure(figure_name, image_url)
+
+    def get_figure_url(self, figure_subtree: BeautifulSoup) -> str:
+        return super().get_figure_url(figure_subtree)
+
     def get_page_info(self, soup):
         totalResults = soup.find("span", {"class": "result__count"}).text
         totalResults = int(totalResults.replace(",", ""))
@@ -878,13 +922,18 @@ class Wiley(JournalFamily):
         page = 0
         return page, totalPages, totalResults
 
-    def get_additional_url_arguements(self, soup):
+    def get_additional_url_arguments(self, soup):
         current_year = datetime.now().year
-        journal_list = soup.find(id="Published in").parent.next_sibling
-        journal_link_tags = journal_list.find_all("a", href=True)
-        journal_link_tags_exh = journal_list.find_all("option", value=True)
-
-        journal_codes = [jlt.attrs["href"].split("=")[-1] for jlt in journal_link_tags]
+        try:
+            journal_list = soup.find(id="Published in").parent.next_sibling
+            journal_link_tags = journal_list.find_all("a", href=True)
+            journal_link_tags_exh = journal_list.find_all("option", value=True)
+            journal_codes = [
+                jlt.attrs["href"].split("=")[-1] for jlt in journal_link_tags
+            ]
+        except AttributeError:
+            self.logger.debug("No journal codes found")
+            journal_codes = []
 
         if self.order == "exhaustive":
             num_years = 100
@@ -903,7 +952,7 @@ class Wiley(JournalFamily):
             for year in range(current_year - num_years, current_year)
         ]
 
-        years = [["", ""]] + years
+        years = ["1800"] + years
         return years, journal_codes, orderings
 
     def turn_page(self, url, pg_num):
