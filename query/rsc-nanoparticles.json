@@ -1,0 +1,26 @@
+{
+    "name": "rsc-nano",
+
+    "journal_family": "rsc",
+
+    "maximum_scraped": 5,
+
+    "sortby": "relevant",
+
+    "query":
+    {
+        "search_field_1":
+        {
+            "term":"stem",
+            "synonyms":[]
+        }
+    },
+
+    "open": true,
+
+    "save_format": ["save_subfigures"],
+
+    "logging": ["print", "exsclaim.log"],
+
+    "results_dirs": "rsc-nano"
+}

@@ -1,9 +1,9 @@
-{   
-    "name": "nature-stem",
+{
+    "name": "nature-nano",
 
     "journal_family": "nature",
 
-    "maximum_scraped": 5,
+    "maximum_scraped": 2,
 
     "sortby": "relevant",
 
@@ -11,14 +11,14 @@
     {
         "search_field_1":
         {
-            "term":"stem",
-            "synonyms":[]
+            "term":"nano",
+            "synonyms":["nanoparticle"]
         }
     },
 
     "open": true,
 
-    "save_format": ["postgres"],
+    "save_format": ["boxes"],
 
     "logging": ["print", "exsclaim.log"]
 }
