@@ -30,6 +30,11 @@ setuptools.setup(
     install_requires=install_requires,
     package_data={
         "exsclaim": [
+            "figures/checkpoints/classifier_model.pt",
+            "figures/checkpoints/object_detection_model.pt",
+            "figures/checkpoints/scale_bar_detection_model.pt",
+            "figures/checkpoints/scale_label_recognition_model.pt",
+            "figures/checkpoints/text_recognition_model.pt",
             "figures/config/yolov3_default_master.cfg",
             "figures/config/yolov3_default_subfig.cfg",
             "figures/config/scale_label_reader.json",
