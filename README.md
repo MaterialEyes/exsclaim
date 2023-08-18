@@ -15,27 +15,45 @@ EXSCLAIM! is a Python package that can be used for the automatic generation of d
 2. [CaptionDistributor](https://github.com/MaterialEyes/exsclaim/wiki/JournalScraper): separate figure captions into the component chunks that refer to the figure's subfigures
 3. [FigureSeparator](https://github.com/MaterialEyes/exsclaim/wiki/JournalScraper): separate figures into subfigures, detect scale information, label, and type of image
 
-You can use exsclaim as a:
-- direct python import
+You can use EXSCLAIM!:
+- in a development environment
+```
+python run.py --query /path/to/query.json
+```
+- as a direct python import
 ```
 from exsclaim.pipeline import Pipeline
 test_pipeline = Pipeline(query)
 results = test_pipeline.run()
 ```
-- [command line interface](https://github.com/MaterialEyes/exsclaim/wiki/Command-Line-Interface)
+- as [command line interface](https://github.com/MaterialEyes/exsclaim/wiki/Command-Line-Interface)
 ```
 $ exsclaim run /path/to/query.json
 ```
-- [user interface](https://github.com/MaterialEyes/exsclaim/wiki/User-Interface)
+- as a [user interface](https://github.com/MaterialEyes/exsclaim/wiki/User-Interface)
 ![Screenshot of EXSCLAIM user interface. Search form on left of screen and grid of image results on the right.](https://drive.google.com/uc?export=view&id=1OGPrMwld_9fYPlYh50PV7JowIzP52nha)
 
 ## Using EXSCLAIM
+### Note
+The way in which a webpage (content) is delivered to a user can change over time, and thus continued support is necessary to ensure that the design of each journal-specfic scraper/parser is fully functional with the current journal format.
 
 ### Requirements
 EXSCLAIM works with Python 3.6+. We recommend using a conda or python environment to install dependencies. To use the pipeline, you need a Query on which to run the pipeline. The query can be a JSON or Python dictionary (depending on how you are accessing the pipeline) and must have the parameters(/keys/attributes) defined in the [Query JSON schema](https://github.com/MaterialEyes/exsclaim/wiki/JSON-Schema#query-json-) and examples can be found [in the query directory](https://github.com/MaterialEyes/exsclaim/tree/master/query).
 
 ### Installation
 There are multiple ways to use EXSCLAIM. If you wish to develop or modify the source code, see [Git Clone](#gitclone) installation instructions. If you simply wish to utilize the package, see the [Pip](#pip) installation instructions. For utilizing EXSCLAIM's User Interface (which is useful if you want to avoid writing any code or want an easy to way to view results), see [UI](#ui) instructions.
+
+#### Git Clone (Recommended)
+To setup a development environment from the GitHub repository, run the following commands (a Python 3.10 venv virtual environment is provided as an example):
+```
+git clone https://github.com/MaterialEyes/exsclaim.git
+cd exsclaim
+python3.10 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+bash exsclaim/utilities/download_model_checkpoints.sh
+python -m spacy download en_core_web_sm 
+```
 
 #### Pip
 To install the latest stable release:
@@ -50,20 +68,21 @@ To start container:
 To re-build:
 `docker-compose up --build`
 
-
 To run in python shell
 `docker exec -it <service_name> bash`
 
-#### Git Clone
-To install directly from github, run the following commands (it is recommended to run in a conda or python virtual environment):
+If you run into errors, please check [Troubleshooting](https://github.com/MaterialEyes/exsclaim/wiki/Troubleshooting). If they persist, please open an issue.
+
+
+### Enable Journal Scraping for Dynamic Webpages
+To scrape from journals that use javascript (e.g., RSC, ACS), you need to setup chrome and chromedriver and add their path to the `exsclaim/journal.py` file. 
+
+E.g. for a linux terminal you need the following:
 ```
-git clone https://github.com/MaterialEyes/exsclaim.git
-cd exsclaim
-pip setup.py install
-python -m spacy download en_core_web_sm
+wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+wget https://chromedriver.storage.googleapis.com/90.0.4430.24/chromedriver_linux64.zip
 ```
 
-If you run into errors, please check [Troubleshooting](https://github.com/MaterialEyes/exsclaim/wiki/Troubleshooting). If they persist, please open an issue.
 
 ## Acknowledgements <a name="credits"></a>
 This material is based upon work supported by Laboratory Directed Research and Development (LDRD) funding from Argonne National Laboratory, provided by the Director, Office of Science, of the U.S. Department of Energy under Contract No. DE-AC02-06CH11357
