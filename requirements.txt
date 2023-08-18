@@ -5,16 +5,19 @@ beautifulsoup4
 pyyaml>=5.1
 scipy
 scikit-image
-torch>=1.6
+torch==1.11.0
 opencv-contrib-python
 requests
-torchvision>=0.7
+torchvision>=0.7, <0.13
 urllib3
-spacy>=3.0
+spacy>=3.0, <3.7
 lxml
-selenium
+selenium < 4.10
 webdriver-manager
 pytorch-model-summary
 psycopg2-binary
 responses
 deepdiff
+gdown
+itables
+selenium_stealth
