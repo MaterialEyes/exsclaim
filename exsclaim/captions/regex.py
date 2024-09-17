@@ -14,7 +14,7 @@ def load_caption_sentence_regex():
         try:
             caption_sentence_regex = yaml.safe_load(stream)
         except yaml.YAMLError as exc:
-            print(exc)
+            pass # print(exc)
     return caption_sentence_regex
 
 

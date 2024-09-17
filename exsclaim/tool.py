@@ -157,13 +157,14 @@ class JournalScraper(ExsclaimTool):
                 exsclaim_json = self._update_exsclaim(exsclaim_json, article_dict)
                 self.new_articles_visited.add(article)
             except Exception:
-                exception_string = (
-                    "<!> ERROR: An exception occurred in"
-                    " JournalScraper on article: {}".format(article)
-                )
-                if self.print:
-                    Printer(exception_string + "\n")
-                self.logger.exception(exception_string)
+                pass
+                #exception_string = (
+                #    "<!> ERROR: An exception occurred in"
+                #    " JournalScraper on article: {}".format(article)
+                #)
+                #if self.print:
+                #    Printer(exception_string + "\n")
+                #self.logger.exception(exception_string)
 
             # Save to file every N iterations (to accomodate restart scenarios)
             if counter % 1000 == 0:
@@ -275,19 +276,20 @@ class CaptionDistributor(ExsclaimTool):
                 )
                 new_captions_distributed.add(figure_name)
             except Exception:
-                if self.print:
-                    Printer(
-                        (
-                            "<!> ERROR: An exception occurred in"
-                            " CaptionDistributor on figue: {}".format(figure_name)
-                        )
-                    )
-                self.logger.exception(
-                    (
-                        "<!> ERROR: An exception occurred in"
-                        " CaptionDistributor on figue: {}".format(figure_name)
-                    )
-                )
+                pass
+                #if self.print:
+                #    Printer(
+                #        (
+                #            "<!> ERROR: An exception occurred in"
+                #            " CaptionDistributor on figue: {}".format(figure_name)
+                #        )
+                #    )
+                #self.logger.exception(
+                #    (
+                #        "<!> ERROR: An exception occurred in"
+                #        " CaptionDistributor on figue: {}".format(figure_name)
+                #    )
+                #)
             # Save to file every N iterations (to accomodate restart scenarios)
             if counter % 1000 == 0:
                 self._appendJSON(exsclaim_json, new_captions_distributed)

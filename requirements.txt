@@ -13,8 +13,12 @@ urllib3
 spacy>=3.0
 lxml
 selenium
+selenium-stealth
 webdriver-manager
 pytorch-model-summary
 psycopg2-binary
 responses
 deepdiff
+gdown
+itables
+urllib3==1.25.10

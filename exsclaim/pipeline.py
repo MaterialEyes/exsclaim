@@ -267,177 +267,105 @@ class Pipeline:
     # ## Save Methods ## #
 
     def to_file(self):
-        """Saves data to a csv and saves subfigures as individual images
-
+        """ Saves data to a csv and saves subfigures as individual images
+        
         Modifies:
             Creates directories to save each subfigure
         """
+        search_query = self.query_dict
         self.display_info(
-            (
-                "Printing Master Image Objects to: {}/images\n".format(
-                    self.results_directory
-                )
-            )
+            ("Printing Master Image Objects to: {}/images\n".format(
+                self.results_directory
+            ))
         )
         for figure_name in self.exsclaim_dict:
             # figure_name is <figure_root_name>.<figure_extension>
             figure_root_name, figure_extension = os.path.splitext(figure_name)
             try:
-                figure = plt.imread(self.results_directory / "figures" / figure_name)
-            except Exception:
-                self.logger.exception(
-                    (
-                        "Error printing {0} to file."
-                        " It may be damaged!".format(figure_name)
-                    )
+                figure = plt.imread(
+                    self.results_directory / "figures" / figure_name
                 )
-                figure = np.zeros((256, 256))
+            except Exception as e:
+                self.logger.exception(("Error printing {0} to file."
+                    " It may be damaged!".format(figure_name)))
+                figure = np.zeros((256,256))
 
-            # save each master, inset, and dependent image as their own file
-            # in a directory according to label
+            ## save each master, inset, and dependent image as their own file
+            ## in a directory according to label
             figure_dict = self.exsclaim_dict[figure_name]
             for master_image in figure_dict.get("master_images", []):
-                # create a directory for each master image in
+                # create a directory for each master image in 
                 # <results_dir>/images/<figure_name>/<subfigure_label>
                 directory = (
-                    self.results_directory
-                    / "images"
-                    / figure_root_name
-                    / master_image["subfigure_label"]["text"]
+                    self.results_directory / "images" / figure_root_name / 
+                    master_image['subfigure_label']['text']
                 )
                 os.makedirs(directory, exist_ok=True)
                 # generate the name of the master_image
-                master_class = (
-                    "uas"
-                    if master_image["classification"] is None
-                    else master_image["classification"][0:3].lower()
-                )
-                master_name = (
-                    "_".join(
-                        [
-                            figure_root_name,
-                            master_image["subfigure_label"]["text"],
-                            master_class,
-                        ]
-                    )
-                    + figure_extension
-                )
+                master_class  = ('uas' if master_image['classification'] is None 
+                                       else master_image['classification'][0:3].lower())
+                master_name = "/" + "_".join([figure_root_name,
+                                              master_image['subfigure_label']['text'],
+                                              master_class
+                                            ]) + figure_extension
                 # save master image to file
-                master_patch = boxes.crop_from_geometry(
-                    master_image["geometry"], figure
-                )
-                master_patch = master_patch.copy(order="C")
+                master_patch = boxes.crop_from_geometry(master_image['geometry'], figure)
+                master_patch = master_patch.copy(order='C')                
                 try:
-                    plt.imsave(str(directory) / master_name, master_patch)
-                except Exception:
-                    self.logger.exception(
-                        (
-                            "Error in saving cropped master"
-                            " image of figure: {}".format(figure_root_name)
-                        )
-                    )
+                    plt.imsave(str(directory) + master_name, master_patch)  
+                except Exception as err:
+                    self.logger.exception(("Error in saving cropped master"
+                        " image of figure: {}".format(figure_root_name)))
                 # Repeat for dependents of the master image to file
-                for dependent_id, dependent_image in enumerate(
-                    master_image.get("dependent_images", [])
-                ):
+                for dependent_id, dependent_image in enumerate(master_image.get("dependent_images", [])):
                     dependent_root_name = "/".join([directory, "dependent"])
                     os.makedirs(dependent_root_name, exist_ok=True)
-                    dependent_class = (
-                        "uas"
-                        if dependent_image["classification"] is None
-                        else dependent_image["classification"][0:3].lower()
-                    )
-                    dependent_name = (
-                        "_".join(
-                            [
-                                master_name.split("par")[0] + "dep" + str(dependent_id),
-                                dependent_class,
-                            ]
-                        )
-                        + figure_extension
-                    )
+                    dependent_class  = ('uas' if dependent_image['classification'] is None 
+                                              else dependent_image['classification'][0:3].lower())
+                    dependent_name = "_".join([master_name.split('par')[0] +
+                                              "dep" + str(dependent_id),
+                                              dependent_class
+                                              ]) + figure_extension
                     # save dependent image to file
-                    dpatch = boxes.crop_from_geometry(
-                        dependent_image["geometry"], figure
-                    )
+                    dpatch = boxes.crop_from_geometry(dependent_image['geometry'], figure)
                     try:
-                        plt.imsave(dependent_root_name / dependent_name, dpatch)
-                    except Exception:
-                        self.logger.exception(
-                            (
-                                "Error in saving cropped master"
-                                " image of figure: {}".format(figure_root_name)
-                            )
-                        )
+                        plt.imsave(dependent_root_name+dependent_name,dpatch) 
+                    except Exception as err:
+                        self.logger.exception(("Error in saving cropped master"
+                            " image of figure: {}".format(figure_root_name)))
                     # Repeat for insets of dependents of master image to file
-                    for inset_id, inset_image in enumerate(
-                        dependent_image.get("inset_images", [])
-                    ):
-                        inset_root_name = "/".join([dependent_root_name, "inset"])
+                    for inset_id, inset_image in enumerate(dependent_image.get("inset_images", [])):
+                        inset_root_name = "/".join([dependent_root_name,"inset"])
                         os.makedirs(inset_root_name, exist_ok=True)
-                        inset_classification = (
-                            "uas"
-                            if inset_image["classification"] is None
-                            else inset_image["classification"][0:3].lower()
-                        )
-                        inset_name = (
-                            "_".join(
-                                [
-                                    dependent_name.split(figure_extension)[0][0:-3]
-                                    + "ins"
-                                    + str(inset_id),
-                                    inset_classification,
-                                ]
-                            )
-                            + figure_extension
-                        )
-
-                        ipatch = boxes.crop_from_geometry(
-                            inset_image["geometry"], figure
-                        )
+                        inset_classification  = ('uas' if inset_image['classification'] is None
+                                                 else inset_image['classification'][0:3].lower())
+                        inset_name = "_".join([dependent_name.split(figure_extension)[0][0:-3] +
+                                               "ins" + str(inset_id),
+                                               inset_classification]) + figure_extension
+                        
+                        ipatch = boxes.crop_from_geometry(inset_image['geometry'],figure)
                         # save inset image to file
                         try:
-                            plt.imsave(inset_root_name + inset_name, ipatch)
-                        except Exception:
-                            self.logger.exception(
-                                (
-                                    "Error in saving cropped master"
-                                    " image of figure: {}".format(figure_root_name)
-                                )
-                            )
+                            plt.imsave(inset_root_name+inset_name,ipatch)
+                        except Exception as err:
+                            self.logger.exception(("Error in saving cropped master"
+                                " image of figure: {}".format(figure_root_name)))
                 # Write insets of masters to file
-                for inset_id, inset_image in enumerate(
-                    master_image.get("inset_images", [])
-                ):
-                    inset_root_name = "/".join([directory, "inset"])
+                for inset_id, inset_image in enumerate(master_image.get("inset_images", [])):
+                    inset_root_name = "/".join([directory,"inset"])
                     os.makedirs(inset_root_name, exist_ok=True)
-                    inset_classification = (
-                        "uas"
-                        if inset_image["classification"] is None
-                        else inset_image["classification"][0:3].lower()
-                    )
-                    inset_name = (
-                        "_".join(
-                            [
-                                master_name.split(figure_extension)[0][0:-3]
-                                + "ins"
-                                + str(inset_id),
-                                inset_classification,
-                            ]
-                        )
-                        + figure_extension
-                    )
-                    ipatch = boxes.crop_from_geometry(inset_image["geometry"], figure)
+                    inset_classification  = ('uas' if inset_image['classification'] is None
+                                              else inset_image['classification'][0:3].lower())
+                    inset_name = "_".join([master_name.split(figure_extension)[0][0:-3] +
+                                           "ins" + str(inset_id),
+                                           inset_classification]) + figure_extension
+                    ipatch = boxes.crop_from_geometry(inset_image['geometry'], figure)
                     # save inset image to file
                     try:
-                        plt.imsave(inset_root_name / inset_name, ipatch)
-                    except Exception:
-                        self.logger.exception(
-                            (
-                                "Error in saving cropped master"
-                                " image of figure: {}".format(figure_root_name)
-                            )
-                        )
+                        plt.imsave(inset_root_name+inset_name,ipatch)
+                    except Exception as err:
+                        self.logger.exception(("Error in saving cropped master"
+                            " image of figure: {}".format(figure_root_name)))
         self.display_info(">>> SUCCESS!\n")
 
     def make_visualization(self, figure_name):
